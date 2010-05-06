@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Class-Path: lib/hsqldb.jar lib/jna.jar lib/jaudiotagger.jar lib/wavpac
+ k.jar lib/cuelib.jar lib/javalayer.jar lib/jflac.jar lib/jmac.jar lib
+ /jorbis.jar
+Main-Class: com.tulskiy.musique.system.Main
+
