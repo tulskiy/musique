@@ -1,0 +1,16 @@
+This is a 100% Java audio player that supports most popular formats
+
+    * MP3
+    * MP4
+    * OGG
+    * FLAC
+    * WavPack
+    * APE
+    * WAV, AU, AIFF
+
+note: MP4 support is done through JNI and libfaad2
+
+There is also built in support for CUE files and gapless playback
+
+to compile, run ant -f musique.xml or open the project in IntelliJ IDEA
+Community Edition
