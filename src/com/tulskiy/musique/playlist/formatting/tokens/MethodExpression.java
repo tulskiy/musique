@@ -46,6 +46,10 @@ public class MethodExpression implements Expression {
         expressions.add(expression);
     }
 
+    public ArrayList<Expression> getExpressions() {
+        return expressions;
+    }
+
     public Object eval(Song song) {
         try {
             return method.invoke(methods, song, expressions);
@@ -55,6 +59,11 @@ public class MethodExpression implements Expression {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public Class getType() {
+        return method.getReturnType();
     }
 
     @Override

@@ -24,11 +24,7 @@ import com.tulskiy.musique.system.Configuration;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.io.IOException;
+import java.awt.event.*;
 
 /**
  * @Author: Denis Tulskiy
@@ -41,7 +37,6 @@ public class MainWindow extends JFrame {
 
     public MainWindow() {
         super("Musique");
-
 
 //        setBackground(config.getColor("gui.backgroundColor"));
         createMenu();
@@ -65,15 +60,17 @@ public class MainWindow extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                exit();
+                app.exit();
             }
         });
     }
 
-    private void exit() {
-        config.setRectangle("gui.mainWindowPosition", new Rectangle(getX(), getY(), getWidth(), getHeight()));
-        config.setInt("gui.mainWindowState", getExtendedState());
-        app.exit();
+    private JMenuItem newItem(String name, String hotkey, ActionListener al) {
+        JMenuItem item = new JMenuItem(name);
+        item.setAccelerator(KeyStroke.getKeyStroke(hotkey));
+        item.addActionListener(al);
+
+        return item;
     }
 
     private void createMenu() {
@@ -84,22 +81,15 @@ public class MainWindow extends JFrame {
         menuBar.add(fileMenu);
         final PlaylistManager playlistManager = app.getPlaylistManager();
 
-        fileMenu.add("New Playlist").addActionListener(new ActionListener() {
+        /*fileMenu.add("New Playlist").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String name = JOptionPane.showInputDialog("Enter Playlist Name");
                 playlistManager.newPlaylist(name);
-                playlistPanel.updatePanel();
+                playlistPanel.update();
             }
-        });
+        });*/
 
-        fileMenu.add("Empty Playlist").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                playlistManager.getCurrentPlaylist().clear();
-                playlistPanel.updatePanel();
-            }
-        });
-
-        fileMenu.addSeparator();
+//        fileMenu.addSeparator();
 
         fileMenu.add("Add Files").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -111,16 +101,43 @@ public class MainWindow extends JFrame {
                     playlistManager.getCurrentPlaylist().addFiles(fc.getSelectedFiles());
                 }
 
-                playlistPanel.updatePanel();
+                playlistPanel.update();
             }
         });
 
         fileMenu.addSeparator();
 
-        fileMenu.add("Exit").addActionListener(new ActionListener() {
+        fileMenu.add(newItem("Quit", "control Q", new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                exit();
+                app.exit();
+            }
+        }));
+
+        JMenu editMenu = new JMenu("Edit");
+        menuBar.add(editMenu);
+
+        editMenu.add("Clear").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playlistManager.getCurrentPlaylist().clear();
+                playlistPanel.update();
             }
         });
+
+        editMenu.add(newItem("Remove", "DELETE", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playlistPanel.removeItems();
+            }
+        }));
+
+    }
+
+    public void shutdown() {
+        setVisible(false);
+        config.setRectangle("gui.mainWindowPosition", new Rectangle(getX(), getY(), getWidth(), getHeight()));
+        config.setInt("gui.mainWindowState", getExtendedState());
+        playlistPanel.shutdown();
     }
 }

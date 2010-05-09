@@ -1,3 +1,9 @@
+insert into playlist_columns values (DEFAULT, 'Playing', '$isPlaying()', 55, 0, 0, false);
+insert into playlist_columns values (DEFAULT, 'Name', '[%artist% - ]$if3(%title%, %fileName%)', 365, 1, 0, false);
+insert into playlist_columns values (DEFAULT, 'Length', '%length%', 70, 2, 0, false);
+insert into playlist_columns values (DEFAULT, 'Album', '%album%', 265, 3, 0, false);
+insert into playlist_columns values (DEFAULT, 'Date', '%year%', 55, 4, 0, false);
+
 drop table settings if exists;
 
 create table settings (
@@ -8,7 +14,7 @@ create table settings (
 );
 
 insert into settings (key, value, type) values
-    ('gui.mainWindowState', '6', 'INTEGER'),
+    ('gui.mainWindowState', '0', 'INTEGER'),
     ('gui.controlPanelBg',
         '<root>
             <field name="r" value="238" type="int"/>
@@ -19,8 +25,8 @@ insert into settings (key, value, type) values
         '<root>
             <field name="x" value="0" type="int"/>
             <field name="y" value="0" type="int"/>
-            <field name="width" value="640" type="int"/>
-            <field name="height" value="480" type="int"/>
+            <field name="width" value="830" type="int"/>
+            <field name="height" value="610" type="int"/>
          </root>', 'RECTANGLE'),
     ('gui.playlistFont',
         '<root>
@@ -56,18 +62,4 @@ insert into settings (key, value, type) values
 
     ('tagging.defaultEncoding', 'windows-1251', 'STRING'),
 
-    ('codecs.mp3.useNative', 'false', 'BOOLEAN'),
-    ('array',
-        '<root>
-            <field name="0" value="zero" type="string"/>
-            <field name="1" value="one" type="string"/>
-            <field name="2" value="two" type="string"/>
-         </root>', 'ARRAY'),
-    ('playlistColumns',
-        '<root>
-            <field name="Playing" value="0" type="int"/>
-            <field name="Name" value="[%artist% - ]$if3(%title%, %fileName%)" type="string"/>
-            <field name="Length" value="%length%" type="string"/>
-            <field name="Album" value="%album%" type="string"/>
-            <field name="Date" value="%year%" type="string"/>
-         </root>', 'MAP');
+    ('codecs.mp3.useNative', 'false', 'BOOLEAN');

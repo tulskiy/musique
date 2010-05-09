@@ -20,17 +20,14 @@ package com.tulskiy.musique.gui.playlist;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.db.DBMapper;
-import com.tulskiy.musique.gui.custom.Column;
+import com.tulskiy.musique.gui.custom.SeparatorTable;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Song;
-import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableColumnModel;
-import javax.swing.table.TableCellRenderer;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -38,67 +35,87 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: Feb 6, 2010
  */
 public class PlaylistPanel extends JPanel {
+    private DBMapper<PlaylistColumn> columnDBMapper = DBMapper.create(PlaylistColumn.class);
+
     private Application app = Application.getInstance();
     private PlaylistTable table;
-    private Playlist playlist;
     private PlaylistManager playlistManager;
     private JComboBox playlistSelection;
+    private ArrayList<PlaylistColumn> columns = new ArrayList<PlaylistColumn>();
 
     public PlaylistPanel() {
         playlistManager = app.getPlaylistManager();
-        playlist = playlistManager.getCurrentPlaylist();
-        Parser p = new Parser();
-        Playlist[] playlists = new Playlist[playlistManager.getTotalPlaylists()];
-        for (int i = 0; i < playlists.length; i++)
-            playlists[i] = playlistManager.getPlaylist(i);
-        playlistSelection = new JComboBox(playlists);
+        Playlist playlist = playlistManager.getCurrentPlaylist();
+        final ArrayList<Playlist> playlists = playlistManager.getPlaylists();
+        playlistSelection = new JComboBox();
         playlistSelection.setModel(new DefaultComboBoxModel() {
             @Override
             public int getSize() {
-                return playlistManager.getTotalPlaylists();
+                return playlists.size();
             }
 
             @Override
             public Object getElementAt(int index) {
-                return playlistManager.getPlaylist(index);
+                return playlists.get(index);
+            }
+
+            @Override
+            public int getIndexOf(Object anObject) {
+                return playlists.indexOf(anObject);
             }
         });
 
-        playlistSelection.setSelectedItem(playlist);
+        playlistSelection.setSelectedIndex(0);
         playlistSelection.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JComboBox box = (JComboBox) e.getSource();
+                System.out.println(box.getSelectedItem());
                 table.setPlaylist((Playlist) box.getSelectedItem());
                 playlistManager.selectPlaylist(box.getSelectedIndex());
+                System.out.println(box.getSelectedIndex());
             }
         });
 
-        table = new PlaylistTable();
-        table.setPlaylist(playlistManager.getCurrentPlaylist());
+        columnDBMapper.loadAll("select * from playlist_columns order by position", columns);
+        table = new PlaylistTable(playlist);
 
         table.setSelectionBackground(new Color(Integer.valueOf("f5b796", 16)));
 
         setLayout(new BorderLayout());
         Box box = new Box(BoxLayout.X_AXIS);
-        box.add(new JLabel("Playlist"));
+        box.add(Box.createHorizontalStrut(5));
+        box.add(new JLabel("Playlist "));
+        box.add(playlistSelection);
 
-        add(playlistSelection, BorderLayout.NORTH);
+        add(box, BorderLayout.NORTH);
 
         JScrollPane tableScrollPane = new JScrollPane(table);
 
         add(tableScrollPane, BorderLayout.CENTER);
+
+//        JTabbedPane tabbedPane = new JTabbedPane();
+//        add(tabbedPane, BorderLayout.CENTER);
+//        tabbedPane.addTab("Default", tableScrollPane);
+//        JLabel tabName = new JLabel("Default");
+//        tabName.setPreferredSize(new Dimension(50, 10));
+//        tabbedPane.setTabComponentAt(0, tabName);
+//        tabbedPane.setFocusable(false);
+
         buildListeners();
     }
 
-    public void updatePanel() {
-        table.updateTable();
+    class SelectionModel extends DefaultComboBoxModel {
+
+    }
+
+    public void update() {
+        table.update();
         playlistSelection.repaint();
     }
 
@@ -115,25 +132,96 @@ public class PlaylistPanel extends JPanel {
 
         app.getPlayer().addListener(new PlayerListener() {
             public void onEvent(PlayerEvent e) {
-                table.updateTable();
+                table.update();
             }
         });
-
     }
 
-    public static void main(String[] args) {
-        Application app = Application.getInstance();
-        app.load();
-        app.getPlaylistManager().getPlaylist(1).clear();
-        app.getPlaylistManager().savePlaylists();
-        JFrame frame = new JFrame("Test");
-        frame.setContentPane(new PlaylistPanel());
+    public void shutdown() {
+        table.saveColumns();
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(600, 400);
-
-        frame.setVisible(true);
+        for (PlaylistColumn c : columns) {
+            columnDBMapper.save(c);
+        }
     }
 
+    public void removeItems() {
+        ArrayList<Song> toRemove = new ArrayList<Song>();
+        Playlist pl = playlistManager.getCurrentPlaylist();
 
+        for (int i : table.getSelectedRows()) {
+            toRemove.add(pl.get(i));
+        }
+
+        pl.removeAll(toRemove);
+        table.clearSelection();
+
+        update();
+    }
+
+    class PlaylistTable extends SeparatorTable {
+
+        private Playlist playlist;
+
+        public PlaylistTable(Playlist playlist) {
+            this.playlist = playlist;
+            setModel(new PlaylistModel());
+
+            for (int i = 0; i < columns.size(); i++) {
+                PlaylistColumn pc = columns.get(i);
+                getColumnModel().getColumn(i).setPreferredWidth(pc.getSize());
+            }
+        }
+
+        public void setPlaylist(Playlist playlist) {
+            this.playlist = playlist;
+            update();
+        }
+
+        public void update() {
+            revalidate();
+            repaint();
+        }
+
+        public Song getSelectedSong() {
+            int index = getSelectedRow();
+            if (index > 0)
+                return playlist.get(index);
+
+            return null;
+        }
+
+        class PlaylistModel extends AbstractTableModel {
+            public int getRowCount() {
+                return playlist.size();
+            }
+
+            public int getColumnCount() {
+                return columns.size();
+            }
+
+            @Override
+            public String getColumnName(int column) {
+                return columns.get(column).getName();
+            }
+
+            public Object getValueAt(int rowIndex, int columnIndex) {
+                return columns.get(columnIndex).getValue(playlist.get(rowIndex));
+            }
+
+            @Override
+            public Class<?> getColumnClass(int columnIndex) {
+                return columns.get(columnIndex).getType();
+            }
+        }
+
+        private void saveColumns() {
+            for (int i = 0; i < getColumnModel().getColumnCount(); i++) {
+                TableColumn tc = getColumnModel().getColumn(i);
+                PlaylistColumn pc = columns.get(tc.getModelIndex());
+                pc.setPosition(i);
+                pc.setSize(tc.getWidth());
+            }
+        }
+    }
 }

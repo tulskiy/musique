@@ -26,6 +26,7 @@ import com.tulskiy.musique.playlist.Song;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @Author: Denis Tulskiy
@@ -132,6 +133,13 @@ public class Playlist extends ArrayList<Song> {
             songDBMapper.delete(song);
         }
         super.clear();
+    }
+
+    public boolean removeAll(Collection<?> c) {
+        for (Object song : c) {
+            songDBMapper.delete((Song) song);
+        }
+        return super.removeAll(c);
     }
 
     @Override

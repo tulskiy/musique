@@ -5,8 +5,6 @@ create table playlists (
     name VARCHAR(30)
 );
 
-insert into playlists values (DEFAULT, 'Default');
-
 drop table cue_sheets if exists;
 
 create table cue_sheets (
@@ -61,9 +59,3 @@ create table playlist_columns(
     orientation INTEGER,
     editable BOOLEAN
 );
-
-insert into playlist_columns values (DEFAULT, 'Playing', '$isPlaying()', 20, 0, 0, false);
-insert into playlist_columns values (DEFAULT, 'Name', '[%artist% - ]$if3(%title%, %fileName%)', 20, 1, 0, false);
-insert into playlist_columns values (DEFAULT, 'Length', '%length%', 20, 2, 0, false);
-insert into playlist_columns values (DEFAULT, 'Album', '%album%', 20, 3, 0, false);
-insert into playlist_columns values (DEFAULT, 'Date', '%year%', 20, 4, 0, false);

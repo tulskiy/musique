@@ -21,19 +21,11 @@ package com.tulskiy.musique.gui.custom;
  * @Author: Denis Tulskiy
  * @Date: Sep 29, 2009
  */
-public class Separator implements TableItem {
+public class Separator {
     private String value;
 
     public Separator(String value) {
         this.value = value;
-    }
-
-    public Object getValue(int column) {
-        return this;
-    }
-
-    public void setValue(Object value, int column) {
-        //do nothing
     }
 
     @Override

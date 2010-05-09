@@ -21,6 +21,7 @@ import com.tulskiy.musique.playlist.formatting.tokens.*;
 import com.tulskiy.musique.playlist.formatting.tokens.MethodExpression;
 import com.tulskiy.musique.playlist.formatting.tokens.ParameterExpression;
 
+import java.util.ArrayList;
 import java.util.Stack;
 import java.util.StringTokenizer;
 
@@ -75,6 +76,11 @@ public class Parser {
             }
         }
 
-        return root;
+        ArrayList<Expression> e = root.getExpressions();
+        if (e.size() == 1) {
+            return e.get(0);
+        } else {
+            return root;
+        }
     }
 }

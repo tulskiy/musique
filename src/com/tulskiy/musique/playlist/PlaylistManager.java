@@ -30,6 +30,11 @@ public class PlaylistManager {
     private int currentPlaylist;
     private DBMapper<Playlist> playlistDBMapper = new DBMapper<Playlist>(Playlist.class);
 
+
+    public ArrayList<Playlist> getPlaylists() {
+        return playlists;
+    }
+
     public void selectPlaylist(int index) {
         currentPlaylist = index;
     }
@@ -47,6 +52,7 @@ public class PlaylistManager {
 
         if (playlists.size() == 0) {
             newPlaylist("Default");
+            savePlaylists();
         }
     }
 

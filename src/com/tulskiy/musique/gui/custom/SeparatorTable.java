@@ -30,7 +30,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Rectangle2D;
-import java.util.List;
 
 /**
  * @Author: Denis Tulskiy
@@ -43,7 +42,6 @@ public class SeparatorTable extends JTable {
     private Color bgColor2;
     private Color selectBgColor1;
     private Color selectBgColor2;
-    private List<Column> columns;
 
     private Font separatorFont;
     private Color separatorColor;
@@ -222,7 +220,7 @@ public class SeparatorTable extends JTable {
         scrollRectToVisible(visible);
     }
 
-    public Rectangle getCellRect(int row, int column, boolean includeSpacing) {
+    /*public Rectangle getCellRect(int row, int column, boolean includeSpacing) {
         final TableModel eventTableModel = getModel();
 
         // sometimes JTable asks for a cellrect that doesn't exist anymore, due
@@ -244,8 +242,9 @@ public class SeparatorTable extends JTable {
         } else {
             return super.getCellRect(row, column, includeSpacing);
         }
-    }
+    }*/
 
+/*
     public Object getValueAt(int row, int column) {
         final Object rowValue = getModel().getValueAt(row, 0);
 
@@ -256,6 +255,7 @@ public class SeparatorTable extends JTable {
         // otherwise it's business as usual
         return super.getValueAt(row, column);
     }
+*/
 
     class DefaultCellRenderer extends DefaultTableCellRenderer {
         private SeparatorCellRenderer separatorCellRenderer = new SeparatorCellRenderer();
@@ -320,45 +320,5 @@ public class SeparatorTable extends JTable {
             g.drawString(value, 5, getHeight() - 5);
             g.drawLine((int) (bounds.getWidth() + 20), getHeight() / 2, getWidth(), getHeight() / 2);
         }
-    }
-
-
-    public void test() {
-        Application application = Application.getInstance();
-        Configuration config = application.getConfiguration();
-        JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(700, 400);
-
-        JPanel pane = new JPanel(new BorderLayout());
-        frame.setContentPane(pane);
-
-//        TableItem[] names = new TableItem[]{
-//                new StringTableItem("Metal", "Value 2", "Value 3", "Value4"), new Separator("Scott Grooves / Mothership Reconnection [Daft Punk Remix]"),
-//                new StringTableItem("Elem1"), new StringTableItem("Metal"), new StringTableItem("Metal"),
-//                new StringTableItem("Elem10"), new Separator("Separator here"), new StringTableItem("Metal"),
-//                new StringTableItem("Metal"), new StringTableItem("Metal"), new Separator("Separator here"),
-//                new StringTableItem("Metal"), new StringTableItem("Metal")
-//        };
-//        Column[] columns = new Column[]{
-//                new Column("Col1", 30, SwingConstants.CENTER), new Column("col2", 200),
-//                new Column("col3", 80, SwingConstants.RIGHT), new Column("col4", true)
-//        };
-//        setModel(Arrays.asList(names), Arrays.asList(columns));
-
-        setBackground(config.getColor("gui.backgroundColor"));
-        setSelectionBackground(config.getColor("gui.selectionColor"));
-        setSeparatorColor(config.getColor("gui.highlightColor"));
-        setForeground(config.getColor("gui.textColor"));
-        setFont(config.getFont("gui.playlistFont"));
-
-        setDefaultRenderer(Object.class, new DefaultCellRenderer());
-        pane.add(new JScrollPane(this));
-
-        frame.setVisible(true);
-    }
-
-    public static void main(String[] args) {
-        new SeparatorTable().test();
     }
 }

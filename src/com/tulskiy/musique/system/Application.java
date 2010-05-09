@@ -28,6 +28,7 @@ import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
 
 import javax.swing.*;
+import java.io.File;
 
 public class Application {
     private static Application ourInstance = new Application();
@@ -47,8 +48,15 @@ public class Application {
     }
 
     public void load() {
+        boolean firstRun = !new File("resources/db/library.script").exists();
+
         dbManager = new DBManager();
         dbManager.connect();
+
+        if (firstRun) {
+            dbManager.runScript("install.sql");
+            dbManager.runScript("defaultSettings.sql");
+        }
 
         configuration = new Configuration();
         configuration.load();
@@ -77,7 +85,7 @@ public class Application {
     public void exit() {
         player.pause();
         if (mainWindow != null)
-            mainWindow.setVisible(false);
+            mainWindow.shutdown();
         playlistManager.savePlaylists();
         configuration.save();
         dbManager.closeConnection();

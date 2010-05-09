@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * @Date: 27.10.2008
  */
 public class FileInfo extends JDialog {
-    private static DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
+    /*private static DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
     private Song song;
     private java.util.List<TableItem> metadataList = new ArrayList<TableItem>();
     private java.util.List<TableItem> propertiesList = new ArrayList<TableItem>();
@@ -109,5 +109,5 @@ public class FileInfo extends JDialog {
             }
         });
         fileInfo.setVisible(true);
-    }
+    }*/
 }
