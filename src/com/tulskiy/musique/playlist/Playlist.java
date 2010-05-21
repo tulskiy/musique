@@ -44,7 +44,7 @@ public class Playlist extends ArrayList<Song> {
     private String name;
 
     private boolean stopLoading = false;
-    private ArrayList<File> tempList = new ArrayList<File>();
+    private ArrayList<File> tempList;
 
     public void load() {
         System.out.println("Loading playlist " + playlistID);
@@ -94,7 +94,7 @@ public class Playlist extends ArrayList<Song> {
     }
 
     public void addFiles(File... files) {
-        tempList.clear();
+        tempList = new ArrayList<File>();
         for (File f : files) {
             if (f.isDirectory()) {
                 loadDirectory(f);
@@ -140,6 +140,11 @@ public class Playlist extends ArrayList<Song> {
             songDBMapper.delete((Song) song);
         }
         return super.removeAll(c);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o;
     }
 
     @Override

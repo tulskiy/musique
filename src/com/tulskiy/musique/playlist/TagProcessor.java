@@ -35,6 +35,12 @@ public class TagProcessor {
     private final ArrayList<Song> audioFiles = new ArrayList<Song>();
     private Playlist playlist;
 
+    public File getCurrentFile() {
+        return currentFile;
+    }
+
+    private File currentFile;
+
     public TagProcessor(ArrayList<File> files, Playlist playlist) {
         TextEncoding.getInstanceOf().setDefaultNonUnicode("windows-1251");
         this.files = files;
@@ -79,6 +85,7 @@ public class TagProcessor {
 
                 synchronized (audioFiles) {
                     AudioFileReader reader = PluginLoader.getAudioFileReader(file.getName());
+                    currentFile = file;
                     if (reader != null)
                         reader.read(file, audioFiles);
                 }

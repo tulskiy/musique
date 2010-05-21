@@ -27,20 +27,19 @@ import java.util.ArrayList;
 
 public class PlaylistManager {
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
-    private int currentPlaylist;
+    private Playlist currentPlaylist;
     private DBMapper<Playlist> playlistDBMapper = new DBMapper<Playlist>(Playlist.class);
-
 
     public ArrayList<Playlist> getPlaylists() {
         return playlists;
     }
 
-    public void selectPlaylist(int index) {
-        currentPlaylist = index;
+    public void selectPlaylist(Playlist playlist) {
+        currentPlaylist = playlist;
     }
 
     public Playlist getCurrentPlaylist() {
-        return playlists.get(currentPlaylist);
+        return currentPlaylist;
     }
 
     public void loadPlaylists() {
@@ -51,9 +50,11 @@ public class PlaylistManager {
         }
 
         if (playlists.size() == 0) {
-            newPlaylist("Default");
+            addPlaylist("Default");
             savePlaylists();
         }
+
+        selectPlaylist(playlists.get(0));
     }
 
     public int getTotalPlaylists() {
@@ -64,11 +65,18 @@ public class PlaylistManager {
         return playlists.get(index);
     }
 
-    public void newPlaylist(String name) {
+    public Playlist addPlaylist(String name) {
         Playlist playlist = new Playlist();
         playlist.setName(name);
         playlistDBMapper.save(playlist);
         playlists.add(playlist);
+        return playlist;
+    }
+
+    public void removePlaylist(Playlist pl) {
+        pl.clear();
+        playlistDBMapper.delete(pl);
+        playlists.remove(pl);
     }
 
     public void savePlaylists() {

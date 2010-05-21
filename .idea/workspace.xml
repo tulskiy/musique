@@ -48,56 +48,54 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" readonly="true" id="611532ec-c25a-4b28-a1fb-666b0fe6ad0a" name="Default" comment="* Updated copyright to LGPL 3&#10;* Added File menu">
+    <list default="true" readonly="true" id="611532ec-c25a-4b28-a1fb-666b0fe6ad0a" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/jflac.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/jflac.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/MethodExpression.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/MethodExpression.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/resources/db/library.script" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/SeparatorTable.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/SeparatorTable.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/tulskiy.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/tulskiy.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/musique.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/musique.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/copyright/LGPL_3.xml" afterPath="$PROJECT_DIR$/.idea/copyright/LGPL_3.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/cuelib.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/cuelib.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/TextExpression.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/TextExpression.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/FileInfo.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/FileInfo.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/fileColors.xml" afterPath="$PROJECT_DIR$/.idea/fileColors.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/StringTableItem.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/db/defaultSettings.sql" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/db/defaultSettings.sql" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/ParameterExpression.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/ParameterExpression.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dynamic.xml" afterPath="$PROJECT_DIR$/.idea/dynamic.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" afterPath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Expression.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Expression.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/db/install.sql" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/db/install.sql" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/templateLanguages.xml" afterPath="$PROJECT_DIR$/.idea/templateLanguages.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/jflac.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/jflac.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/jmac.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/jmac.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/images/next.png" afterPath="$PROJECT_DIR$/resources/images/next.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/projectCodeStyle.xml" afterPath="$PROJECT_DIR$/.idea/projectCodeStyle.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/javalayer.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/javalayer.xml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/TableItem.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/db/SubClass.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/images/play.png" afterPath="$PROJECT_DIR$/resources/images/play.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/db/AnnotationMapper.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/modules.xml" afterPath="$PROJECT_DIR$/.idea/modules.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dictionaries/tulskiy.xml" afterPath="$PROJECT_DIR$/.idea/dictionaries/tulskiy.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/resources/images/playlist_pause.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/musique.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/musique.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/copyright/LGPL_3.xml" afterPath="$PROJECT_DIR$/.idea/copyright/LGPL_3.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Playlist.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Playlist.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/resources/db/library.properties" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/resources/images/previous.png" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/db/Test.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/resources/images/playlist_play.png" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/TagProcessor.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/TagProcessor.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/cuelib.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/cuelib.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/images/stop.png" afterPath="$PROJECT_DIR$/resources/images/stop.png" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/fileColors.xml" afterPath="$PROJECT_DIR$/.idea/fileColors.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/wavpack.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/wavpack.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistColumn.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistColumn.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/Column.java" afterPath="" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/PlaylistPanel_Old.java" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/images/pause.png" afterPath="$PROJECT_DIR$/resources/images/pause.png" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/jaudiotagger.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/jaudiotagger.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/musique" afterPath="$PROJECT_DIR$/musique" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/Separator.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/Separator.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/groovyc.xml" afterPath="$PROJECT_DIR$/.idea/groovyc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/Parser.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/Parser.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/Test.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/Test.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/dynamic.xml" afterPath="$PROJECT_DIR$/.idea/dynamic.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/artifacts/jorbis.xml" afterPath="$PROJECT_DIR$/.idea/artifacts/jorbis.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/db/Bean.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/ant.xml" afterPath="$PROJECT_DIR$/.idea/ant.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" afterPath="$PROJECT_DIR$/.idea/copyright/profiles_settings.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" />
     </list>
     <ignored path="musique.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -123,6 +121,32 @@
   <component name="DebuggerManager">
     <line_breakpoints>
       <breakpoint url="file://$PROJECT_DIR$/test/com/tulskiy/musique/audio/TagTest.java" line="74" class="com.tulskiy.musique.audio.TagTest" package="com.tulskiy.musique.audio">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/DefaultRowSorter.java" line="878" class="javax.swing.DefaultRowSorter" package="javax.swing">
+        <option name="ENABLED" value="true" />
+        <option name="LOG_ENABLED" value="false" />
+        <option name="LOG_EXPRESSION_ENABLED" value="false" />
+        <option name="SUSPEND_POLICY" value="SuspendAll" />
+        <option name="COUNT_FILTER_ENABLED" value="false" />
+        <option name="COUNT_FILTER" value="0" />
+        <option name="CONDITION_ENABLED" value="false" />
+        <option name="CLASS_FILTERS_ENABLED" value="false" />
+        <option name="INSTANCE_FILTERS_ENABLED" value="false" />
+        <option name="CONDITION" value="" />
+        <option name="LOG_MESSAGE" value="" />
+      </breakpoint>
+      <breakpoint url="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/JComboBox.java" line="549" class="javax.swing.JComboBox" package="javax.swing">
         <option name="ENABLED" value="true" />
         <option name="LOG_ENABLED" value="false" />
         <option name="LOG_EXPRESSION_ENABLED" value="false" />
@@ -177,30 +201,19 @@
   <component name="FileColors" enabled="false" enabledForTabs="false" />
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="PlaylistPanel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
+      <file leaf-file-name="Test.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/Test.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="155" column="16" selection-start="5261" selection-end="5261" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="DefaultComboBoxModel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/DefaultComboBoxModel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="104" column="48" selection-start="3250" selection-end="3250" vertical-scroll-proportion="0.0">
+            <state line="53" column="27" selection-start="1976" selection-end="1976" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PlaylistManager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java">
+      <file leaf-file-name="PlaylistPanel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="47" selection-start="1173" selection-end="1173" vertical-scroll-proportion="0.0">
+            <state line="161" column="28" selection-start="5705" selection-end="5705" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -209,61 +222,34 @@
       <file leaf-file-name="Playlist.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Playlist.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="138" column="12" selection-start="3714" selection-end="3714" vertical-scroll-proportion="0.0">
+            <state line="103" column="13" selection-start="2897" selection-end="2897" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Application.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java">
+      <file leaf-file-name="ControlPanel.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="51" column="24" selection-start="1603" selection-end="1603" vertical-scroll-proportion="0.36206895">
+            <state line="132" column="34" selection-start="5310" selection-end="5310" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MainWindow.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java">
+      <file leaf-file-name="Methods.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="130" column="47" selection-start="4696" selection-end="4696" vertical-scroll-proportion="-8.52">
+            <state line="35" column="15" selection-start="1335" selection-end="1335" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="JMenuItem.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/JMenuItem.java">
+      <file leaf-file-name="PlaylistManager.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="351" column="16" selection-start="11383" selection-end="11388" vertical-scroll-proportion="-0.48">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="KeyEvent.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/awt/event/KeyEvent.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="141" column="13" selection-start="6692" selection-end="6692" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="JTabbedPane.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/JTabbedPane.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="2341" column="21" selection-start="81387" selection-end="81387" vertical-scroll-proportion="0.0">
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FileInfo.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/FileInfo.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="33" column="40" selection-start="1127" selection-end="1127" vertical-scroll-proportion="0.0">
+            <state line="54" column="20" selection-start="1665" selection-end="1665" vertical-scroll-proportion="0.16445623">
               <folding />
             </state>
           </provider>
@@ -276,25 +262,29 @@
       <setting name="OPEN_NEW_TAB" value="false" />
     </FindUsagesManager>
   </component>
+  <component name="Git.Settings">
+    <option name="LINE_SEPARATORS_CONVERSION" value="NONE" />
+    <option name="LINE_SEPARATORS_CONVERSION_ASK" value="false" />
+  </component>
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/Parser.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Expression.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/MethodExpression.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/ParameterExpression.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/TextExpression.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistColumn.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/Separator.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/FileInfo.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/SeparatorTable.java" />
-        <option value="$PROJECT_DIR$/resources/db/library.script" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
+        <option value="$PROJECT_DIR$/resources/db/library.script" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/TagProcessor.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Playlist.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerImpl.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/Test.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java" />
       </list>
     </option>
   </component>
@@ -329,7 +319,7 @@
     <option name="STATE" value="0" />
   </component>
   <component name="ProjectView">
-    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+    <navigator currentView="PackagesPane" proportions="" version="1" splitterProportion="0.5">
       <flattenPackages ProjectPane="false" />
       <showMembers />
       <showModules />
@@ -609,6 +599,24 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="db" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="PackagesPane">
@@ -627,6 +635,68 @@
             <PATH_ELEMENT>
               <option name="myItemId" value="musique" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="javax" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="javax" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="imageio" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
             </PATH_ELEMENT>
           </PATH>
           <PATH>
@@ -648,6 +718,122 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tulskiy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="system" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tulskiy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="playlist" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tulskiy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="playlist" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="formatting" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="com" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tulskiy" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="playlist" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="formatting" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="tokens" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -707,6 +893,136 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cuelib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cuelib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="javax" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cuelib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="javax" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="imageio" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cuelib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cuelib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="awt" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cuelib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="Libraries" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewLibrariesNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="java" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="awt" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="image" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageElementNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="musique" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="cuelib" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PackageViewModuleNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="Scope" />
@@ -714,16 +1030,16 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth1" value="138" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth0" value="98" />
+    <property name="project.structure.last.edited" value="Modules" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth3" value="34" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="OverrideImplement.combined" value="true" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth2" value="128" />
-    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="OverrideImplement.combined" value="true" />
+    <property name="project.structure.proportion" value="0.15" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder1" value="1" />
+    <property name="options.splitter.main.proportions" value="0.3" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder0" value="0" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder3" value="3" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder2" value="2" />
@@ -745,18 +1061,18 @@
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="GoToFile.includeJavaFiles" value="false" />
-    <property name="options.lastSelected" value="reference.settingsdialog.IDE.editor.colors.Java" />
+    <property name="options.lastSelected" value="reference.settings.ide.settings.web.browsers" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder3" value="3" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder4" value="4" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder1" value="1" />
-    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder2" value="2" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder2" value="2" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder0" value="0" />
     <property name="GenerateAntBuildDialog.backupFiles" value="false" />
-    <property name="options.searchVisible" value="true" />
     <property name="dynamic.classpath" value="false" />
+    <property name="options.searchVisible" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CreateClassDialog.RecentsKey">
@@ -772,29 +1088,6 @@
     </key>
   </component>
   <component name="RunManager" selected="Application.Main">
-    <configuration default="false" name="PlaylistPanel" type="Application" factoryName="Application" temporary="true">
-      <extension name="coverage" enabled="false" merge="false">
-        <pattern>
-          <option name="PATTERN" value="com.tulskiy.musique.gui.playlist.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <extension name="snapshooter" />
-      <option name="MAIN_CLASS_NAME" value="com.tulskiy.musique.gui.playlist.PlaylistPanel" />
-      <option name="VM_PARAMETERS" value="-Djava.library.path=native -Djna.library.path=native -server" />
-      <option name="PROGRAM_PARAMETERS" value="" />
-      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" value="" />
-      <option name="ENABLE_SWING_INSPECTOR" value="false" />
-      <option name="ENV_VARIABLES" />
-      <option name="PASS_PARENT_ENVS" value="true" />
-      <module name="musique" />
-      <envs />
-      <RunnerSettings RunnerId="Run" />
-      <ConfigurationWrapper RunnerId="Run" />
-      <method />
-    </configuration>
     <configuration default="false" name="DecoderTest.testNativeMP3" type="JUnit" factoryName="JUnit" temporary="true">
       <extension name="coverage" enabled="false" merge="false" />
       <extension name="snapshooter" />
@@ -888,6 +1181,24 @@
       <option name="TEST_SEARCH_SCOPE">
         <value defaultName="moduleWithDependencies" />
       </option>
+      <envs />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method />
+    </configuration>
+    <configuration default="false" name="Test" type="Application" factoryName="Application" temporary="true">
+      <extension name="coverage" enabled="false" merge="false" />
+      <extension name="snapshooter" />
+      <option name="MAIN_CLASS_NAME" value="com.tulskiy.musique.Test" />
+      <option name="VM_PARAMETERS" value="-Djava.library.path=native -Djna.library.path=native -server" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="file://$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" value="" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="musique" />
       <envs />
       <RunnerSettings RunnerId="Run" />
       <ConfigurationWrapper RunnerId="Run" />
@@ -1029,11 +1340,11 @@
       <method />
     </configuration>
     <list size="6">
-      <item index="0" class="java.lang.String" itemvalue="Application.PlaylistPanel" />
-      <item index="1" class="java.lang.String" itemvalue="JUnit.DecoderTest.testNativeMP3" />
-      <item index="2" class="java.lang.String" itemvalue="JUnit.DecoderTest.testAAC" />
-      <item index="3" class="java.lang.String" itemvalue="JUnit.DecoderTest.testAPE" />
-      <item index="4" class="java.lang.String" itemvalue="JUnit.DecoderTest.testAPENative" />
+      <item index="0" class="java.lang.String" itemvalue="JUnit.DecoderTest.testNativeMP3" />
+      <item index="1" class="java.lang.String" itemvalue="JUnit.DecoderTest.testAAC" />
+      <item index="2" class="java.lang.String" itemvalue="JUnit.DecoderTest.testAPE" />
+      <item index="3" class="java.lang.String" itemvalue="JUnit.DecoderTest.testAPENative" />
+      <item index="4" class="java.lang.String" itemvalue="Application.Test" />
       <item index="5" class="java.lang.String" itemvalue="Application.Main" />
     </list>
     <configuration name="&lt;template&gt;" type="WebApp" default="true" selected="false">
@@ -1098,28 +1409,28 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="24" width="1366" height="694" extended-state="0" />
-    <editor active="true" />
+    <frame x="-1" y="24" width="1368" height="705" extended-state="6" />
+    <editor active="false" />
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23423423" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21463415" sideWeight="0.66190475" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32792792" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39925373" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39750445" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.329602" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32612613" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3244207" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297619" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902735" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39969605" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.21276596" sideWeight="0.7145454" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2124431" sideWeight="0.7201426" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.7145454" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.27272728" sideWeight="0.9886364" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24962063" sideWeight="0.7201426" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26737967" sideWeight="0.9886364" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20162602" sideWeight="0.66190475" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Properties" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287841" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.3262032" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297619" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1143,7 +1454,7 @@
     <option name="ENABLE_BACKGROUND_PROCESSES" value="false" />
     <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="* Updated copyright to LGPL 3&#10;* Added File menu" />
+    <option name="LAST_COMMIT_MESSAGE" value="Set default LaF to Native." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -1169,6 +1480,9 @@
     <MESSAGE value="* bugfixes in libfaad2 jni code&#10;* more methods for title formatter" />
     <MESSAGE value="* bugfixes&#10;* work in progress on new PlaylistTable" />
     <MESSAGE value="* Updated copyright to LGPL 3&#10;* Added File menu" />
+    <MESSAGE value="Several changes in the GUI. Saving of column position and width, detecting column type. New menu items + shortcuts." />
+    <MESSAGE value="Changed MASTER_GAIN to VOLUME. Probably it's an OpenJDK issue, but MASTER_GAIN is not supported." />
+    <MESSAGE value="Set default LaF to Native." />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -1220,116 +1534,116 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/ComboBoxModel.java">
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="53" column="0" selection-start="2193" selection-end="2193" vertical-scroll-proportion="0.51724136">
+        <state line="102" column="22" selection-start="2960" selection-end="2960" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/system/Settings.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/awt/Image.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="159" column="46" selection-start="5295" selection-end="5295" vertical-scroll-proportion="0.0">
+        <state line="197" column="50" selection-start="8154" selection-end="8154" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/db/install.sql">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/awt/image/BufferedImage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0">
+        <state line="69" column="13" selection-start="2732" selection-end="2732" vertical-scroll-proportion="-17.192982">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/JTabbedPane.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/imageio/ImageReader.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="2341" column="21" selection-start="81387" selection-end="81387" vertical-scroll-proportion="0.0">
+        <state line="74" column="33" selection-start="3031" selection-end="3031" vertical-scroll-proportion="-11.149123">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/FileInfo.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/imageio/ImageIO.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="40" selection-start="1127" selection-end="1127" vertical-scroll-proportion="0.0">
+        <state line="64" column="26" selection-start="2477" selection-end="2477" vertical-scroll-proportion="0.5069638">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/awt/AWTKeyStroke.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/sun/awt/image/ToolkitImage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="203" column="39" selection-start="8011" selection-end="8011" vertical-scroll-proportion="0.4592145">
+        <state line="70" column="27" selection-start="2313" selection-end="2313" vertical-scroll-proportion="-13.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/awt/event/KeyEvent.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/sun/awt/SunToolkit.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="141" column="13" selection-start="6692" selection-end="6692" vertical-scroll-proportion="0.0">
+        <state line="974" column="24" selection-start="35990" selection-end="35990" vertical-scroll-proportion="0.375">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/JMenuItem.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/sun/awt/HeadlessToolkit.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="351" column="16" selection-start="11383" selection-end="11388" vertical-scroll-proportion="-0.48">
+        <state line="383" column="21" selection-start="10791" selection-end="10791" vertical-scroll-proportion="0.375">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/awt/Toolkit.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="130" column="47" selection-start="4696" selection-end="4696" vertical-scroll-proportion="-8.52">
+        <state line="1092" column="0" selection-start="47969" selection-end="47969" vertical-scroll-proportion="0.31666666">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/ImageIcon.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="33" column="47" selection-start="1173" selection-end="1173" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/JComboBox.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="1444" column="15" selection-start="51215" selection-end="51215" vertical-scroll-proportion="0.3323263">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/DefaultComboBoxModel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="104" column="48" selection-start="3250" selection-end="3250" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/util/ArrayList.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="625" column="20" selection-start="24367" selection-end="24367" vertical-scroll-proportion="-0.93390805">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="155" column="16" selection-start="5261" selection-end="5261" vertical-scroll-proportion="0.0">
+        <state line="97" column="46" selection-start="3665" selection-end="3665" vertical-scroll-proportion="0.11666667">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Playlist.java">
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/Test.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="138" column="12" selection-start="3714" selection-end="3714" vertical-scroll-proportion="0.0">
+        <state line="53" column="27" selection-start="1976" selection-end="1976" vertical-scroll-proportion="0.0">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java">
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="51" column="24" selection-start="1603" selection-end="1603" vertical-scroll-proportion="0.36206895">
+        <state line="132" column="34" selection-start="5310" selection-end="5310" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="161" column="28" selection-start="5705" selection-end="5705" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Playlist.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="103" column="13" selection-start="2897" selection-end="2897" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="15" selection-start="1335" selection-end="1335" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="54" column="20" selection-start="1665" selection-end="1665" vertical-scroll-proportion="0.16445623">
           <folding />
         </state>
       </provider>

@@ -18,6 +18,7 @@
 package com.tulskiy.musique.gui;
 
 import com.tulskiy.musique.gui.playlist.PlaylistPanel;
+import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -81,15 +82,21 @@ public class MainWindow extends JFrame {
         menuBar.add(fileMenu);
         final PlaylistManager playlistManager = app.getPlaylistManager();
 
-        /*fileMenu.add("New Playlist").addActionListener(new ActionListener() {
+        fileMenu.add("New Playlist").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 String name = JOptionPane.showInputDialog("Enter Playlist Name");
-                playlistManager.newPlaylist(name);
-                playlistPanel.update();
+                playlistPanel.addPlaylist(name);
             }
-        });*/
+        });
 
-//        fileMenu.addSeparator();
+        fileMenu.add("Remove Playlist").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playlistPanel.removePlaylist();
+            }
+        });
+
+        fileMenu.addSeparator();
 
         fileMenu.add("Add Files").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -98,6 +105,7 @@ public class MainWindow extends JFrame {
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int retVal = fc.showOpenDialog(null);
                 if (retVal == JFileChooser.APPROVE_OPTION) {
+                    ProgressMonitor pm = new ProgressMonitor(null, "Adding Files", "", 0, 100);
                     playlistManager.getCurrentPlaylist().addFiles(fc.getSelectedFiles());
                 }
 
@@ -120,15 +128,14 @@ public class MainWindow extends JFrame {
         editMenu.add("Clear").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                playlistManager.getCurrentPlaylist().clear();
-                playlistPanel.update();
+                playlistPanel.clearPlaylist();
             }
         });
 
         editMenu.add(newItem("Remove", "DELETE", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                playlistPanel.removeItems();
+                playlistPanel.removeSelected();   /**/
             }
         }));
 

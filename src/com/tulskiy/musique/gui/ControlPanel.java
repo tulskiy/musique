@@ -31,6 +31,7 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
+import javax.swing.plaf.metal.MetalSliderUI;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -71,34 +72,37 @@ public class ControlPanel extends JPanel {
         Dimension buttonSize = new Dimension(32, 32);
         stopButton.setIcon(new ImageIcon("resources/images/stop.png"));
         stopButton.setName("stopButton");
-//        stopButton.setBorder(BorderFactory.createEmptyBorder());
+        stopButton.setBorderPainted(false);
         stopButton.setFocusable(false);
-        stopButton.setPreferredSize(buttonSize);
+//        stopButton.setPreferredSize(buttonSize);
 
-        prevButton.setIcon(new ImageIcon("resources/images/previous.png"));
+        prevButton.setIcon(new ImageIcon("resources/images/prev.png"));
         prevButton.setName("prevButton");
         prevButton.setFocusable(false);
+        prevButton.setBorderPainted(false);
 //        prevButton.setBorder(BorderFactory.createEmptyBorder());
-        prevButton.setPreferredSize(buttonSize);
+//        prevButton.setPreferredSize(buttonSize);
 
         playButton.setIcon(new ImageIcon("resources/images/play.png"));
         playButton.setName("prevButton");
+        playButton.setBorderPainted(false);
 //        playButton.setBorder(BorderFactory.createEmptyBorder());
         playButton.setFocusable(false);
-        playButton.setPreferredSize(buttonSize);
+//        playButton.setPreferredSize(buttonSize);
 
         pauseButton.setIcon(new ImageIcon("resources/images/pause.png"));
 //        pauseButton.setBorder(BorderFactory.createEmptyBorder());
+        pauseButton.setBorderPainted(false);
         pauseButton.setName("prevButton");
         pauseButton.setFocusable(false);
-        pauseButton.setPreferredSize(buttonSize);
+//        pauseButton.setPreferredSize(buttonSize);
 
         nextButton.setIcon(new ImageIcon("resources/images/next.png"));
 //        nextButton.setBorder(BorderFactory.createEmptyBorder());
         nextButton.setBorderPainted(false);
         nextButton.setName("nextButton");
         nextButton.setFocusable(false);
-        nextButton.setPreferredSize(buttonSize);
+//        nextButton.setPreferredSize(buttonSize);
 
         volumeSlider = new JSlider(0, 1000);
         volumeSlider.setMaximumSize(new Dimension(100, 30));

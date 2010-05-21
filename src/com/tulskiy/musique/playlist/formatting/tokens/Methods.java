@@ -30,8 +30,8 @@ import java.util.ArrayList;
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class Methods {
-    private static ImageIcon playingIcon = new ImageIcon("resources/images/playlist_play.png");
-    private static ImageIcon pausedIcon = new ImageIcon("resources/images/playlist_pause.png");
+    private static ImageIcon playingIcon = new ImageIcon("resources/images/play.png");
+    private static ImageIcon pausedIcon = new ImageIcon("resources/images/pause.png");
     private Application app = Application.getInstance();
 
     public String if3(Song song, ArrayList<Expression> args) {
