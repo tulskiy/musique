@@ -67,7 +67,9 @@ public class Application {
         player = new PlayerImpl();
 
         try {
-            UIManager.setLookAndFeel(configuration.getProperty("gui.LAF"));
+//            UIManager.setLookAndFeel(configuration.getProperty("gui.LAF"));
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.put("Slider.paintValue", Boolean.FALSE);
         } catch (Exception e) {
             System.err.println("Could not load LaF");
         }
