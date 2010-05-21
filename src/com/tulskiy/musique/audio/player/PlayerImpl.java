@@ -76,8 +76,10 @@ public class PlayerImpl implements Player {
     }
 
     public void setVolume(float volume) {
-        if (playerThread.masterGain != null)
-            playerThread.masterGain.setValue(AudioMath.linearToDb(volume));
+        FloatControl v = playerThread.volume;
+        if (v != null) {
+            v.setValue(v.getMaximum() * volume);
+        }
     }
 
     public void addListener(PlayerListener listener) {
@@ -97,8 +99,8 @@ public class PlayerImpl implements Player {
     }
 
     public float getVolume() {
-        if (playerThread.masterGain != null)
-            return playerThread.masterGain.getValue();
+        if (playerThread.volume != null)
+            return playerThread.volume.getValue();
         else
             return (float) 80.0;
     }
@@ -146,7 +148,7 @@ public class PlayerImpl implements Player {
 
         private final Object lock = new Object();
         private SourceDataLine line;
-        private FloatControl masterGain;
+        private FloatControl volume;
         private long currentByte = 0;
         private boolean paused = true;
         private Song currentSong;
@@ -223,8 +225,8 @@ public class PlayerImpl implements Player {
             line = (SourceDataLine) AudioSystem.getLine(info);
             line.open(fmt, BUFFER_SIZE);
             line.start();
-            if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-//                masterGain = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+            if (line.isControlSupported(FloatControl.Type.VOLUME)) {
+                volume = (FloatControl) line.getControl(FloatControl.Type.VOLUME);
             }
         }
 
@@ -243,6 +245,8 @@ public class PlayerImpl implements Player {
                     Song s = order.next(currentSong);
                     if (s != null)
                         open(s, true);
+                    else
+                        return;
                 }
 
                 paused = false;
@@ -258,6 +262,8 @@ public class PlayerImpl implements Player {
             Song s = order.next(currentSong);
             if (s != null)
                 open(s, true);
+            else
+                return;
             play();
         }
 
