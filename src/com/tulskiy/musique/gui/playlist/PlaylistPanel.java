@@ -28,6 +28,8 @@ import com.tulskiy.musique.system.Application;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,6 +54,7 @@ public class PlaylistPanel extends JPanel {
     private HashMap<Playlist, PlaylistTable> tables = new HashMap<Playlist, PlaylistTable>();
     private Playlist playlist;
     private JTextField searchField;
+    private TableColumn tc;
 
     public PlaylistPanel() {
         playlistManager = app.getPlaylistManager();
@@ -102,18 +105,65 @@ public class PlaylistPanel extends JPanel {
 
         buildListeners();
 
+        final JPopupMenu headerMenu = new JPopupMenu();
+        final JTableHeader header = table.getTableHeader();
+
+        headerMenu.add(new JMenuItem("Add Column")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame parent = (JFrame) getRootPane().getParent();
+                PlaylistColumn column = new PlaylistColumn();
+                ColumnDialog dialog = new ColumnDialog(parent, "Add Column", column);
+                if (dialog.showDialog()) {
+                    columns.add(column);
+                    TableColumn tc = new TableColumn(columns.size() - 1);
+                    table.addColumn(tc);
+                    tc.setIdentifier(column.getName());
+                    columnDBMapper.save(column);
+                }
+            }
+        });
+        headerMenu.add(new JMenuItem("Edit Column")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFrame parent = (JFrame) getRootPane().getParent();
+                PlaylistColumn column = columns.get(tc.getModelIndex());
+                ColumnDialog dialog = new ColumnDialog(parent, "Edit Column", column);
+                if (dialog.showDialog()) {
+                    tc.setHeaderValue(column.getName());
+                    table.update();
+                }
+            }
+        });
+        headerMenu.add(new JMenuItem("Remove Column")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.removeColumn(tc);
+                PlaylistColumn pc = columns.remove(tc.getModelIndex());
+                columnDBMapper.delete(pc);
+            }
+        });
+        header.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    int ind = header.getColumnModel().getColumnIndexAtX(e.getX());
+                    tc = header.getColumnModel().getColumn(ind);
+                    headerMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
     }
 
     public void update() {
         table.update();
-//        playlistSelection.repaint();
     }
 
     public void buildListeners() {
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2) {
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
                     app.getPlayer().open(table.getSelectedSong());
                     app.getPlayer().play();
                 }

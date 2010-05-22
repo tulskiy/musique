@@ -70,6 +70,8 @@ public class PlaylistTable extends SeparatorTable {
 
     public void update() {
         model.fireTableDataChanged();
+        getTableHeader().revalidate();
+        getTableHeader().repaint();
         revalidate();
         repaint();
     }

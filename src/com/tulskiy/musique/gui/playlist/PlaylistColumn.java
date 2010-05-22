@@ -33,7 +33,7 @@ public class PlaylistColumn {
     private static Parser parser = new Parser();
 
     @Id
-    private int id;
+    private int id = -1;
 
     @Column
     private String name;

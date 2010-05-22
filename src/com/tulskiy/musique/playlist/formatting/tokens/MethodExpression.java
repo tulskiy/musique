@@ -52,7 +52,8 @@ public class MethodExpression implements Expression {
 
     public Object eval(Song song) {
         try {
-            return method.invoke(methods, song, expressions);
+            if (method != null)
+                return method.invoke(methods, song, expressions);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -63,7 +64,10 @@ public class MethodExpression implements Expression {
 
     @Override
     public Class getType() {
-        return method.getReturnType();
+        if (method != null)
+            return method.getReturnType();
+        else
+            return Object.class;
     }
 
     @Override
