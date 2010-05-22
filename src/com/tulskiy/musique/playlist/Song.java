@@ -23,13 +23,13 @@ import com.tulskiy.musique.db.Id;
 import com.tulskiy.musique.util.Util;
 
 import java.io.File;
-import java.util.HashMap;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: Jan 4, 2010
  */
 
+@SuppressWarnings({"UnusedDeclaration", "FieldCanBeLocal"})
 @Entity("songs")
 public class Song {
     @Id
@@ -63,9 +63,6 @@ public class Song {
     private String genre = "";
     @Column
     private String comment = "";
-    @Column
-    private String extraTagFields;
-    private String cueSheet;
 
     @Column
     private int bitrate;
@@ -85,14 +82,9 @@ public class Song {
     private String codec = "";
     @Column
     private int cueID;
-    @Column
-    private String extraHeaderFields;
-
-    private HashMap<String, Object> extraHeaderFieldsMap;
-
-    private HashMap<String, Object> extraTagFieldsMap;
 
     private File file;
+    private String cueSheet;
     private CUESheet cue;
     private String fileName;
     private String length;
@@ -250,35 +242,6 @@ public class Song {
         this.cueSheet = cueSheet;
     }
 
-    private void ensureExtraTagFieldsMap() {
-        if (extraTagFieldsMap == null)
-            extraTagFieldsMap = new HashMap<String, Object>();
-    }
-
-
-    public String getExtraTagFields() {
-//        if (extraTagFieldsMap == null || extraTagFieldsMap.size() == 0)
-//            return null;
-//        else
-//            return Util.getFields(extraTagFieldsMap);
-        return null;
-    }
-
-    public void setExtraTagFields(String extraTagFields) {
-//        if (extraTagFields != null && extraTagFields.length() > 0)
-//            extraTagFieldsMap = Util.loadFields(extraTagFields);
-    }
-
-//    public String getCustomTagField(String key) {
-//        ensureExtraTagFieldsMap();
-//        return (String) extraTagFieldsMap.get(key);
-//    }
-
-//    public void setCustomTagField(String key, String value) {
-//        ensureExtraTagFieldsMap();
-//        extraTagFieldsMap.put(key, value);
-//    }
-
     public String getTrack() {
         if (trackNumber != null) {
             if (totalTracks != null) {
@@ -302,10 +265,6 @@ public class Song {
 
         return "";
     }
-
-//    public HashMap<String, Object> getExtraTagFieldsMap() {
-//        return extraTagFieldsMap;
-//    }
 
     public int getBitrate() {
         return bitrate;
@@ -377,31 +336,6 @@ public class Song {
         this.codec = codec;
     }
 
-//    private void ensureExtraHeaderFieldsMap() {
-//        if (extraHeaderFieldsMap == null)
-//            extraHeaderFieldsMap = new HashMap<String, Object>();
-//    }
-
-//    public String getCustomHeaderField(String key) {
-//        ensureExtraHeaderFieldsMap();
-//        return (String) extraHeaderFieldsMap.get(key);
-//    }
-
-//    public void setCustomHeaderField(String key, String value) {
-//        ensureExtraHeaderFieldsMap();
-//        extraHeaderFieldsMap.put(key, value);
-//    }
-
-//    public long getCustomHeaderNumber(String key) {
-//        ensureExtraHeaderFieldsMap();
-//        return (Long) extraHeaderFieldsMap.get(key);
-//    }
-
-//    public void setCustomHeaderNumber(String key, long value) {
-//        ensureExtraHeaderFieldsMap();
-//        extraHeaderFieldsMap.put(key, value);
-//    }
-
     public int getCueID() {
         if (cue == null)
             return -1;
@@ -417,23 +351,6 @@ public class Song {
         }
 
     }
-
-    public String getExtraHeaderFields() {
-//        if (extraHeaderFieldsMap == null || extraHeaderFieldsMap.size() == 0)
-//            return null;
-//        else
-//            return Util.getFields(extraHeaderFieldsMap);
-        return null;
-    }
-
-    public void setExtraHeaderFields(String extraHeaderFields) {
-//        if (extraHeaderFields != null && extraHeaderFields.length() > 0)
-//            extraHeaderFieldsMap = Util.loadFields(extraHeaderFields);
-    }
-
-//    public HashMap<String, Object> getExtraHeaderFieldsMap() {
-//        return extraHeaderFieldsMap;
-//    }
 
     public void setCue(CUESheet sheet) {
         this.cue = sheet;
