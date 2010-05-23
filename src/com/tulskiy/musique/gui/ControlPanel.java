@@ -69,40 +69,11 @@ public class ControlPanel extends JPanel {
         for (MouseListener ml : progressSlider.getMouseListeners())
             progressSlider.removeMouseListener(ml);
 
-        Dimension buttonSize = new Dimension(32, 32);
-        stopButton.setIcon(new ImageIcon("resources/images/stop.png"));
-        stopButton.setName("stopButton");
-        stopButton.setBorderPainted(false);
-        stopButton.setFocusable(false);
-//        stopButton.setPreferredSize(buttonSize);
-
-        prevButton.setIcon(new ImageIcon("resources/images/prev.png"));
-        prevButton.setName("prevButton");
-        prevButton.setFocusable(false);
-        prevButton.setBorderPainted(false);
-//        prevButton.setBorder(BorderFactory.createEmptyBorder());
-//        prevButton.setPreferredSize(buttonSize);
-
-        playButton.setIcon(new ImageIcon("resources/images/play.png"));
-        playButton.setName("prevButton");
-        playButton.setBorderPainted(false);
-//        playButton.setBorder(BorderFactory.createEmptyBorder());
-        playButton.setFocusable(false);
-//        playButton.setPreferredSize(buttonSize);
-
-        pauseButton.setIcon(new ImageIcon("resources/images/pause.png"));
-//        pauseButton.setBorder(BorderFactory.createEmptyBorder());
-        pauseButton.setBorderPainted(false);
-        pauseButton.setName("prevButton");
-        pauseButton.setFocusable(false);
-//        pauseButton.setPreferredSize(buttonSize);
-
-        nextButton.setIcon(new ImageIcon("resources/images/next.png"));
-//        nextButton.setBorder(BorderFactory.createEmptyBorder());
-        nextButton.setBorderPainted(false);
-        nextButton.setName("nextButton");
-        nextButton.setFocusable(false);
-//        nextButton.setPreferredSize(buttonSize);
+        stopButton = createButton("resources/images/stop.png");
+        prevButton = createButton("resources/images/prev.png");
+        playButton = createButton("resources/images/play.png");
+        pauseButton = createButton("resources/images/pause.png");
+        nextButton = createButton("resources/images/next.png");
 
         volumeSlider = new JSlider(0, 1000);
         volumeSlider.setMaximumSize(new Dimension(100, 30));
@@ -110,21 +81,11 @@ public class ControlPanel extends JPanel {
         volumeSlider.setValue(1000);
         volumeSlider.setFocusable(false);
 
-//        JButton gcButton = new JButton("GC");
-//        gcButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                System.gc();
-//            }
-//        });
-//
-//        JButton plButton = new JButton("Pl");
-//        plButton.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                Playlist playlist = app.getPlaylistManager().getCurrentPlaylist();
-//                playlist.clear();
-//                playlist.addFiles(new File("testfiles"));
-//            }
-//        });
+        //ugly hack to make volume and progress sliders be on same level
+        progressSlider.setMaximumSize(new Dimension(10000, 30));
+        progressSlider.setPreferredSize(new Dimension(100, 30));
+
+
         Box box = new Box(BoxLayout.X_AXIS);
         box.add(Box.createHorizontalStrut(5));
         box.add(stopButton);
@@ -141,6 +102,21 @@ public class ControlPanel extends JPanel {
         add(box);
 
         buildListeners();
+    }
+
+    private JButton createButton(String path) {
+        JButton b = new JButton();
+        Dimension buttonSize = new Dimension(30, 30);
+        b.setIcon(new ImageIcon(path));
+        b.setBorderPainted(false);
+        b.setName("nextButton");
+        b.setFocusable(false);
+        if (UIManager.getLookAndFeel().getName().contains("Metal")) {
+            b.setBackground(getBackground());
+        }
+        b.setPreferredSize(buttonSize);
+
+        return b;
     }
 
     private int getSliderValueForX(JSlider slider, int x) {

@@ -77,6 +77,11 @@ public class Application {
 
     public void start() {
         try {
+            if (mainWindow != null) {
+                mainWindow.setVisible(false);
+                mainWindow = null;
+            }
+
             mainWindow = new MainWindow();
             mainWindow.setVisible(true);
         } catch (Exception e) {

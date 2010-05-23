@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.gui;
 
+import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import com.tulskiy.musique.gui.playlist.PlaylistPanel;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -24,6 +25,7 @@ import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -139,6 +141,34 @@ public class MainWindow extends JFrame {
             }
         }));
 
+        JMenu viewMenu = new JMenu("View");
+        menuBar.add(viewMenu);
+
+        final JFrame fr = this;
+        ActionListener al = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String cmd = e.getActionCommand();
+                    if (cmd.equals("Metal")) {
+                        UIManager.setLookAndFeel(new MetalLookAndFeel());
+                    } else if (cmd.equals("Nimbus")) {
+                        UIManager.setLookAndFeel(new NimbusLookAndFeel());
+                    } else {
+                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    }
+                    app.start();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        };
+
+        JMenu laf = new JMenu("L&F");
+        laf.add("Metal").addActionListener(al);
+        laf.add("Nimbus").addActionListener(al);
+        laf.add("Native").addActionListener(al);
+        viewMenu.add(laf);
     }
 
     public void shutdown() {

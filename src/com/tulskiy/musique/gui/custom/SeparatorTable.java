@@ -131,52 +131,23 @@ public class SeparatorTable extends JTable {
     public void setSelectionBackground(Color selectionBackground) {
         super.setSelectionBackground(selectionBackground);
         selectBgColor1 = selectionBackground;
-        selectBgColor2 = brighter(selectionBackground);
+        selectBgColor2 = darker(selectionBackground);
     }
 
     public void setSeparatorColor(Color color) {
         this.separatorColor = color;
     }
 
-    @Override
-    public void setForeground(Color fg) {
-        super.setForeground(fg);
-        setSelectionForeground(fg);
-    }
-
     public void setBackground(Color color) {
         super.setBackground(color);
-        bgColor1 = darker(color);
-        bgColor2 = brighter(color);
+        bgColor1 = color;
+        bgColor2 = darker(color);
     }
 
     private Color darker(Color c) {
         return new Color(Math.max((int) (c.getRed() * FACTOR), 0),
                 Math.max((int) (c.getGreen() * FACTOR), 0),
                 Math.max((int) (c.getBlue() * FACTOR), 0));
-    }
-
-    private Color brighter(Color c) {
-        int r = c.getRed();
-        int g = c.getGreen();
-        int b = c.getBlue();
-
-        /* From 2D group:
-         * 1. black.brighter() should return grey
-         * 2. applying brighter to blue will always return blue, brighter
-         * 3. non pure color (non zero rgb) will eventually return white
-         */
-        int i = (int) (1.0 / (1.0 - FACTOR));
-        if (r == 0 && g == 0 && b == 0) {
-            return new Color(i, i, i);
-        }
-        if (r > 0 && r < i) r = i;
-        if (g > 0 && g < i) g = i;
-        if (b > 0 && b < i) b = i;
-
-        return new Color(Math.min((int) (r / FACTOR), 255),
-                Math.min((int) (g / FACTOR), 255),
-                Math.min((int) (b / FACTOR), 255));
     }
 
     public void scrollToRow(int currentItem) {
