@@ -77,7 +77,7 @@ public class ColumnDialog extends JDialog {
         b2.add(Box.createHorizontalStrut(5));
         add(b2, BorderLayout.SOUTH);
         pack();
-        setSize(200, getHeight());
+        setSize(300, getHeight());
     }
 
     public boolean showDialog() {
