@@ -40,7 +40,7 @@ public class PlaylistColumn {
     @Column
     private String expression;
     @Column
-    private int size;
+    private int size = 150;
     @Column
     private int position;
     @Column

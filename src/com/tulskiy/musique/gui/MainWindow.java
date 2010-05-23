@@ -157,6 +157,7 @@ public class MainWindow extends JFrame {
                     } else {
                         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     }
+                    playlistPanel.shutdown();
                     app.start();
                 } catch (Exception e1) {
                     e1.printStackTrace();

@@ -48,12 +48,18 @@ public class PlaylistTable extends SeparatorTable {
         setModel(model);
         sorter = new TableRowSorter<PlaylistModel>(model);
         setRowSorter(sorter);
+        getTableHeader().setPreferredSize(new Dimension(100, 25));
+    }
 
-        for (int i = 0; i < columns.size(); i++) {
-            PlaylistColumn pc = columns.get(i);
-            getColumnModel().getColumn(i).setPreferredWidth(pc.getSize());
+    @Override
+    public void createDefaultColumnsFromModel() {
+        super.createDefaultColumnsFromModel();
+        if (columns != null) {
+            for (int i = 0; i < columns.size(); i++) {
+                PlaylistColumn pc = columns.get(i);
+                getColumnModel().getColumn(i).setPreferredWidth(pc.getSize());
+            }
         }
-
     }
 
     public void filter(String text) {

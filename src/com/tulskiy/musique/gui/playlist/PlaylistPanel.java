@@ -112,10 +112,9 @@ public class PlaylistPanel extends JPanel {
                 PlaylistColumn column = new PlaylistColumn();
                 ColumnDialog dialog = new ColumnDialog(getParentFrame(), "Add Column", column);
                 if (dialog.showDialog()) {
+                    table.saveColumns();
                     columns.add(column);
-                    TableColumn tc = new TableColumn();
-                    table.addColumn(tc);
-                    tc.setIdentifier(column.getName());
+                    table.createDefaultColumnsFromModel();
                     columnDBMapper.save(column);
                 }
             }
@@ -123,6 +122,7 @@ public class PlaylistPanel extends JPanel {
         headerMenu.add(new JMenuItem("Edit Column")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                if (tc == null) return;
                 PlaylistColumn column = columns.get(tc.getModelIndex());
                 ColumnDialog dialog = new ColumnDialog(getParentFrame(), "Edit Column", column);
                 if (dialog.showDialog()) {
@@ -134,8 +134,9 @@ public class PlaylistPanel extends JPanel {
         headerMenu.add(new JMenuItem("Remove Column")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                table.removeColumn(tc);
+                if (tc == null) return;
                 PlaylistColumn pc = columns.remove(tc.getModelIndex());
+                table.createDefaultColumnsFromModel();
                 columnDBMapper.delete(pc);
             }
         });
@@ -153,8 +154,10 @@ public class PlaylistPanel extends JPanel {
 
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    int ind = header.getColumnModel().getColumnIndexAtX(e.getX());
-                    tc = header.getColumnModel().getColumn(ind);
+                    int index = header.getColumnModel().getColumnIndexAtX(e.getX());
+                    if (index != -1) {
+                        tc = header.getColumnModel().getColumn(index);
+                    }
                     headerMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }

@@ -65,6 +65,8 @@ public class ColumnDialog extends JDialog {
                 setVisible(false);
             }
         });
+        b2.add(Box.createHorizontalStrut(5));
+
         JButton cancelButton = new JButton("Cancel");
         b2.add(cancelButton);
         cancelButton.addActionListener(new ActionListener() {
@@ -74,7 +76,7 @@ public class ColumnDialog extends JDialog {
                 setVisible(false);
             }
         });
-        b2.add(Box.createHorizontalStrut(5));
+        b2.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 10));
         add(b2, BorderLayout.SOUTH);
         pack();
         setSize(300, getHeight());

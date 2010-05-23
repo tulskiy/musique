@@ -96,7 +96,9 @@ public class SongInfoDialog extends JDialog {
                 setVisible(false);
             }
         });
+        b1.add(Box.createHorizontalStrut(5));
         b1.add(cancel);
+        b1.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 10));
 
         add(b1, BorderLayout.SOUTH);
 
