@@ -24,6 +24,7 @@ import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.PluginLoader;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -36,7 +37,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Vector;
 
 /**
@@ -45,18 +45,23 @@ import java.util.Vector;
  */
 public class PlaylistPanel extends JPanel {
     private DBMapper<PlaylistColumn> columnDBMapper = DBMapper.create(PlaylistColumn.class);
+    private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
 
     private Application app = Application.getInstance();
     private PlaylistTable table;
     private PlaylistManager playlistManager;
     private JComboBox playlistSelection;
     private ArrayList<PlaylistColumn> columns = new ArrayList<PlaylistColumn>();
-    private HashMap<Playlist, PlaylistTable> tables = new HashMap<Playlist, PlaylistTable>();
     private Playlist playlist;
     private JTextField searchField;
+
+    //stuff for popup menu
     private TableColumn tc;
+    private Song song;
+    private JFrame parentFrame;
 
     public PlaylistPanel() {
+
         playlistManager = app.getPlaylistManager();
         playlist = playlistManager.getCurrentPlaylist();
         playlistSelection = new JComboBox(new Vector<Playlist>(playlistManager.getPlaylists()));
@@ -75,8 +80,6 @@ public class PlaylistPanel extends JPanel {
         columnDBMapper.loadAll("select * from playlist_columns order by position", columns);
         table = new PlaylistTable(playlist, columns);
 
-        table.setSelectionBackground(new Color(Integer.valueOf("f5b796", 16)));
-
         setLayout(new BorderLayout());
         Box box = new Box(BoxLayout.X_AXIS);
         box.add(Box.createHorizontalStrut(5));
@@ -88,35 +91,29 @@ public class PlaylistPanel extends JPanel {
         searchField.setMaximumSize(new Dimension(300, 40));
         searchField.setPreferredSize(new Dimension(300, 0));
         box.add(searchField);
+        box.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
         add(box, BorderLayout.NORTH);
 
         JScrollPane tableScrollPane = new JScrollPane(table);
         add(tableScrollPane, BorderLayout.CENTER);
 
-//        JTabbedPane tabbedPane = new JTabbedPane();
-//        add(tabbedPane, BorderLayout.CENTER);
-//        tabbedPane.addTab("Default", tableScrollPane);
-//        tabbedPane.addTab("New", new JLabel("hello"));
-//        JLabel tabName = new JLabel("Default");
-//        tabName.setPreferredSize(new Dimension(50, 10));
-//        tabbedPane.setTabComponentAt(0, tabName);
-//        tabbedPane.setFocusable(false);
-
         buildListeners();
+        createPopupMenu();
+    }
 
+    private void createPopupMenu() {
         final JPopupMenu headerMenu = new JPopupMenu();
         final JTableHeader header = table.getTableHeader();
 
         headerMenu.add(new JMenuItem("Add Column")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFrame parent = (JFrame) getRootPane().getParent();
                 PlaylistColumn column = new PlaylistColumn();
-                ColumnDialog dialog = new ColumnDialog(parent, "Add Column", column);
+                ColumnDialog dialog = new ColumnDialog(getParentFrame(), "Add Column", column);
                 if (dialog.showDialog()) {
                     columns.add(column);
-                    TableColumn tc = new TableColumn(columns.size() - 1);
+                    TableColumn tc = new TableColumn();
                     table.addColumn(tc);
                     tc.setIdentifier(column.getName());
                     columnDBMapper.save(column);
@@ -126,9 +123,8 @@ public class PlaylistPanel extends JPanel {
         headerMenu.add(new JMenuItem("Edit Column")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFrame parent = (JFrame) getRootPane().getParent();
                 PlaylistColumn column = columns.get(tc.getModelIndex());
-                ColumnDialog dialog = new ColumnDialog(parent, "Edit Column", column);
+                ColumnDialog dialog = new ColumnDialog(getParentFrame(), "Edit Column", column);
                 if (dialog.showDialog()) {
                     tc.setHeaderValue(column.getName());
                     table.update();
@@ -143,16 +139,88 @@ public class PlaylistPanel extends JPanel {
                 columnDBMapper.delete(pc);
             }
         });
+
         header.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON3) {
+            public void mousePressed(MouseEvent e) {
+                show(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                show(e);
+            }
+
+            public void show(MouseEvent e) {
+                if (e.isPopupTrigger()) {
                     int ind = header.getColumnModel().getColumnIndexAtX(e.getX());
                     tc = header.getColumnModel().getColumn(ind);
                     headerMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
+
+        final JPopupMenu tableMenu = new JPopupMenu();
+
+        tableMenu.add(new JMenuItem("Add to Queue")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        tableMenu.add(new JMenuItem("Remove")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        tableMenu.add(new JMenuItem("Properties")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showInfo(song);
+            }
+        });
+
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                show(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                show(e);
+            }
+
+            public void show(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    song = table.selectSongAt(e.getPoint());
+                    tableMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+
+    }
+
+    public JFrame getParentFrame() {
+        if (parentFrame == null) {
+            parentFrame = (JFrame) getRootPane().getParent();
+        }
+        return parentFrame;
+    }
+
+    public void showInfo(Song s) {
+        SongInfoDialog dialog = new SongInfoDialog(getParentFrame(), s);
+        if (dialog.showDialog()) {
+            try {
+                songDBMapper.save(song);
+                PluginLoader.getAudioFileWriter(song.getFilePath()).write(song);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void update() {

@@ -25,6 +25,8 @@ import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 /**
@@ -78,8 +80,18 @@ public class PlaylistTable extends SeparatorTable {
 
     public Song getSelectedSong() {
         int index = getSelectedRow();
-        if (index > 0)
+        if (index >= 0)
             return playlist.get(convertRowIndexToModel(index));
+
+        return null;
+    }
+
+    public Song selectSongAt(Point p) {
+        int index = rowAtPoint(p);
+        if (index >= 0) {
+            setRowSelectionInterval(index, index);
+            return playlist.get(convertRowIndexToModel(index));
+        }
 
         return null;
     }

@@ -21,12 +21,10 @@ import com.tulskiy.musique.db.Column;
 import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.db.Entity;
 import com.tulskiy.musique.db.Id;
-import com.tulskiy.musique.playlist.Song;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * @Author: Denis Tulskiy
@@ -132,6 +130,13 @@ public class Playlist extends ArrayList<Song> {
         for (Song song : this) {
             songDBMapper.delete(song);
         }
+        //hack to delete CUE sheets
+        ArrayList<CUESheet> list = new ArrayList<CUESheet>();
+        cueSheetDBMapper.loadAll(list);
+        for (CUESheet cueSheet : list) {
+            cueSheetDBMapper.delete(cueSheet);
+        }
+
         super.clear();
     }
 
