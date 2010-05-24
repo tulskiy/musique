@@ -125,24 +125,27 @@ public class Configuration {
     }
 
 
-    public Integer getInt(String key) {
-        return (Integer) getValue(key);
+    public Integer getInt(String key, int def) {
+        Integer val = (Integer) getValue(key);
+        return val != null ? val : def;
     }
 
     public void setInt(String key, int value) {
         setValue(key, value, PropertyType.INTEGER);
     }
 
-    public Double getDouble(String key) {
-        return (Double) getValue(key);
+    public Double getDouble(String key, double def) {
+        Double val = (Double) getValue(key);
+        return val != null ? val : def;
     }
 
     public void setDouble(String key, double value) {
         setValue(key, value, PropertyType.DOUBLE);
     }
 
-    public Boolean getBoolean(String key) {
-        return (Boolean) getValue(key);
+    public Boolean getBoolean(String key, boolean def) {
+        Boolean val = (Boolean) getValue(key);
+        return val != null ? val : def;
     }
 
     public void setBoolean(String key, boolean value) {
