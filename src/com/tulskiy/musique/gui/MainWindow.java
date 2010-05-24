@@ -17,15 +17,11 @@
 
 package com.tulskiy.musique.gui;
 
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import com.tulskiy.musique.gui.playlist.PlaylistPanel;
-import com.tulskiy.musique.playlist.Playlist;
-import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
 import javax.swing.*;
-import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -41,13 +37,13 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         super("Musique");
 
-//        setBackground(config.getColor("gui.backgroundColor"));
-        createMenu();
         ControlPanel controlPanel = new ControlPanel();
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
+        JMenuBar menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+        playlistPanel.addMenu(menuBar);
         JPanel panel = new JPanel();
-//        panel.setBackground(config.getColor("gui.backgroundColor"));
         panel.setLayout(new BorderLayout());
         panel.setOpaque(true);
         panel.add(playlistPanel);
@@ -59,117 +55,13 @@ public class MainWindow extends JFrame {
         Rectangle r = config.getRectangle("gui.mainWindowPosition");
         setLocation((int) r.getX(), (int) r.getY());
         setSize((int) r.getWidth(), (int) r.getHeight());
-        setExtendedState(config.getInt("gui.mainWindowState"));
+        setExtendedState(config.getInt("gui.mainWindowState", 0));
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
                 app.exit();
             }
         });
-    }
-
-    private JMenuItem newItem(String name, String hotkey, ActionListener al) {
-        JMenuItem item = new JMenuItem(name);
-        item.setAccelerator(KeyStroke.getKeyStroke(hotkey));
-        item.addActionListener(al);
-
-        return item;
-    }
-
-    private void createMenu() {
-        JMenuBar menuBar = new JMenuBar();
-        setJMenuBar(menuBar);
-
-        JMenu fileMenu = new JMenu("File");
-        menuBar.add(fileMenu);
-        final PlaylistManager playlistManager = app.getPlaylistManager();
-
-        fileMenu.add("New Playlist").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String name = JOptionPane.showInputDialog("Enter Playlist Name");
-                playlistPanel.addPlaylist(name);
-            }
-        });
-
-        fileMenu.add("Remove Playlist").addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playlistPanel.removePlaylist();
-            }
-        });
-
-        fileMenu.addSeparator();
-
-        fileMenu.add("Add Files").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = new JFileChooser();
-                fc.setMultiSelectionEnabled(true);
-                fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-                int retVal = fc.showOpenDialog(null);
-                if (retVal == JFileChooser.APPROVE_OPTION) {
-                    ProgressMonitor pm = new ProgressMonitor(null, "Adding Files", "", 0, 100);
-                    playlistManager.getCurrentPlaylist().addFiles(fc.getSelectedFiles());
-                }
-
-                playlistPanel.update();
-            }
-        });
-
-        fileMenu.addSeparator();
-
-        fileMenu.add(newItem("Quit", "control Q", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                app.exit();
-            }
-        }));
-
-        JMenu editMenu = new JMenu("Edit");
-        menuBar.add(editMenu);
-
-        editMenu.add("Clear").addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playlistPanel.clearPlaylist();
-            }
-        });
-
-        editMenu.add(newItem("Remove", "DELETE", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playlistPanel.removeSelected();   /**/
-            }
-        }));
-
-        JMenu viewMenu = new JMenu("View");
-        menuBar.add(viewMenu);
-
-        final JFrame fr = this;
-        ActionListener al = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    String cmd = e.getActionCommand();
-                    if (cmd.equals("Metal")) {
-                        UIManager.setLookAndFeel(new MetalLookAndFeel());
-                    } else if (cmd.equals("Nimbus")) {
-                        UIManager.setLookAndFeel(new NimbusLookAndFeel());
-                    } else {
-                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    }
-                    playlistPanel.shutdown();
-                    app.start();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
-            }
-        };
-
-        JMenu laf = new JMenu("L&F");
-        laf.add("Metal").addActionListener(al);
-        laf.add("Nimbus").addActionListener(al);
-        laf.add("Native").addActionListener(al);
-        viewMenu.add(laf);
     }
 
     public void shutdown() {
