@@ -24,14 +24,18 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" readonly="true" id="611532ec-c25a-4b28-a1fb-666b0fe6ad0a" name="Default" comment="Code cleanup for player. Added stop() and prev() actions. Moved Playback Order to the playlist table">
+    <list default="true" readonly="true" id="611532ec-c25a-4b28-a1fb-666b0fe6ad0a" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" />
     </list>
-    <ignored path=".idea/workspace.xml" />
     <ignored path="musique.iws" />
+    <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -137,12 +141,17 @@
       <file leaf-file-name="PlaylistPanel.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="248" column="65" selection-start="9062" selection-end="9062" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="class#9166:9634" expanded="false" />
-                <element signature="class#12956:13761" expanded="false" />
-              </folding>
+            <state line="104" column="21" selection-start="4115" selection-end="4115" vertical-scroll-proportion="0.0">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Song.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="92" column="8" selection-start="2284" selection-end="2284" vertical-scroll-proportion="0.0">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -150,59 +159,46 @@
       <file leaf-file-name="PlaylistTable.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="31" selection-start="1435" selection-end="1435" vertical-scroll-proportion="0.0">
+            <state line="228" column="18" selection-start="6312" selection-end="6312" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="class#Order#0;class#PlaylistTable#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PlayerEvent.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerEvent.java">
+      <file leaf-file-name="MP4FileReader.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/formats/aac/MP4FileReader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="25" column="56" selection-start="945" selection-end="945" vertical-scroll-proportion="0.0">
+            <state line="46" column="20" selection-start="1514" selection-end="1514" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="PlayerListener.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerListener.java">
+      <file leaf-file-name="MainWindow.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="17" selection-start="848" selection-end="848" vertical-scroll-proportion="0.0">
+            <state line="39" column="26" selection-start="1319" selection-end="1319" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Player.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java">
+      <file leaf-file-name="Application.java" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="337" column="32" selection-start="9819" selection-end="9819" vertical-scroll-proportion="0.55263156">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ControlPanel.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="167" column="25" selection-start="6028" selection-end="6028" vertical-scroll-proportion="0.0">
+            <state line="88" column="41" selection-start="2686" selection-end="2686" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="StatusBar.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/StatusBar.java">
+      <file leaf-file-name="PlaylistManager.java" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="100" column="27" selection-start="3236" selection-end="3236" vertical-scroll-proportion="0.0">
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state line="88" column="10" selection-start="2656" selection-end="2656" vertical-scroll-proportion="0.374269">
+              <folding />
             </state>
           </provider>
         </entry>
@@ -221,14 +217,10 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistColumn.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Playback.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerImpl.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlaybackOrder.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/system/Configuration.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerState.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/StatusBar.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerEvent.java" />
@@ -237,6 +229,10 @@
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/SeparatorTable.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java" />
       </list>
     </option>
   </component>
@@ -283,7 +279,6 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="Favorites" />
       <pane id="PackagesPane">
         <subPane>
           <PATH>
@@ -585,6 +580,7 @@
         </subPane>
       </pane>
       <pane id="Scope" />
+      <pane id="Favorites" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -608,45 +604,61 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth1" value="138" />
     <property name="GenerateAntBuildDialog.generateIdeaHomeProperty" value="false" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth0" value="98" />
-    <property name="project.structure.last.edited" value="Modules" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth3" value="34" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth2" value="128" />
-    <property name="OverrideImplement.combined" value="true" />
-    <property name="project.structure.proportion" value="0.15" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth0" value="70" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth1" value="111" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder0" value="0" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder3" value="3" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder2" value="2" />
-    <property name="GenerateAntBuildDialog.generateSingleFile" value="true" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth2" value="103" />
-    <property name="recentsLimit" value="5" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth0" value="81" />
     <property name="MemberChooser.sorted" value="false" />
+    <property name="recentsLimit" value="5" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth2" value="103" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth1" value="113" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder4" value="4" />
-    <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth0" value="103" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth2" value="100" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth3" value="1005" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatWidth3" value="1009" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth4" value="778" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth2" value="96" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeWidth3" value="103" />
-    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="false" />
-    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeWidth1" value="108" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="MemberChooser.showClasses" value="true" />
-    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth4" value="802" />
     <property name="GoToClass.includeLibraries" value="false" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="GoToFile.includeJavaFiles" value="false" />
     <property name="options.lastSelected" value="copyright.filetypes.XML" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
+    <property name="MemberChooser.copyJavadoc" value="false" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth1" value="138" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth0" value="98" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth3" value="34" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="OverrideImplement.combined" value="true" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth2" value="128" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder0" value="0" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder3" value="3" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder2" value="2" />
+    <property name="GenerateAntBuildDialog.generateSingleFile" value="true" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder1" value="1" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatOrder4" value="4" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder0" value="0" />
+    <property name="GenerateAntBuildDialog.inclineRuntiemClasspath" value="false" />
+    <property name="GenerateAntBuildDialog.enableUiFormCompile" value="false" />
+    <property name="GoToClass.toSaveIncludeLibraries" value="false" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder2" value="2" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_flatOrder3" value="3" />
+    <property name="MemberChooser.showClasses" value="true" />
+    <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_flatWidth4" value="802" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder0" value="0" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder3" value="3" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder1" value="1" />
+    <property name="FileHistory.git4idea.history.GitHistoryProvider_treeOrder2" value="2" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder3" value="3" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder4" value="4" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder1" value="1" />
-    <property name="project.structure.side.proportion" value="0.2" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder2" value="2" />
-    <property name="GenerateAntBuildDialog.forceTargetJdk" value="true" />
-    <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="FileHistory.org.jetbrains.idea.svn.history.SvnHistoryProvider_treeOrder0" value="0" />
     <property name="GenerateAntBuildDialog.backupFiles" value="false" />
     <property name="dynamic.classpath" value="false" />
@@ -992,10 +1004,9 @@
     <layout>
       <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23351158" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21463415" sideWeight="0.66190475" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3262032" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39750445" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.329602" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32798573" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3244207" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297619" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
@@ -1008,6 +1019,7 @@
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Properties" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287841" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3262032" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="IDEtalk" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Repositories" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3297619" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1032,7 +1044,7 @@
     <option name="ENABLE_BACKGROUND_PROCESSES" value="false" />
     <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="stop if nothing to play after next() or prev()" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added playback order control." />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -1045,7 +1057,6 @@
     <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
-    <MESSAGE value="still trying to figure out how the db should work. Take 2" />
     <MESSAGE value="Moved Tag and Header to Song" />
     <MESSAGE value="Need to find a memory leak." />
     <MESSAGE value="." />
@@ -1070,6 +1081,7 @@
     <MESSAGE value="moved menu creation code to PlaylistPanel" />
     <MESSAGE value="Code cleanup for player. Added stop() and prev() actions. Moved Playback Order to the playlist table" />
     <MESSAGE value="stop if nothing to play after next() or prev()" />
+    <MESSAGE value="Added playback order control." />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -1121,115 +1133,45 @@
     </buildFile>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/awt/Component.java">
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/lang/Thread.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="828" column="16" selection-start="27179" selection-end="27179" vertical-scroll-proportion="0.7017544">
-          <folding />
-        </state>
+        <state line="725" column="22" selection-start="29180" selection-end="29180" vertical-scroll-proportion="0.33333334" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/system/Configuration.java">
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="147" column="38" selection-start="4143" selection-end="4143" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="44" column="38" selection-start="1552" selection-end="1552" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="199" column="16" selection-start="4622" selection-end="4622" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/formats/ape/APETagProcessor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="50" column="0" selection-start="2018" selection-end="2018" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/formats/wavpack/WavPackFileReader.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="42" column="0" selection-start="1530" selection-end="1530" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="17" selection-start="848" selection-end="848" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
+        <state line="106" column="32" selection-start="3387" selection-end="3387" vertical-scroll-proportion="0.33333334" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/StatusBar.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="100" column="27" selection-start="3236" selection-end="3236" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
+        <state line="100" column="27" selection-start="3236" selection-end="3236" vertical-scroll-proportion="0.0" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlaybackOrder.java">
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerListener.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="17" selection-start="891" selection-end="891" vertical-scroll-proportion="0.41504177">
+        <state line="23" column="17" selection-start="848" selection-end="848" vertical-scroll-proportion="0.44562334">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerEvent.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="25" column="56" selection-start="945" selection-end="945" vertical-scroll-proportion="0.0">
+        <state line="25" column="56" selection-start="945" selection-end="945" vertical-scroll-proportion="0.055702917">
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/java/lang/Thread.java">
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/MainWindow.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="725" column="22" selection-start="29180" selection-end="29180" vertical-scroll-proportion="0.33333334">
+        <state line="39" column="26" selection-start="1319" selection-end="1319" vertical-scroll-proportion="0.0">
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="106" column="32" selection-start="3387" selection-end="3387" vertical-scroll-proportion="0.33333334">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="167" column="25" selection-start="6028" selection-end="6028" vertical-scroll-proportion="0.0">
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="248" column="65" selection-start="9062" selection-end="9062" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="class#9166:9634" expanded="false" />
-            <element signature="class#12956:13761" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="31" selection-start="1435" selection-end="1435" vertical-scroll-proportion="0.0">
+        <state line="73" column="47" selection-start="2869" selection-end="2869" vertical-scroll-proportion="0.2638889">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -1238,10 +1180,66 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="337" column="32" selection-start="9819" selection-end="9819" vertical-scroll-proportion="0.55263156">
+        <state line="279" column="11" selection-start="8304" selection-end="8304" vertical-scroll-proportion="0.3">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///usr/lib/jvm/java-6-openjdk/src.zip!/javax/swing/JPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="115" column="11" selection-start="4050" selection-end="4050" vertical-scroll-proportion="0.33333334">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="104" column="21" selection-start="4115" selection-end="4115" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/formats/aac/MP4FileReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="46" column="20" selection-start="1514" selection-end="1514" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/custom/SeparatorTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="170" column="24" selection-start="5826" selection-end="5826" vertical-scroll-proportion="0.51754385">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="92" column="8" selection-start="2284" selection-end="2284" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="228" column="18" selection-start="6312" selection-end="6312" vertical-scroll-proportion="0.0">
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="class#Order#0;class#PlaylistTable#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="88" column="41" selection-start="2686" selection-end="2686" vertical-scroll-proportion="0.0">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/playlist/PlaylistManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="88" column="10" selection-start="2656" selection-end="2656" vertical-scroll-proportion="0.374269">
+          <folding />
         </state>
       </provider>
     </entry>

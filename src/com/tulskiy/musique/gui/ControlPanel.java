@@ -21,7 +21,6 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.GlobalTimer;
 import com.tulskiy.musique.util.Util;
 
@@ -54,11 +53,9 @@ public class ControlPanel extends JPanel {
     private boolean isSeeking = false;
 
     public ControlPanel() {
-        Application application = Application.getInstance();
-        Configuration config = application.getConfiguration();
         setLayout(new BorderLayout());
-        Color bgColor = config.getColor("gui.controlPanelBg");
-        setBackground(bgColor);
+//        Color bgColor = config.getColor("gui.controlPanelBg");
+//        setBackground(bgColor);
 
         progressSlider.setValue(0);
         progressSlider.setFocusable(false);
@@ -71,13 +68,13 @@ public class ControlPanel extends JPanel {
         pauseButton = createButton("resources/images/pause.png");
         nextButton = createButton("resources/images/next.png");
 
-        volumeSlider = new JSlider(0, 1000);
+        volumeSlider = new JSlider(0, 100);
         volumeSlider.setMaximumSize(new Dimension(100, 30));
         volumeSlider.setPreferredSize(new Dimension(100, 30));
-        volumeSlider.setValue(1000);
+        volumeSlider.setValue((int) (player.getVolume() * 100));
         volumeSlider.setFocusable(false);
 
-        //ugly hack to make volume and progress sliders be on same level
+        //hack to make volume and progress sliders be on same level
         progressSlider.setMaximumSize(new Dimension(10000, 30));
         progressSlider.setPreferredSize(new Dimension(100, 30));
 
@@ -122,7 +119,7 @@ public class ControlPanel extends JPanel {
     private void buildListeners() {
         volumeSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                player.setVolume(volumeSlider.getValue() / 1000f);
+                player.setVolume(volumeSlider.getValue() / 100f);
             }
         });
 

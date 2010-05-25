@@ -56,6 +56,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     private TableRowSorter<PlaylistModel> sorter;
     private PlaylistModel model;
     private Order order = Order.DEFAULT;
+    private Song lastPlayed;
 
     public PlaylistTable(Playlist playlist, ArrayList<PlaylistColumn> columns) {
         this.playlist = playlist;
@@ -154,26 +155,44 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         this.order = order;
     }
 
+    public void setLastPlayed(Song lastPlayed) {
+        this.lastPlayed = lastPlayed;
+        int index = indexOf(lastPlayed);
+        if (index != -1) {
+            scrollToRow(index);
+            setRowSelectionInterval(index, index);
+        }
+    }
+
     @Override
     public Song next(Song file) {
-        int index = indexOf(file);
-        if (index == -1)
-            return null;
+        int index;
 
-        int size = sorter.getViewRowCount();
+        if (file == null) {
+            index = indexOf(lastPlayed);
+            if (index == -1)
+                index = 0;
+        } else {
+            index = indexOf(file);
+            if (index == -1)
+                return null;
 
-        switch (order) {
-            case DEFAULT:
-                index = index < size - 1 ? index + 1 : -1;
-                break;
-            case REPEAT:
-                index = (index + 1) % size;
-                break;
-            case REPEAT_TRACK:
-                break;
-            case SHUFFLE:
-                index = (int) (Math.random() * size);
-                break;
+
+            int size = sorter.getViewRowCount();
+
+            switch (order) {
+                case DEFAULT:
+                    index = index < size - 1 ? index + 1 : -1;
+                    break;
+                case REPEAT:
+                    index = (index + 1) % size;
+                    break;
+                case REPEAT_TRACK:
+                    break;
+                case SHUFFLE:
+                    index = (int) (Math.random() * size);
+                    break;
+            }
         }
 
         return index != -1 ? playlist.get(convertRowIndexToModel(index)) : null;

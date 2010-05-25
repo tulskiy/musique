@@ -101,6 +101,9 @@ public class PlaylistPanel extends JPanel {
         JScrollPane tableScrollPane = new JScrollPane(table);
         add(tableScrollPane, BorderLayout.CENTER);
 
+        int lastPlayed = config.getInt("player.lastPlayed", -1);
+        table.setLastPlayed(new Song(lastPlayed));
+
         buildListeners();
         createPopupMenu();
     }
@@ -178,7 +181,7 @@ public class PlaylistPanel extends JPanel {
         tableMenu.add(new JMenuItem("Remove")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                table.removeSelected();
             }
         });
 

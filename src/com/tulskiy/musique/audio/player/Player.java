@@ -41,6 +41,7 @@ public class Player {
 
     private PlayerThread playerThread = new PlayerThread();
     private PlaybackOrder order;
+    private float volumeValue = 1f;
 
     public void open(Song song) {
         playerThread.open(song, true);
@@ -91,6 +92,7 @@ public class Player {
 
     public void setVolume(float volume) {
         FloatControl v = playerThread.volume;
+        this.volumeValue = volume;
         if (v != null) {
             v.setValue(v.getMaximum() * volume);
         }
@@ -125,7 +127,7 @@ public class Player {
         if (volume != null)
             return volume.getValue() / volume.getMaximum();
         else
-            return 1;
+            return this.volumeValue;
     }
 
     public void setPlaybackOrder(PlaybackOrder order) {
@@ -263,6 +265,7 @@ public class Player {
             line.start();
             if (line.isControlSupported(FloatControl.Type.VOLUME)) {
                 volume = (FloatControl) line.getControl(FloatControl.Type.VOLUME);
+                volume.setValue(volumeValue * volume.getMaximum());
             }
         }
 

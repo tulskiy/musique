@@ -22,11 +22,14 @@
 package com.tulskiy.musique.playlist;
 
 import com.tulskiy.musique.db.DBMapper;
+import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 
 import java.util.ArrayList;
 
 public class PlaylistManager {
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
+    private Configuration config = Application.getInstance().getConfiguration();
     private Playlist currentPlaylist;
     private DBMapper<Playlist> playlistDBMapper = new DBMapper<Playlist>(Playlist.class);
 
@@ -54,7 +57,14 @@ public class PlaylistManager {
             savePlaylists();
         }
 
+        int index = config.getInt("playlist.currentPlaylist", -1);
         selectPlaylist(playlists.get(0));
+        for (Playlist playlist : playlists) {
+            if (playlist.getPlaylistID() == index) {
+                selectPlaylist(playlist);
+                break;
+            }
+        }
     }
 
     public int getTotalPlaylists() {
@@ -83,5 +93,6 @@ public class PlaylistManager {
         for (Playlist playlist : playlists) {
             playlist.save();
         }
+        config.setInt("playlist.currentPlaylist", currentPlaylist.getPlaylistID());
     }
 }

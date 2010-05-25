@@ -25,6 +25,7 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.db.DBManager;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
+import com.tulskiy.musique.playlist.Song;
 
 import javax.swing.*;
 import java.io.File;
@@ -53,8 +54,8 @@ public class Application {
         dbManager.connect();
 
         if (firstRun) {
-            dbManager.runScript("install.sql");
-            dbManager.runScript("defaultSettings.sql");
+            installDB();
+            defaultSettings();
         }
 
         configuration = new Configuration();
@@ -65,13 +66,27 @@ public class Application {
 
         player = new Player();
 
+        loadSettings();
+
         try {
-//            UIManager.setLookAndFeel(configuration.getProperty("gui.LAF"));
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(configuration.getProperty("gui.LAF"));
             UIManager.put("Slider.paintValue", Boolean.FALSE);
         } catch (Exception e) {
-            System.err.println("Could not load LaF");
+            System.err.println("Could not load LaF: " + e.getCause());
         }
+    }
+
+    private void loadSettings() {
+        player.setVolume(configuration.getDouble("player.volume", 1).floatValue());
+    }
+
+    private void saveSettings() {
+        configuration.setDouble("player.volume", player.getVolume());
+        Song lastPlayed = player.getSong();
+        if (lastPlayed != null) {
+            configuration.setInt("player.lastPlayed", lastPlayed.getSongID());
+        }
+        configuration.setProperty("gui.LAF", UIManager.getLookAndFeel().getClass().getCanonicalName());
     }
 
     public void start() {
@@ -93,6 +108,7 @@ public class Application {
         if (mainWindow != null)
             mainWindow.shutdown();
         playlistManager.savePlaylists();
+        saveSettings();
         configuration.save();
         dbManager.closeConnection();
         System.exit(0);

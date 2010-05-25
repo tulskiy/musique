@@ -89,6 +89,14 @@ public class Song {
     private String fileName;
     private String length;
 
+    public Song() {
+
+    }
+
+    public Song(int id) {
+        songID = id;
+    }
+
     public int getPlaylistID() {
         return playlistID;
     }
@@ -367,5 +375,14 @@ public class Song {
         return "Song{" +
                 "filePath='" + getFilePath() + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Song s = (Song) obj;
+        if (s.songID == -1 || this.songID == -1)
+            return false;
+        else
+            return s.songID == this.songID;
     }
 }
