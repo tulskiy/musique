@@ -70,22 +70,34 @@ public class Player {
     }
 
     public void next() {
-        if (order == null) return;
+        if (order == null) {
+            stop();
+            return;
+        }
         Song s = order.next(playerThread.currentSong);
         if (s != null)
             playerThread.open(s, true);
-        else
+        else {
+            stop();
             return;
+        }
+
         playerThread.play();
     }
 
     public void prev() {
-        if (order == null) return;
-        Song s = order.prev(playerThread.currentSong);
+        if (order == null) {
+            stop();
+            return;
+        }
+        Song s = order.next(playerThread.currentSong);
         if (s != null)
             playerThread.open(s, true);
-        else
+        else {
+            stop();
             return;
+        }
+
         playerThread.play();
     }
 
