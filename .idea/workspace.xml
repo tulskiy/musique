@@ -24,26 +24,11 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" readonly="true" id="611532ec-c25a-4b28-a1fb-666b0fe6ad0a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerImpl.java" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Playback.java" afterPath="" />
+    <list default="true" readonly="true" id="611532ec-c25a-4b28-a1fb-666b0fe6ad0a" name="Default" comment="Code cleanup for player. Added stop() and prev() actions. Moved Playback Order to the playlist table">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player2.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerEvent.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerEvent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/Test.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/Test.java" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerState.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlaybackOrder.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/BufferThread.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/musique.iml" afterPath="$PROJECT_DIR$/musique.iml" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerThread.java" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/StatusBar.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/StatusBar.java" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/dsp/PlaybackOrder.java" afterPath="" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" afterPath="$PROJECT_DIR$/src/com/tulskiy/musique/system/Application.java" />
     </list>
     <ignored path=".idea/workspace.xml" />
     <ignored path="musique.iws" />
@@ -152,11 +137,11 @@
       <file leaf-file-name="PlaylistPanel.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="288" column="21" selection-start="10054" selection-end="10054" vertical-scroll-proportion="0.0">
+            <state line="248" column="65" selection-start="9062" selection-end="9062" vertical-scroll-proportion="0.0">
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="class#8976:9444" expanded="false" />
-                <element signature="class#12760:13565" expanded="false" />
+                <element signature="class#9166:9634" expanded="false" />
+                <element signature="class#12956:13761" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -165,19 +150,10 @@
       <file leaf-file-name="PlaylistTable.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="114" column="22" selection-start="3408" selection-end="3408" vertical-scroll-proportion="0.0">
+            <state line="40" column="31" selection-start="1435" selection-end="1435" vertical-scroll-proportion="0.0">
               <folding>
-                <element signature="class#PlaylistModel#0;class#PlaylistTable#0" expanded="false" />
+                <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="WavPackFileReader.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/formats/wavpack/WavPackFileReader.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="42" column="0" selection-start="1530" selection-end="1530" vertical-scroll-proportion="0.0">
-              <folding />
             </state>
           </provider>
         </entry>
@@ -203,7 +179,7 @@
       <file leaf-file-name="Player.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="361" column="25" selection-start="10642" selection-end="10642" vertical-scroll-proportion="0.71468145">
+            <state line="337" column="32" selection-start="9819" selection-end="9819" vertical-scroll-proportion="0.55263156">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -214,7 +190,7 @@
       <file leaf-file-name="ControlPanel.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="191" column="24" selection-start="6762" selection-end="6762" vertical-scroll-proportion="0.0">
+            <state line="167" column="25" selection-start="6028" selection-end="6028" vertical-scroll-proportion="0.0">
               <folding />
             </state>
           </provider>
@@ -253,14 +229,14 @@
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlaybackOrder.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/system/Configuration.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/Song.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" />
-        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerState.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/StatusBar.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerEvent.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/playlist/formatting/tokens/Methods.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java" />
         <option value="$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java" />
+        <option value="$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java" />
       </list>
     </option>
   </component>
@@ -1014,7 +990,7 @@
     <frame x="-1" y="24" width="1368" height="705" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23351158" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.23351158" sideWeight="0.0" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.21463415" sideWeight="0.66190475" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3262032" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1025,9 +1001,9 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32902735" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.39969605" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23216996" sideWeight="0.7540107" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.23216996" sideWeight="0.7201426" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.26737967" sideWeight="0.9886364" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.26737967" sideWeight="0.9886364" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20162602" sideWeight="0.66190475" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="SVN Properties" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.3287841" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1056,7 +1032,7 @@
     <option name="ENABLE_BACKGROUND_PROCESSES" value="false" />
     <option name="CHANGED_ON_SERVER_INTERVAL" value="60" />
     <option name="FORCE_NON_EMPTY_COMMENT" value="false" />
-    <option name="LAST_COMMIT_MESSAGE" value="moved menu creation code to PlaylistPanel" />
+    <option name="LAST_COMMIT_MESSAGE" value="stop if nothing to play after next() or prev()" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_FILES_UP_TO_DATE_BEFORE_COMMIT" value="false" />
@@ -1069,8 +1045,6 @@
     <option name="UPDATE_GROUP_BY_CHANGELIST" value="false" />
     <option name="SHOW_FILE_HISTORY_AS_TREE" value="false" />
     <option name="FILE_HISTORY_SPLITTER_PROPORTION" value="0.6" />
-    <MESSAGE value="A lot of stuff changed. Added HSQLDB support for playlist." />
-    <MESSAGE value="still trying to figure out how the db should work" />
     <MESSAGE value="still trying to figure out how the db should work. Take 2" />
     <MESSAGE value="Moved Tag and Header to Song" />
     <MESSAGE value="Need to find a memory leak." />
@@ -1094,6 +1068,8 @@
     <MESSAGE value="Fixed adding/removing columns" />
     <MESSAGE value="Added default values to getInt(), getDouble() and getBoolean(). I only needed getInt(), but whatever." />
     <MESSAGE value="moved menu creation code to PlaylistPanel" />
+    <MESSAGE value="Code cleanup for player. Added stop() and prev() actions. Moved Playback Order to the playlist table" />
+    <MESSAGE value="stop if nothing to play after next() or prev()" />
   </component>
   <component name="VssConfiguration">
     <option name="CLIENT_PATH" value="" />
@@ -1187,26 +1163,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="114" column="22" selection-start="3408" selection-end="3408" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="class#PlaylistModel#0;class#PlaylistTable#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="288" column="21" selection-start="10054" selection-end="10054" vertical-scroll-proportion="0.0">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="class#8976:9444" expanded="false" />
-            <element signature="class#12760:13565" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/PlayerListener.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="23" column="17" selection-start="848" selection-end="848" vertical-scroll-proportion="0.0">
@@ -1255,14 +1211,34 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/ControlPanel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="191" column="24" selection-start="6762" selection-end="6762" vertical-scroll-proportion="0.0">
+        <state line="167" column="25" selection-start="6028" selection-end="6028" vertical-scroll-proportion="0.0">
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistPanel.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="248" column="65" selection-start="9062" selection-end="9062" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="class#9166:9634" expanded="false" />
+            <element signature="class#12956:13761" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/gui/playlist/PlaylistTable.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="31" selection-start="1435" selection-end="1435" vertical-scroll-proportion="0.0">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/tulskiy/musique/audio/player/Player.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="361" column="25" selection-start="10642" selection-end="10642" vertical-scroll-proportion="0.71468145">
+        <state line="337" column="32" selection-start="9819" selection-end="9819" vertical-scroll-proportion="0.55263156">
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

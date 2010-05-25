@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.gui.playlist;
 
+import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.gui.custom.SeparatorTable;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Song;
@@ -26,19 +27,35 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 
 /**
  * Author: Denis Tulskiy
  * Date: May 13, 2010
  */
-public class PlaylistTable extends SeparatorTable {
+public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
+    enum Order {
+        DEFAULT("Default"),
+        REPEAT("Repeat"),
+        REPEAT_TRACK("Repeat Track"),
+        SHUFFLE("Random");
+
+        private String text;
+
+        Order(String text) {
+            this.text = text;
+        }
+
+        public String getText() {
+            return text;
+        }
+    }
 
     private Playlist playlist;
     private ArrayList<PlaylistColumn> columns;
     private TableRowSorter<PlaylistModel> sorter;
     private PlaylistModel model;
+    private Order order = Order.DEFAULT;
 
     public PlaylistTable(Playlist playlist, ArrayList<PlaylistColumn> columns) {
         this.playlist = playlist;
@@ -84,6 +101,20 @@ public class PlaylistTable extends SeparatorTable {
         repaint();
     }
 
+    public int indexOf(Song song) {
+        int index = playlist.indexOf(song);
+        if (index != -1)
+            index = convertRowIndexToView(index);
+
+        return index;
+    }
+
+    public void scrollToSong(Song song) {
+        int index = indexOf(song);
+        if (index != -1)
+            scrollToRow(index);
+    }
+
     public Song getSelectedSong() {
         int index = getSelectedRow();
         if (index >= 0)
@@ -100,6 +131,79 @@ public class PlaylistTable extends SeparatorTable {
         }
 
         return null;
+    }
+
+    public void removeSelected() {
+        ArrayList<Song> toRemove = new ArrayList<Song>();
+
+        for (int i : getSelectedRows()) {
+            toRemove.add(playlist.get(convertRowIndexToModel(i)));
+        }
+
+        playlist.removeAll(toRemove);
+        sorter.rowsDeleted(
+                getSelectionModel().getMinSelectionIndex(),
+                getSelectionModel().getMaxSelectionIndex());
+
+        clearSelection();
+
+        update();
+    }
+
+    public void setOrder(Order order) {
+        this.order = order;
+    }
+
+    @Override
+    public Song next(Song file) {
+        int index = indexOf(file);
+        if (index == -1)
+            return null;
+
+        int size = sorter.getViewRowCount();
+
+        switch (order) {
+            case DEFAULT:
+                index = index < size - 1 ? index + 1 : -1;
+                break;
+            case REPEAT:
+                index = (index + 1) % size;
+                break;
+            case REPEAT_TRACK:
+                break;
+            case SHUFFLE:
+                index = (int) (Math.random() * size);
+                break;
+        }
+
+        return index != -1 ? playlist.get(convertRowIndexToModel(index)) : null;
+    }
+
+    @Override
+    public Song prev(Song file) {
+        int index = indexOf(file);
+        if (index == -1)
+            return null;
+
+        int size = sorter.getViewRowCount();
+
+        switch (order) {
+            case DEFAULT:
+                index--;
+                break;
+            case REPEAT:
+                index--;
+                if (index < 0)
+                    index += size;
+                break;
+            case REPEAT_TRACK:
+                break;
+            case SHUFFLE:
+                index = (int) (Math.random() * size);
+                break;
+        }
+
+        return index > -1 ? playlist.get(convertRowIndexToModel(index)) : null;
     }
 
     class PlaylistModel extends AbstractTableModel {

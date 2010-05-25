@@ -70,35 +70,23 @@ public class Player {
     }
 
     public void next() {
-        if (order == null) {
-            stop();
-            return;
-        }
         Song s = order.next(playerThread.currentSong);
-        if (s != null)
+        if (s != null) {
             playerThread.open(s, true);
-        else {
+            playerThread.play();
+        } else {
             stop();
-            return;
         }
-
-        playerThread.play();
     }
 
     public void prev() {
-        if (order == null) {
-            stop();
-            return;
-        }
-        Song s = order.next(playerThread.currentSong);
-        if (s != null)
+        Song s = order.prev(playerThread.currentSong);
+        if (s != null) {
             playerThread.open(s, true);
-        else {
+            playerThread.play();
+        } else {
             stop();
-            return;
         }
-
-        playerThread.play();
     }
 
     public void setVolume(float volume) {

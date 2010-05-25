@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.gui.playlist;
 
+import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.db.DBMapper;
@@ -24,6 +25,7 @@ import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.PluginLoader;
 
 import javax.swing.*;
@@ -48,6 +50,7 @@ public class PlaylistPanel extends JPanel {
     private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
 
     private Application app = Application.getInstance();
+    private Configuration config = app.getConfiguration();
     private PlaylistTable table;
     private PlaylistManager playlistManager;
     private JComboBox playlistSelection;
@@ -61,7 +64,6 @@ public class PlaylistPanel extends JPanel {
     private JFrame parentFrame;
 
     public PlaylistPanel() {
-
         playlistManager = app.getPlaylistManager();
         playlist = playlistManager.getCurrentPlaylist();
         playlistSelection = new JComboBox(new Vector<Playlist>(playlistManager.getPlaylists()));
@@ -79,6 +81,7 @@ public class PlaylistPanel extends JPanel {
 
         columnDBMapper.loadAll("select * from playlist_columns order by position", columns);
         table = new PlaylistTable(playlist, columns);
+        app.getPlayer().setPlaybackOrder(table);
 
         setLayout(new BorderLayout());
         Box box = new Box(BoxLayout.X_AXIS);
@@ -226,10 +229,6 @@ public class PlaylistPanel extends JPanel {
         }
     }
 
-    public void update() {
-        table.update();
-    }
-
     public void buildListeners() {
         table.addMouseListener(new MouseAdapter() {
             @Override
@@ -241,9 +240,14 @@ public class PlaylistPanel extends JPanel {
             }
         });
 
-        app.getPlayer().addListener(new PlayerListener() {
+        final Player player = app.getPlayer();
+        player.addListener(new PlayerListener() {
             public void onEvent(PlayerEvent e) {
                 table.update();
+                switch (e.getEventCode()) {
+                    case FILE_OPENED:
+                        table.scrollToSong(player.getSong());
+                }
             }
         });
 
@@ -273,43 +277,142 @@ public class PlaylistPanel extends JPanel {
         }
     }
 
-    public void removeSelected() {
-        ArrayList<Song> toRemove = new ArrayList<Song>();
-        Playlist pl = playlistManager.getCurrentPlaylist();
-
-        for (int i : table.getSelectedRows()) {
-            toRemove.add(pl.get(table.convertColumnIndexToModel(i)));
-        }
-
-        pl.removeAll(toRemove);
-        table.getRowSorter().rowsDeleted(
-                table.getSelectionModel().getMinSelectionIndex(),
-                table.getSelectionModel().getMaxSelectionIndex());
-        table.clearSelection();
-
-        update();
-    }
-
     public void addPlaylist(String name) {
         playlist = playlistManager.addPlaylist(name);
         playlistSelection.addItem(playlist);
         playlistSelection.setSelectedItem(playlist);
     }
 
-    public void removePlaylist() {
-        playlistManager.removePlaylist(playlist);
-        playlistSelection.removeItem(playlist);
-        if (playlistManager.getTotalPlaylists() == 0) {
-            addPlaylist("Default");
-        }
-        playlistSelection.setSelectedIndex(0);
+    private JMenuItem newItem(String name, String hotkey, ActionListener al) {
+        JMenuItem item = new JMenuItem(name);
+        item.setAccelerator(KeyStroke.getKeyStroke(hotkey));
+        item.addActionListener(al);
+
+        return item;
     }
 
-    public void clearPlaylist() {
-        Playlist pl = playlistManager.getCurrentPlaylist();
-//        int size = pl.size();
-//        table.getRowSorter().allRowsChanged();
-        pl.clear();
-        table.update();
+    public void addMenu(JMenuBar menuBar) {
+        JMenu fileMenu = new JMenu("File");
+        menuBar.add(fileMenu);
+        JMenu editMenu = new JMenu("Edit");
+        menuBar.add(editMenu);
+        JMenu viewMenu = new JMenu("View");
+        menuBar.add(viewMenu);
+        JMenu playbackMenu = new JMenu("Playback");
+        menuBar.add(playbackMenu);
+
+        fileMenu.add("New Playlist").addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String name = JOptionPane.showInputDialog("Enter Playlist Name");
+                addPlaylist(name);
+            }
+        });
+
+        fileMenu.add("Remove Playlist").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playlistManager.removePlaylist(playlist);
+                playlistSelection.removeItem(playlist);
+                if (playlistManager.getTotalPlaylists() == 0) {
+                    addPlaylist("Default");
+                }
+                playlistSelection.setSelectedIndex(0);
+            }
+        });
+
+        fileMenu.addSeparator();
+
+        fileMenu.add("Add Files").addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser();
+                fc.setMultiSelectionEnabled(true);
+                fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                int retVal = fc.showOpenDialog(null);
+                if (retVal == JFileChooser.APPROVE_OPTION) {
+//                    ProgressMonitor pm = new ProgressMonitor(null, "Adding Files", "", 0, 100);
+                    playlistManager.getCurrentPlaylist().addFiles(fc.getSelectedFiles());
+                }
+
+                table.update();
+            }
+        });
+
+        fileMenu.addSeparator();
+
+        fileMenu.add(newItem("Quit", "control Q", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                app.exit();
+            }
+        }));
+
+
+        editMenu.add("Clear").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Playlist pl = playlistManager.getCurrentPlaylist();
+                pl.clear();
+                table.update();
+            }
+        });
+
+        editMenu.add(newItem("Remove", "DELETE", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.removeSelected();
+            }
+        }));
+
+
+        JMenu laf = new JMenu("Look and Feel");
+        ActionListener lafListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String cmd = e.getActionCommand();
+                    if (cmd.equals("Metal")) {
+                        UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
+                    } else if (cmd.equals("Nimbus")) {
+                        UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+                    } else {
+                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                    }
+                    shutdown();
+                    app.start();
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            }
+        };
+
+        laf.add("Metal").addActionListener(lafListener);
+        laf.add("Nimbus").addActionListener(lafListener);
+        laf.add("Native").addActionListener(lafListener);
+        viewMenu.add(laf);
+
+        JMenu orderMenu = new JMenu("Order");
+        playbackMenu.add(orderMenu);
+        ActionListener orderListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem item = (JMenuItem) e.getSource();
+                PlaylistTable.Order o = PlaylistTable.Order.valueOf(item.getName());
+                table.setOrder(o);
+                config.setInt("player.playbackOrder", o.ordinal());
+            }
+        };
+
+        int index = config.getInt("player.playbackOrder", 0);
+        PlaylistTable.Order[] orders = PlaylistTable.Order.values();
+        ButtonGroup gr = new ButtonGroup();
+        for (PlaylistTable.Order o : orders) {
+            JCheckBoxMenuItem item = new JCheckBoxMenuItem(o.getText());
+            if (o.ordinal() == index)
+                item.setSelected(true);
+            item.addActionListener(orderListener);
+            item.setName(o.toString());
+            gr.add(item);
+            orderMenu.add(item);
+        }
     }
 }
