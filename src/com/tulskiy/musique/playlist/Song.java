@@ -196,7 +196,8 @@ public class Song {
     public void setDiscNumber(String discNumber) {
         if (discNumber != null && discNumber.length() > 0) {
             String[] s = discNumber.split("/");
-            this.discNumber = s[0];
+            if (s.length > 0)
+                this.discNumber = s[0];
             if (s.length > 1)
                 this.totalDiscs = s[1];
         }

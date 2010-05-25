@@ -17,7 +17,6 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
-import com.tulskiy.musique.audio.player.PlayerState;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
 
@@ -103,12 +102,12 @@ public class Methods {
 
     public ImageIcon isPlaying(Song song, ArrayList<Expression> args) {
         if (app.getPlayer().getSong() == song) {
-            if (app.getPlayer().getState() == PlayerState.PAUSED)
+            if (app.getPlayer().isPaused())
                 return pausedIcon;
-            else
+            if (app.getPlayer().isPlaying())
                 return playingIcon;
-        } else {
-            return null;
         }
+
+        return null;
     }
 }

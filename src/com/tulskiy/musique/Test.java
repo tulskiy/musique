@@ -36,7 +36,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * @Author: Denis Tulskiy
+ * Author: Denis Tulskiy
+ *
  * @Date: Jan 21, 2010
  */
 public class Test {

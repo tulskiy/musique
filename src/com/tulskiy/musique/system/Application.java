@@ -22,7 +22,6 @@
 package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.player.Player;
-import com.tulskiy.musique.audio.player.PlayerImpl;
 import com.tulskiy.musique.db.DBManager;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -64,7 +63,7 @@ public class Application {
         playlistManager = new PlaylistManager();
         playlistManager.loadPlaylists();
 
-        player = new PlayerImpl();
+        player = new Player();
 
         try {
 //            UIManager.setLookAndFeel(configuration.getProperty("gui.LAF"));

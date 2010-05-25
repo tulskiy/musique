@@ -15,29 +15,16 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.audio.player.dsp;
+package com.tulskiy.musique.audio.player;
 
-import com.tulskiy.musique.playlist.Playlist;
-import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Song;
-import com.tulskiy.musique.system.Application;
 
 /**
  * @Author: Denis Tulskiy
- * @Date: Jan 23, 2010
+ * @Date: 01.07.2009
  */
-public class PlaybackOrder {
-    private Application app = Application.getInstance();
-    private PlaylistManager playlistManager = app.getPlaylistManager();
+public interface PlaybackOrder {
+    public Song next(Song file);
 
-    public Song next(Song song) {
-        Playlist playlist = playlistManager.getCurrentPlaylist();
-
-        int index = playlist.indexOf(song);
-        if (index >= playlist.size() - 1) {
-            return null;
-        }
-
-        return playlist.get(index + 1);
-    }
+    public Song prev(Song file);
 }

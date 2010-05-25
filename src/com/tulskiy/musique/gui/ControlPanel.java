@@ -19,8 +19,6 @@ package com.tulskiy.musique.gui;
 
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
-import com.tulskiy.musique.audio.player.PlayerState;
-import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -31,10 +29,8 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
-import javax.swing.plaf.metal.MetalSliderUI;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.File;
 
 /**
  * @Author: Denis Tulskiy
@@ -169,7 +165,7 @@ public class ControlPanel extends JPanel {
 
         prevButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-
+                player.prev();
             }
         });
         playButton.addActionListener(new ActionListener() {
@@ -177,12 +173,21 @@ public class ControlPanel extends JPanel {
                 player.play();
             }
         });
+
+        stopButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                player.stop();
+            }
+        });
+
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (player.getState() == PlayerState.PAUSED)
-                    player.play();
-                else
+                if (player.isPlaying()) {
                     player.pause();
+                } else if (player.isPaused()) {
+                    player.play();
+                }
             }
         });
         nextButton.addActionListener(new ActionListener() {
@@ -194,19 +199,10 @@ public class ControlPanel extends JPanel {
         player.addListener(new com.tulskiy.musique.audio.player.PlayerListener() {
             public void onEvent(PlayerEvent e) {
                 switch (e.getEventCode()) {
-                    case PLAYING_STARTED:
-//                        setIsPlaying(true);
-                        break;
-                    case FINISHED_PLAYING:
+                    case STOPPED:
                         progressSlider.setValue(progressSlider.getMinimum());
-                    case PAUSED:
-//                        setIsPlaying(false);
                         break;
                     case FILE_OPENED:
-//                        System.out.println(player.getStartPosition());
-//                        System.out.println(player.getEndPosition());
-//                        progressSlider.setMinimum((int) player.getStartPosition());
-//                        progressSlider.setMaximum((int) player.getTotalSamples());
                         Song song = player.getSong();
                         if (song != null)
                             progressSlider.setMaximum((int) song.getTotalSamples());
@@ -218,10 +214,8 @@ public class ControlPanel extends JPanel {
 
         GlobalTimer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (player.getState() == PlayerState.PLAYING &&
-                        !isSeeking) {
+                if (player.isPlaying() && !isSeeking) {
                     progressSlider.setValue((int) player.getCurrentSample());
-//                    System.out.println(player.getCurrentPosition());
                 }
             }
         });

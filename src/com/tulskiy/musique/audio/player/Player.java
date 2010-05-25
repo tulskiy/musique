@@ -17,36 +17,355 @@
 
 package com.tulskiy.musique.audio.player;
 
+import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.system.PluginLoader;
+import com.tulskiy.musique.util.AudioMath;
+
+import javax.sound.sampled.*;
+import java.util.ArrayList;
+
+import static com.tulskiy.musique.audio.player.PlayerEvent.PlayerEventCode.*;
 
 /**
  * @Author: Denis Tulskiy
- * @Date: Jan 23, 2010
+ * @Date: Jan 21, 2010
  */
-public interface Player {
-    void open(Song audioFile);
+public class Player {
+    private static enum PlayerState {
+        PLAYING, PAUSED, STOPPED
+    }
 
-    void play();
+    private PlayerState state = PlayerState.STOPPED;
+    private static ArrayList<PlayerListener> listeners = new ArrayList<PlayerListener>();
 
-    void pause();
+    private PlayerThread playerThread = new PlayerThread();
+    private PlaybackOrder order;
 
-    void seek(long sample);
+    public void open(Song song) {
+        playerThread.open(song, true);
+    }
 
-    void stop();
+    public void play() {
+        if (!playerThread.isAlive()) {
+            playerThread.start();
+        }
 
-    void next();
+        if (state != PlayerState.PAUSED)
+            open(playerThread.currentSong);
 
-    void prev();
+        playerThread.play();
+    }
 
-    void setVolume(float volume);
+    public void pause() {
+        playerThread.pause();
+    }
 
-    void addListener(PlayerListener listener);
+    public void seek(long sample) {
+        playerThread.seek(sample);
+    }
 
-    long getCurrentSample();
+    public void stop() {
+        playerThread.stopPlaying();
+    }
 
-    Song getSong();
+    public void next() {
+        if (order == null) return;
+        Song s = order.next(playerThread.currentSong);
+        if (s != null)
+            playerThread.open(s, true);
+        else
+            return;
+        playerThread.play();
+    }
 
-    PlayerState getState();
+    public void prev() {
+        if (order == null) return;
+        Song s = order.prev(playerThread.currentSong);
+        if (s != null)
+            playerThread.open(s, true);
+        else
+            return;
+        playerThread.play();
+    }
 
-    float getVolume();
+    public void setVolume(float volume) {
+        FloatControl v = playerThread.volume;
+        if (v != null) {
+            v.setValue(v.getMaximum() * volume);
+        }
+    }
+
+    public void addListener(PlayerListener listener) {
+        listeners.add(listener);
+    }
+
+    public long getCurrentSample() {
+        return playerThread.getCurrentSample();
+    }
+
+    public Song getSong() {
+        return playerThread.currentSong;
+    }
+
+    public boolean isPlaying() {
+        return state == PlayerState.PLAYING;
+    }
+
+    public boolean isPaused() {
+        return state == PlayerState.PAUSED;
+    }
+
+    public boolean isStopped() {
+        return state == PlayerState.STOPPED;
+    }
+
+    public float getVolume() {
+        FloatControl volume = playerThread.volume;
+        if (volume != null)
+            return volume.getValue() / volume.getMaximum();
+        else
+            return 1;
+    }
+
+    public void setPlaybackOrder(PlaybackOrder order) {
+        this.order = order;
+    }
+
+    void setState(PlayerState state) {
+        this.state = state;
+        PlayerEvent.PlayerEventCode code = null;
+        switch (state) {
+            case PLAYING:
+                code = PLAYING_STARTED;
+                break;
+            case PAUSED:
+                code = PAUSED;
+                break;
+            case STOPPED:
+                code = STOPPED;
+        }
+
+        if (code != null) {
+            fireEvent(code);
+        }
+    }
+
+    void fireEvent(PlayerEvent.PlayerEventCode event) {
+        PlayerEvent e = new PlayerEvent(event);
+        EventLauncher eventLauncher = new EventLauncher(e);
+        eventLauncher.run();
+    }
+
+    private class EventLauncher extends Thread {
+        private PlayerEvent e;
+
+        private EventLauncher(PlayerEvent e) {
+            this.e = e;
+        }
+
+        @Override
+        public void run() {
+            for (PlayerListener l : listeners) {
+                l.onEvent(e);
+            }
+        }
+    }
+
+    class PlayerThread extends Thread {
+        private final int BUFFER_SIZE = (int) Math.pow(2, 16);
+
+        private final Object lock = new Object();
+        private SourceDataLine line;
+        private FloatControl volume;
+        private long currentByte = 0;
+        private boolean paused = true;
+        private Song currentSong;
+        private Song nextSong;
+        private Decoder decoder;
+        private long cueTotalBytes;
+
+        @SuppressWarnings({"InfiniteLoopStatement", "ConstantConditions"})
+        @Override
+        public void run() {
+            byte[] buf = new byte[65536];
+            int len;
+            while (true) {
+                synchronized (lock) {
+                    try {
+                        while (paused) {
+                            if (state == PlayerState.PLAYING)
+                                setState(PlayerState.PAUSED);
+                            lock.wait();
+                        }
+                        if (order == null) {
+                            stopPlaying();
+                            continue;
+                        }
+
+                        setState(PlayerState.PLAYING);
+
+                        while (!paused) {
+                            if (nextSong != null) {
+                                open(nextSong, false);
+                                nextSong = null;
+                            }
+
+                            len = decoder.decode(buf);
+
+                            if (len == -1) {
+                                nextSong = order.next(currentSong);
+                                if (nextSong == null)
+                                    stopPlaying();
+                                continue;
+                            }
+
+                            if (currentSong.getCueID() != -1) {
+                                if (cueTotalBytes <= currentByte + len) {
+                                    Song s = order.next(currentSong);
+
+                                    if (s != null) {
+                                        len = (int) (cueTotalBytes - currentByte);
+                                        nextSong = s;
+                                    } else {
+                                        stopPlaying();
+                                        continue;
+                                    }
+                                }
+                            }
+
+                            currentByte += len;
+
+                            line.write(buf, 0, len);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+        private void initLine() throws LineUnavailableException {
+            AudioFormat fmt = decoder.getAudioFormat();
+            //if it is same format and the line is opened, do nothing
+            if (line != null) {
+                if (!line.getFormat().matches(fmt)) {
+                    line.drain();
+                    line.close();
+                    line = null;
+                } else {
+                    return;
+                }
+            }
+            DataLine.Info info = new DataLine.Info(SourceDataLine.class, fmt, BUFFER_SIZE);
+            line = (SourceDataLine) AudioSystem.getLine(info);
+            line.open(fmt, BUFFER_SIZE);
+            line.start();
+            if (line.isControlSupported(FloatControl.Type.VOLUME)) {
+                volume = (FloatControl) line.getControl(FloatControl.Type.VOLUME);
+            }
+        }
+
+        public void pause() {
+            paused = true;
+
+            synchronized (lock) {
+                if (line != null)
+                    line.stop();
+            }
+        }
+
+        public void play() {
+            if (paused) {
+                if (currentSong == null && order != null) {
+                    Song s = order.next(currentSong);
+                    if (s != null)
+                        open(s, true);
+                    else
+                        return;
+                }
+
+                paused = false;
+
+                synchronized (lock) {
+                    line.start();
+                    lock.notifyAll();
+                }
+            }
+        }
+
+        public void seek(long sample) {
+            PlayerState oldState = state;
+
+            pause();
+
+            if (line != null)
+                line.flush();
+
+            if (decoder != null) {
+                decoder.seekSample(currentSong.getStartPosition() + sample);
+                currentByte = AudioMath.samplesToBytes(sample, decoder.getAudioFormat().getFrameSize());
+
+                if (oldState == PlayerState.PLAYING) {
+                    play();
+                }
+            }
+        }
+
+        public synchronized void open(Song song, boolean force) {
+            if (force) {
+                if (line != null)
+                    line.flush();
+
+                pause();
+
+                if (line != null)
+                    line.flush();
+            }
+
+            try {
+                if (decoder != null) {
+                    decoder.close();
+                }
+
+                if (song != null) {
+                    decoder = PluginLoader.getDecoder(song);
+                    currentSong = song;
+                    currentByte = 0;
+
+                    if (decoder == null || !decoder.open(song))
+                        return;
+
+                    decoder.seekSample(song.getStartPosition());
+                    if (song.getCueID() > 0) {
+                        cueTotalBytes = AudioMath.samplesToBytes(song.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
+                    } else {
+                        cueTotalBytes = 0;
+                    }
+
+                    initLine();
+
+                    fireEvent(FILE_OPENED);
+                }
+
+            } catch (LineUnavailableException e) {
+                e.printStackTrace();
+                pause();
+            }
+        }
+
+        public void stopPlaying() {
+            pause();
+            if (decoder != null)
+                decoder.close();
+            decoder = null;
+            setState(PlayerState.STOPPED);
+        }
+
+        public synchronized long getCurrentSample() {
+            if (decoder != null) {
+                return AudioMath.bytesToSamples(currentByte, decoder.getAudioFormat().getFrameSize());
+            } else return 0;
+        }
+    }
 }

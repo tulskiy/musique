@@ -20,7 +20,6 @@ package com.tulskiy.musique.gui;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.audio.player.PlayerState;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.util.GlobalTimer;
@@ -30,8 +29,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Formatter;
-import java.util.Locale;
 
 /**
  * @Author: Denis Tulskiy
@@ -40,17 +37,12 @@ import java.util.Locale;
 public class StatusBar extends JPanel {
     private JLabel info;
     private JLabel time;
-    private JLabel gain;
 
     private Player player = Application.getInstance().getPlayer();
 
     public StatusBar() {
         info = new JLabel(" ");
         time = new JLabel("0:00");
-//        gain = new JLabel(volumeToString(player.getVolume()));
-//        gain = new JLabel();
-//        gain.setPreferredSize(new Dimension(70, 23));
-//        gain.setHorizontalAlignment(SwingConstants.RIGHT);
 
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(10, 23));
@@ -61,22 +53,16 @@ public class StatusBar extends JPanel {
         box.add(Box.createGlue());
         box.add(time);
         box.add(Box.createHorizontalStrut(20));
-//        box.add(gain);
-//        box.add(Box.createHorizontalStrut(5));
 
         add(box);
 
         buildListeners();
     }
 
-    private String volumeToString(float volume) {
-        return new Formatter().format(Locale.US, "%2.2f dB", volume).toString();
-    }
-
     private void buildListeners() {
         GlobalTimer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (player.getState() == PlayerState.PLAYING) {
+                if (player.isPlaying()) {
                     Song song = player.getSong();
                     String s = Util.samplesToTime(player.getCurrentSample(), song.getSamplerate(), 0);
                     s += " / " + Util.samplesToTime(song.getTotalSamples(), song.getSamplerate(), 0);
@@ -88,10 +74,7 @@ public class StatusBar extends JPanel {
         player.addListener(new PlayerListener() {
             public void onEvent(PlayerEvent e) {
                 switch (e.getEventCode()) {
-                    case VOLUME_CHANGED:
-                        gain.setText(volumeToString(player.getVolume()));
-                        break;
-                    case FINISHED_PLAYING:
+                    case STOPPED:
                         time.setText("0:00");
                 }
             }
