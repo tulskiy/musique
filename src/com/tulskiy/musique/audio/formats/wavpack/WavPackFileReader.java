@@ -24,8 +24,6 @@ import com.tulskiy.musique.playlist.Song;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.wavpack.WavPackReader;
 
-import java.io.File;
-
 /**
  * @Author: Denis Tulskiy
  * @Date: 01.07.2009
@@ -34,14 +32,11 @@ public class WavPackFileReader extends AudioFileReader {
     private static Decoder decoder = new WavPackDecoder();
     private static APETagProcessor apeTagProcessor = new APETagProcessor();
 
-    public Song readSingle(File file) {
-        Song song = new Song();
-        song.setFile(file);
-
+    public Song readSingle(Song song) {
         WavPackReader reader = new WavPackReader();
         try {
             apeTagProcessor.readAPEv2Tag(song);
-            org.jaudiotagger.audio.AudioFile audioFile = reader.read(file);
+            org.jaudiotagger.audio.AudioFile audioFile = reader.read(song.getFile());
             copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), song);
         } catch (Exception e) {
             e.printStackTrace();

@@ -178,11 +178,7 @@ public class ControlPanel extends JPanel {
 
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (player.isPlaying()) {
-                    player.pause();
-                } else if (player.isPaused()) {
-                    player.play();
-                }
+                player.pause();
             }
         });
         nextButton.addActionListener(new ActionListener() {

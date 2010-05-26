@@ -32,7 +32,6 @@ import org.kc7bfi.jflac.metadata.Metadata;
 import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.metadata.VorbisComment;
 
-import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.HashMap;
 
@@ -43,15 +42,11 @@ import java.util.HashMap;
 public class FLACFileReader extends AudioFileReader {
     private static FLACDecoder decoder = new FLACDecoder();
 
-    public Song readSingle(File file) {
-        Song song = new Song();
-
-        song.setFile(file);
-
+    public Song readSingle(Song song) {
         try {
-            if (Util.getFileExt(file).equalsIgnoreCase("oga")) {
+            if (Util.getFileExt(song.getFile()).equalsIgnoreCase("oga")) {
                 OggFlacDecoder dec = new OggFlacDecoder();
-                dec.open(new RandomAccessFile(file, "r"));
+                dec.open(new RandomAccessFile(song.getFile(), "r"));
                 StreamInfo streamInfo = dec.getStreamInfo();
                 song.setSamplerate(streamInfo.getSampleRate());
                 song.setCodec("Ogg FLAC");
@@ -72,14 +67,14 @@ public class FLACFileReader extends AudioFileReader {
                                 vorbisTag.add(vorbisTag.createTagField(key, map.get(key)));
                             }
                         }
-                        copyTagFields(vorbisTag, song, file);
+                        copyTagFields(vorbisTag, song);
                     }
                 }
             } else {
                 FlacFileReader reader = new FlacFileReader();
-                AudioFile af1 = reader.read(file);
+                AudioFile af1 = reader.read(song.getFile());
                 Tag tag = af1.getTag();
-                copyTagFields(tag, song, file);
+                copyTagFields(tag, song);
                 song.setTotalTracks(tag.getFirst("TOTALTRACKS"));
                 song.setDiscNumber(tag.getFirst("DISCNUMBER"));
                 song.setTotalDiscs(tag.getFirst("TOTALDISCS"));

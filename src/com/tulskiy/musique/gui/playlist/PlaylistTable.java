@@ -91,11 +91,12 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     public void setPlaylist(Playlist playlist) {
         sorter.setRowFilter(null);
         this.playlist = playlist;
+        model.fireTableDataChanged();
         update();
     }
 
     public void update() {
-        model.fireTableDataChanged();
+//        model.fireTableDataChanged();
         getTableHeader().revalidate();
         getTableHeader().repaint();
         revalidate();
@@ -142,12 +143,13 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         }
 
         playlist.removeAll(toRemove);
-        sorter.rowsDeleted(
-                getSelectionModel().getMinSelectionIndex(),
-                getSelectionModel().getMaxSelectionIndex());
+//        sorter.rowsDeleted(
+//                getSelectionModel().getMinSelectionIndex(),
+//                getSelectionModel().getMaxSelectionIndex());
 
         clearSelection();
 
+        model.fireTableDataChanged();
         update();
     }
 

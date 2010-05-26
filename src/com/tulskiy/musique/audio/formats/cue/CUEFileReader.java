@@ -48,7 +48,7 @@ public class CUEFileReader extends AudioFileReader {
         }
     }
 
-    public Song readSingle(File file) {
+    public Song readSingle(Song song) {
         //do nothing here
         return null;
     }

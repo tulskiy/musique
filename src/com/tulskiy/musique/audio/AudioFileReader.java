@@ -19,7 +19,6 @@ package com.tulskiy.musique.audio;
 
 import com.tulskiy.musique.audio.formats.cue.CUEParser;
 import com.tulskiy.musique.playlist.Song;
-import com.tulskiy.musique.util.Util;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.tag.Tag;
 
@@ -46,21 +45,31 @@ public abstract class AudioFileReader {
         }
     }
 
-    public abstract Song readSingle(File file);
+    public abstract Song readSingle(Song song);
+
+    public Song readSingle(File file) {
+        Song s = new Song();
+        s.setFile(file);
+        return readSingle(s);
+    }
 
     public abstract boolean isFileSupported(String ext);
 
     public abstract Decoder getDecoder();
 
-    protected void copyTagFields(Tag abstractTag, Song song, File file) throws IOException {
+    private boolean empty(String field) {
+        return field == null || field.isEmpty();
+    }
+
+    protected void copyTagFields(Tag abstractTag, Song song) throws IOException {
         if (abstractTag != null && song != null) {
-            song.setAlbum(abstractTag.getFirstAlbum());
-            song.setArtist(abstractTag.getFirstArtist());
+            if (empty(song.getAlbum())) song.setAlbum(abstractTag.getFirstAlbum());
+            if (empty(song.getArtist())) song.setArtist(abstractTag.getFirstArtist());
             song.setComment(abstractTag.getFirstComment());
-            song.setTitle(abstractTag.getFirstTitle());
-            song.setYear(abstractTag.getFirstYear());
+            if (empty(song.getTitle())) song.setTitle(abstractTag.getFirstTitle());
+            if (empty(song.getYear())) song.setYear(abstractTag.getFirstYear());
             song.setCueSheet(abstractTag.getFirst("CUESHEET"));
-            song.setGenre(abstractTag.getFirstGenre());
+            if (empty(song.getGenre())) song.setGenre(abstractTag.getFirstGenre());
             song.setAlbumArtist(abstractTag.getFirst("ALBUM ARTIST"));
             song.setTrackNumber(abstractTag.getFirstTrack());
 

@@ -22,9 +22,6 @@ import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Song;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.mp4.Mp4FileReader;
-import org.jaudiotagger.tag.mp4.Mp4FieldKey;
-
-import java.io.File;
 
 /**
  * @Author: Denis Tulskiy
@@ -43,17 +40,13 @@ public class MP4FileReader extends AudioFileReader {
     }
 
     @Override
-    public Song readSingle(File file) {
-        Song song = new Song();
-
-        song.setFile(file);
-
+    public Song readSingle(Song song) {
         Mp4FileReader reader = new Mp4FileReader();
         try {
-            org.jaudiotagger.audio.AudioFile audioFile = reader.read(file);
+            org.jaudiotagger.audio.AudioFile audioFile = reader.read(song.getFile());
             copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), song);
             org.jaudiotagger.tag.Tag tag = audioFile.getTag();
-            copyTagFields(tag, song, file);
+            copyTagFields(tag, song);
             song.setTrackNumber(tag.getFirstTrack());
             song.setDiscNumber(tag.getFirst("disk"));
             song.setAlbumArtist(tag.getFirst("aART"));

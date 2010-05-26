@@ -25,8 +25,6 @@ import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.ogg.OggFileReader;
 import org.jaudiotagger.tag.Tag;
 
-import java.io.File;
-
 /**
  * @Author: Denis Tulskiy
  * @Date: 29.06.2009
@@ -34,16 +32,12 @@ import java.io.File;
 public class OGGFileReader extends AudioFileReader {
     private static VorbisDecoder vorbisdecoder = new VorbisDecoder();
 
-    public Song readSingle(File file) {
-        Song song = new Song();
-
-        song.setFile(file);
-
+    public Song readSingle(Song song) {
         try {
             OggFileReader reader = new OggFileReader();
-            AudioFile af1 = reader.read(file);
+            AudioFile af1 = reader.read(song.getFile());
             Tag tag = af1.getTag();
-            copyTagFields(tag, song, file);
+            copyTagFields(tag, song);
             song.setTotalTracks(tag.getFirst("TOTALTRACKS"));
             song.setDiscNumber(tag.getFirst("DISCNUMBER"));
             song.setTotalDiscs(tag.getFirst("TOTALDISCS"));

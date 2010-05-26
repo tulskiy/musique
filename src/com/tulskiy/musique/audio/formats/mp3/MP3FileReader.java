@@ -21,8 +21,6 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
 import com.tulskiy.musique.playlist.Song;
-import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
 import org.jaudiotagger.audio.mp3.LameFrame;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -30,7 +28,6 @@ import org.jaudiotagger.audio.mp3.XingFrame;
 import org.jaudiotagger.tag.TagFieldKey;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -49,16 +46,12 @@ public class MP3FileReader extends AudioFileReader {
         decoder = null;
     }
 
-    public Song readSingle(File file) {
-        Song song = new Song();
-
-        song.setFile(file);
-
+    public Song readSingle(Song song) {
         MP3File mp3File = null;
         boolean hasApe = false;
         try {
             hasApe = apeTagProcessor.readAPEv2Tag(song);
-            mp3File = new MP3File(file, MP3File.LOAD_IDV2TAG, true);
+            mp3File = new MP3File(song.getFile(), MP3File.LOAD_IDV2TAG, true);
         } catch (Exception e) {
 //            e.printStackTrace();
         }
@@ -69,7 +62,7 @@ public class MP3FileReader extends AudioFileReader {
                 try {
                     ID3v24Tag v24Tag = mp3File.getID3v2TagAsv24();
                     if (v24Tag != null) {
-                        copyTagFields(v24Tag, song, file);
+                        copyTagFields(v24Tag, song);
                         if (song.getYear() == null || song.getYear().length() == 0) {
                             song.setYear(v24Tag.getFirst(TagFieldKey.DATE).trim());
                         }

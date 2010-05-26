@@ -36,9 +36,8 @@ import java.io.IOException;
 public class PCMFileReader extends AudioFileReader {
     private static Decoder decoder = new PCMDecoder();
 
-    public Song readSingle(File file) {
-        Song song = new Song();
-        song.setFile(file);
+    public Song readSingle(Song song) {
+        File file = song.getFile();
 
         String title = Util.removeExt(file.getName());
         song.setTitle(title);

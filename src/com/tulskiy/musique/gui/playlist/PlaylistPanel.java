@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.gui.playlist;
 
+import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -38,6 +39,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -175,6 +177,17 @@ public class PlaylistPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+            }
+        });
+
+        tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (song != null && song.getCueID() == -1) {
+                    AudioFileReader reader = PluginLoader.getAudioFileReader(song.getFile().getName());
+                    reader.readSingle(song);
+                    table.update();
+                }
             }
         });
 
@@ -410,12 +423,54 @@ public class PlaylistPanel extends JPanel {
         ButtonGroup gr = new ButtonGroup();
         for (PlaylistTable.Order o : orders) {
             JCheckBoxMenuItem item = new JCheckBoxMenuItem(o.getText());
-            if (o.ordinal() == index)
+            if (o.ordinal() == index) {
                 item.setSelected(true);
+                table.setOrder(o);
+            }
             item.addActionListener(orderListener);
             item.setName(o.toString());
             gr.add(item);
             orderMenu.add(item);
         }
+
+        JMenu controlMenu = new JMenu("Control");
+        playbackMenu.add(controlMenu);
+
+        final Player player = app.getPlayer();
+        ActionListener controlListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String cmd = e.getActionCommand();
+                if (cmd.equals("Next")) {
+                    player.next();
+                }
+                if (cmd.equals("Play")) {
+                    player.play();
+                }
+                if (cmd.equals("Pause")) {
+                    player.pause();
+                }
+                if (cmd.equals("Stop")) {
+                    player.stop();
+                }
+                if (cmd.equals("Previous")) {
+                    player.prev();
+                }
+            }
+        };
+        controlMenu.add(newItem("Next", "", controlListener));
+        controlMenu.add(newItem("Play", "", controlListener));
+        controlMenu.add(newItem("Pause", "", controlListener));
+        controlMenu.add(newItem("Stop", "", controlListener));
+        controlMenu.add(newItem("Previous", "", controlListener));
+
+        playbackMenu.addSeparator();
+
+        playbackMenu.add(newItem("Show Now Playing", "SPACE", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.scrollToSong(player.getSong());
+            }
+        }));
     }
 }

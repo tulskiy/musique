@@ -24,7 +24,6 @@ import davaguine.jmac.info.APEFileInfo;
 import davaguine.jmac.info.APEHeader;
 import davaguine.jmac.tools.RandomAccessFile;
 
-import java.io.File;
 import java.io.IOException;
 
 /**
@@ -39,13 +38,9 @@ public class APEFileReader extends AudioFileReader {
         setUseNativeDecoder(false);
     }
 
-    public Song readSingle(File file) {
+    public Song readSingle(Song song) {
         try {
-            Song song = new Song();
-
-            song.setFile(file);
-
-            RandomAccessFile ras = new RandomAccessFile(file, "r");
+            RandomAccessFile ras = new RandomAccessFile(song.getFile(), "r");
             APEHeader header = new APEHeader(ras);
             APEFileInfo fileInfo = new APEFileInfo();
             header.Analyze(fileInfo);

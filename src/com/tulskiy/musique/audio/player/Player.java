@@ -59,7 +59,10 @@ public class Player {
     }
 
     public void pause() {
-        playerThread.pause();
+        if (isPlaying())
+            playerThread.pause();
+        else if (isPaused())
+            playerThread.play();
     }
 
     public void seek(long sample) {
