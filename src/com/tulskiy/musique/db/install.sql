@@ -59,3 +59,18 @@ create table playlist_columns(
     orientation INTEGER,
     editable BOOLEAN
 );
+
+insert into playlist_columns values (DEFAULT, 'Playing', '$isPlaying()', 55, 0, 0, false);
+insert into playlist_columns values (DEFAULT, 'Name', '[%artist% - ]$if3(%title%, %fileName%)', 365, 1, 0, false);
+insert into playlist_columns values (DEFAULT, 'Length', '%length%', 70, 2, 0, false);
+insert into playlist_columns values (DEFAULT, 'Album', '%album%', 265, 3, 0, false);
+insert into playlist_columns values (DEFAULT, 'Date', '%year%', 55, 4, 0, false);
+
+drop table settings if exists;
+
+create table settings (
+    id INTEGER IDENTITY,
+    key VARCHAR(100) unique NOT NULL,
+    value VARCHAR(2000),
+    type VARCHAR(30)
+);

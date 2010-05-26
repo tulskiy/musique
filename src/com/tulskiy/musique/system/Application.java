@@ -55,7 +55,6 @@ public class Application {
 
         if (firstRun) {
             installDB();
-            defaultSettings();
         }
 
         configuration = new Configuration();
@@ -67,17 +66,26 @@ public class Application {
         player = new Player();
 
         loadSettings();
-
-        try {
-            UIManager.setLookAndFeel(configuration.getProperty("gui.LAF"));
-            UIManager.put("Slider.paintValue", Boolean.FALSE);
-        } catch (Exception e) {
-            System.err.println("Could not load LaF: " + e.getCause());
-        }
     }
 
     private void loadSettings() {
-        player.setVolume(configuration.getDouble("player.volume", 1).floatValue());
+        player.setVolume((float) configuration.getDouble("player.volume", 1));
+        UIManager.put("Slider.paintValue", Boolean.FALSE);
+
+        try {
+            String laf = configuration.getString("gui.LAF", "");
+            if (laf.isEmpty()) {
+                String os = System.getProperty("os.name");
+                if (os.startsWith("Linux")) {
+                    laf = UIManager.getSystemLookAndFeelClassName();
+                } else {
+                    laf = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
+                }
+            }
+            UIManager.setLookAndFeel(laf);
+        } catch (Exception e) {
+            System.err.println("Could not load LaF: " + e.getCause());
+        }
     }
 
     private void saveSettings() {
@@ -86,7 +94,7 @@ public class Application {
         if (lastPlayed != null) {
             configuration.setInt("player.lastPlayed", lastPlayed.getSongID());
         }
-        configuration.setProperty("gui.LAF", UIManager.getLookAndFeel().getClass().getCanonicalName());
+        configuration.setString("gui.LAF", UIManager.getLookAndFeel().getClass().getCanonicalName());
     }
 
     public void start() {
@@ -123,15 +131,6 @@ public class Application {
             dbManager.runScript("install.sql");
         }
     }
-
-    public void defaultSettings() {
-        if (dbManager != null) {
-            dbManager.runScript("defaultSettings.sql");
-            configuration = new Configuration();
-            configuration.load();
-        }
-    }
-
 
     public Configuration getConfiguration() {
         return configuration;

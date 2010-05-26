@@ -67,6 +67,8 @@ public class Configuration {
                     case DOUBLE:
                         p.setValue(res.getDouble("value"));
                         break;
+                    case STRING:
+                        p.setValue(res.getString("value"));
                 }
 
                 properties.put(p.getKey(), p);
@@ -116,16 +118,17 @@ public class Configuration {
         }
     }
 
-    public String getProperty(String key) {
-        return (String) getValue(key);
+    public String getString(String key, String def) {
+        String val = (String) getValue(key);
+        return val != null ? val : def;
     }
 
-    public void setProperty(String key, String value) {
+    public void setString(String key, String value) {
         setValue(key, value, PropertyType.STRING);
     }
 
 
-    public Integer getInt(String key, int def) {
+    public int getInt(String key, int def) {
         Integer val = (Integer) getValue(key);
         return val != null ? val : def;
     }
@@ -134,7 +137,7 @@ public class Configuration {
         setValue(key, value, PropertyType.INTEGER);
     }
 
-    public Double getDouble(String key, double def) {
+    public double getDouble(String key, double def) {
         Double val = (Double) getValue(key);
         return val != null ? val : def;
     }
@@ -186,10 +189,10 @@ public class Configuration {
         setValue(key, Util.getFields(value), type);
     }
 
-    public Color getColor(String key) {
+    public Color getColor(String key, int def) {
         HashMap<String, Object> map = getMap(key);
         if (map == null)
-            return null;
+            return new Color(def);
 
         return new Color(
                 (Integer) map.get("r"),
@@ -230,16 +233,17 @@ public class Configuration {
         setMap(key, map, PropertyType.FONT);
     }
 
-    public Rectangle getRectangle(String key) {
+    public Rectangle getRectangle(String key, int defX, int defY, int defWidth, int defHeight) {
         HashMap<String, Object> map = getMap(key);
-        if (map == null)
-            return null;
-
-        return new Rectangle(
-                (Integer) map.get("x"),
-                (Integer) map.get("y"),
-                (Integer) map.get("width"),
-                (Integer) map.get("height"));
+        if (map == null) {
+            return new Rectangle(defX, defY, defWidth, defHeight);
+        } else {
+            return new Rectangle(
+                    (Integer) map.get("x"),
+                    (Integer) map.get("y"),
+                    (Integer) map.get("width"),
+                    (Integer) map.get("height"));
+        }
     }
 
     public void setRectangle(String key, Rectangle value) {
@@ -252,35 +256,6 @@ public class Configuration {
         map.put("height", (int) value.getHeight());
 
         setMap(key, map, PropertyType.RECTANGLE);
-    }
-
-    public static void main(String[] args) {
-//        DBManager dbManager = DBManager.getInstance();
-//        dbManager.runScript("defaultSettings.sql");
-//        dbManager.runScript("install.sql");
-
-        Configuration conf = new Configuration();
-        conf.load();
-
-//        System.out.println(conf.getColor("color"));
-//        System.out.println(conf.getFont("font"));
-//        System.out.println(conf.getRectangle("rectangle"));
-//        conf.setColor("color", Color.MAGENTA);
-//        conf.setFont("font", Font.decode("Arial-plain-16"));
-//        conf.setRectangle("rectangle", new Rectangle(12, 23, 234, 345));
-
-//        conf.setInt("value1", 15);
-//        conf.setInt("intValue", 10);
-//        conf.setBoolean("boolValue", true);
-//        conf.setDouble("doubleValue", 4.654);
-//        conf.setValue("stringValue", "hello");
-//        conf.setArray("arr", 10, "string", 127);
-
-        conf.save();
-
-        System.out.println("");
-
-//        dbManager.closeConnection();
     }
 
     @Entity("settings")

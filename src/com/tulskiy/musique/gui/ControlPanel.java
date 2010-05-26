@@ -54,8 +54,6 @@ public class ControlPanel extends JPanel {
 
     public ControlPanel() {
         setLayout(new BorderLayout());
-//        Color bgColor = config.getColor("gui.controlPanelBg");
-//        setBackground(bgColor);
 
         progressSlider.setValue(0);
         progressSlider.setFocusable(false);
