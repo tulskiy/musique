@@ -183,7 +183,8 @@ public class Song {
     public void setTrackNumber(String trackNumber) {
         if (trackNumber != null) {
             String[] s = trackNumber.split("/");
-            this.trackNumber = s[0];
+            if (s.length > 0)
+                this.trackNumber = s[0];
             if (s.length > 1)
                 this.totalTracks = s[1];
         }
