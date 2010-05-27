@@ -100,12 +100,14 @@ public class Methods {
             return "";
     }
 
-    public ImageIcon isPlaying(Song song, ArrayList<Expression> args) {
+    public Object isPlaying(Song song, ArrayList<Expression> args) {
         if (app.getPlayer().getSong() == song) {
             if (app.getPlayer().isPaused())
                 return pausedIcon;
             if (app.getPlayer().isPlaying())
                 return playingIcon;
+        } else if (song.getQueuePosition() != -1) {
+            return song.getQueuePosition();
         }
 
         return null;

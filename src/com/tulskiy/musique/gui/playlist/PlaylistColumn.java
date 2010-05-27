@@ -54,10 +54,6 @@ public class PlaylistColumn {
         return expr.eval(song);
     }
 
-    public Class getType() {
-        return expr.getType();
-    }
-
     public int getId() {
         return id;
     }

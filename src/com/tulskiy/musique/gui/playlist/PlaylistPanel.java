@@ -193,7 +193,9 @@ public class PlaylistPanel extends JPanel {
         tableMenu.add(new JMenuItem("Add to Queue")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                for (Song song : songs) {
+                    table.enqueue(song);
+                }
             }
         });
 
@@ -403,6 +405,14 @@ public class PlaylistPanel extends JPanel {
                 table.removeSelected();
             }
         }));
+
+        editMenu.addSeparator();
+        editMenu.add(new JMenuItem("Clear playback queue")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.clearQueue();
+            }
+        });
 
 
         JMenu laf = new JMenu("Look and Feel");

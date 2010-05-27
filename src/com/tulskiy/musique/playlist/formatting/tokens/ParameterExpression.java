@@ -60,11 +60,6 @@ public class ParameterExpression implements Expression {
     }
 
     @Override
-    public Class getType() {
-        return String.class;
-    }
-
-    @Override
     public String toString() {
         return "ParameterExpression{" +
                 "method=" + method +

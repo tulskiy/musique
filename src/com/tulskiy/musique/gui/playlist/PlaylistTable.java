@@ -28,6 +28,7 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 /**
  * Author: Denis Tulskiy
@@ -56,6 +57,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     private TableRowSorter<PlaylistModel> sorter;
     private PlaylistModel model;
     private Order order = Order.DEFAULT;
+    private LinkedList<Song> queue = new LinkedList<Song>();
     private Song lastPlayed;
 
     public PlaylistTable(Playlist playlist, ArrayList<PlaylistColumn> columns) {
@@ -178,9 +180,36 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         }
     }
 
+    public void enqueue(Song song) {
+        queue.add(song);
+        updateQueuePositions();
+    }
+
+    public void clearQueue() {
+        for (Song song : queue) {
+            song.setQueuePosition(-1);
+        }
+        queue.clear();
+        updateQueuePositions();
+    }
+
+    private void updateQueuePositions() {
+        for (int i = 0; i < queue.size(); i++) {
+            queue.get(i).setQueuePosition(i + 1);
+        }
+        update();
+    }
+
     @Override
     public Song next(Song file) {
         int index;
+
+        if (!queue.isEmpty()) {
+            Song song = queue.poll();
+            song.setQueuePosition(-1);
+            updateQueuePositions();
+            return song;
+        }
 
         if (file == null) {
             index = indexOf(lastPlayed);
@@ -255,11 +284,6 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
 
         public Object getValueAt(int rowIndex, int columnIndex) {
             return columns.get(columnIndex).getValue(playlist.get(rowIndex));
-        }
-
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            return columns.get(columnIndex).getType();
         }
     }
 

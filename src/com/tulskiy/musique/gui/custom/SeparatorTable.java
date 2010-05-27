@@ -111,7 +111,7 @@ public class SeparatorTable extends JTable {
         setBackground(getBackground());
         setForeground(getForeground());
         setSelectionBackground(getSelectionBackground());
-        setDefaultRenderer(ImageIcon.class, new IconCellRenderer());
+//        setDefaultRenderer(ImageIcon.class, new IconCellRenderer());
         setDefaultRenderer(Object.class, new DefaultCellRenderer());
     }
 
@@ -253,16 +253,21 @@ public class SeparatorTable extends JTable {
 
             return c;
         }
-    }
-
-    class IconCellRenderer extends DefaultCellRenderer {
-        IconCellRenderer() {
-            setHorizontalAlignment(JLabel.CENTER);
-        }
 
         @Override
         protected void setValue(Object value) {
-            setIcon((value instanceof Icon) ? (Icon) value : null);
+            if (value instanceof ImageIcon) {
+                setIcon((Icon) value);
+                setText(null);
+            } else {
+                super.setValue(value);
+                setIcon(null);
+            }
+
+            if (value instanceof String)
+                setHorizontalAlignment(LEFT);
+            else
+                setHorizontalAlignment(CENTER);
         }
     }
 

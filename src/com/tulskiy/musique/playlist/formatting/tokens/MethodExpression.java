@@ -63,14 +63,6 @@ public class MethodExpression implements Expression {
     }
 
     @Override
-    public Class getType() {
-        if (method != null)
-            return method.getReturnType();
-        else
-            return Object.class;
-    }
-
-    @Override
     public String toString() {
         return "MethodExpression{" +
                 "method=" + method +

@@ -48,10 +48,6 @@ public class Player {
     }
 
     public void play() {
-        if (!playerThread.isAlive()) {
-            playerThread.start();
-        }
-
         if (state != PlayerState.PAUSED)
             open(playerThread.currentSong);
 
@@ -282,6 +278,10 @@ public class Player {
         }
 
         public void play() {
+            if (!isAlive()) {
+                start();
+            }
+
             if (paused) {
                 if (currentSong == null && order != null) {
                     Song s = order.next(currentSong);

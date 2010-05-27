@@ -371,6 +371,16 @@ public class Song {
         return cue;
     }
 
+    private int queuePosition = -1;
+
+    public void setQueuePosition(int queuePosition) {
+        this.queuePosition = queuePosition;
+    }
+
+    public int getQueuePosition() {
+        return queuePosition;
+    }
+
     @Override
     public String toString() {
         return "Song{" +

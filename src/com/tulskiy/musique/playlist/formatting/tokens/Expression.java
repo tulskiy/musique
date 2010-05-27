@@ -25,6 +25,4 @@ import com.tulskiy.musique.playlist.Song;
  */
 public interface Expression {
     public Object eval(Song song);
-
-    public Class getType();
 }
