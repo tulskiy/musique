@@ -71,6 +71,7 @@ public class CUEParser {
                             song.setAlbum(album);
                         String artist = trackData.getPerformer();
                         song.setArtist(artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
+                        song.setAlbumArtist(cueSheet.getPerformer());
                         song.setComment(cueSheet.getComment());
                         song.setTitle(trackData.getTitle());
                         String year = trackData.getMetaData(CueSheet.MetaDataField.YEAR);
