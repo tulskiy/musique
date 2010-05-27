@@ -42,7 +42,6 @@ public class TagProcessor {
     private File currentFile;
 
     public TagProcessor(ArrayList<File> files, Playlist playlist) {
-        TextEncoding.getInstanceOf().setDefaultNonUnicode("windows-1251");
         this.files = files;
         this.playlist = playlist;
     }

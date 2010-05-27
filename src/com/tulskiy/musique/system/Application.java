@@ -26,6 +26,7 @@ import com.tulskiy.musique.db.DBManager;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Song;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import javax.swing.*;
 import java.io.File;
@@ -71,6 +72,8 @@ public class Application {
     private void loadSettings() {
         player.setVolume((float) configuration.getDouble("player.volume", 1));
         UIManager.put("Slider.paintValue", Boolean.FALSE);
+        TextEncoding.getInstanceOf().setDefaultNonUnicode(
+                configuration.getString("tag.defaultEncoding", "windows-1251"));
 
         try {
             String laf = configuration.getString("gui.LAF", "");
