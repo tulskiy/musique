@@ -94,7 +94,8 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             int framesToDecode = targetFrame < DECODE_AFTER_SEEK ? (int) targetFrame : DECODE_AFTER_SEEK;
             for (int i = 0; i < framesToDecode; i++) {
                 readFrame = bitstream.readFrame();
-                decoder.decodeFrame(readFrame, bitstream);
+                if (readFrame != null)
+                    decoder.decodeFrame(readFrame, bitstream);
                 bitstream.closeFrame();
             }
 

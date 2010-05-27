@@ -48,9 +48,7 @@ public class MP3FileReader extends AudioFileReader {
 
     public Song readSingle(Song song) {
         MP3File mp3File = null;
-        boolean hasApe = false;
         try {
-            hasApe = apeTagProcessor.readAPEv2Tag(song);
             mp3File = new MP3File(song.getFile(), MP3File.LOAD_IDV2TAG, true);
         } catch (Exception e) {
 //            e.printStackTrace();
@@ -58,20 +56,18 @@ public class MP3FileReader extends AudioFileReader {
 
 
         if (mp3File != null) {
-            if (!hasApe) {
-                try {
-                    ID3v24Tag v24Tag = mp3File.getID3v2TagAsv24();
-                    if (v24Tag != null) {
-                        copyTagFields(v24Tag, song);
-                        if (song.getYear() == null || song.getYear().length() == 0) {
-                            song.setYear(v24Tag.getFirst(TagFieldKey.DATE).trim());
-                        }
-                        song.setAlbumArtist(v24Tag.getFirst(TagFieldKey.ALBUM_ARTIST).trim());
-                        song.setDiscNumber(v24Tag.getFirst(TagFieldKey.DISC_NO));
+            try {
+                ID3v24Tag v24Tag = mp3File.getID3v2TagAsv24();
+                if (v24Tag != null) {
+                    copyTagFields(v24Tag, song);
+                    if (song.getYear() == null || song.getYear().length() == 0) {
+                        song.setYear(v24Tag.getFirst(TagFieldKey.DATE).trim());
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    song.setAlbumArtist(v24Tag.getFirst(TagFieldKey.ALBUM_ARTIST).trim());
+                    song.setDiscNumber(v24Tag.getFirst(TagFieldKey.DISC_NO));
                 }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
 
             MP3AudioHeader mp3AudioHeader = mp3File.getMP3AudioHeader();
@@ -123,7 +119,15 @@ public class MP3FileReader extends AudioFileReader {
             totalSamples -= enc_delay;
 //            song.setCustomHeaderNumber("mp3_total_samples", totalSamples);
             song.setTotalSamples(totalSamples);
+        } else {
+            try {
+                apeTagProcessor.readAPEv2Tag(song);
+            } catch (IOException e) {
+
+            }
         }
+
+
         return song;
     }
 

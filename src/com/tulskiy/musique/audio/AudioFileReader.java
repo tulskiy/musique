@@ -57,19 +57,15 @@ public abstract class AudioFileReader {
 
     public abstract Decoder getDecoder();
 
-    private boolean empty(String field) {
-        return field == null || field.isEmpty();
-    }
-
     protected void copyTagFields(Tag abstractTag, Song song) throws IOException {
         if (abstractTag != null && song != null) {
-            if (empty(song.getAlbum())) song.setAlbum(abstractTag.getFirstAlbum());
-            if (empty(song.getArtist())) song.setArtist(abstractTag.getFirstArtist());
+            song.setAlbum(abstractTag.getFirstAlbum());
+            song.setArtist(abstractTag.getFirstArtist());
             song.setComment(abstractTag.getFirstComment());
-            if (empty(song.getTitle())) song.setTitle(abstractTag.getFirstTitle());
-            if (empty(song.getYear())) song.setYear(abstractTag.getFirstYear());
+            song.setTitle(abstractTag.getFirstTitle());
+            song.setYear(abstractTag.getFirstYear());
             song.setCueSheet(abstractTag.getFirst("CUESHEET"));
-            if (empty(song.getGenre())) song.setGenre(abstractTag.getFirstGenre());
+            song.setGenre(abstractTag.getFirstGenre());
             song.setAlbumArtist(abstractTag.getFirst("ALBUM ARTIST"));
             song.setTrackNumber(abstractTag.getFirstTrack());
 
