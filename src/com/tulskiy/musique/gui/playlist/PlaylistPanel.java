@@ -61,9 +61,10 @@ public class PlaylistPanel extends JPanel {
     private JTextField searchField;
 
     //stuff for popup menu
-    private TableColumn tc;
-    private Song song;
+    private TableColumn selectedColumn;
+    private ArrayList<Song> songs;
     private JFrame parentFrame;
+    private JScrollPane tableScrollPane;
 
     public PlaylistPanel() {
         playlistManager = app.getPlaylistManager();
@@ -100,7 +101,7 @@ public class PlaylistPanel extends JPanel {
 
         add(box, BorderLayout.NORTH);
 
-        JScrollPane tableScrollPane = new JScrollPane(table);
+        tableScrollPane = new JScrollPane(table);
         add(tableScrollPane, BorderLayout.CENTER);
 
         int lastPlayed = config.getInt("player.lastPlayed", -1);
@@ -130,11 +131,11 @@ public class PlaylistPanel extends JPanel {
         headerMenu.add(new JMenuItem("Edit Column")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tc == null) return;
-                PlaylistColumn column = columns.get(tc.getModelIndex());
+                if (selectedColumn == null) return;
+                PlaylistColumn column = columns.get(selectedColumn.getModelIndex());
                 ColumnDialog dialog = new ColumnDialog(getParentFrame(), "Edit Column", column);
                 if (dialog.showDialog()) {
-                    tc.setHeaderValue(column.getName());
+                    selectedColumn.setHeaderValue(column.getName());
                     table.update();
                 }
             }
@@ -142,12 +143,28 @@ public class PlaylistPanel extends JPanel {
         headerMenu.add(new JMenuItem("Remove Column")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (tc == null) return;
-                PlaylistColumn pc = columns.remove(tc.getModelIndex());
+                if (selectedColumn == null) return;
+                PlaylistColumn pc = columns.remove(selectedColumn.getModelIndex());
                 table.createDefaultColumnsFromModel();
                 columnDBMapper.delete(pc);
             }
         });
+        JCheckBoxMenuItem hideScrollbar = new JCheckBoxMenuItem("Hide Scrollbar");
+        headerMenu.add(hideScrollbar).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
+                if (item.isSelected()) {
+                    config.setBoolean("playlist.hideScrollBar", true);
+                    tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+                } else {
+                    config.setBoolean("playlist.hideScrollBar", false);
+                    tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+                }
+            }
+        });
+        hideScrollbar.setSelected(!config.getBoolean("playlist.hideScrollBar", false));
+        hideScrollbar.doClick();
 
         header.addMouseListener(new MouseAdapter() {
             @Override
@@ -164,7 +181,7 @@ public class PlaylistPanel extends JPanel {
                 if (e.isPopupTrigger()) {
                     int index = header.getColumnModel().getColumnIndexAtX(e.getX());
                     if (index != -1) {
-                        tc = header.getColumnModel().getColumn(index);
+                        selectedColumn = header.getColumnModel().getColumn(index);
                     }
                     headerMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
@@ -183,10 +200,13 @@ public class PlaylistPanel extends JPanel {
         tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (song != null && song.getCueID() == -1) {
-                    AudioFileReader reader = PluginLoader.getAudioFileReader(song.getFile().getName());
-                    reader.readSingle(song);
-                    table.update();
+                if (songs == null) return;
+                for (Song song : songs) {
+                    if (song.getCueID() == -1) {
+                        AudioFileReader reader = PluginLoader.getAudioFileReader(song.getFile().getName());
+                        reader.readSingle(song);
+                        table.update();
+                    }
                 }
             }
         });
@@ -201,7 +221,8 @@ public class PlaylistPanel extends JPanel {
         tableMenu.add(new JMenuItem("Properties")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showInfo(song);
+                if (songs != null && songs.size() > 0)
+                    showInfo(songs.get(0));
             }
         });
 
@@ -218,7 +239,7 @@ public class PlaylistPanel extends JPanel {
 
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    song = table.selectSongAt(e.getPoint());
+                    songs = table.selectSongsAt(e.getPoint());
                     tableMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -237,8 +258,8 @@ public class PlaylistPanel extends JPanel {
         SongInfoDialog dialog = new SongInfoDialog(getParentFrame(), s);
         if (dialog.showDialog()) {
             try {
-                songDBMapper.save(song);
-                PluginLoader.getAudioFileWriter(song.getFilePath()).write(song);
+                songDBMapper.save(s);
+                PluginLoader.getAudioFileWriter(s.getFilePath()).write(s);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -341,6 +362,8 @@ public class PlaylistPanel extends JPanel {
         fileMenu.add("Add Files").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = new JFileChooser();
+                String path = config.getString("playlist.lastDir", "");
+                if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
                 fc.setMultiSelectionEnabled(true);
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int retVal = fc.showOpenDialog(null);
@@ -349,6 +372,8 @@ public class PlaylistPanel extends JPanel {
                     playlistManager.getCurrentPlaylist().addFiles(fc.getSelectedFiles());
                 }
 
+                config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
+                table.dataChanged();
                 table.update();
             }
         });

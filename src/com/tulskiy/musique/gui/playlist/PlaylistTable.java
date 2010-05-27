@@ -66,7 +66,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         setModel(model);
         sorter = new TableRowSorter<PlaylistModel>(model);
         setRowSorter(sorter);
-        getTableHeader().setPreferredSize(new Dimension(100, 25));
+        getTableHeader().setPreferredSize(new Dimension(10000, 25));
     }
 
     @Override
@@ -93,6 +93,10 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         this.playlist = playlist;
         model.fireTableDataChanged();
         update();
+    }
+
+    public void dataChanged() {
+        model.fireTableDataChanged();
     }
 
     public void update() {
@@ -125,14 +129,22 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         return null;
     }
 
-    public Song selectSongAt(Point p) {
+    public ArrayList<Song> selectSongsAt(Point p) {
         int index = rowAtPoint(p);
-        if (index >= 0) {
+        if (index == -1)
+            return null;
+
+        ArrayList<Song> res = new ArrayList<Song>();
+
+        if (!isRowSelected(index)) {
             setRowSelectionInterval(index, index);
-            return playlist.get(convertRowIndexToModel(index));
         }
 
-        return null;
+        for (int i : getSelectedRows()) {
+            res.add(playlist.get(convertRowIndexToModel(i)));
+        }
+
+        return res;
     }
 
     public void removeSelected() {
