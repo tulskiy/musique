@@ -77,7 +77,6 @@ public class SongInfoDialog extends JDialog {
         Box b1 = new Box(BoxLayout.X_AXIS);
         b1.add(Box.createHorizontalGlue());
         write = new JButton("Write");
-        getRootPane().setDefaultButton(write);
         b1.add(write);
         write.addActionListener(new ActionListener() {
             @Override
@@ -99,16 +98,7 @@ public class SongInfoDialog extends JDialog {
                 setVisible(false);
             }
         });
-        addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                System.out.println("here");
-                if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    accept = false;
-                    setVisible(false);
-                }
-            }
-        });
+
         b1.add(Box.createHorizontalStrut(5));
         b1.add(cancel);
         b1.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 10));
@@ -182,8 +172,6 @@ public class SongInfoDialog extends JDialog {
         table.setShowVerticalLines(true);
         table.setIntercellSpacing(new Dimension(1, 1));
         table.setGridColor(Color.lightGray);
-        InputMap map = table.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        map.put(KeyStroke.getKeyStroke("ENTER"), "doNothing");
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
