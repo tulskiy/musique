@@ -48,7 +48,7 @@ public class DBMapper<T> {
     }
 
     public DBMapper(Class<T> mainClass) {
-        System.out.println("Mapper for class" + mainClass);
+//        System.out.println("Mapper for class" + mainClass);
         this.mainClass = mainClass;
         loadFields();
 
