@@ -17,15 +17,11 @@
 
 package com.tulskiy.musique.gui.custom;
 
-import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -173,6 +169,10 @@ public class SeparatorTable extends JTable {
 
     private void center(Rectangle r) {
         Rectangle visible = getVisibleRect();
+        if (visible.isEmpty()) {
+            scrollRectToVisible(r);
+            return;
+        }
 
         visible.x = r.x - (visible.width - r.width) / 2;
         visible.y = r.y - (visible.height - r.height) / 2;
