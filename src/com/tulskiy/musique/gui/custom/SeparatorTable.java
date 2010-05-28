@@ -95,6 +95,14 @@ public class SeparatorTable extends JTable {
         });
     }
 
+    public void addKeyboardAction(KeyStroke keyStroke, String name, Action action) {
+        InputMap imap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ActionMap amap = getActionMap();
+
+        imap.put(keyStroke, name);
+        amap.put(name, action);
+    }
+
     private void initUI() {
 //        setUI(new SpanTableUI());
 

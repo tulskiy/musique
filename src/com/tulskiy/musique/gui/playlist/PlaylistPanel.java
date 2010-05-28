@@ -268,18 +268,65 @@ public class PlaylistPanel extends JPanel {
         }
     }
 
+    private void playSelected() {
+        app.getPlayer().open(table.getSelectedSong());
+        app.getPlayer().play();
+    }
+
     public void buildListeners() {
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-                    app.getPlayer().open(table.getSelectedSong());
-                    app.getPlayer().play();
+                    playSelected();
                 }
             }
         });
 
+        table.addKeyboardAction(KeyStroke.getKeyStroke("ENTER"), "playSelected", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                playSelected();
+            }
+        });
+
         final Player player = app.getPlayer();
+
+        AbstractAction controlAction = new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                String cmd = actionEvent.getActionCommand();
+                if (cmd.equals("b")) {
+                    player.next();
+                }
+                if (cmd.equals("v")) {
+                    player.play();
+                }
+                if (cmd.equals("c")) {
+                    player.pause();
+                }
+                if (cmd.equals("x")) {
+                    player.stop();
+                }
+                if (cmd.equals("z")) {
+                    player.prev();
+                }
+            }
+        };
+
+        table.addKeyboardAction(KeyStroke.getKeyStroke("B"), "next", controlAction);
+        table.addKeyboardAction(KeyStroke.getKeyStroke("V"), "stop", controlAction);
+        table.addKeyboardAction(KeyStroke.getKeyStroke("C"), "pause", controlAction);
+        table.addKeyboardAction(KeyStroke.getKeyStroke("X"), "play", controlAction);
+        table.addKeyboardAction(KeyStroke.getKeyStroke("Z"), "prev", controlAction);
+
+        table.addKeyboardAction(KeyStroke.getKeyStroke("alt ENTER"), "showInfo", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                showInfo(table.getSelectedSong());
+            }
+        });
+
         player.addListener(new PlayerListener() {
             public void onEvent(PlayerEvent e) {
                 table.update();
