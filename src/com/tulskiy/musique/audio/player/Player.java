@@ -117,10 +117,6 @@ public class Player {
         return state == PlayerState.PAUSED;
     }
 
-    public boolean isStopped() {
-        return state == PlayerState.STOPPED;
-    }
-
     public float getVolume() {
         FloatControl volume = playerThread.volume;
         if (volume != null)
@@ -199,7 +195,7 @@ public class Player {
                                 setState(PlayerState.PAUSED);
                             lock.wait();
                         }
-                        if (order == null) {
+                        if (order == null || decoder == null) {
                             stopPlaying();
                             continue;
                         }
@@ -294,7 +290,8 @@ public class Player {
                 paused = false;
 
                 synchronized (lock) {
-                    line.start();
+                    if (line != null)
+                        line.start();
                     lock.notifyAll();
                 }
             }
@@ -339,8 +336,10 @@ public class Player {
                     currentSong = song;
                     currentByte = 0;
 
-                    if (decoder == null || !decoder.open(song))
+                    if (decoder == null || !decoder.open(song)) {
+                        currentSong = null;
                         return;
+                    }
 
                     decoder.seekSample(song.getStartPosition());
                     if (song.getCueID() > 0) {
