@@ -17,8 +17,6 @@
 
 package com.tulskiy.musique.audio.formats.aac.libjfaad;
 
-import com.sun.jna.Platform;
-
 /**
  * Created by IntelliJ IDEA.
  * User: tulskiy
@@ -27,7 +25,7 @@ import com.sun.jna.Platform;
  */
 public class libjfaad {
     static {
-        if (Platform.isWindows()) {
+        if (System.getProperty("os.name").startsWith("Windows")) {
             System.loadLibrary("libfaad2");
             System.loadLibrary("libjfaad");
         } else {

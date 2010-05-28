@@ -39,19 +39,12 @@ public class MP3FileReader extends AudioFileReader {
 
     private static Decoder decoder;
     private APETagProcessor apeTagProcessor = new APETagProcessor();
-    private boolean useNativeDecoder = false;
-
-    public void setUseNativeDecoder(boolean useNativeDecoder) {
-        this.useNativeDecoder = useNativeDecoder;
-        decoder = null;
-    }
 
     public Song readSingle(Song song) {
         MP3File mp3File = null;
         try {
             mp3File = new MP3File(song.getFile(), MP3File.LOAD_IDV2TAG, true);
-        } catch (Exception e) {
-//            e.printStackTrace();
+        } catch (Exception ignored) {
         }
 
 
@@ -73,9 +66,6 @@ public class MP3FileReader extends AudioFileReader {
             MP3AudioHeader mp3AudioHeader = mp3File.getMP3AudioHeader();
             copyHeaderFields(mp3AudioHeader, song);
 
-//            int samplesPerFrame = (int) (mp3AudioHeader.getTimePerFrame() * mp3AudioHeader.getSampleRateAsNumber());
-//            song.setCustomHeaderNumber("samples_per_frame", samplesPerFrame);
-
             long totalSamples = song.getTotalSamples();
             int enc_delay = GAPLESS_DELAY;
 
@@ -91,33 +81,12 @@ public class MP3FileReader extends AudioFileReader {
 
                     if (totalSamples > length)
                         totalSamples = length;
-
-                    /*song.setCustomHeaderField("tool", lameFrame.getEncoder());
-                    String codec_profile = null;
-                    switch (lameFrame.getVbrMethod()) {
-                        case 1:
-                            codec_profile = "CBR";
-                            break;
-                        case 2:
-                            codec_profile = "ABR";
-                            break;
-                        case 3:
-                        case 4:
-                        case 5:
-                        case 6:
-                            codec_profile = "VBR V" + (lameFrame.getVbrMethod() - 2);
-                    }
-                    if (codec_profile != null) {
-                        song.setCustomHeaderField("codec_profile", codec_profile);
-                    } */
                 } else {
                     totalSamples += GAPLESS_DELAY;
                 }
             }
 
-//            song.setCustomHeaderNumber("enc_delay", enc_delay);
             totalSamples -= enc_delay;
-//            song.setCustomHeaderNumber("mp3_total_samples", totalSamples);
             song.setTotalSamples(totalSamples);
         }
 
@@ -137,11 +106,7 @@ public class MP3FileReader extends AudioFileReader {
     @Override
     public Decoder getDecoder() {
         if (decoder == null) {
-            if (useNativeDecoder) {
-                decoder = new MP3NativeDecoder();
-            } else {
-                decoder = new MP3Decoder();
-            }
+            decoder = new MP3Decoder();
         }
         return decoder;
     }

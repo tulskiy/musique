@@ -54,9 +54,7 @@ public class PluginLoader {
 
     static {
         readers = new ArrayList<AudioFileReader>();
-        MP3FileReader mp3Reader = new MP3FileReader();
-//        mp3Reader.setUseNativeDecoder(true);
-        readers.add(mp3Reader);
+        readers.add(new MP3FileReader());
         readers.add(new MP4FileReader());
         readers.add(new APEFileReader());
         readers.add(new CUEFileReader());
