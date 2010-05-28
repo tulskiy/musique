@@ -41,17 +41,17 @@ public class APETagProcessor {
             ras = new RandomAccessFile(song.getFile(), "r");
             APETag tag = new APETag(ras, true);
             if (tag.GetHasAPETag() || tag.GetHasID3Tag()) {
-                song.setAlbum(tag.GetFieldString(APETag.APE_TAG_FIELD_ALBUM));
-                song.setArtist(tag.GetFieldString(APETag.APE_TAG_FIELD_ARTIST));
-                song.setComment(tag.GetFieldString(APETag.APE_TAG_FIELD_COMMENT));
-                song.setTitle(tag.GetFieldString(APETag.APE_TAG_FIELD_TITLE));
-                song.setYear(tag.GetFieldString(APETag.APE_TAG_FIELD_YEAR));
-                song.setGenre(tag.GetFieldString(APETag.APE_TAG_FIELD_GENRE));
-                song.setAlbumArtist(tag.GetFieldString("ALBUM ARTIST"));
-                song.setDiscNumber(tag.GetFieldString("DISC"));
-                song.setTrackNumber(tag.GetFieldString(APETag.APE_TAG_FIELD_TRACK));
+                if (empty(song.getAlbum())) song.setAlbum(tag.GetFieldString(APETag.APE_TAG_FIELD_ALBUM));
+                if (empty(song.getArtist())) song.setArtist(tag.GetFieldString(APETag.APE_TAG_FIELD_ARTIST));
+                if (empty(song.getComment())) song.setComment(tag.GetFieldString(APETag.APE_TAG_FIELD_COMMENT));
+                if (empty(song.getTitle())) song.setTitle(tag.GetFieldString(APETag.APE_TAG_FIELD_TITLE));
+                if (empty(song.getYear())) song.setYear(tag.GetFieldString(APETag.APE_TAG_FIELD_YEAR));
+                if (empty(song.getGenre())) song.setGenre(tag.GetFieldString(APETag.APE_TAG_FIELD_GENRE));
+                if (empty(song.getAlbumArtist())) song.setAlbumArtist(tag.GetFieldString("ALBUM ARTIST"));
+                if (empty(song.getDiscNumber())) song.setDiscNumber(tag.GetFieldString("DISC"));
+                if (empty(song.getTrackNumber())) song.setTrackNumber(tag.GetFieldString(APETag.APE_TAG_FIELD_TRACK));
 
-                song.setCueSheet(tag.GetFieldString("CUESHEET"));
+                if (empty(song.getCueSheet())) song.setCueSheet(tag.GetFieldString("CUESHEET"));
 //                byte[] artwork = tag.GetFieldBinary(APETag.APE_TAG_FIELD_COVER_ART_FRONT);
 //                if (artwork != null) {
 //                    ImageIcon icon = new ImageIcon(artwork);
@@ -70,6 +70,10 @@ public class APETagProcessor {
                 ras.close();
         }
         return false;
+    }
+
+    private boolean empty(String field) {
+        return field == null || field.isEmpty();
     }
 
     public boolean writeAPEv2Tag(Song song) throws IOException {

@@ -119,14 +119,13 @@ public class MP3FileReader extends AudioFileReader {
             totalSamples -= enc_delay;
 //            song.setCustomHeaderNumber("mp3_total_samples", totalSamples);
             song.setTotalSamples(totalSamples);
-        } else {
-            try {
-                apeTagProcessor.readAPEv2Tag(song);
-            } catch (IOException e) {
-
-            }
         }
 
+        try {
+            apeTagProcessor.readAPEv2Tag(song);
+        } catch (IOException ignored) {
+
+        }
 
         return song;
     }
