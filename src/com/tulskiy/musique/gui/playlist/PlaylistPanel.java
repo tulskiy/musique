@@ -40,8 +40,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Vector;
+import java.util.*;
+import java.util.List;
 
 /**
  * @Author: Denis Tulskiy
@@ -103,6 +103,13 @@ public class PlaylistPanel extends JPanel {
 
         tableScrollPane = new JScrollPane(table);
         add(tableScrollPane, BorderLayout.CENTER);
+
+        int sortingColumn = config.getInt("playlist.sortingColumn", -1);
+        if (sortingColumn != -1) {
+            ArrayList<RowSorter.SortKey> list = new ArrayList<RowSorter.SortKey>(1);
+            list.add(new RowSorter.SortKey(sortingColumn, SortOrder.ASCENDING));
+            table.getRowSorter().setSortKeys(list);
+        }
 
         int lastPlayed = config.getInt("player.lastPlayed", -1);
         table.setLastPlayed(new Song(lastPlayed));
@@ -360,6 +367,11 @@ public class PlaylistPanel extends JPanel {
 
         for (PlaylistColumn c : columns) {
             columnDBMapper.save(c);
+        }
+
+        List<? extends RowSorter.SortKey> keys = table.getRowSorter().getSortKeys();
+        if (!keys.isEmpty()) {
+            config.setInt("playlist.sortingColumn", keys.get(0).getColumn());
         }
     }
 
