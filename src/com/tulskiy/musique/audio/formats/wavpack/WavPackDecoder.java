@@ -36,7 +36,6 @@ import java.io.RandomAccessFile;
 public class WavPackDecoder implements Decoder {
     private static final int BUFFER_SIZE = Defines.SAMPLE_BUFFER_SIZE;
 
-    private PCMOutputStream outputStream;
     private AudioFormat audioFormat;
     private WavpackContext wpc;
     private int[] buffer = new int[BUFFER_SIZE];
@@ -66,10 +65,6 @@ public class WavPackDecoder implements Decoder {
         return false;
     }
 
-    public void setOutputStream(PCMOutputStream outputStream) {
-        this.outputStream = outputStream;
-    }
-
     public AudioFormat getAudioFormat() {
         return audioFormat;
     }
@@ -84,7 +79,6 @@ public class WavPackDecoder implements Decoder {
         samplesUnpacked *= channels;
         format_samples(samplesUnpacked);
         int len = samplesUnpacked * bps / 8;
-//        outputStream.write(pcmBuffer, 0, len);
         System.arraycopy(pcmBuffer, 0, buf, 0, len);
 
         return len;
@@ -92,7 +86,8 @@ public class WavPackDecoder implements Decoder {
 
     public void close() {
         try {
-            ras.close();
+            if (ras != null)
+                ras.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

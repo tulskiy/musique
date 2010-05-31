@@ -36,14 +36,6 @@ public interface Decoder {
     public boolean open(Song inputFile);
 
     /**
-     * Set output stream. Each call to {@link Decoder#decode(byte[])}
-     * will write PCM data to the stream
-     *
-     * @param outputStream
-     */
-    public void setOutputStream(PCMOutputStream outputStream);
-
-    /**
      * Get format of the PCM data. Usually it is 44100 kHz, 16 bit, signed,
      * little or big endian
      *

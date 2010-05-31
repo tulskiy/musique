@@ -33,8 +33,6 @@ import java.io.IOException;
  */
 public class VorbisDecoder implements Decoder {
     private VorbisFile vorbisFile;
-    private PCMOutputStream outputStream;
-    private byte[] buffer = new byte[4096];
     private AudioFormat audioFormat;
 
     public boolean open(Song inputFile) {
@@ -48,30 +46,25 @@ public class VorbisDecoder implements Decoder {
         return true;
     }
 
-    public void setOutputStream(PCMOutputStream outputStream) {
-        this.outputStream = outputStream;
-    }
-
     public AudioFormat getAudioFormat() {
         return audioFormat;
     }
 
     public void seekSample(long sample) {
         vorbisFile.pcm_seek(sample);
-//        System.out.println(vorbisFile.pcm_tell());
     }
 
     public int decode(byte[] buf) {
         int ret = vorbisFile.read(buf, buf.length);
         if (ret <= 0)
             return -1;
-//        outputStream.write(buffer, 0, ret);
         return ret;
     }
 
     public void close() {
         try {
-            vorbisFile.close();
+            if (vorbisFile != null)
+                vorbisFile.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

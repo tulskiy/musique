@@ -42,9 +42,6 @@ public class FLACDecoder implements Decoder {
     private org.kc7bfi.jflac.FLACDecoder decoder;
     private ByteData byteData;
     private int offset = -1;
-    private PCMOutputStream outputStream;
-//    private boolean ogg;
-//    private OggFlacDecoder oggDecoder;
 
     public synchronized boolean open(Song iFile) {
         try {
@@ -65,10 +62,6 @@ public class FLACDecoder implements Decoder {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public void setOutputStream(PCMOutputStream outputStream) {
-        this.outputStream = outputStream;
     }
 
     public AudioFormat getAudioFormat() {
@@ -104,7 +97,6 @@ public class FLACDecoder implements Decoder {
     public int decode(byte[] buf) {
         try {
             if (offset != -1) {
-//                outputStream.write(byteData.getData(), offset, byteData.getLen() - offset);
                 int len = byteData.getLen() - offset;
                 System.arraycopy(byteData.getData(), offset, buf, 0, len);
                 offset = -1;
@@ -114,7 +106,6 @@ public class FLACDecoder implements Decoder {
             if (readFrame == null)
                 return -1;
             byteData = decoder.decodeFrame(readFrame, null);
-//            outputStream.write(byteData.getData(), 0, byteData.getLen());
             System.arraycopy(byteData.getData(), 0, buf, 0, byteData.getLen());
             return byteData.getLen();
         } catch (IOException e) {

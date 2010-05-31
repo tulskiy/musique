@@ -25,7 +25,6 @@ import javazoom.jl.decoder.Header;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 /**
@@ -41,7 +40,6 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     private Header readFrame;
     private Song inputFile;
 
-    private PCMOutputStream outputStream;
     private long totalSamples;
     private long streamSize;
     private byte[] buffer = new byte[5000];
@@ -49,7 +47,6 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     private int sampleOffset = 0;
     private int encDelay;
     private long currentSample;
-    private boolean skipFrame = false;
 
     private Header skipFrame() throws BitstreamException {
         readFrame = bitstream.readFrame();
@@ -131,22 +128,12 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        encDelay = (int) song.getCustomHeaderNumber("enc_delay");
-//        System.out.println("EncDelay1: " + encDelay + " EncDelay2: " + t);
         int sampleRate = song.getSamplerate();
         int channels = song.getChannels();
-//        samplesPerFrame = (int) song.getCustomHeaderNumber("samples_per_frame");
-//        System.out.println("Samples per frame: " + samplesPerFrame);
         audioFormat = new AudioFormat(sampleRate, 16, channels, true, false);
-//        long t = song.getCustomHeaderNumber("mp3_total_samples");
-//        System.out.println("Total: " + totalSamples + " t: " + t);
         createBitstream(0, 0);
 
         return true;
-    }
-
-    public void setOutputStream(PCMOutputStream outputStream) {
-        this.outputStream = outputStream;
     }
 
     public AudioFormat getAudioFormat() {
@@ -154,8 +141,6 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     }
 
     public void seekSample(long targetSample) {
-//        if (currentSample == targetSample)
-//            return;
         currentSample = targetSample;
         SeekTable seekTable = SeekTableBuilder.getSeekTableCache().get(inputFile.getFile());
         if (seekTable != null && seekTable.getPointsCount() > 0) {
@@ -209,7 +194,8 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     }
 
     public void close() {
-        bitstream.close();
+        if (bitstream != null)
+            bitstream.close();
         readFrame = null;
     }
 

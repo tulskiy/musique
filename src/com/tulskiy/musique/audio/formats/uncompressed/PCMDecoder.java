@@ -32,9 +32,7 @@ import java.io.IOException;
  * @Date: 30.06.2009
  */
 public class PCMDecoder implements Decoder {
-    private PCMOutputStream outputStream;
     private AudioInputStream audioInputStream;
-    private byte[] readbuf = new byte[40000];
     private Song inputFile;
 
     public boolean open(Song inputFile) {
@@ -49,10 +47,6 @@ public class PCMDecoder implements Decoder {
             e.printStackTrace();
         }
         return false;
-    }
-
-    public void setOutputStream(PCMOutputStream outputStream) {
-        this.outputStream = outputStream;
     }
 
     public AudioFormat getAudioFormat() {
@@ -76,12 +70,7 @@ public class PCMDecoder implements Decoder {
 
     public int decode(byte[] buf) {
         try {
-            int len = audioInputStream.read(buf, 0, buf.length - 1);
-//            if (len < 0) {
-//                return -1;
-//            }
-//            outputStream.write(readbuf, 0, len);
-            return len;
+            return audioInputStream.read(buf, 0, buf.length - 1);
         } catch (IOException e) {
             e.printStackTrace();
         }

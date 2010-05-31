@@ -23,7 +23,6 @@ import com.tulskiy.musique.audio.io.PCMOutputStream;
 import com.tulskiy.musique.playlist.Song;
 
 import javax.sound.sampled.AudioFormat;
-import java.nio.ByteBuffer;
 
 /**
  * @Author: Denis Tulskiy
@@ -34,8 +33,6 @@ public class MP4Decoder implements Decoder {
 
     private int handler;
     private AudioFormat audioFormat;
-    private byte[] buffer = new byte[5000];
-    private PCMOutputStream outputStream;
 
     public boolean open(Song inputFile) {
         handler = lib.open(inputFile.getFile().getAbsolutePath());
@@ -49,10 +46,6 @@ public class MP4Decoder implements Decoder {
         return true;
     }
 
-    public void setOutputStream(PCMOutputStream outputStream) {
-        this.outputStream = outputStream;
-    }
-
     public AudioFormat getAudioFormat() {
         return audioFormat;
     }
@@ -62,15 +55,11 @@ public class MP4Decoder implements Decoder {
     }
 
     public int decode(byte[] buf) {
-//        if (len == -1)
-//            return -1;
-
-//        outputStream.write(buffer, 0, len);
-
         return lib.decode(handler, buf, buf.length);
     }
 
     public void close() {
-        lib.close(handler);
+        if (handler != -1)
+            lib.close(handler);
     }
 }

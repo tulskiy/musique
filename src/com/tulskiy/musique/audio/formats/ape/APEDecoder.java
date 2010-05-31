@@ -39,25 +39,18 @@ public class APEDecoder implements Decoder {
     private IAPEDecompress decoder;
     private static final int BLOCKS_PER_DECODE = 4096 * 2;
     private int blockAlign;
-    private PCMOutputStream outputStream;
-    private byte[] buffer;
 
     public boolean open(Song inputFile) {
         try {
             File apeInputFile = File.createFile(inputFile.getFile().getAbsolutePath(), "r");
             decoder = IAPEDecompress.CreateIAPEDecompress(apeInputFile);
             blockAlign = decoder.getApeInfoBlockAlign();
-            buffer = new byte[blockAlign * BLOCKS_PER_DECODE];
             return true;
         } catch (IOException e) {
             e.printStackTrace();
             close();
         }
         return false;
-    }
-
-    public void setOutputStream(PCMOutputStream outputStream) {
-        this.outputStream = outputStream;
     }
 
     public AudioFormat getAudioFormat() {
@@ -80,11 +73,9 @@ public class APEDecoder implements Decoder {
 
     public int decode(byte[] buf) {
         try {
-//            System.out.println(decoder.getApeInfoDecompressCurrentBlock());
             int blocksDecoded = decoder.GetData(buf, BLOCKS_PER_DECODE);
             if (blocksDecoded <= 0)
                 return -1;
-            //            outputStream.write(buffer, 0, len);
             return blocksDecoded * blockAlign;
         } catch (IOException e) {
             e.printStackTrace();
@@ -96,7 +87,8 @@ public class APEDecoder implements Decoder {
 
     public void close() {
         try {
-            decoder.getApeInfoIoSource().close();
+            if (decoder != null)
+                decoder.getApeInfoIoSource().close();
         } catch (IOException e) {
             e.printStackTrace();
         }
