@@ -89,6 +89,7 @@ public class Song {
     private CUESheet cue;
     private String fileName;
     private String length;
+    private String tracknumber;
 
     public Song() {
 
@@ -187,7 +188,7 @@ public class Song {
             if (s.length > 0) {
                 try {
                     int i = Integer.parseInt(s[0]);
-                    s[0] = new Formatter().format("%02d", i).toString();
+                    this.tracknumber = new Formatter().format("%02d", i).toString();
                 } catch (NumberFormatException ignored) {
                 }
 
@@ -198,6 +199,10 @@ public class Song {
             if (s.length > 1)
                 this.totalTracks = s[1];
         }
+    }
+
+    public String getTracknumber() {
+        return tracknumber;
     }
 
     public String getTotalTracks() {
