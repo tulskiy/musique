@@ -23,6 +23,7 @@ import com.tulskiy.musique.db.Id;
 import com.tulskiy.musique.util.Util;
 
 import java.io.File;
+import java.util.Formatter;
 
 /**
  * @Author: Denis Tulskiy
@@ -183,8 +184,17 @@ public class Song {
     public void setTrackNumber(String trackNumber) {
         if (trackNumber != null) {
             String[] s = trackNumber.split("/");
-            if (s.length > 0)
+            if (s.length > 0) {
+                try {
+                    int i = Integer.parseInt(s[0]);
+                    s[0] = new Formatter().format("%02d", i).toString();
+                } catch (NumberFormatException ignored) {
+                }
+
                 this.trackNumber = s[0];
+
+            }
+
             if (s.length > 1)
                 this.totalTracks = s[1];
         }

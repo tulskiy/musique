@@ -90,7 +90,8 @@ public class PCMDecoder implements Decoder {
 
     public void close() {
         try {
-            audioInputStream.close();
+            if (audioInputStream != null)
+                audioInputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

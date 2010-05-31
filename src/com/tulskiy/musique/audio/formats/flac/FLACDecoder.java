@@ -125,7 +125,8 @@ public class FLACDecoder implements Decoder {
 
     public void close() {
         try {
-            inputFile.close();
+            if (inputFile != null)
+                inputFile.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
