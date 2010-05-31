@@ -53,7 +53,7 @@ public class PlaylistManager {
         }
 
         if (playlists.size() == 0) {
-            addPlaylist("Default");
+            currentPlaylist = addPlaylist("Default");
             savePlaylists();
         }
 
