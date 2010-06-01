@@ -17,15 +17,17 @@
 
 package com.tulskiy.musique.audio.formats.mp3;
 
-import com.tulskiy.musique.audio.io.PCMOutputStream;
 import com.tulskiy.musique.playlist.*;
 import com.tulskiy.musique.util.AudioMath;
 import javazoom.jl.decoder.*;
 import javazoom.jl.decoder.Header;
 
 import javax.sound.sampled.AudioFormat;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * @Author: Denis Tulskiy
@@ -33,6 +35,12 @@ import java.io.IOException;
  */
 public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     private static final int DECODE_AFTER_SEEK = 9;
+    private LinkedHashMap<File, SeekTable> seekTableCache = new LinkedHashMap<File, SeekTable>(10, 0.7f, true) {
+        @Override
+        protected boolean removeEldestEntry(Map.Entry<File, SeekTable> eldest) {
+            return size() > 10;
+        }
+    };
 
     private Bitstream bitstream;
     private javazoom.jl.decoder.Decoder decoder;
@@ -58,44 +66,62 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         return readFrame;
     }
 
+    private int samplesToMinutes(long samples) {
+        return (int) (samples / inputFile.getSamplerate() / 60f);
+    }
+
     @SuppressWarnings({"ResultOfMethodCallIgnored"})
-    private boolean createBitstream(long fileOffset, long targetSample) {
+    private boolean createBitstream(long targetSample) {
         if (bitstream != null)
             bitstream.close();
         bitstream = null;
         try {
-            FileInputStream fis = new FileInputStream(inputFile.getFile());
-            if (fileOffset > 0) {
-                fis.skip(fileOffset);
-            }
-            bitstream = new Bitstream(fis);
-            decoder = new javazoom.jl.decoder.Decoder();
+            File file = inputFile.getFile();
+            FileInputStream fis = new FileInputStream(file);
+
+            //so we compute target frame first
             targetSample += encDelay;
-            if (targetSample > totalSamples) {
-                targetSample = totalSamples;
-            }
-            long targetFrame;
-            if (samplesPerFrame == 0) {
-                targetFrame = 0;
-                sampleOffset = 0;
-            } else {
-                targetFrame = (long) ((double) targetSample / samplesPerFrame);
-                sampleOffset = (int) (targetSample - targetFrame * samplesPerFrame) * audioFormat.getFrameSize();
-//                System.out.println("Seek to frame: " + targetFrame + " with offset: " + sampleOffset + ". File offset: " + fileOffset);
-            }
-            readFrame = null;
-            for (int i = 0; i < targetFrame - DECODE_AFTER_SEEK; i++) {
-                skipFrame();
+            int targetFrame = (int) ((double) targetSample / samplesPerFrame);
+            sampleOffset = (int) (targetSample - targetFrame * samplesPerFrame) * audioFormat.getFrameSize();
+
+            //then we get the seek table or create it if needed
+            SeekTable seekTable = seekTableCache.get(file);
+            if (seekTable == null &&
+                    samplesToMinutes(totalSamples) > 10) {
+                seekTable = new SeekTable();
+                seekTableCache.put(file, seekTable);
             }
 
-            int framesToDecode = targetFrame < DECODE_AFTER_SEEK ? (int) targetFrame : DECODE_AFTER_SEEK;
+            int currentFrame = 0;
+            //if we have a point, use it
+            if (seekTable != null) {
+                SeekTable.SeekPoint seekPoint = seekTable.get(targetFrame - DECODE_AFTER_SEEK);
+                fis.skip(seekPoint.offset);
+                currentFrame = seekPoint.frame;
+            }
+
+            //then we create the bitstream
+            bitstream = new Bitstream(fis);
+            decoder = new javazoom.jl.decoder.Decoder();
+
+            readFrame = null;
+            for (int i = currentFrame; i < targetFrame - DECODE_AFTER_SEEK; i++) {
+                skipFrame();
+                //store frame's position
+                if (seekTable != null && i % 10000 == 0) {
+                    seekTable.add(i, streamSize - bitstream.getPosition());
+                    System.out.println("here " + i);
+                }
+            }
+
+            //decode some frames to warm up the decoder
+            int framesToDecode = targetFrame < DECODE_AFTER_SEEK ? targetFrame : DECODE_AFTER_SEEK;
             for (int i = 0; i < framesToDecode; i++) {
                 readFrame = bitstream.readFrame();
                 if (readFrame != null)
                     decoder.decodeFrame(readFrame, bitstream);
                 bitstream.closeFrame();
             }
-
 
             return true;
         } catch (IOException ex) {
@@ -131,7 +157,8 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         int sampleRate = song.getSamplerate();
         int channels = song.getChannels();
         audioFormat = new AudioFormat(sampleRate, 16, channels, true, false);
-        createBitstream(0, 0);
+        createBitstream(0);
+        currentSample = 0;
 
         return true;
     }
@@ -142,19 +169,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
 
     public void seekSample(long targetSample) {
         currentSample = targetSample;
-        SeekTable seekTable = SeekTableBuilder.getSeekTableCache().get(inputFile.getFile());
-        if (seekTable != null && seekTable.getPointsCount() > 0) {
-            synchronized (seekTable) {
-                SeekTable.SeekPoint sp = seekTable.getHigher(targetSample - DECODE_AFTER_SEEK * samplesPerFrame);
-                createBitstream(sp.byteOffset, targetSample - sp.sampleNumber);
-            }
-        } else {
-            if (seekTable == null) {
-                SeekTableBuilder stb = new SeekTableBuilder(inputFile.getFile(), streamSize, totalSamples, samplesPerFrame);
-                stb.start();
-            }
-            createBitstream(0, targetSample);
-        }
+        createBitstream(targetSample);
     }
 
     public int decode(byte[] buf) {
@@ -179,9 +194,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             if (currentSample > totalSamples) {
                 len -= AudioMath.samplesToBytes(currentSample - totalSamples, audioFormat.getFrameSize());
             }
-//            outputStream.write(buffer, sampleOffset, len);
             System.arraycopy(buffer, sampleOffset, buf, 0, len);
-//            len -= sampleOffset;
             sampleOffset = 0;
             readFrame = null;
             return len;

@@ -17,42 +17,37 @@
 
 package com.tulskiy.musique.audio.formats.mp3;
 
+import java.util.TreeSet;
+
 class SeekTable {
-    private SeekPoint[] points;
-    private int pointsCount;
+    private TreeSet<SeekPoint> points = new TreeSet<SeekPoint>();
 
-    public SeekTable(int totalPoints) {
-        points = new SeekPoint[totalPoints];
-        pointsCount = 0;
+    SeekTable() {
+        points.add(new SeekPoint(0, 0));
     }
 
-    public int getPointsCount() {
-        return pointsCount;
+    public void add(int frame, long offset) {
+        points.add(new SeekPoint(frame, offset));
     }
 
-    public void addSeekPoint(long sampleNumber, long byteOffset) {
-        points[pointsCount++] = new SeekPoint(sampleNumber, byteOffset);
+    public SeekPoint get(int frame) {
+        if (frame < 0)
+            frame = 0;
+        return points.floor(new SeekPoint(frame, 0));
     }
 
-    public SeekPoint getHigher(long targetSample) {
-        if (targetSample < 0)
-            targetSample = 0;
-        for (int i = 0; i < pointsCount; i++) {
-            if (points[i].sampleNumber > targetSample)
-                return points[i - 1];
-            else if (points[i].sampleNumber == targetSample)
-                return points[i];
+    public class SeekPoint implements Comparable<SeekPoint> {
+        public int frame;
+        public long offset;
+
+        SeekPoint(int frame, long offset) {
+            this.frame = frame;
+            this.offset = offset;
         }
-        return points[pointsCount - 1];
-    }
 
-    public class SeekPoint {
-        public long sampleNumber;
-        public long byteOffset;
-
-        SeekPoint(long sampleNumber, long byteOffset) {
-            this.sampleNumber = sampleNumber;
-            this.byteOffset = byteOffset;
+        @Override
+        public int compareTo(SeekPoint seekPoint) {
+            return ((Integer) frame).compareTo(seekPoint.frame);
         }
     }
 }

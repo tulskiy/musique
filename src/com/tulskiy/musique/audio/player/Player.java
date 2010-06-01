@@ -346,7 +346,7 @@ public class Player {
                     }
 
                     decoder.seekSample(song.getStartPosition());
-                    if (song.getCueID() > 0) {
+                    if (song.getCueID() != -1) {
                         cueTotalBytes = AudioMath.samplesToBytes(song.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
                     } else {
                         cueTotalBytes = 0;
