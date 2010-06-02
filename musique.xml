@@ -881,7 +881,7 @@
             <fileset dir="${basedir}/resources/images"/>
         </copy>
         <copy file="${basedir}/Copying" tofile="${artifact.output.release}/Copying"/>
-        <copy file="musique.sh" tofile="${artifact.output.release}/musique"/>
+        <copy file="${basedir}/musique.sh" tofile="${artifact.output.release}/musique.sh"/>
         <copy file="${basedir}/README" tofile="${artifact.output.release}/README"/>
         <copy file="${basedir}/musique.bat" tofile="${artifact.output.release}/musique.bat"/>
         <mkdir dir="${artifact.output.release}/native"/>

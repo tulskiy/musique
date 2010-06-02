@@ -269,7 +269,7 @@ public class Song {
 
     public String getTrack() {
         if (trackNumber != null) {
-            if (totalTracks != null) {
+            if (totalTracks != null && !totalTracks.isEmpty()) {
                 return trackNumber + "/" + totalTracks;
             } else {
                 return trackNumber;
@@ -281,7 +281,7 @@ public class Song {
 
     public String getDisc() {
         if (discNumber != null) {
-            if (totalDiscs != null) {
+            if (totalDiscs != null && !totalDiscs.isEmpty()) {
                 return discNumber + "/" + totalDiscs;
             } else {
                 return discNumber;
@@ -405,9 +405,11 @@ public class Song {
 
     @Override
     public boolean equals(Object obj) {
+        if (!(obj instanceof Song))
+            return false;
         Song s = (Song) obj;
         if (s.songID == -1 || this.songID == -1)
-            return false;
+            return super.equals(obj);
         else
             return s.songID == this.songID;
     }

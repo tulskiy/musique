@@ -8,9 +8,77 @@ This is a 100% Java audio player that supports most popular formats
     * APE
     * WAV, AU, AIFF
 
-note: MP4 support is done through JNI and libfaad2
+note: MP4 support is done through JNI and libfaad2, (32-bit JRE's only)
 
 There is also built in support for CUE files and gapless playback
 
-to compile, run ant -f musique.xml or open the project in IntelliJ IDEA
-Community Edition
+Compiling
+
+    To compile, run ant -f musique.xml or open the project in IntelliJ IDEA
+    Community Edition
+
+    Requirements: Sun JDK 1.6, or OpenJDK 1.6
+
+    Then run either musique.sh or musique.bat
+
+Reading and Editing Tags notes
+
+    Currently non-unicode tags are read as windows1251 (Cyrillic), I'll add settings
+    dialog for that later
+
+    Writing tags for CUE files is also not supported
+
+Title formatting help:
+
+    Everything is pretty much winamp/foobar2000 style:
+    Currently the following tags are supported:
+
+    %artist%, %title%, %album%, %year%, %genre%, %comment%, %length% - Don't need to explain these
+    %albumArtist% - Album Artist, for MP3 I use album artist from TXXX, fb2k style
+    %fileName% - filename without extension
+    %filePath% - full file path
+    %trackNumber%, %totalTracks% - track number and total tracks
+    %tracknumber% - (lower-case 'n') returns track number formatted as a two-digit number
+    %track% - convenience method that returns trackNumber/totalTrack, eg. 1/12
+    %discNumber%, %totalDiscs% - disc number and total discs
+    %codec% - returns codec (mp3, FLAC, WavPack, Ogg Vorbis, Monkey's Audio, PCM)
+
+    you can also use some technical info fields like
+    %bitrate%, %totalSamples%, %songIndex%, %sampleRate%
+
+    You can also use some functions, but not many of them are implemented yet:
+    $if1(arg1, arg2, arg3) - returns arg2 if arg1 is not empty, and arg3 otherwise
+    $if3(arg1, arg2, ...) - returns first non-empty argument
+    $strcmp(arg1, arg2) - returns 1 if arg1=arg2, empty string otherwise
+    $isPlaying() - used to idicate that the song is currently playing, paused or in playback queue
+
+    '' - Regular strings are enclosed in single quotation marks
+    [arg1 arg2] - will return contents only if at least on of the args is not empty
+
+    Some sample usages:
+
+    $if1($strcmp('mp3', %codec%),'this is mp3','hurray to free formats')
+        will compare field 'codec' with string 'mp3', and return 'this is mp3' if they are equal
+
+    [%artist% - ]%title% - returns 'Artist - Title' if artist field is not empty,
+        otherwise returns just 'Title'
+
+    $if3(%title%, %fileName%) - returns file name without extension if title is empty
+
+    $if3(%albumArtist%, %artist%)\%year%\%album%%discNumber%%tracknumber%%title%%fileName%
+        I use this expression to sort my collection
+
+
+Performance Notes
+
+    I've tested the program in Windows 7 on Core 2 Duo 2.13 GHz, JRE 1.6u20 32-bit
+    and average CPU load was less than 1. Memory consumption was around 60-70 Mb
+
+    When I run the program in Ubuntu 10.04 32-bit and OpenJDK 1.6, memory consumption
+    is also around 60-70Mb, but the CPU load is 4%.
+    However, deadbeef and rhytmbox use same amount of CPU so I suspect it's because of
+    PulseAudio.
+
+    I've tested it with 64bit OpenJDK and memory usage was 100Mb and CPU load also 4%
+    Rhytmbox and deadbeef use less than 1%. So I don't know why it's slow.
+    I can't test it on Sun JRE now.
