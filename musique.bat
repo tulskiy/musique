@@ -1,1 +1,1 @@
-java -Djava.library.path=native -Djna.library.path=native -jar musique.jar
+java -Djava.library.path=native -jar musique.jar

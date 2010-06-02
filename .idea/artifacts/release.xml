@@ -19,7 +19,7 @@
         </element>
       </element>
       <element id="file-copy" path="$PROJECT_DIR$/Copying" />
-      <element id="file-copy" path="$PROJECT_DIR$/musique" />
+      <element id="file-copy" path="$PROJECT_DIR$/musique.sh" />
       <element id="file-copy" path="$PROJECT_DIR$/README" />
       <element id="file-copy" path="$PROJECT_DIR$/musique.bat" />
       <element id="directory" name="native">

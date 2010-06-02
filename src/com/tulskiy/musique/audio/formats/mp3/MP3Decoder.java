@@ -110,7 +110,6 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
                 //store frame's position
                 if (seekTable != null && i % 10000 == 0) {
                     seekTable.add(i, streamSize - bitstream.getPosition());
-                    System.out.println("here " + i);
                 }
             }
 
