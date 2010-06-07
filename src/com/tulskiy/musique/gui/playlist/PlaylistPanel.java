@@ -105,7 +105,7 @@ public class PlaylistPanel extends JPanel {
         add(tableScrollPane, BorderLayout.CENTER);
 
         int sortingColumn = config.getInt("playlist.sortingColumn", -1);
-        if (sortingColumn != -1) {
+        if (sortingColumn != -1 && sortingColumn < columns.size()) {
             ArrayList<RowSorter.SortKey> list = new ArrayList<RowSorter.SortKey>(1);
             list.add(new RowSorter.SortKey(sortingColumn, SortOrder.ASCENDING));
             table.getRowSorter().setSortKeys(list);
