@@ -37,13 +37,6 @@ import com.tulskiy.musique.util.Util;
 
 import java.util.ArrayList;
 
-//import java.io.File;
-//import java.net.MalformedURLException;
-//import java.net.URL;
-//import java.net.URLClassLoader;
-//import java.util.ArrayList;
-//import java.util.ServiceLoader;
-
 /**
  * @Author: Denis Tulskiy
  * @Date: 24.06.2009
@@ -90,36 +83,11 @@ public class PluginLoader {
         return null;
     }
 
-    //    private static ServiceLoader<AudioFileReader> audioFileReaderServiceLoader = null;
-
-//    public static AudioFileReader getAudioFileReader(String ext) {
-//        if (audioFileReaderServiceLoader == null) {
-//            loadSPI();
-//        }
-//        for (AudioFileReader fileReader : audioFileReaderServiceLoader) {
-//            if (fileReader.isFileSupported(ext))
-//                return fileReader;
-//        }
-//        return null;
-//    }
-
-//    private static void loadSPI() {
-//        File pluginsDir = new File("plugins");
-//        ArrayList<URL> urls = new ArrayList<URL>();
-//        for (File f : pluginsDir.listFiles()) {
-//            if (Util.getFileExt(f).equalsIgnoreCase("jar")) {
-//                try {
-//                    urls.add(f.toURI().toURL());
-//                } catch (MalformedURLException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//        URLClassLoader pluginClassLoader = new URLClassLoader(urls.toArray(new URL[urls.size()]), ClassLoader.getSystemClassLoader());
-//        audioFileReaderServiceLoader = ServiceLoader.load(AudioFileReader.class, pluginClassLoader);
-//    }
-
     public static Decoder getDecoder(Song audioFile) {
-        return getAudioFileReader(audioFile.getFile().getName()).getDecoder();
+        AudioFileReader reader = getAudioFileReader(audioFile.getFile().getName());
+        if (reader != null)
+            return reader.getDecoder();
+        else
+            return null;
     }
 }

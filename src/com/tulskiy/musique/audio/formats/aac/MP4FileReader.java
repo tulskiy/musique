@@ -33,8 +33,8 @@ public class MP4FileReader extends AudioFileReader {
     static {
         try {
             decoder = new MP4Decoder();
-        } catch (Error e) {
-            System.err.println("Couldn't find libfaad2");
+        } catch (Error ignored) {
+//            System.err.println("Couldn't find libfaad2");
         }
     }
 
@@ -59,8 +59,8 @@ public class MP4FileReader extends AudioFileReader {
 
     @Override
     public boolean isFileSupported(String ext) {
-        return (ext.equalsIgnoreCase("mp4") ||
-                ext.equalsIgnoreCase("m4a"));
+        return decoder != null &&
+                (ext.equalsIgnoreCase("mp4") || ext.equalsIgnoreCase("m4a"));
     }
 
     @Override
