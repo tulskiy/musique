@@ -99,12 +99,13 @@ public class ControlPanel extends JPanel {
         JButton b = new JButton();
         Dimension buttonSize = new Dimension(30, 30);
         b.setIcon(new ImageIcon(path));
-        b.setBorderPainted(false);
         b.setName("nextButton");
         b.setFocusable(false);
-        if (UIManager.getLookAndFeel().getName().contains("Metal")) {
-            b.setBackground(getBackground());
+        String laf = UIManager.getLookAndFeel().getName();
+        if (laf.contains("GTK")) {
+            b.setBorderPainted(false);
         }
+
         b.setPreferredSize(buttonSize);
 
         return b;
