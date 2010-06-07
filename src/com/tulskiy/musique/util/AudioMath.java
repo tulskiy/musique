@@ -33,11 +33,4 @@ public class AudioMath {
     public static double samplesToMillis(long samples, int sampleRate) {
         return (double) samples / sampleRate * 1000;
     }
-
-    public static float linearToDb(double volume) {
-        double minGainDB = -80.0;
-        double ampGainDB = 80.0;
-        double cste = Math.log(10.0) / 20;
-        return (float) (minGainDB + (1 / cste) * Math.log(1 + (Math.exp(cste * ampGainDB) - 1) * volume));
-    }
 }

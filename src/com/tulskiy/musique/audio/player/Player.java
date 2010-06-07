@@ -42,6 +42,7 @@ public class Player {
     private PlayerThread playerThread = new PlayerThread();
     private PlaybackOrder order;
     private float volumeValue = 1f;
+    private boolean linearVolume = false;
 
     public void open(Song song) {
         playerThread.open(song, true);
@@ -93,7 +94,10 @@ public class Player {
         FloatControl v = playerThread.volume;
         this.volumeValue = volume;
         if (v != null) {
-            v.setValue(v.getMaximum() * volume);
+            if (linearVolume)
+                v.setValue(v.getMaximum() * volume);
+            else
+                v.setValue(linearToDb(volume));
         }
     }
 
@@ -119,10 +123,21 @@ public class Player {
 
     public float getVolume() {
         FloatControl volume = playerThread.volume;
-        if (volume != null)
-            return volume.getValue() / volume.getMaximum();
-        else
+        if (volume != null) {
+            if (linearVolume)
+                return volume.getValue() / volume.getMaximum();
+            else
+                return dbToLinear(volume.getValue());
+        } else
             return this.volumeValue;
+    }
+
+    public float linearToDb(double volume) {
+        return (float) (20 * Math.log10(volume));
+    }
+
+    public float dbToLinear(double volume) {
+        return (float) Math.pow(10, volume / 20);
     }
 
     public void setPlaybackOrder(PlaybackOrder order) {
@@ -261,6 +276,11 @@ public class Player {
             if (line.isControlSupported(FloatControl.Type.VOLUME)) {
                 volume = (FloatControl) line.getControl(FloatControl.Type.VOLUME);
                 volume.setValue(volumeValue * volume.getMaximum());
+                linearVolume = true;
+            } else if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
+                volume = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+                volume.setValue(linearToDb(volumeValue));
+                linearVolume = false;
             }
         }
 
