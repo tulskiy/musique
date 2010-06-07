@@ -1,7 +1,8 @@
 <component name="ArtifactManager">
   <artifact name="release">
-    <output-path>$PROJECT_DIR$/tags/current</output-path>
+    <output-path>$PROJECT_DIR$/tags/musique</output-path>
     <root id="root">
+      <element id="artifact" artifact-name="musique" />
       <element id="directory" name="lib">
         <element id="artifact" artifact-name="cuelib" />
         <element id="artifact" artifact-name="jaudiotagger" />
@@ -12,19 +13,15 @@
         <element id="artifact" artifact-name="wavpack" />
         <element id="library" level="project" name="hsqldb" />
       </element>
-      <element id="artifact" artifact-name="musique" />
       <element id="directory" name="resources">
         <element id="directory" name="images">
           <element id="dir-copy" path="$PROJECT_DIR$/resources/images" />
         </element>
       </element>
       <element id="file-copy" path="$PROJECT_DIR$/Copying" />
+      <element id="file-copy" path="$PROJECT_DIR$/musique.bat" />
       <element id="file-copy" path="$PROJECT_DIR$/musique.sh" />
       <element id="file-copy" path="$PROJECT_DIR$/README" />
-      <element id="file-copy" path="$PROJECT_DIR$/musique.bat" />
-      <element id="directory" name="native">
-        <element id="dir-copy" path="$PROJECT_DIR$/native" />
-      </element>
     </root>
   </artifact>
 </component>
