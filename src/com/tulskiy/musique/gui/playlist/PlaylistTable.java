@@ -214,12 +214,11 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         if (file == null) {
             index = indexOf(lastPlayed);
             if (index == -1)
-                index = 0;
+                index = indexOf(new Song(0));
         } else {
             index = indexOf(file);
             if (index == -1)
                 return null;
-
 
             int size = sorter.getViewRowCount();
 

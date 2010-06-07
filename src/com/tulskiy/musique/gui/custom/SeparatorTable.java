@@ -48,26 +48,26 @@ public class SeparatorTable extends JTable {
         buildListeners();
     }
 
-    private boolean isSeparator(int row) {
-        return getModel().getValueAt(row, 0) instanceof Separator;
-    }
+//    private boolean isSeparator(int row) {
+//        return getModel().getValueAt(row, 0) instanceof Separator;
+//    }
 
     private void buildListeners() {
-        getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                if (getSelectedRowCount() == 1) {
-                    if (isSeparator(getSelectedRow())) {
-                        int row = getSelectedRow() + 1;
-
-                        while (row < getModel().getRowCount() && !isSeparator(row)) {
-                            row++;
-                        }
-
-                        getSelectionModel().setSelectionInterval(getSelectedRow(), row - 1);
-                    }
-                }
-            }
-        });
+//        getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//            public void valueChanged(ListSelectionEvent e) {
+//                if (getSelectedRowCount() == 1) {
+//                    if (isSeparator(getSelectedRow())) {
+//                        int row = getSelectedRow() + 1;
+//
+//                        while (row < getModel().getRowCount() && !isSeparator(row)) {
+//                            row++;
+//                        }
+//
+//                        getSelectionModel().setSelectionInterval(getSelectedRow(), row - 1);
+//                    }
+//                }
+//            }
+//        });
 
         InputMap imap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap amap = getActionMap();
