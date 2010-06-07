@@ -61,9 +61,9 @@ create table playlist_columns(
 );
 
 insert into playlist_columns values (DEFAULT, 'Playing', '$isPlaying()', 55, 0, 0, false);
-insert into playlist_columns values (DEFAULT, 'Name', '[%artist% - ]$if3(%title%, %fileName%)', 345, 1, 0, false);
+insert into playlist_columns values (DEFAULT, 'Name', '[%artist% - ]$if3(%title%, %fileName%)', 325, 1, 0, false);
 insert into playlist_columns values (DEFAULT, 'Length', '%length%', 70, 2, 0, false);
-insert into playlist_columns values (DEFAULT, 'Album', '%album%', 245, 3, 0, false);
+insert into playlist_columns values (DEFAULT, 'Album', '%album%', 225, 3, 0, false);
 insert into playlist_columns values (DEFAULT, 'Date', '%year%', 55, 4, 0, false);
 
 drop table settings if exists;
