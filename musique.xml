@@ -53,34 +53,6 @@
         <include name="**/?*.sql"/>
     </patternset>
 
-    <!-- JDK definitions -->
-
-    <property name="jdk.bin.1.6" value="${jdk.home.1.6}/bin"/>
-    <path id="jdk.classpath.1.6">
-        <fileset dir="${jdk.home.1.6}">
-            <include name="jre/lib/jsse.jar"/>
-            <include name="jre/lib/about.jar"/>
-            <include name="jre/lib/jce.jar"/>
-            <include name="jre/lib/resources.jar"/>
-            <include name="jre/lib/javazic.jar"/>
-            <include name="jre/lib/rhino.jar"/>
-            <include name="jre/lib/charsets.jar"/>
-            <include name="jre/lib/compilefontconfig.jar"/>
-            <include name="jre/lib/management-agent.jar"/>
-            <include name="jre/lib/rt.jar"/>
-            <include name="jre/lib/ext/localedata.jar"/>
-            <include name="jre/lib/ext/pulse-java.jar"/>
-            <include name="jre/lib/ext/dnsns.jar"/>
-            <include name="jre/lib/ext/gnome-java-bridge.jar"/>
-            <include name="jre/lib/ext/sunpkcs11.jar"/>
-            <include name="jre/lib/ext/sunjce_provider.jar"/>
-        </fileset>
-    </path>
-
-    <property name="project.jdk.home" value="${jdk.home.1.6}"/>
-    <property name="project.jdk.bin" value="${jdk.bin.1.6}"/>
-    <property name="project.jdk.classpath" value="jdk.classpath.1.6"/>
-
 
     <!-- Project Libraries -->
 
@@ -92,10 +64,6 @@
     <dirname property="module.cuelib.basedir" file="${ant.file}"/>
 
 
-    <property name="module.jdk.home.cuelib" value="${project.jdk.home}"/>
-    <property name="module.jdk.bin.cuelib" value="${project.jdk.bin}"/>
-    <property name="module.jdk.classpath.cuelib" value="${project.jdk.classpath}"/>
-
     <property name="compiler.args.cuelib" value="${compiler.args}"/>
 
     <property name="cuelib.output.dir" value="${module.cuelib.basedir}/out/production/cuelib"/>
@@ -105,9 +73,7 @@
         <!-- Paths to be included in compilation bootclasspath -->
     </path>
 
-    <path id="cuelib.module.classpath">
-        <path refid="${module.jdk.classpath.cuelib}"/>
-    </path>
+    <path id="cuelib.module.classpath"/>
 
     <path id="cuelib.runtime.module.classpath">
         <pathelement location="${cuelib.output.dir}"/>
@@ -136,7 +102,7 @@
     <target name="compile.module.cuelib.production" description="Compile module cuelib; production classes">
         <mkdir dir="${cuelib.output.dir}"/>
         <javac destdir="${cuelib.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.cuelib}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.cuelib}"/>
             <bootclasspath refid="cuelib.module.bootclasspath"/>
             <classpath refid="cuelib.module.classpath"/>
@@ -166,10 +132,6 @@
     <dirname property="module.javalayer.basedir" file="${ant.file}"/>
 
 
-    <property name="module.jdk.home.javalayer" value="${project.jdk.home}"/>
-    <property name="module.jdk.bin.javalayer" value="${project.jdk.bin}"/>
-    <property name="module.jdk.classpath.javalayer" value="${project.jdk.classpath}"/>
-
     <property name="compiler.args.javalayer" value="${compiler.args}"/>
 
     <property name="javalayer.output.dir" value="${module.javalayer.basedir}/out/production/javalayer"/>
@@ -179,9 +141,7 @@
         <!-- Paths to be included in compilation bootclasspath -->
     </path>
 
-    <path id="javalayer.module.classpath">
-        <path refid="${module.jdk.classpath.javalayer}"/>
-    </path>
+    <path id="javalayer.module.classpath"/>
 
     <path id="javalayer.runtime.module.classpath">
         <pathelement location="${javalayer.output.dir}"/>
@@ -210,7 +170,7 @@
     <target name="compile.module.javalayer.production" description="Compile module javalayer; production classes">
         <mkdir dir="${javalayer.output.dir}"/>
         <javac destdir="${javalayer.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.javalayer}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.javalayer}"/>
             <bootclasspath refid="javalayer.module.bootclasspath"/>
             <classpath refid="javalayer.module.classpath"/>
@@ -240,10 +200,6 @@
     <dirname property="module.jflac.basedir" file="${ant.file}"/>
 
 
-    <property name="module.jdk.home.jflac" value="${project.jdk.home}"/>
-    <property name="module.jdk.bin.jflac" value="${project.jdk.bin}"/>
-    <property name="module.jdk.classpath.jflac" value="${project.jdk.classpath}"/>
-
     <property name="compiler.args.jflac" value="${compiler.args}"/>
 
     <property name="jflac.output.dir" value="${module.jflac.basedir}/out/production/jflac"/>
@@ -253,9 +209,7 @@
         <!-- Paths to be included in compilation bootclasspath -->
     </path>
 
-    <path id="jflac.module.classpath">
-        <path refid="${module.jdk.classpath.jflac}"/>
-    </path>
+    <path id="jflac.module.classpath"/>
 
     <path id="jflac.runtime.module.classpath">
         <pathelement location="${jflac.output.dir}"/>
@@ -284,7 +238,7 @@
     <target name="compile.module.jflac.production" description="Compile module jflac; production classes">
         <mkdir dir="${jflac.output.dir}"/>
         <javac destdir="${jflac.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.jflac}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.jflac}"/>
             <bootclasspath refid="jflac.module.bootclasspath"/>
             <classpath refid="jflac.module.classpath"/>
@@ -314,10 +268,6 @@
     <dirname property="module.jmac.basedir" file="${ant.file}"/>
 
 
-    <property name="module.jdk.home.jmac" value="${project.jdk.home}"/>
-    <property name="module.jdk.bin.jmac" value="${project.jdk.bin}"/>
-    <property name="module.jdk.classpath.jmac" value="${project.jdk.classpath}"/>
-
     <property name="compiler.args.jmac" value="${compiler.args}"/>
 
     <property name="jmac.output.dir" value="${module.jmac.basedir}/out/production/jmac"/>
@@ -327,9 +277,7 @@
         <!-- Paths to be included in compilation bootclasspath -->
     </path>
 
-    <path id="jmac.module.classpath">
-        <path refid="${module.jdk.classpath.jmac}"/>
-    </path>
+    <path id="jmac.module.classpath"/>
 
     <path id="jmac.runtime.module.classpath">
         <pathelement location="${jmac.output.dir}"/>
@@ -358,7 +306,7 @@
     <target name="compile.module.jmac.production" description="Compile module jmac; production classes">
         <mkdir dir="${jmac.output.dir}"/>
         <javac destdir="${jmac.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.jmac}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.jmac}"/>
             <bootclasspath refid="jmac.module.bootclasspath"/>
             <classpath refid="jmac.module.classpath"/>
@@ -388,10 +336,6 @@
     <dirname property="module.jorbis.basedir" file="${ant.file}"/>
 
 
-    <property name="module.jdk.home.jorbis" value="${project.jdk.home}"/>
-    <property name="module.jdk.bin.jorbis" value="${project.jdk.bin}"/>
-    <property name="module.jdk.classpath.jorbis" value="${project.jdk.classpath}"/>
-
     <property name="compiler.args.jorbis" value="${compiler.args}"/>
 
     <property name="jorbis.output.dir" value="${module.jorbis.basedir}/out/production/jorbis"/>
@@ -401,9 +345,7 @@
         <!-- Paths to be included in compilation bootclasspath -->
     </path>
 
-    <path id="jorbis.module.classpath">
-        <path refid="${module.jdk.classpath.jorbis}"/>
-    </path>
+    <path id="jorbis.module.classpath"/>
 
     <path id="jorbis.runtime.module.classpath">
         <pathelement location="${jorbis.output.dir}"/>
@@ -432,7 +374,7 @@
     <target name="compile.module.jorbis.production" description="Compile module jorbis; production classes">
         <mkdir dir="${jorbis.output.dir}"/>
         <javac destdir="${jorbis.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.jorbis}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.jorbis}"/>
             <bootclasspath refid="jorbis.module.bootclasspath"/>
             <classpath refid="jorbis.module.classpath"/>
@@ -462,10 +404,6 @@
     <dirname property="module.wavpack.basedir" file="${ant.file}"/>
 
 
-    <property name="module.jdk.home.wavpack" value="${project.jdk.home}"/>
-    <property name="module.jdk.bin.wavpack" value="${project.jdk.bin}"/>
-    <property name="module.jdk.classpath.wavpack" value="${project.jdk.classpath}"/>
-
     <property name="compiler.args.wavpack" value="${compiler.args}"/>
 
     <property name="wavpack.output.dir" value="${module.wavpack.basedir}/out/production/wavpack"/>
@@ -475,9 +413,7 @@
         <!-- Paths to be included in compilation bootclasspath -->
     </path>
 
-    <path id="wavpack.module.classpath">
-        <path refid="${module.jdk.classpath.wavpack}"/>
-    </path>
+    <path id="wavpack.module.classpath"/>
 
     <path id="wavpack.runtime.module.classpath">
         <pathelement location="${wavpack.output.dir}"/>
@@ -506,7 +442,7 @@
     <target name="compile.module.wavpack.production" description="Compile module wavpack; production classes">
         <mkdir dir="${wavpack.output.dir}"/>
         <javac destdir="${wavpack.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.wavpack}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.wavpack}"/>
             <bootclasspath refid="wavpack.module.bootclasspath"/>
             <classpath refid="wavpack.module.classpath"/>
@@ -536,10 +472,6 @@
     <dirname property="module.jaudiotagger.basedir" file="${ant.file}"/>
 
 
-    <property name="module.jdk.home.jaudiotagger" value="${project.jdk.home}"/>
-    <property name="module.jdk.bin.jaudiotagger" value="${project.jdk.bin}"/>
-    <property name="module.jdk.classpath.jaudiotagger" value="${project.jdk.classpath}"/>
-
     <property name="compiler.args.jaudiotagger" value="${compiler.args}"/>
 
     <property name="jaudiotagger.output.dir" value="${module.jaudiotagger.basedir}/out/production/jaudiotagger"/>
@@ -550,7 +482,6 @@
     </path>
 
     <path id="jaudiotagger.module.classpath">
-        <path refid="${module.jdk.classpath.jaudiotagger}"/>
         <pathelement location="${wavpack.output.dir}"/>
         <pathelement location="${wavpack.testoutput.dir}"/>
     </path>
@@ -585,7 +516,7 @@
             description="Compile module jaudiotagger; production classes">
         <mkdir dir="${jaudiotagger.output.dir}"/>
         <javac destdir="${jaudiotagger.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.jaudiotagger}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.jaudiotagger}"/>
             <bootclasspath refid="jaudiotagger.module.bootclasspath"/>
             <classpath refid="jaudiotagger.module.classpath"/>
@@ -615,10 +546,6 @@
     <dirname property="module.musique.basedir" file="${ant.file}"/>
 
 
-    <property name="module.jdk.home.musique" value="${project.jdk.home}"/>
-    <property name="module.jdk.bin.musique" value="${project.jdk.bin}"/>
-    <property name="module.jdk.classpath.musique" value="${project.jdk.classpath}"/>
-
     <property name="compiler.args.musique" value="${compiler.args}"/>
 
     <property name="musique.output.dir" value="${module.musique.basedir}/out/production/musique"/>
@@ -629,7 +556,6 @@
     </path>
 
     <path id="musique.module.classpath">
-        <path refid="${module.jdk.classpath.musique}"/>
         <pathelement location="${jaudiotagger.output.dir}"/>
         <pathelement location="${jaudiotagger.testoutput.dir}"/>
         <pathelement location="${wavpack.output.dir}"/>
@@ -692,7 +618,7 @@
             description="Compile module musique; production classes">
         <mkdir dir="${musique.output.dir}"/>
         <javac destdir="${musique.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.musique}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.musique}"/>
             <bootclasspath refid="musique.module.bootclasspath"/>
             <classpath refid="musique.module.classpath"/>
@@ -712,7 +638,7 @@
             description="compile module musique; test classes" unless="skip.tests">
         <mkdir dir="${musique.testoutput.dir}"/>
         <javac destdir="${musique.testoutput.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}"
-               memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.musique}/javac">
+               memorymaximumsize="${compiler.max.memory}" fork="true">
             <compilerarg line="${compiler.args.musique}"/>
             <classpath refid="musique.module.classpath"/>
             <classpath>
