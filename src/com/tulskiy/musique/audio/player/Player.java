@@ -381,6 +381,16 @@ public class Player {
                 }
 
             } catch (LineUnavailableException e) {
+                System.out.println("Line is unavailable. Listing all mixers");
+                Mixer.Info[] infos = AudioSystem.getMixerInfo();
+                for (Mixer.Info info : infos) {
+                    System.out.println(info.getName() + ": " + info.getDescription());
+                    Mixer mixer = AudioSystem.getMixer(info);
+                    Line.Info[] lineInfo = mixer.getSourceLineInfo();
+                    for (Line.Info info1 : lineInfo) {
+                        System.out.println("\t" + info1);
+                    }
+                }
                 e.printStackTrace();
                 pause();
             }
