@@ -269,8 +269,11 @@ public class Player {
                     return;
                 }
             }
+            System.out.println("Audio format: " + fmt);
             DataLine.Info info = new DataLine.Info(SourceDataLine.class, fmt, BUFFER_SIZE);
+            System.out.println("Dataline Info: " + info);
             line = (SourceDataLine) AudioSystem.getLine(info);
+            System.out.println("Line: " + line);
             line.open(fmt, BUFFER_SIZE);
             line.start();
             if (line.isControlSupported(FloatControl.Type.VOLUME)) {

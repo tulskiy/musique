@@ -45,7 +45,7 @@ public class Playlist extends ArrayList<Song> {
     private ArrayList<File> tempList;
 
     public void load() {
-        System.out.println("Loading playlist " + playlistID);
+//        System.out.println("Loading playlist " + playlistID);
         clear();
         songDBMapper.loadAll("select * from songs where playlistID=" + playlistID + " order by playlistPosition", this);
     }
