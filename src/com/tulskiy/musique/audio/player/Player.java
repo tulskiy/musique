@@ -352,10 +352,10 @@ public class Player {
                 }
 
                 if (song != null) {
-//                    if (!song.getFile().exists()) {
-//                        decoder = null;
-//                        return;
-//                    }
+                    if (!song.getFile().exists()) {
+                        decoder = null;
+                        return;
+                    }
                     decoder = PluginLoader.getDecoder(song);
                     currentSong = song;
                     currentByte = 0;
