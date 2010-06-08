@@ -54,6 +54,7 @@ public class ControlPanel extends JPanel {
 
     public ControlPanel() {
         setLayout(new BorderLayout());
+        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray));
 
         progressSlider.setValue(0);
         progressSlider.setFocusable(false);

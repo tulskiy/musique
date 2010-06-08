@@ -32,7 +32,7 @@ import java.util.Collection;
  */
 @SuppressWarnings({"serial"})
 @Entity("playlists")
-public class Playlist extends ArrayList<Song> {
+public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
     private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
     private DBMapper<CUESheet> cueSheetDBMapper = DBMapper.create(CUESheet.class);
 
@@ -40,6 +40,8 @@ public class Playlist extends ArrayList<Song> {
     private int playlistID = -1;
     @Column
     private String name;
+    @Column
+    private int position;
 
     private boolean stopLoading = false;
     private ArrayList<File> tempList;
@@ -73,6 +75,14 @@ public class Playlist extends ArrayList<Song> {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     @Override
@@ -149,11 +159,16 @@ public class Playlist extends ArrayList<Song> {
 
     @Override
     public boolean equals(Object o) {
-        return this == o;
+        return o instanceof Playlist && this == o;
     }
 
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public int compareTo(Playlist o) {
+        return ((Integer) position).compareTo(o.getPosition());
     }
 }

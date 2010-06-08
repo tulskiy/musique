@@ -26,6 +26,7 @@ import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class PlaylistManager {
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
@@ -47,6 +48,7 @@ public class PlaylistManager {
 
     public void loadPlaylists() {
         playlistDBMapper.loadAll(playlists);
+        Collections.sort(playlists);
 
         for (Playlist playlist : playlists) {
             playlist.load();
@@ -89,9 +91,22 @@ public class PlaylistManager {
         playlists.remove(pl);
     }
 
+    public void movePlaylist(int from, int to) {
+        Playlist p = playlists.get(from);
+        if (from > to)
+            from++;
+        else
+            to++;
+        playlists.add(to, p);
+        playlists.remove(from);
+    }
+
     public void savePlaylists() {
-        for (Playlist playlist : playlists) {
+        for (int i = 0; i < playlists.size(); i++) {
+            Playlist playlist = playlists.get(i);
+            playlist.setPosition(i);
             playlist.save();
+            playlistDBMapper.save(playlist);
         }
         config.setInt("playlist.currentPlaylist", currentPlaylist.getPlaylistID());
     }

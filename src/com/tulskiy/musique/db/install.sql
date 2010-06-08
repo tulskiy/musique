@@ -2,7 +2,8 @@ drop table playlists if exists;
 
 create table playlists (
     playlistID integer identity,
-    name VARCHAR(30)
+    name VARCHAR(30),
+    position INTEGER
 );
 
 drop table cue_sheets if exists;

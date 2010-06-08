@@ -78,12 +78,12 @@ public class Application {
         try {
             String laf = configuration.getString("gui.LAF", "");
             if (laf.isEmpty()) {
-                String os = System.getProperty("os.name");
-                if (os.startsWith("Linux")) {
-                    laf = UIManager.getSystemLookAndFeelClassName();
-                } else {
-                    laf = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
-                }
+//                String os = System.getProperty("os.name");
+//                if (os.startsWith("Linux")) {
+//                    laf = UIManager.getSystemLookAndFeelClassName();
+//                } else {
+                laf = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
+//                }
             }
             UIManager.setLookAndFeel(laf);
         } catch (Exception e) {
@@ -103,7 +103,7 @@ public class Application {
     public void start() {
         try {
             if (mainWindow != null) {
-                mainWindow.setVisible(false);
+                mainWindow.shutdown();
                 mainWindow = null;
             }
 
