@@ -17,7 +17,6 @@
 
 package com.tulskiy.musique.gui.playlist;
 
-import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -27,15 +26,12 @@ import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
-import com.tulskiy.musique.system.PluginLoader;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -48,27 +44,22 @@ import java.util.List;
  */
 public class PlaylistPanel extends JPanel {
     private DBMapper<PlaylistColumn> columnDBMapper = DBMapper.create(PlaylistColumn.class);
-    private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private PlaylistTable table;
     private PlaylistManager playlistManager;
 //    private JComboBox playlistSelection;
-    private ArrayList<PlaylistColumn> columns = new ArrayList<PlaylistColumn>();
+    private ArrayList<PlaylistColumn> columns;
     private Playlist playlist;
     private JTabbedPane tabbedPane;
 
     private JTextField searchField;
-    //stuff for popup menu
-    private TableColumn selectedColumn;
-    private ArrayList<Song> songs;
+
     private Playlist tabPlaylist;
     private int tabIndex;
     private int dragTo = -1;
     private int dragFrom;
-    private JFrame parentFrame;
-    private JScrollPane tableScrollPane;
 
     public PlaylistPanel() {
         playlistManager = app.getPlaylistManager();
@@ -86,6 +77,20 @@ public class PlaylistPanel extends JPanel {
 //            }
 //        });
 
+        columns = new ArrayList<PlaylistColumn>() {
+            @Override
+            public boolean add(PlaylistColumn playlistColumn) {
+                columnDBMapper.save(playlistColumn);
+                return super.add(playlistColumn);
+            }
+
+            @Override
+            public PlaylistColumn remove(int index) {
+                PlaylistColumn pc = get(index);
+                columnDBMapper.delete(pc);
+                return super.remove(index);
+            }
+        };
         columnDBMapper.loadAll("select * from playlist_columns order by position", columns);
         table = new PlaylistTable(playlist, columns);
         app.getPlayer().setPlaybackOrder(table);
@@ -106,7 +111,6 @@ public class PlaylistPanel extends JPanel {
 
 //        add(box, BorderLayout.NORTH);
 
-        tableScrollPane = new JScrollPane(table);
 //        add(tableScrollPane, BorderLayout.CENTER);
         tabbedPane = new JTabbedPane() {
             @Override
@@ -141,7 +145,7 @@ public class PlaylistPanel extends JPanel {
         tabbedPane.setSelectedIndex(playlists.indexOf(playlist));
 
         add(tabbedPane, BorderLayout.NORTH);
-        add(tableScrollPane, BorderLayout.CENTER);
+        add(new JScrollPane(table), BorderLayout.CENTER);
 
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override
@@ -205,140 +209,6 @@ public class PlaylistPanel extends JPanel {
     }
 
     private void createPopupMenu() {
-        final JPopupMenu headerMenu = new JPopupMenu();
-        final JTableHeader header = table.getTableHeader();
-
-        headerMenu.add(new JMenuItem("Add Column")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                PlaylistColumn column = new PlaylistColumn();
-                ColumnDialog dialog = new ColumnDialog(getParentFrame(), "Add Column", column);
-                if (dialog.showDialog()) {
-                    table.saveColumns();
-                    columns.add(column);
-                    table.createDefaultColumnsFromModel();
-                    columnDBMapper.save(column);
-                }
-            }
-        });
-        headerMenu.add(new JMenuItem("Edit Column")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (selectedColumn == null) return;
-                PlaylistColumn column = columns.get(selectedColumn.getModelIndex());
-                ColumnDialog dialog = new ColumnDialog(getParentFrame(), "Edit Column", column);
-                if (dialog.showDialog()) {
-                    selectedColumn.setHeaderValue(column.getName());
-                    table.update();
-                }
-            }
-        });
-        headerMenu.add(new JMenuItem("Remove Column")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (selectedColumn == null) return;
-                PlaylistColumn pc = columns.remove(selectedColumn.getModelIndex());
-                table.createDefaultColumnsFromModel();
-                columnDBMapper.delete(pc);
-            }
-        });
-        JCheckBoxMenuItem hideScrollbar = new JCheckBoxMenuItem("Hide Scrollbar");
-        headerMenu.add(hideScrollbar).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
-                if (item.isSelected()) {
-                    config.setBoolean("playlist.hideScrollBar", true);
-                    tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                } else {
-                    config.setBoolean("playlist.hideScrollBar", false);
-                    tableScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                }
-            }
-        });
-        hideScrollbar.setSelected(!config.getBoolean("playlist.hideScrollBar", false));
-        hideScrollbar.doClick();
-
-        header.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                show(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                show(e);
-            }
-
-            public void show(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    int index = header.getColumnModel().getColumnIndexAtX(e.getX());
-                    if (index != -1) {
-                        selectedColumn = header.getColumnModel().getColumn(index);
-                    }
-                    headerMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
-
-        final JPopupMenu tableMenu = new JPopupMenu();
-
-        tableMenu.add(new JMenuItem("Add to Queue")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (Song song : songs) {
-                    table.enqueue(song);
-                }
-            }
-        });
-
-        tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (songs == null) return;
-                for (Song song : songs) {
-                    if (song.getCueID() == -1) {
-                        AudioFileReader reader = PluginLoader.getAudioFileReader(song.getFile().getName());
-                        reader.readSingle(song);
-                        table.update();
-                    }
-                }
-            }
-        });
-
-        tableMenu.add(new JMenuItem("Remove")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.removeSelected();
-            }
-        });
-
-        tableMenu.add(new JMenuItem("Properties")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (songs != null && songs.size() > 0)
-                    showInfo(songs.get(0));
-            }
-        });
-
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                show(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                show(e);
-            }
-
-            public void show(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    songs = table.selectSongsAt(e.getPoint());
-                    tableMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
 
         final JPopupMenu tabMenu = new JPopupMenu();
 
@@ -355,7 +225,7 @@ public class PlaylistPanel extends JPanel {
                 if (tabIndex == -1)
                     return;
                 String name = JOptionPane.showInputDialog("Rename", tabPlaylist.getName());
-                if (name == null) return;
+                if (name == null || name.isEmpty()) return;
                 tabPlaylist.setName(name);
                 tabbedPane.setTitleAt(tabIndex, name);
             }
@@ -394,24 +264,6 @@ public class PlaylistPanel extends JPanel {
         });
     }
 
-    public JFrame getParentFrame() {
-        if (parentFrame == null) {
-            parentFrame = (JFrame) getRootPane().getParent();
-        }
-        return parentFrame;
-    }
-
-    public void showInfo(Song s) {
-        SongInfoDialog dialog = new SongInfoDialog(getParentFrame(), s);
-        if (dialog.showDialog()) {
-            try {
-                songDBMapper.save(s);
-                PluginLoader.getAudioFileWriter(s.getFilePath()).write(s);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 
     private void playSelected() {
         app.getPlayer().open(table.getSelectedSong());
@@ -468,7 +320,7 @@ public class PlaylistPanel extends JPanel {
         table.addKeyboardAction(KeyStroke.getKeyStroke("alt ENTER"), "showInfo", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-                showInfo(table.getSelectedSong());
+                table.showInfo(table.getSelectedSong());
             }
         });
 
@@ -514,6 +366,7 @@ public class PlaylistPanel extends JPanel {
     }
 
     public void addPlaylist(String name) {
+        if (name == null || name.isEmpty()) return;
         playlist = playlistManager.addPlaylist(name);
 //        playlistSelection.addItem(playlist);
 //        playlistSelection.setSelectedItem(playlist);
