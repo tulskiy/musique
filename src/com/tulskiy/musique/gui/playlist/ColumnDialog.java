@@ -55,13 +55,20 @@ public class ColumnDialog extends JDialog {
         Box b2 = new Box(BoxLayout.X_AXIS);
         b2.add(Box.createHorizontalGlue());
         JButton okButton = new JButton("  OK  ");
+        getRootPane().setDefaultButton(okButton);
         b2.add(okButton);
         okButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                String name = columnName.getText();
+                String fmt = (String) format.getSelectedItem();
+                if (name == null || name.isEmpty() || fmt == null || fmt.isEmpty()) {
+                    accept = false;
+                    return;
+                }
                 accept = true;
-                column.setName(columnName.getText());
-                column.setExpression((String) format.getSelectedItem());
+                column.setName(name);
+                column.setExpression(fmt);
                 setVisible(false);
             }
         });
