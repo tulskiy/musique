@@ -145,7 +145,7 @@ public class PlaylistPanel extends JPanel {
         tabbedPane.setSelectedIndex(playlists.indexOf(playlist));
 
         add(tabbedPane, BorderLayout.NORTH);
-        add(new JScrollPane(table), BorderLayout.CENTER);
+        add(table.getScrollPane(), BorderLayout.CENTER);
 
         tabbedPane.addChangeListener(new ChangeListener() {
             @Override

@@ -84,7 +84,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         sorter = new TableRowSorter<PlaylistModel>(model);
         setRowSorter(sorter);
         getTableHeader().setPreferredSize(new Dimension(10000, 20));
-        scrollPane = new JScrollPane();
+        scrollPane = new JScrollPane(this);
         buildMenus();
     }
 
