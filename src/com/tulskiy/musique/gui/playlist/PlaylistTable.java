@@ -118,6 +118,10 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         update();
     }
 
+    public Playlist getPlaylist() {
+        return playlist;
+    }
+
     public void dataChanged() {
         model.fireTableDataChanged();
     }

@@ -85,7 +85,11 @@ public class SeparatorTable extends JTable {
         amap.put("goDown", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 int selectedRow = getSelectionModel().getAnchorSelectionIndex();
-                selectedRow = Math.min(selectedRow + 1, getModel().getRowCount() - 1);
+                int count = getModel().getRowCount();
+                if (getRowSorter() != null) {
+                    count = getRowSorter().getViewRowCount();
+                }
+                selectedRow = Math.min(selectedRow + 1, count - 1);
                 changeSelection(selectedRow, 0, false, false);
             }
         });

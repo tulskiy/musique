@@ -399,7 +399,6 @@ public class PlaylistPanel extends JPanel {
                 addPlaylist(name);
             }
         });
-
         fileMenu.add("Remove Playlist").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -412,9 +411,7 @@ public class PlaylistPanel extends JPanel {
 //                playlistSelection.setSelectedIndex(0);
             }
         });
-
         fileMenu.addSeparator();
-
         fileMenu.add("Add Files").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = new JFileChooser();
@@ -433,16 +430,13 @@ public class PlaylistPanel extends JPanel {
                 table.update();
             }
         });
-
         fileMenu.addSeparator();
-
         fileMenu.add(newItem("Quit", "control Q", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 app.exit();
             }
         }));
-
 
         editMenu.add("Clear").addActionListener(new ActionListener() {
             @Override
@@ -452,14 +446,12 @@ public class PlaylistPanel extends JPanel {
                 table.update();
             }
         });
-
         editMenu.add(newItem("Remove", "DELETE", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 table.removeSelected();
             }
         }));
-
         editMenu.addSeparator();
         editMenu.add(new JMenuItem("Clear playback queue")).addActionListener(new ActionListener() {
             @Override
@@ -467,7 +459,12 @@ public class PlaylistPanel extends JPanel {
                 table.clearQueue();
             }
         });
-
+        editMenu.add(newItem("Search", "ctrl F", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new SearchDialog(table).setVisible(true);
+            }
+        }));
 
         JMenu laf = new JMenu("Look and Feel");
         ActionListener lafListener = new ActionListener() {

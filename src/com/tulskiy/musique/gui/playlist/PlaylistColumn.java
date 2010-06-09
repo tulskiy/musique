@@ -50,6 +50,15 @@ public class PlaylistColumn {
 
     private Expression expr;
 
+    public PlaylistColumn() {
+    }
+
+    public PlaylistColumn(String name, int size, String expression) {
+        this.name = name;
+        this.size = size;
+        setExpression(expression);
+    }
+
     public Object getValue(Song song) {
         return expr.eval(song);
     }
