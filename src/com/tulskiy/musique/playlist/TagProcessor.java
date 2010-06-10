@@ -25,13 +25,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: 23.06.2009
  */
 public class TagProcessor {
-    private final ArrayList<File> files;
+    private final LinkedList<File> files;
     private final ArrayList<Song> audioFiles = new ArrayList<Song>();
     private Playlist playlist;
 
@@ -39,9 +40,13 @@ public class TagProcessor {
         return currentFile;
     }
 
+    public int getFilesLeft() {
+        return files.size();
+    }
+
     private File currentFile;
 
-    public TagProcessor(ArrayList<File> files, Playlist playlist) {
+    public TagProcessor(LinkedList<File> files, Playlist playlist) {
         this.files = files;
         this.playlist = playlist;
     }
@@ -70,6 +75,12 @@ public class TagProcessor {
         playlist.addAll(audioFiles);
     }
 
+    public void cancel() {
+        synchronized (files) {
+            files.clear();
+        }
+    }
+
     private class Worker extends Thread {
         @Override
         public void run() {
@@ -78,7 +89,7 @@ public class TagProcessor {
             while (true) {
                 synchronized (files) {
                     if (files.size() > 0) {
-                        file = files.remove(0);
+                        file = files.pop();
                     } else break;
                 }
 

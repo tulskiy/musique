@@ -25,6 +25,7 @@ import com.tulskiy.musique.db.Id;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * @Author: Denis Tulskiy
@@ -99,40 +100,6 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
         }
 
         return true;
-    }
-
-    public void addFiles(File... files) {
-        tempList = new ArrayList<File>();
-        for (File f : files) {
-            if (f.isDirectory()) {
-                loadDirectory(f);
-            } else if (f.isFile()) {
-                tempList.add(f);
-            }
-        }
-
-        TagProcessor tagProcessor = new TagProcessor(tempList, this);
-        tagProcessor.start();
-    }
-
-    private void loadDirectory(File dir) {
-        if (stopLoading) {
-            return;
-        }
-        if (dir.isDirectory()) {
-            File[] files = dir.listFiles();
-
-            for (File file : files) {
-                if (stopLoading) {
-                    break;
-                }
-                if (file.isFile()) {
-                    tempList.add(file);
-                } else {
-                    loadDirectory(file);
-                }
-            }
-        }
     }
 
     @Override

@@ -421,8 +421,7 @@ public class PlaylistPanel extends JPanel {
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int retVal = fc.showOpenDialog(null);
                 if (retVal == JFileChooser.APPROVE_OPTION) {
-//                    ProgressMonitor pm = new ProgressMonitor(null, "Adding Files", "", 0, 100);
-                    playlistManager.getCurrentPlaylist().addFiles(fc.getSelectedFiles());
+                    new ProgressDialog(table.getParentFrame(), "Adding files").addFiles(playlist, fc.getSelectedFiles());
                 }
 
                 config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
