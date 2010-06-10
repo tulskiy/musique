@@ -184,6 +184,11 @@ public class Player {
         }
     }
 
+    public void setMixer(Mixer.Info info) {
+        playerThread.mixer = AudioSystem.getMixer(info);
+        playerThread.mixerChanged = true;
+    }
+
     class PlayerThread extends Thread {
         private final int BUFFER_SIZE = (int) Math.pow(2, 16);
 
@@ -196,6 +201,8 @@ public class Player {
         private Song nextSong;
         private Decoder decoder;
         private long cueTotalBytes;
+        private Mixer mixer;
+        private boolean mixerChanged;
 
         @SuppressWarnings({"InfiniteLoopStatement", "ConstantConditions"})
         @Override
@@ -261,7 +268,8 @@ public class Player {
             AudioFormat fmt = decoder.getAudioFormat();
             //if it is same format and the line is opened, do nothing
             if (line != null) {
-                if (!line.getFormat().matches(fmt)) {
+                if (mixerChanged || !line.getFormat().matches(fmt)) {
+                    mixerChanged = false;
                     line.drain();
                     line.close();
                     line = null;
@@ -272,7 +280,12 @@ public class Player {
             System.out.println("Audio format: " + fmt);
             DataLine.Info info = new DataLine.Info(SourceDataLine.class, fmt, BUFFER_SIZE);
             System.out.println("Dataline Info: " + info);
-            line = (SourceDataLine) AudioSystem.getLine(info);
+            if (mixer != null && mixer.isLineSupported(info)) {
+                line = (SourceDataLine) mixer.getLine(info);
+                System.out.println("Mixer: " + mixer.getMixerInfo().getDescription());
+            } else {
+                line = AudioSystem.getSourceDataLine(fmt);
+            }
             System.out.println("Line: " + line);
             line.open(fmt, BUFFER_SIZE);
             line.start();
@@ -391,7 +404,12 @@ public class Player {
                         System.out.println("\t" + info1);
                     }
                 }
-                e.printStackTrace();
+                for (Mixer.Info i : AudioSystem.getMixerInfo()) {
+                    for (Line l : AudioSystem.getMixer(i).getSourceLines()) {
+                        l.close();
+                    }
+                }
+//                e.printStackTrace();
                 pause();
             }
         }

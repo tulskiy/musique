@@ -27,6 +27,8 @@ import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Mixer;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -203,6 +205,20 @@ public class PlaylistPanel extends JPanel {
 
         int lastPlayed = config.getInt("player.lastPlayed", -1);
         table.setLastPlayed(new Song(lastPlayed));
+
+        /*Mixer.Info[] info = AudioSystem.getMixerInfo();
+        final JComboBox mixers = new JComboBox(info);
+        mixers.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Mixer.Info mixer = (Mixer.Info) mixers.getSelectedItem();
+                app.getPlayer().setMixer(mixer);
+            }
+        });
+
+        mixers.setSelectedItem(0);
+
+        add(mixers, BorderLayout.SOUTH);*/
 
         buildListeners();
         createPopupMenu();
