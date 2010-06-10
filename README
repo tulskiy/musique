@@ -70,15 +70,32 @@ Title formatting help:
 
 
 Performance Notes
+    The program should be run in client mode, not server, otherwise memory and CPU
+    usage will be too high.
 
     I've tested the program in Windows 7 on Core 2 Duo 2.13 GHz, JRE 1.6u20 32-bit
-    and average CPU load was less than 1. Memory consumption was around 60-70 Mb
+    and average CPU load was less than 1. Memory consumption was around 40-50 Mb
 
     When I run the program in Ubuntu 10.04 32-bit and OpenJDK 1.6, memory consumption
-    is also around 60-70Mb, but the CPU load is 4%.
+    is also around 40-50Mb, but the CPU load is 4%.
     However, deadbeef and rhytmbox use same amount of CPU so I suspect it's because of
     PulseAudio.
 
-    I've tested it with 64bit OpenJDK and memory usage was 100Mb and CPU load also 4%
-    Rhytmbox and deadbeef use less than 1%. So I don't know why it's slow.
-    I can't test it on Sun JRE now.
+    If you are running a 64-bit system and 64-bit JDK, it can not be run in client mode,
+    so it is better to install a 32-bit JRE. Then just change path to jre in musique.sh
+
+Troubleshooting
+
+    On Linux, Sun JRE is using alsa for sound output and the implementation is known to be
+    very buggy. Issues include conflicts with PulseAudio - player throws LineUnavailableException
+    when some other program is playing audio, or, when the player is running, other programs can not
+    play sound.
+
+    So if you use PulseAudio, it is best to install OpenJDK, which has good
+    PulseAudio support. If you don't want to use OpenJDK, you can copy PulseAudio support
+    from OpenJDK to Sun JDK using these instructions:
+    https://bugs.launchpad.net/ubuntu/+source/sun-java6/+bug/457144
+
+    copy the following files from openjdk folder to java-sun folder
+    ./jre/lib/(i386, amd64)/libpulse-java.so
+    ./jre/ext/pulse-java.jar
