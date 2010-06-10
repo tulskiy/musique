@@ -94,8 +94,10 @@ Troubleshooting
     So if you use PulseAudio, it is best to install OpenJDK, which has good
     PulseAudio support. If you don't want to use OpenJDK, you can copy PulseAudio support
     from OpenJDK to Sun JDK using these instructions:
-    https://bugs.launchpad.net/ubuntu/+source/sun-java6/+bug/457144
 
     copy the following files from openjdk folder to java-sun folder
     ./jre/lib/(i386, amd64)/libpulse-java.so
     ./jre/ext/pulse-java.jar
+
+    another solution is to use padsp to redirect sound to pulseaudio,
+    in this case, run musique-padsp.sh instead of musique.sh
