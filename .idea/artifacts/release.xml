@@ -22,6 +22,8 @@
       <element id="file-copy" path="$PROJECT_DIR$/musique.bat" />
       <element id="file-copy" path="$PROJECT_DIR$/musique.sh" />
       <element id="file-copy" path="$PROJECT_DIR$/README" />
+      <element id="file-copy" path="$PROJECT_DIR$/musique-padsp.sh" />
+      <element id="file-copy" path="$PROJECT_DIR$/musique-32bit.sh" />
     </root>
   </artifact>
 </component>

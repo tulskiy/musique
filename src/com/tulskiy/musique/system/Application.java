@@ -131,6 +131,7 @@ public class Application {
 
     public void installDB() {
         if (dbManager != null) {
+            System.out.println("Installing database");
             dbManager.runScript("install.sql");
         }
     }
