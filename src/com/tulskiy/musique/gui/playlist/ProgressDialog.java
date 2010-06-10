@@ -41,8 +41,8 @@ public class ProgressDialog extends JDialog {
         super(owner, message, true);
 
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(owner);
         setSize(400, 100);
+        setLocationRelativeTo(owner);
 
         progress = new JProgressBar(0, 100);
         status = new JLabel("Scanning folders...");

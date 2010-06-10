@@ -37,7 +37,6 @@ public class ColumnDialog extends JDialog {
     public ColumnDialog(JFrame parent, String title, final PlaylistColumn column) {
         super(parent, title, true);
         setLayout(new BorderLayout());
-        setLocationRelativeTo(parent);
 
         JPanel p1 = new JPanel(new GridLayout(4, 1));
         p1.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -87,6 +86,8 @@ public class ColumnDialog extends JDialog {
         add(b2, BorderLayout.SOUTH);
         pack();
         setSize(300, getHeight());
+        setLocationRelativeTo(parent);
+
     }
 
     public boolean showDialog() {
