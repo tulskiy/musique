@@ -39,7 +39,7 @@ public class WavPackFileReader extends AudioFileReader {
             org.jaudiotagger.audio.AudioFile audioFile = reader.read(song.getFile());
             copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), song);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Couldn't read file: " + song.getFilePath());
         }
         return song;
     }

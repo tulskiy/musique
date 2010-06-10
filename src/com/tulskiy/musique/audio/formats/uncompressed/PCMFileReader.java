@@ -51,11 +51,8 @@ public class PCMFileReader extends AudioFileReader {
             song.setCodec("PCM");
             if (format.getFrameLength() > 0)
                 song.setBitrate((int) (file.length() / format.getFrameLength() / format.getFormat().getSampleRate()));
-        } catch (UnsupportedAudioFileException e) {
-            System.out.println("Unsopported: " + file.getAbsolutePath());
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Couldn't read file: " + song.getFilePath());
         }
         return song;
     }

@@ -49,8 +49,8 @@ public class APEFileReader extends AudioFileReader {
             tagProcessor.readAPEv2Tag(song);
             ras.close();
             return song;
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            System.out.println("Couldn't read file: " + song.getFilePath());
         }
         return null;
     }

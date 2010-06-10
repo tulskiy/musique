@@ -82,7 +82,7 @@ public class FLACFileReader extends AudioFileReader {
                 copyHeaderFields(audioHeader, song);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Couldn't read file: " + song.getFilePath());
         }
         return song;
     }

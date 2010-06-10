@@ -43,7 +43,7 @@ public class OGGFileReader extends AudioFileReader {
             song.setTotalDiscs(tag.getFirst("TOTALDISCS"));
             copyHeaderFields((GenericAudioHeader) af1.getAudioHeader(), song);
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Couldn't read file: " + song.getFilePath());
         }
         return song;
     }

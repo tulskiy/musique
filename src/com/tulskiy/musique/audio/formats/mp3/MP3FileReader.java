@@ -45,6 +45,7 @@ public class MP3FileReader extends AudioFileReader {
         try {
             mp3File = new MP3File(song.getFile(), MP3File.LOAD_IDV2TAG, true);
         } catch (Exception ignored) {
+            System.out.println("Couldn't read file: " + song.getFilePath());
         }
 
 

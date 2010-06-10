@@ -51,7 +51,7 @@ public class MP4FileReader extends AudioFileReader {
             song.setAlbumArtist(tag.getFirst("aART"));
 //            song.setCustomHeaderField("tool", audioFile.getTag().getFirst(Mp4FieldKey.ENCODER.getFieldName()));
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("Couldn't read file: " + song.getFilePath());
         }
 
         return song;
