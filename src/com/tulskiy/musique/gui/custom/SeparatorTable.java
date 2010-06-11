@@ -17,9 +17,15 @@
 
 package com.tulskiy.musique.gui.custom;
 
+import sun.swing.DefaultLookup;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.synth.Region;
+import javax.swing.plaf.synth.SynthContext;
+import javax.swing.plaf.synth.SynthLookAndFeel;
+import javax.swing.plaf.synth.SynthStyle;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
@@ -121,6 +127,14 @@ public class SeparatorTable extends JTable {
         setSelectionBackground(getSelectionBackground());
 //        setDefaultRenderer(ImageIcon.class, new IconCellRenderer());
         setDefaultRenderer(Object.class, new DefaultCellRenderer());
+
+        //fix dropLine colors, I fucking hate Nimbus
+        Color droplineColor = UIManager.getColor("Table.dropLineShortColor");
+        UIManager.getDefaults().put("Table.dropLineColor", droplineColor);
+        UIDefaults defaults = new UIDefaults();
+        defaults.put("Table.dropLineColor", droplineColor);
+        putClientProperty("Nimbus.Overrides", defaults);
+        putClientProperty("Nimbus.Overrides.InheritDefaults", false);
     }
 
     @Override
@@ -252,9 +266,8 @@ public class SeparatorTable extends JTable {
                 c = separatorCellRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus,
                         row, column);
             } else {
-                c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+                c = super.getTableCellRendererComponent(table, value, isSelected, false,
                         row, column);
-                setBorder(BorderFactory.createEmptyBorder(1, 3, 1, 3));
             }
 
             if (!isSelected) {

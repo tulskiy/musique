@@ -89,17 +89,24 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
     @Override
     public boolean add(Song song) {
         song.setPlaylistID(playlistID);
-//        songDBMapper.save(song);
         return super.add(song);
     }
 
     @Override
     public boolean addAll(Collection<? extends Song> c) {
         for (Song s : c) {
-            add(s);
+            s.setPlaylistID(playlistID);
         }
 
-        return true;
+        return super.addAll(c);
+    }
+
+    @Override
+    public boolean addAll(int index, Collection<? extends Song> c) {
+        for (Song s : c) {
+            s.setPlaylistID(playlistID);
+        }
+        return super.addAll(index, c);
     }
 
     @Override

@@ -21,14 +21,15 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.db.DBMapper;
+import com.tulskiy.musique.gui.dialogs.ProgressDialog;
+import com.tulskiy.musique.gui.dialogs.SearchDialog;
+import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Mixer;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -206,6 +207,9 @@ public class PlaylistPanel extends JPanel {
         int lastPlayed = config.getInt("player.lastPlayed", -1);
         table.setLastPlayed(new Song(lastPlayed));
 
+        table.setDragEnabled(true);
+        table.setDropMode(DropMode.INSERT_ROWS);
+        table.setTransferHandler(new PlaylistTransferHandler());
         /*Mixer.Info[] info = AudioSystem.getMixerInfo();
         final JComboBox mixers = new JComboBox(info);
         mixers.addActionListener(new ActionListener() {
@@ -437,7 +441,9 @@ public class PlaylistPanel extends JPanel {
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int retVal = fc.showOpenDialog(null);
                 if (retVal == JFileChooser.APPROVE_OPTION) {
-                    new ProgressDialog(table.getParentFrame(), "Adding files").addFiles(playlist, fc.getSelectedFiles());
+                    ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding files");
+                    dialog.addFiles(playlist, Arrays.asList(fc.getSelectedFiles()));
+                    table.update();
                 }
 
                 config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
@@ -574,4 +580,6 @@ public class PlaylistPanel extends JPanel {
             }
         }));
     }
+
+
 }

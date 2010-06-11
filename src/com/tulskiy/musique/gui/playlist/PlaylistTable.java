@@ -21,6 +21,8 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.gui.custom.SeparatorTable;
+import com.tulskiy.musique.gui.dialogs.ColumnDialog;
+import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;
@@ -153,6 +155,15 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
             return playlist.get(convertRowIndexToModel(index));
 
         return null;
+    }
+
+    public ArrayList<Song> getSelectedSongs() {
+        int[] rows = getSelectedRows();
+        ArrayList<Song> songs = new ArrayList<Song>();
+        for (int row : rows) {
+            songs.add(playlist.get(convertRowIndexToModel(row)));
+        }
+        return songs;
     }
 
     private ArrayList<Song> selectSongsAt(Point p) {
