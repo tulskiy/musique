@@ -124,11 +124,12 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
         super.clear();
     }
 
-    public boolean removeAll(Collection<?> c) {
+    public void deleteAll(Collection<?> c) {
         for (Object song : c) {
             songDBMapper.delete((Song) song);
         }
-        return super.removeAll(c);
+
+        removeAll(c);
     }
 
     @Override

@@ -191,7 +191,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
             toRemove.add(playlist.get(convertRowIndexToModel(i)));
         }
 
-        playlist.removeAll(toRemove);
+        playlist.deleteAll(toRemove);
         sorter.rowsDeleted(
                 getSelectionModel().getMinSelectionIndex(),
                 getSelectionModel().getMaxSelectionIndex());

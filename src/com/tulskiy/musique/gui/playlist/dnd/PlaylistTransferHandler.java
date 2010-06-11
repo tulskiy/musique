@@ -80,20 +80,23 @@ public class PlaylistTransferHandler extends TransferHandler {
 
         Transferable t = support.getTransferable();
         PlaylistTable table = (PlaylistTable) support.getComponent();
-        DataFlavor[] flavors = t.getTransferDataFlavors();
-        for (DataFlavor flavor : flavors) {
-            System.out.println(flavor);
-        }
 
         try {
             if (support.isDataFlavorSupported(SongsSelection.getFlavor())) {
                 List<Song> songs = (List<Song>) t.getTransferData(SongsSelection.getFlavor());
+                Playlist playlist = table.getPlaylist();
 
                 JTable.DropLocation dl = (JTable.DropLocation) support.getDropLocation();
-                int row = table.convertRowIndexToModel(dl.getRow());
-                System.out.println(row);
+                int index = dl.getRow();
+                int row;
+                if (index == playlist.size()) {
+                    //corner case
+                    row = index;
+                } else {
+                    row = table.convertRowIndexToModel(index);
+                }
+
                 if (row != -1) {
-                    Playlist playlist = table.getPlaylist();
                     int toSubstract = 0;
                     for (Song song : songs) {
                         if (playlist.indexOf(song) < row)
@@ -128,7 +131,7 @@ public class PlaylistTransferHandler extends TransferHandler {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
