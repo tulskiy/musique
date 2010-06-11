@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui.playlist;
+package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.TagProcessor;
@@ -70,7 +70,7 @@ public class ProgressDialog extends JDialog {
         add(status, BorderLayout.SOUTH);
     }
 
-    public void addFiles(final Playlist playlist, final File[] files) {
+    public void addFiles(final Playlist playlist, final java.util.List<File> files) {
         Thread t = new Thread(new Runnable() {
             @Override
             public void run() {

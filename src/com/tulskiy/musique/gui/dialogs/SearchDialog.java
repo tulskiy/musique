@@ -15,9 +15,11 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui.playlist;
+package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.gui.playlist.PlaylistColumn;
+import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Song;
 import com.tulskiy.musique.system.Application;

@@ -15,7 +15,9 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui.playlist;
+package com.tulskiy.musique.gui.dialogs;
+
+import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 
 import javax.swing.*;
 import java.awt.*;
