@@ -164,7 +164,7 @@ public class SongInfoDialog extends JDialog {
     }
 
     private JComponent createTable(TableModel model) {
-        SeparatorTable table = new SeparatorTable();
+        final SeparatorTable table = new SeparatorTable();
         table.setModel(model);
 
         table.getColumn("Key").setPreferredWidth(100);
@@ -172,6 +172,24 @@ public class SongInfoDialog extends JDialog {
         table.setShowVerticalLines(true);
         table.setIntercellSpacing(new Dimension(1, 1));
         table.setGridColor(Color.lightGray);
+        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.addKeyboardAction(KeyStroke.getKeyStroke("ENTER"), "startEditing", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                table.editCellAt(table.getSelectedRow(), 1);
+            }
+        });
+
+        table.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (table.isEditing() && (
+                        e.getKeyCode() == KeyEvent.VK_DOWN ||
+                                e.getKeyCode() == KeyEvent.VK_UP)) {
+                    table.getCellEditor().stopCellEditing();
+                }
+            }
+        });
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -214,7 +232,7 @@ public class SongInfoDialog extends JDialog {
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 1;
+            return columnIndex == 1 && write.isEnabled();
         }
     }
 }
