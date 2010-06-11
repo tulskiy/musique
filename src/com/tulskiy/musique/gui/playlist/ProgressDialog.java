@@ -94,7 +94,9 @@ public class ProgressDialog extends JDialog {
                     @Override
                     public void actionPerformed(ActionEvent e) {
                         progress.setValue(progress.getMaximum() - tagProcessor.getFilesLeft());
-                        status.setText(tagProcessor.getCurrentFile().getPath());
+                        File currentFile = tagProcessor.getCurrentFile();
+                        if (currentFile != null)
+                            status.setText(currentFile.getPath());
                     }
                 });
                 timer.start();
