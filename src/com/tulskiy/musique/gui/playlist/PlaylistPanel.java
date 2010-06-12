@@ -33,8 +33,6 @@ import com.tulskiy.musique.system.Configuration;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -52,33 +50,13 @@ public class PlaylistPanel extends JPanel {
     private Configuration config = app.getConfiguration();
     private PlaylistTable table;
     private PlaylistManager playlistManager;
-//    private JComboBox playlistSelection;
     private ArrayList<PlaylistColumn> columns;
     private Playlist playlist;
     private JTabbedPane tabbedPane;
 
-    private JTextField searchField;
-
-    private Playlist tabPlaylist;
-    private int tabIndex;
-    private int dragTo = -1;
-    private int dragFrom;
-
     public PlaylistPanel() {
         playlistManager = app.getPlaylistManager();
         playlist = playlistManager.getCurrentPlaylist();
-//        playlistSelection = new JComboBox(new Vector<Playlist>(playlistManager.getPlaylists()));
-//        playlistSelection.setSelectedItem(playlist);
-
-//        playlistSelection.addActionListener(new ActionListener() {
-//            public void actionPerformed(ActionEvent e) {
-//                JComboBox box = (JComboBox) e.getSource();
-//                playlist = (Playlist) box.getSelectedItem();
-//                searchField.setText("");
-//                table.setPlaylist(playlist);
-//                playlistManager.selectPlaylist(playlist);
-//            }
-//        });
 
         columns = new ArrayList<PlaylistColumn>() {
             @Override
@@ -100,102 +78,10 @@ public class PlaylistPanel extends JPanel {
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
-        Box box = new Box(BoxLayout.X_AXIS);
-        box.add(Box.createHorizontalStrut(5));
-        box.add(new JLabel("Playlist "));
-//        box.add(playlistSelection);
-        box.add(Box.createHorizontalStrut(10));
-        box.add(new JLabel("Search: "));
-        searchField = new JTextField();
-        searchField.setMaximumSize(new Dimension(300, 40));
-        searchField.setPreferredSize(new Dimension(300, 0));
-        box.add(searchField);
-        box.setBorder(BorderFactory.createEmptyBorder(3, 3, 3, 3));
 
-//        add(box, BorderLayout.NORTH);
-
-//        add(tableScrollPane, BorderLayout.CENTER);
-        tabbedPane = new JTabbedPane() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                if (dragTo != -1 && dragFrom != -1 && dragTo != dragFrom) {
-                    Rectangle b = tabbedPane.getBoundsAt(dragTo);
-                    g.setColor(Color.GRAY);
-                    int x = (int) (b.getX());
-                    if (dragTo > dragFrom)
-                        x += b.getWidth();
-                    int y = (int) b.getY();
-                    g.fillRect(x - 1, y + 2, 3, (int) b.getHeight() - 2);
-
-                    int[] xP = {x - 1, x - 5, x + 5, x + 1};
-                    int[] yP = {y + 2, y - 5, y - 5, y + 2};
-                    g.fillPolygon(xP, yP, xP.length);
-                }
-            }
-        };
-        final ArrayList<Playlist> playlists = playlistManager.getPlaylists();
-        for (Playlist pl : playlists) {
-            tabbedPane.add(pl.getName(), null);
-        }
-
-        if (UIManager.getLookAndFeel().getName().contains("GTK")) {
-            tabbedPane.setPreferredSize(new Dimension(10000, 30));
-        } else {
-            tabbedPane.setPreferredSize(new Dimension(10000, 25));
-        }
-        tabbedPane.setFocusable(false);
-        tabbedPane.setSelectedIndex(playlists.indexOf(playlist));
-
+        tabbedPane = new TabbedPane();
         add(tabbedPane, BorderLayout.NORTH);
         add(table.getScrollPane(), BorderLayout.CENTER);
-
-        tabbedPane.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int index = tabbedPane.getSelectedIndex();
-                if (index == -1) return;
-                playlist = playlistManager.getPlaylist(index);
-                table.setPlaylist(playlist);
-                playlistManager.selectPlaylist(playlist);
-            }
-        });
-
-        tabbedPane.addMouseMotionListener(new MouseMotionListener() {
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                dragTo = tabbedPane.indexAtLocation(e.getX(), e.getY());
-                tabbedPane.repaint();
-            }
-
-            @Override
-            public void mouseMoved(MouseEvent e) {
-            }
-        });
-
-        tabbedPane.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
-                    playlistManager.movePlaylist(dragFrom, dragTo);
-
-                    for (int i = 0; i < playlists.size(); i++) {
-                        Playlist pl = playlists.get(i);
-                        tabbedPane.setTitleAt(i, pl.getName());
-                    }
-
-                    tabbedPane.setSelectedIndex(dragTo);
-                }
-                dragTo = -1;
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-                dragFrom = tabbedPane.indexAtLocation(e.getX(), e.getY());
-            }
-        });
-
-//        add(cPanel, BorderLayout.CENTER);
 
         int sortingColumn = config.getInt("playlist.sortingColumn", -1);
         if (sortingColumn != -1 && sortingColumn < columns.size()) {
@@ -210,80 +96,9 @@ public class PlaylistPanel extends JPanel {
         table.setDragEnabled(true);
         table.setDropMode(DropMode.INSERT_ROWS);
         table.setTransferHandler(new PlaylistTransferHandler());
-        /*Mixer.Info[] info = AudioSystem.getMixerInfo();
-        final JComboBox mixers = new JComboBox(info);
-        mixers.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Mixer.Info mixer = (Mixer.Info) mixers.getSelectedItem();
-                app.getPlayer().setMixer(mixer);
-            }
-        });
-
-        mixers.setSelectedItem(0);
-
-        add(mixers, BorderLayout.SOUTH);*/
 
         buildListeners();
-        createPopupMenu();
     }
-
-    private void createPopupMenu() {
-
-        final JPopupMenu tabMenu = new JPopupMenu();
-
-        tabMenu.add(new JMenuItem("New Playlist")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String name = JOptionPane.showInputDialog("Enter Playlist Name", "New Playlist");
-                addPlaylist(name);
-            }
-        });
-        tabMenu.add(new JMenuItem("Rename")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (tabIndex == -1)
-                    return;
-                String name = JOptionPane.showInputDialog("Rename", tabPlaylist.getName());
-                if (name == null || name.isEmpty()) return;
-                tabPlaylist.setName(name);
-                tabbedPane.setTitleAt(tabIndex, name);
-            }
-        });
-        tabMenu.add(new JMenuItem("Remove Playlist")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (tabIndex == -1) return;
-                tabbedPane.remove(tabIndex);
-                playlistManager.removePlaylist(tabPlaylist);
-                if (playlistManager.getTotalPlaylists() == 0) {
-                    addPlaylist("Default");
-                }
-            }
-        });
-
-        tabbedPane.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                show(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                show(e);
-            }
-
-            public void show(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
-                    if (tabIndex != -1)
-                        tabPlaylist = playlistManager.getPlaylist(tabIndex);
-                    tabMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
-    }
-
 
     private void playSelected() {
         app.getPlayer().open(table.getSelectedSong());
@@ -353,23 +168,6 @@ public class PlaylistPanel extends JPanel {
                 }
             }
         });
-
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                table.filter(searchField.getText());
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                table.filter(searchField.getText());
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                table.filter(searchField.getText());
-            }
-        });
     }
 
     public void shutdown() {
@@ -388,11 +186,18 @@ public class PlaylistPanel extends JPanel {
     public void addPlaylist(String name) {
         if (name == null || name.isEmpty()) return;
         playlist = playlistManager.addPlaylist(name);
-//        playlistSelection.addItem(playlist);
-//        playlistSelection.setSelectedItem(playlist);
 
         tabbedPane.add(name, null);
         tabbedPane.setSelectedIndex(playlistManager.getTotalPlaylists() - 1);
+    }
+
+    private void removePlaylist(int index) {
+        Playlist pl = playlistManager.getPlaylist(index);
+        tabbedPane.remove(index);
+        playlistManager.removePlaylist(pl);
+        if (playlistManager.getTotalPlaylists() == 0) {
+            addPlaylist("Default");
+        }
     }
 
     private JMenuItem newItem(String name, String hotkey, ActionListener al) {
@@ -422,13 +227,7 @@ public class PlaylistPanel extends JPanel {
         fileMenu.add("Remove Playlist").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                tabbedPane.remove(playlistManager.getPlaylists().indexOf(playlist));
-//                playlistSelection.removeItem(playlist);
-                playlistManager.removePlaylist(playlist);
-                if (playlistManager.getTotalPlaylists() == 0) {
-                    addPlaylist("Default");
-                }
-//                playlistSelection.setSelectedIndex(0);
+                removePlaylist(tabbedPane.getSelectedIndex());
             }
         });
         fileMenu.addSeparator();
@@ -581,5 +380,146 @@ public class PlaylistPanel extends JPanel {
         }));
     }
 
+    class TabbedPane extends JTabbedPane {
+        private ArrayList<Playlist> playlists;
+        private Playlist tabPlaylist;
+        private int tabIndex;
+        private int dragTo = -1;
+        private int dragFrom;
+
+        TabbedPane() {
+            playlists = playlistManager.getPlaylists();
+            for (Playlist pl : playlists) {
+                add(pl.getName(), null);
+            }
+
+            if (UIManager.getLookAndFeel().getName().contains("GTK")) {
+                setPreferredSize(new Dimension(10000, 30));
+            } else {
+                setPreferredSize(new Dimension(10000, 25));
+            }
+            setFocusable(false);
+            setSelectedIndex(playlists.indexOf(playlist));
+
+            buildListeners();
+            createPopupMenu();
+        }
+
+        private void buildListeners() {
+            addChangeListener(new ChangeListener() {
+                @Override
+                public void stateChanged(ChangeEvent e) {
+                    int index = tabbedPane.getSelectedIndex();
+                    if (index == -1) return;
+                    playlist = playlistManager.getPlaylist(index);
+                    table.setPlaylist(playlist);
+                    playlistManager.selectPlaylist(playlist);
+                }
+            });
+
+            addMouseMotionListener(new MouseMotionListener() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                    dragTo = tabbedPane.indexAtLocation(e.getX(), e.getY());
+                    tabbedPane.repaint();
+                }
+
+                @Override
+                public void mouseMoved(MouseEvent e) {
+                }
+            });
+
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
+                        playlistManager.movePlaylist(dragFrom, dragTo);
+
+                        for (int i = 0; i < playlists.size(); i++) {
+                            Playlist pl = playlists.get(i);
+                            tabbedPane.setTitleAt(i, pl.getName());
+                        }
+
+                        tabbedPane.setSelectedIndex(dragTo);
+                    }
+                    dragTo = -1;
+                }
+
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    dragFrom = tabbedPane.indexAtLocation(e.getX(), e.getY());
+                }
+            });
+        }
+
+        private void createPopupMenu() {
+            final JPopupMenu tabMenu = new JPopupMenu();
+
+            tabMenu.add(new JMenuItem("New Playlist")).addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String name = JOptionPane.showInputDialog("Enter Playlist Name", "New Playlist");
+                    addPlaylist(name);
+                }
+            });
+            tabMenu.add(new JMenuItem("Rename")).addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (tabIndex == -1)
+                        return;
+                    String name = JOptionPane.showInputDialog("Rename", tabPlaylist.getName());
+                    if (name == null || name.isEmpty()) return;
+                    tabPlaylist.setName(name);
+                    tabbedPane.setTitleAt(tabIndex, name);
+                }
+            });
+            tabMenu.add(new JMenuItem("Remove Playlist")).addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if (tabIndex == -1) return;
+                    removePlaylist(tabIndex);
+                }
+            });
+
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mousePressed(MouseEvent e) {
+                    show(e);
+                }
+
+                @Override
+                public void mouseReleased(MouseEvent e) {
+                    show(e);
+                }
+
+                public void show(MouseEvent e) {
+                    if (e.isPopupTrigger()) {
+                        tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
+                        if (tabIndex != -1)
+                            tabPlaylist = playlistManager.getPlaylist(tabIndex);
+                        tabMenu.show(e.getComponent(), e.getX(), e.getY());
+                    }
+                }
+            });
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (dragTo != -1 && dragFrom != -1 && dragTo != dragFrom) {
+                Rectangle b = tabbedPane.getBoundsAt(dragTo);
+                g.setColor(Color.GRAY);
+                int x = (int) (b.getX());
+                if (dragTo > dragFrom)
+                    x += b.getWidth();
+                int y = (int) b.getY();
+                g.fillRect(x - 1, y + 2, 3, (int) b.getHeight() - 2);
+
+                int[] xP = {x - 1, x - 5, x + 5, x + 1};
+                int[] yP = {y + 2, y - 5, y - 5, y + 2};
+                g.fillPolygon(xP, yP, xP.length);
+            }
+        }
+    }
 
 }

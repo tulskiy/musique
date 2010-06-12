@@ -22,10 +22,8 @@ import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.db.Entity;
 import com.tulskiy.musique.db.Id;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * @Author: Denis Tulskiy
@@ -44,11 +42,7 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
     @Column
     private int position;
 
-    private boolean stopLoading = false;
-    private ArrayList<File> tempList;
-
     public void load() {
-//        System.out.println("Loading playlist " + playlistID);
         clear();
         songDBMapper.loadAll("select * from songs where playlistID=" + playlistID + " order by playlistPosition", this);
     }
