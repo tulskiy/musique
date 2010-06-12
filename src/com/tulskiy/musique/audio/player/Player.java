@@ -267,7 +267,7 @@ public class Player {
         private void initLine() throws LineUnavailableException {
             AudioFormat fmt = decoder.getAudioFormat();
             //if it is same format and the line is opened, do nothing
-            if (line != null) {
+            if (line != null && line.isOpen()) {
                 if (mixerChanged || !line.getFormat().matches(fmt)) {
                     mixerChanged = false;
                     line.drain();
@@ -304,7 +304,7 @@ public class Player {
             paused = true;
 
             synchronized (lock) {
-                if (line != null)
+                if (line != null && line.isOpen())
                     line.stop();
             }
         }
@@ -353,12 +353,12 @@ public class Player {
 
         public synchronized void open(Song song, boolean force) {
             if (force) {
-                if (line != null)
+                if (line != null && line.isOpen())
                     line.flush();
 
                 pause();
 
-                if (line != null)
+                if (line != null && line.isOpen())
                     line.flush();
             }
 
@@ -416,6 +416,8 @@ public class Player {
 
         public void stopPlaying() {
             pause();
+            if (line != null)
+                line.close();
             if (decoder != null)
                 decoder.close();
             decoder = null;

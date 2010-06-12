@@ -115,7 +115,7 @@ public class Application {
     }
 
     public void exit() {
-        player.pause();
+        player.stop();
         if (mainWindow != null)
             mainWindow.shutdown();
         playlistManager.savePlaylists();
