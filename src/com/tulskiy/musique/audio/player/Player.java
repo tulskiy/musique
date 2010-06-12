@@ -416,8 +416,8 @@ public class Player {
 
         public void stopPlaying() {
             pause();
-            if (line != null)
-                line.close();
+//            if (line != null)
+//                line.close();
             if (decoder != null)
                 decoder.close();
             decoder = null;
