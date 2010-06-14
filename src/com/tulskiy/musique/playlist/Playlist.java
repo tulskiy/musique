@@ -107,8 +107,8 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
     @Override
     public void clear() {
         for (Song song : this) {
-            song.setCueID(-1);
             songDBMapper.delete(song);
+            song.setCueID(-1);
         }
         //hack to delete CUE sheets
         ArrayList<CUESheet> list = new ArrayList<CUESheet>();
@@ -122,8 +122,8 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
 
     public void deleteAll(Collection<Song> c) {
         for (Song song : c) {
-            song.setSongID(-1);
             songDBMapper.delete(song);
+            song.setSongID(-1);
         }
 
         removeAll(c);

@@ -74,10 +74,7 @@ public class PlaylistPanel extends JPanel {
 
         table = new PlaylistTable(playlist, columns);
         app.getPlayer().setPlaybackOrder(table);
-
-        table.setDragEnabled(true);
-        table.setDropMode(DropMode.INSERT_ROWS);
-        table.setTransferHandler(new PlaylistTransferHandler());
+        setUpDndCCP();
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
@@ -95,6 +92,25 @@ public class PlaylistPanel extends JPanel {
 
         int lastPlayed = config.getInt("player.lastPlayed", -1);
         table.setLastPlayed(new Song(lastPlayed));
+    }
+
+    private void setUpDndCCP() {
+        table.setDragEnabled(true);
+        table.setDropMode(DropMode.INSERT_ROWS);
+        table.setTransferHandler(new PlaylistTransferHandler(table));
+        ActionMap map = table.getActionMap();
+
+        Action cutAction = TransferHandler.getCutAction();
+        map.put(cutAction.getValue(Action.NAME), cutAction);
+        Action copyAction = TransferHandler.getCopyAction();
+        map.put(copyAction.getValue(Action.NAME), copyAction);
+        Action pasteAction = TransferHandler.getPasteAction();
+        map.put(pasteAction.getValue(Action.NAME), pasteAction);
+
+        InputMap iMap = table.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        iMap.put(KeyStroke.getKeyStroke("ctrl X"), cutAction.getValue(Action.NAME));
+        iMap.put(KeyStroke.getKeyStroke("ctrl C"), copyAction.getValue(Action.NAME));
+        iMap.put(KeyStroke.getKeyStroke("ctrl V"), pasteAction.getValue(Action.NAME));
     }
 
     public void shutdown() {
@@ -153,7 +169,7 @@ public class PlaylistPanel extends JPanel {
             }
         });
         fileMenu.addSeparator();
-        fileMenu.add(newItem("Quit", "control Q", new ActionListener() {
+        fileMenu.add(newItem("Quit", "ctrl Q", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 app.exit();
