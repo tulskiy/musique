@@ -36,7 +36,7 @@ public class Song {
     @Id
     public int songID = -1;
     @Column
-    private int playlistID;
+    private int playlistID = -1;
     @Column
     private int playlistPosition;
     @Column

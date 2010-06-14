@@ -120,13 +120,14 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
         super.clear();
     }
 
-    public void deleteAll(Collection<Song> c) {
-        for (Song song : c) {
-            songDBMapper.delete(song);
-            song.setSongID(-1);
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        for (Object o : c) {
+            Song s = (Song) o;
+            s.setPlaylistID(-1);
+            songDBMapper.save(s);
         }
-
-        removeAll(c);
+        return super.removeAll(c);
     }
 
     @Override

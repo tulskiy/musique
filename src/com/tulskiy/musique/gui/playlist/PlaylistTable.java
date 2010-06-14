@@ -154,7 +154,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         aMap.put("removeSelected", new AbstractAction("Remove") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                playlist.deleteAll(getSelectedSongs());
+                playlist.removeAll(getSelectedSongs());
 //                sorter.rowsDeleted(
 //                        getSelectionModel().getMinSelectionIndex(),
 //                        getSelectionModel().getMaxSelectionIndex());

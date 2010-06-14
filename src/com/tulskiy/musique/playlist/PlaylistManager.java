@@ -33,6 +33,7 @@ public class PlaylistManager {
     private Configuration config = Application.getInstance().getConfiguration();
     private Playlist currentPlaylist;
     private DBMapper<Playlist> playlistDBMapper = new DBMapper<Playlist>(Playlist.class);
+    private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
 
     public ArrayList<Playlist> getPlaylists() {
         return playlists;
@@ -108,6 +109,15 @@ public class PlaylistManager {
             playlist.save();
             playlistDBMapper.save(playlist);
         }
+
+        //remove songs that do not belong to any playlist
+        ArrayList<Song> removed = new ArrayList<Song>();
+        songDBMapper.loadAll("select * from songs where playlistID=-1", removed);
+
+        for (Song song : removed) {
+            songDBMapper.delete(song);
+        }
+
         config.setInt("playlist.currentPlaylist", currentPlaylist.getPlaylistID());
     }
 }
