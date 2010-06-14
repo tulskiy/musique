@@ -17,9 +17,6 @@
 
 package com.tulskiy.musique.gui.playlist;
 
-import com.tulskiy.musique.audio.player.Player;
-import com.tulskiy.musique.audio.player.PlayerEvent;
-import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
@@ -36,7 +33,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -73,8 +71,13 @@ public class PlaylistPanel extends JPanel {
             }
         };
         columnDBMapper.loadAll("select * from playlist_columns order by position", columns);
+
         table = new PlaylistTable(playlist, columns);
         app.getPlayer().setPlaybackOrder(table);
+
+        table.setDragEnabled(true);
+        table.setDropMode(DropMode.INSERT_ROWS);
+        table.setTransferHandler(new PlaylistTransferHandler());
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
@@ -92,82 +95,6 @@ public class PlaylistPanel extends JPanel {
 
         int lastPlayed = config.getInt("player.lastPlayed", -1);
         table.setLastPlayed(new Song(lastPlayed));
-
-        table.setDragEnabled(true);
-        table.setDropMode(DropMode.INSERT_ROWS);
-        table.setTransferHandler(new PlaylistTransferHandler());
-
-        buildListeners();
-    }
-
-    private void playSelected() {
-        app.getPlayer().open(table.getSelectedSong());
-        app.getPlayer().play();
-    }
-
-    public void buildListeners() {
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-                    playSelected();
-                }
-            }
-        });
-
-        table.addKeyboardAction(KeyStroke.getKeyStroke("ENTER"), "playSelected", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                playSelected();
-            }
-        });
-
-        final Player player = app.getPlayer();
-
-        AbstractAction controlAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                String cmd = actionEvent.getActionCommand();
-                if (cmd.equals("b")) {
-                    player.next();
-                }
-                if (cmd.equals("v")) {
-                    player.play();
-                }
-                if (cmd.equals("c")) {
-                    player.pause();
-                }
-                if (cmd.equals("x")) {
-                    player.stop();
-                }
-                if (cmd.equals("z")) {
-                    player.prev();
-                }
-            }
-        };
-
-        table.addKeyboardAction(KeyStroke.getKeyStroke("B"), "next", controlAction);
-        table.addKeyboardAction(KeyStroke.getKeyStroke("V"), "stop", controlAction);
-        table.addKeyboardAction(KeyStroke.getKeyStroke("C"), "pause", controlAction);
-        table.addKeyboardAction(KeyStroke.getKeyStroke("X"), "play", controlAction);
-        table.addKeyboardAction(KeyStroke.getKeyStroke("Z"), "prev", controlAction);
-
-        table.addKeyboardAction(KeyStroke.getKeyStroke("alt ENTER"), "showInfo", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent actionEvent) {
-                table.showInfo(table.getSelectedSong());
-            }
-        });
-
-        player.addListener(new PlayerListener() {
-            public void onEvent(PlayerEvent e) {
-                table.update();
-                switch (e.getEventCode()) {
-                    case FILE_OPENED:
-                        table.scrollToSong(player.getSong());
-                }
-            }
-        });
     }
 
     public void shutdown() {
@@ -180,23 +107,6 @@ public class PlaylistPanel extends JPanel {
         List<? extends RowSorter.SortKey> keys = table.getRowSorter().getSortKeys();
         if (!keys.isEmpty()) {
             config.setInt("playlist.sortingColumn", keys.get(0).getColumn());
-        }
-    }
-
-    public void addPlaylist(String name) {
-        if (name == null || name.isEmpty()) return;
-        playlist = playlistManager.addPlaylist(name);
-
-        tabbedPane.add(name, null);
-        tabbedPane.setSelectedIndex(playlistManager.getTotalPlaylists() - 1);
-    }
-
-    private void removePlaylist(int index) {
-        Playlist pl = playlistManager.getPlaylist(index);
-        tabbedPane.remove(index);
-        playlistManager.removePlaylist(pl);
-        if (playlistManager.getTotalPlaylists() == 0) {
-            addPlaylist("Default");
         }
     }
 
@@ -217,19 +127,11 @@ public class PlaylistPanel extends JPanel {
         menuBar.add(viewMenu);
         JMenu playbackMenu = new JMenu("Playback");
         menuBar.add(playbackMenu);
+        final ActionMap aMap = table.getActionMap();
 
-        fileMenu.add("New Playlist").addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String name = JOptionPane.showInputDialog("Enter Playlist Name", "New Playlist");
-                addPlaylist(name);
-            }
-        });
-        fileMenu.add("Remove Playlist").addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                removePlaylist(tabbedPane.getSelectedIndex());
-            }
-        });
+        ActionMap tMap = tabbedPane.getActionMap();
+        fileMenu.add(tMap.get("newPlaylist"));
+        fileMenu.add(tMap.get("removePlaylist"));
         fileMenu.addSeparator();
         fileMenu.add("Add Files").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -266,19 +168,9 @@ public class PlaylistPanel extends JPanel {
                 table.update();
             }
         });
-        editMenu.add(newItem("Remove", "DELETE", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.removeSelected();
-            }
-        }));
+        editMenu.add(aMap.get("removeSelected"));
         editMenu.addSeparator();
-        editMenu.add(new JMenuItem("Clear playback queue")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.clearQueue();
-            }
-        });
+        editMenu.add(aMap.get("clearQueue"));
         editMenu.add(newItem("Search", "ctrl F", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -342,48 +234,19 @@ public class PlaylistPanel extends JPanel {
         JMenu controlMenu = new JMenu("Control");
         playbackMenu.add(controlMenu);
 
-        final Player player = app.getPlayer();
-        ActionListener controlListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String cmd = e.getActionCommand();
-                if (cmd.equals("Next")) {
-                    player.next();
-                }
-                if (cmd.equals("Play")) {
-                    player.play();
-                }
-                if (cmd.equals("Pause")) {
-                    player.pause();
-                }
-                if (cmd.equals("Stop")) {
-                    player.stop();
-                }
-                if (cmd.equals("Previous")) {
-                    player.prev();
-                }
-            }
-        };
-        controlMenu.add(newItem("Next", "", controlListener));
-        controlMenu.add(newItem("Play", "", controlListener));
-        controlMenu.add(newItem("Pause", "", controlListener));
-        controlMenu.add(newItem("Stop", "", controlListener));
-        controlMenu.add(newItem("Previous", "", controlListener));
+        controlMenu.add(aMap.get("next"));
+        controlMenu.add(aMap.get("play"));
+        controlMenu.add(aMap.get("pause"));
+        controlMenu.add(aMap.get("stop"));
+        controlMenu.add(aMap.get("prev"));
 
         playbackMenu.addSeparator();
 
-        playbackMenu.add(newItem("Show Now Playing", "SPACE", new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                table.scrollToSong(player.getSong());
-            }
-        }));
+        playbackMenu.add(aMap.get("showNowPlaying"));
     }
 
     class TabbedPane extends JTabbedPane {
         private ArrayList<Playlist> playlists;
-        private Playlist tabPlaylist;
-        private int tabIndex;
         private int dragTo = -1;
         private int dragFrom;
 
@@ -454,32 +317,46 @@ public class PlaylistPanel extends JPanel {
 
         private void createPopupMenu() {
             final JPopupMenu tabMenu = new JPopupMenu();
-
-            tabMenu.add(new JMenuItem("New Playlist")).addActionListener(new ActionListener() {
+            ActionMap aMap = getActionMap();
+            aMap.put("newPlaylist", new AbstractAction("New Playlist") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String name = JOptionPane.showInputDialog("Enter Playlist Name", "New Playlist");
                     addPlaylist(name);
                 }
             });
-            tabMenu.add(new JMenuItem("Rename")).addActionListener(new ActionListener() {
+            aMap.put("renamePlaylist", new AbstractAction("Rename") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (tabIndex == -1)
-                        return;
-                    String name = JOptionPane.showInputDialog("Rename", tabPlaylist.getName());
-                    if (name == null || name.isEmpty()) return;
-                    tabPlaylist.setName(name);
-                    tabbedPane.setTitleAt(tabIndex, name);
+                    int index = getSelectedIndex();
+                    if (index != -1) {
+                        Playlist pl = playlistManager.getPlaylist(index);
+                        String name = JOptionPane.showInputDialog("Rename", pl.getName());
+                        if (name != null && !name.isEmpty()) {
+                            pl.setName(name);
+                            setTitleAt(index, name);
+                        }
+                    }
                 }
             });
-            tabMenu.add(new JMenuItem("Remove Playlist")).addActionListener(new ActionListener() {
+            aMap.put("removePlaylist", new AbstractAction("Remove Playlist") {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    if (tabIndex == -1) return;
-                    removePlaylist(tabIndex);
+                    int index = getSelectedIndex();
+                    if (index != -1) {
+                        Playlist pl = playlistManager.getPlaylist(index);
+                        tabbedPane.remove(index);
+                        playlistManager.removePlaylist(pl);
+                        if (playlistManager.getTotalPlaylists() == 0) {
+                            addPlaylist("Default");
+                        }
+                    }
                 }
             });
+
+            tabMenu.add(aMap.get("newPlaylist"));
+            tabMenu.add(aMap.get("renamePlaylist"));
+            tabMenu.add(aMap.get("removePlaylist"));
 
             addMouseListener(new MouseAdapter() {
                 @Override
@@ -494,13 +371,21 @@ public class PlaylistPanel extends JPanel {
 
                 public void show(MouseEvent e) {
                     if (e.isPopupTrigger()) {
-                        tabIndex = tabbedPane.indexAtLocation(e.getX(), e.getY());
-                        if (tabIndex != -1)
-                            tabPlaylist = playlistManager.getPlaylist(tabIndex);
+                        int index = tabbedPane.indexAtLocation(e.getX(), e.getY());
+                        if (index != -1)
+                            setSelectedIndex(index);
                         tabMenu.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
             });
+        }
+
+        private void addPlaylist(String name) {
+            if (name == null || name.isEmpty()) return;
+            playlist = playlistManager.addPlaylist(name);
+
+            tabbedPane.add(name, null);
+            tabbedPane.setSelectedIndex(playlistManager.getTotalPlaylists() - 1);
         }
 
         @Override

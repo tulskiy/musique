@@ -56,7 +56,6 @@ public class SongInfoDialog extends JDialog {
 
     public SongInfoDialog(JFrame owner, final Song song) {
         super(owner, "Song Properties", true);
-        setLocationRelativeTo(owner);
         setLayout(new BorderLayout());
 
         JComponent tagsTable = createTable(new MyModel(new String[][]{tagKeys, tagValues}));
@@ -109,8 +108,8 @@ public class SongInfoDialog extends JDialog {
         status.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 0));
         add(status, BorderLayout.NORTH);
 
-        pack();
         setSize(400, 380);
+        setLocationRelativeTo(owner);
 
         loadSong(song);
     }

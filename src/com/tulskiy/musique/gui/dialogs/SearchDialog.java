@@ -17,12 +17,9 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Playlist;
-import com.tulskiy.musique.playlist.Song;
-import com.tulskiy.musique.system.Application;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -106,7 +103,7 @@ public class SearchDialog extends JDialog {
         searchField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                playSelected();
+                table.runAction("playSelected");
             }
         });
 
@@ -126,20 +123,6 @@ public class SearchDialog extends JDialog {
                 }
             }
         });
-        table.addKeyboardAction(KeyStroke.getKeyStroke("ENTER"), "playSelected", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playSelected();
-            }
-        });
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-                    playSelected();
-                }
-            }
-        });
         table.addKeyboardAction(KeyStroke.getKeyStroke("ESCAPE"), "escape", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -147,12 +130,4 @@ public class SearchDialog extends JDialog {
             }
         });
     }
-
-    private void playSelected() {
-        Player player = Application.getInstance().getPlayer();
-        Song song = table.getSelectedSong();
-        player.open(song);
-        player.play();
-    }
-
 }

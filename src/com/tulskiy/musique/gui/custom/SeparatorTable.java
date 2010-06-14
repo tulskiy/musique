@@ -101,6 +101,12 @@ public class SeparatorTable extends JTable {
         });
     }
 
+    public void runAction(Object actionKey) {
+        Action action = getActionMap().get(actionKey);
+        if (action != null)
+            action.actionPerformed(new ActionEvent(this, 0, actionKey.toString()));
+    }
+
     public void addKeyboardAction(KeyStroke keyStroke, String name, Action action) {
         InputMap imap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap amap = getActionMap();

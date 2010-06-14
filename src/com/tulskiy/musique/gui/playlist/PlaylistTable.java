@@ -19,6 +19,9 @@ package com.tulskiy.musique.gui.playlist;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.PlaybackOrder;
+import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.audio.player.PlayerEvent;
+import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.gui.custom.SeparatorTable;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
@@ -65,6 +68,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     }
 
     private Application app = Application.getInstance();
+    private Player player = app.getPlayer();
     private Configuration config = app.getConfiguration();
 
     private Playlist playlist;
@@ -87,8 +91,131 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         setRowSorter(sorter);
         getTableHeader().setPreferredSize(new Dimension(10000, 20));
         scrollPane = new JScrollPane(this);
+        buildActions();
         buildMenus();
     }
+
+    public void buildActions() {
+        ActionMap aMap = getActionMap();
+        InputMap iMap = getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        aMap.put("next", new AbstractAction("Next") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                player.next();
+            }
+        });
+        aMap.put("stop", new AbstractAction("Stop") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                player.stop();
+            }
+        });
+        aMap.put("play", new AbstractAction("Play") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                player.play();
+            }
+        });
+        aMap.put("pause", new AbstractAction("Pause") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                player.pause();
+            }
+        });
+        aMap.put("prev", new AbstractAction("Previous") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                player.prev();
+            }
+        });
+        aMap.put("playSelected", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Song> songs = getSelectedSongs();
+                if (!songs.isEmpty()) {
+                    player.open(songs.get(0));
+                    player.play();
+                }
+            }
+        });
+        aMap.put("showProperties", new AbstractAction("Properties") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showInfo(getSelectedSongs());
+            }
+        });
+        aMap.put("showNowPlaying", new AbstractAction("Scroll to Now Playing") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                scrollToSong(player.getSong());
+            }
+        });
+        aMap.put("removeSelected", new AbstractAction("Remove") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playlist.deleteAll(getSelectedSongs());
+//                sorter.rowsDeleted(
+//                        getSelectionModel().getMinSelectionIndex(),
+//                        getSelectionModel().getMaxSelectionIndex());
+
+                clearSelection();
+
+                model.fireTableDataChanged();
+                update();
+            }
+        });
+        aMap.put("enqueue", new AbstractAction("Add to Queue") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (Song song : getSelectedSongs()) {
+                    enqueue(song);
+                }
+            }
+        });
+        aMap.put("clearQueue", new AbstractAction("Clear Playback Queue") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (Song song : queue) {
+                    song.setQueuePosition(-1);
+                }
+                queue.clear();
+                updateQueuePositions();
+            }
+        });
+
+
+        iMap.put(KeyStroke.getKeyStroke("B"), "next");
+        iMap.put(KeyStroke.getKeyStroke("V"), "stop");
+        iMap.put(KeyStroke.getKeyStroke("C"), "pause");
+        iMap.put(KeyStroke.getKeyStroke("X"), "play");
+        iMap.put(KeyStroke.getKeyStroke("Z"), "prev");
+
+        iMap.put(KeyStroke.getKeyStroke("ENTER"), "playSelected");
+        iMap.put(KeyStroke.getKeyStroke("alt ENTER"), "showProperties");
+        iMap.put(KeyStroke.getKeyStroke("SPACE"), "showNowPlaying");
+        iMap.put(KeyStroke.getKeyStroke("DELETE"), "removeSelected");
+        iMap.put(KeyStroke.getKeyStroke("Q"), "enqueue");
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                    runAction("playSelected");
+                }
+            }
+        });
+        player.addListener(new PlayerListener() {
+            public void onEvent(PlayerEvent e) {
+                update();
+                switch (e.getEventCode()) {
+                    case FILE_OPENED:
+                        runAction("showNowPlaying");
+                }
+            }
+        });
+    }
+
 
     public JScrollPane getScrollPane() {
         return scrollPane;
@@ -149,14 +276,6 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
             scrollToRow(index);
     }
 
-    public Song getSelectedSong() {
-        int index = getSelectedRow();
-        if (index >= 0)
-            return playlist.get(convertRowIndexToModel(index));
-
-        return null;
-    }
-
     public ArrayList<Song> getSelectedSongs() {
         int[] rows = getSelectedRows();
         ArrayList<Song> songs = new ArrayList<Song>();
@@ -166,47 +285,17 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         return songs;
     }
 
-    private ArrayList<Song> selectSongsAt(Point p) {
+    private void selectSongsAt(Point p) {
         int index = rowAtPoint(p);
-        if (index == -1)
-            return null;
-
-        ArrayList<Song> res = new ArrayList<Song>();
-
-        if (!isRowSelected(index)) {
+        if (index != -1 && !isRowSelected(index)) {
             setRowSelectionInterval(index, index);
         }
-
-        for (int i : getSelectedRows()) {
-            res.add(playlist.get(convertRowIndexToModel(i)));
-        }
-
-        return res;
-    }
-
-    void removeSelected() {
-        ArrayList<Song> toRemove = new ArrayList<Song>();
-
-        for (int i : getSelectedRows()) {
-            toRemove.add(playlist.get(convertRowIndexToModel(i)));
-        }
-
-        playlist.deleteAll(toRemove);
-        sorter.rowsDeleted(
-                getSelectionModel().getMinSelectionIndex(),
-                getSelectionModel().getMaxSelectionIndex());
-
-        clearSelection();
-
-        model.fireTableDataChanged();
-        update();
     }
 
     //stuff for popup menu
 
     private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
     private TableColumn selectedColumn;
-    private ArrayList<Song> songs;
     private JFrame parentFrame;
 
     public JFrame getParentFrame() {
@@ -216,7 +305,10 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         return parentFrame;
     }
 
-    public void showInfo(Song s) {
+    public void showInfo(ArrayList<Song> songs) {
+        if (songs.isEmpty())
+            return;
+        Song s = songs.get(0);
         SongInfoDialog dialog = new SongInfoDialog(getParentFrame(), s);
         if (dialog.showDialog()) {
             try {
@@ -228,7 +320,8 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         }
     }
 
-    private void buildMenus() {
+    public void buildMenus() {
+        ActionMap aMap = getActionMap();
         final JPopupMenu headerMenu = new JPopupMenu();
         final JTableHeader header = getTableHeader();
 
@@ -316,20 +409,11 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
 
         final JPopupMenu tableMenu = new JPopupMenu();
 
-        tableMenu.add(new JMenuItem("Add to Queue")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                for (Song song : songs) {
-                    enqueue(song);
-                }
-            }
-        });
-
+        tableMenu.add(aMap.get("enqueue")).setAccelerator(KeyStroke.getKeyStroke("Q"));
         tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (songs == null) return;
-                for (Song song : songs) {
+                for (Song song : getSelectedSongs()) {
                     if (song.getCueID() == -1) {
                         AudioFileReader reader = PluginLoader.getAudioFileReader(song.getFile().getName());
                         reader.readSingle(song);
@@ -338,21 +422,8 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
                 }
             }
         });
-
-        tableMenu.add(new JMenuItem("Remove")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                removeSelected();
-            }
-        });
-
-        tableMenu.add(new JMenuItem("Properties")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (songs != null && songs.size() > 0)
-                    showInfo(songs.get(0));
-            }
-        });
+        tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));
+        tableMenu.add(aMap.get("showProperties")).setAccelerator(KeyStroke.getKeyStroke("alt ENTER"));
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -367,7 +438,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
 
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    songs = selectSongsAt(e.getPoint());
+                    selectSongsAt(e.getPoint());
                     tableMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -391,14 +462,6 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
 
     public void enqueue(Song song) {
         queue.add(song);
-        updateQueuePositions();
-    }
-
-    public void clearQueue() {
-        for (Song song : queue) {
-            song.setQueuePosition(-1);
-        }
-        queue.clear();
         updateQueuePositions();
     }
 
