@@ -52,7 +52,7 @@ public class MainWindow extends JFrame {
         add(panel, BorderLayout.CENTER);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        Rectangle r = config.getRectangle("gui.mainWindowPosition", 0, 0, 790, 480);
+        Rectangle r = config.getRectangle("gui.mainWindowPosition", new Rectangle(0, 0, 790, 480));
         setLocation((int) r.getX(), (int) r.getY());
         setSize((int) r.getWidth(), (int) r.getHeight());
         setExtendedState(config.getInt("gui.mainWindowState", 0));
@@ -71,3 +71,6 @@ public class MainWindow extends JFrame {
         playlistPanel.shutdown();
     }
 }
+
+
+

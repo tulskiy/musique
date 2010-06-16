@@ -17,301 +17,253 @@
 
 package com.tulskiy.musique.system;
 
-import com.tulskiy.musique.db.*;
-import com.tulskiy.musique.util.Util;
-
 import java.awt.*;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: Jan 7, 2010
+ * Author: Denis Tulskiy
+ * Date: Jun 15, 2010
  */
-
 public class Configuration {
-    private Application app = Application.getInstance();
+    private static final String CONFIG_PATH = "resources/config";
+    private Logger logger = Logger.getLogger(getClass().getName());
 
-    enum PropertyType {
-        STRING,
-        INTEGER,
-        BOOLEAN,
-        DOUBLE,
-        COLOR,
-        FONT,
-        RECTANGLE,
-        ARRAY,
-        MAP
-    }
-
-    private DBMapper<Property> propertyDBMapper = DBMapper.create(Property.class);
-    private HashMap<String, Property> properties = new HashMap<String, Property>();
+    private Map<String, Object> map = new TreeMap<String, Object>();
 
     public void load() {
         try {
-            ResultSet res = app.getDbManager().executeQuery("select * from settings");
-            while (res.next()) {
-                Property p = new Property();
-                propertyDBMapper.load(p, res);
+            load(new FileReader(CONFIG_PATH));
+        } catch (FileNotFoundException e) {
+            logger.info("Could not find default config file. Possibly fresh install");
+        }
+    }
 
-                switch (p.getPropertyType()) {
-                    case INTEGER:
-                        p.setValue(res.getInt("value"));
-                        break;
-                    case BOOLEAN:
-                        p.setValue(res.getBoolean("value"));
-                        break;
-                    case DOUBLE:
-                        p.setValue(res.getDouble("value"));
-                        break;
-                    case STRING:
-                        p.setValue(res.getString("value"));
+    public void load(Reader reader) {
+        try {
+            logger.info("Loading configuration");
+            BufferedReader r = new BufferedReader(reader);
+
+            ArrayList<String> array = null;
+            String key = null;
+            while (r.ready()) {
+                String line = r.readLine();
+
+                if (line == null)
+                    break;
+
+                if (line.startsWith("  ") && array != null) {
+                    array.add(line.trim());
+                } else {
+                    if (array != null) {
+                        if (array.size() > 0)
+                            map.put(key, array);
+                        array = null;
+                    }
+
+                    int index = line.indexOf(':');
+                    if (index == -1)
+                        continue;
+
+                    key = line.substring(0, index);
+                    String value = line.substring(index + 1).trim();
+                    if (value.isEmpty()) {
+                        array = new ArrayList<String>();
+                    } else {
+                        map.put(key, value);
+                    }
                 }
-
-                properties.put(p.getKey(), p);
             }
-            res.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+
+            if (array != null)
+                map.put(key, array);
+        } catch (IOException e) {
+            logger.severe("Failed to load configuration: " + e.getMessage());
         }
     }
 
     public void save() {
-        for (Property p : properties.values()) {
-            propertyDBMapper.save(p);
+        try {
+            save(new FileWriter(CONFIG_PATH));
+        } catch (IOException e) {
+            logger.severe("Failed to save configuration: " + e.getMessage());
         }
     }
 
-    public Set<String> getKeys() {
-        return properties.keySet();
+    @SuppressWarnings({"unchecked"})
+    public void save(Writer writer) {
+        logger.setLevel(Level.INFO);
+        logger.info("Saving configuration");
+        PrintWriter w = new PrintWriter(writer);
+
+        for (String key : map.keySet()) {
+            w.printf("%s: ", key);
+            Object value = map.get(key);
+
+            if (value instanceof String) {
+                w.println(value);
+            } else if (value instanceof List) {
+                w.println();
+
+                List<String> list = (List<String>) value;
+                for (String s : list) {
+                    w.println("  " + s);
+                }
+            }
+        }
+
+        w.close();
     }
 
-    public PropertyType getType(String key) {
-        Property p = properties.get(key);
-        if (p != null)
-            return p.getPropertyType();
-        else
-            return null;
+    public int getInt(String key, int def) {
+        try {
+            return Integer.valueOf(map.get(key).toString());
+        } catch (Exception e) {
+            return def;
+        }
     }
 
-    public Object getValue(String key) {
-        Property p = properties.get(key);
-        if (p != null)
-            return p.getValue();
-        else
-            return null;
-    }
-
-    public void setValue(String key, Object value, PropertyType type) {
-        Property p = properties.get(key);
-        if (p != null) {
-            p.setValue(value);
-        } else {
-            p = new Property();
-            p.setKey(key);
-            p.setValue(value);
-            p.setPropertyType(type);
-            properties.put(key, p);
+    public float getDouble(String key, float def) {
+        try {
+            return Float.valueOf(map.get(key).toString());
+        } catch (Exception e) {
+            return def;
         }
     }
 
     public String getString(String key, String def) {
-        String val = (String) getValue(key);
-        return val != null ? val : def;
+        try {
+            return map.get(key).toString();
+        } catch (Exception e) {
+            return def;
+        }
     }
 
-    public void setString(String key, String value) {
-        setValue(key, value, PropertyType.STRING);
+    public Color getColor(String key, Color def) {
+        try {
+            String s = map.get(key).toString().substring(1);
+            return new Color(Integer.parseInt(s, 16));
+        } catch (Exception e) {
+            return def;
+        }
     }
 
+    public Rectangle getRectangle(String key, Rectangle def) {
+        try {
+            String value = map.get(key).toString();
+            String[] tokens = value.split(" ");
+            if (tokens.length != 4)
+                throw new NumberFormatException();
 
-    public int getInt(String key, int def) {
-        Integer val = (Integer) getValue(key);
-        return val != null ? val : def;
+            int[] values = new int[4];
+            for (int i = 0; i < tokens.length; i++) {
+                String s = tokens[i];
+                values[i] = Integer.parseInt(s);
+            }
+            return new Rectangle(values[0], values[1], values[2], values[3]);
+        } catch (Exception e) {
+            return def;
+        }
+    }
+
+    public Font getFont(String key, Font def) {
+        try {
+            String value = map.get(key).toString();
+            String[] tokens = value.split(", ");
+
+            return new Font(tokens[0],
+                    Integer.parseInt(tokens[1]),
+                    Integer.parseInt(tokens[2]));
+        } catch (Exception e) {
+            return def;
+        }
+    }
+
+    public boolean getBoolean(String key, boolean def) {
+        try {
+            String value = map.get(key).toString();
+            return Boolean.parseBoolean(value);
+        } catch (Exception e) {
+            return def;
+        }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public ArrayList<String> getList(String key, ArrayList<String> def) {
+        try {
+            return (ArrayList<String>) map.get(key);
+        } catch (Exception e) {
+            return def;
+        }
+    }
+
+    public void setObject(String key, Object value) {
+        map.put(key, value.toString());
     }
 
     public void setInt(String key, int value) {
-        setValue(key, value, PropertyType.INTEGER);
-    }
-
-    public double getDouble(String key, double def) {
-        Double val = (Double) getValue(key);
-        return val != null ? val : def;
+        setObject(key, value);
     }
 
     public void setDouble(String key, double value) {
-        setValue(key, value, PropertyType.DOUBLE);
+        setObject(key, value);
     }
 
-    public Boolean getBoolean(String key, boolean def) {
-        Boolean val = (Boolean) getValue(key);
-        return val != null ? val : def;
-    }
-
-    public void setBoolean(String key, boolean value) {
-        setValue(key, value, PropertyType.BOOLEAN);
-    }
-
-    public Object[] getArray(String key) {
-        String value = (String) getValue(key);
-        if (value == null)
-            return null;
-        HashMap<String, Object> map = Util.loadFields(value);
-        Object[] res = new Object[map.size()];
-        for (Map.Entry<String, Object> s : map.entrySet()) {
-            res[Integer.valueOf(s.getKey())] = s.getValue();
-        }
-
-        return res;
-    }
-
-    public void setArray(String key, Object... a) {
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        for (int i = 0; i < a.length; i++) {
-            map.put(String.valueOf(i), a[i]);
-        }
-
-        setValue(key, Util.getFields(map), PropertyType.ARRAY);
-    }
-
-    public HashMap<String, Object> getMap(String key) {
-        return Util.loadFields((String) getValue(key));
-    }
-
-    public void setMap(String key, HashMap<String, Object> value) {
-        setValue(key, Util.getFields(value), PropertyType.MAP);
-    }
-
-    private void setMap(String key, HashMap<String, Object> value, PropertyType type) {
-        setValue(key, Util.getFields(value), type);
-    }
-
-    public Color getColor(String key, int def) {
-        HashMap<String, Object> map = getMap(key);
-        if (map == null)
-            return new Color(def);
-
-        return new Color(
-                (Integer) map.get("r"),
-                (Integer) map.get("g"),
-                (Integer) map.get("b"));
-    }
-
-    public void setColor(String key, Color value) {
-        if (value == null)
-            return;
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("r", value.getRed());
-        map.put("g", value.getGreen());
-        map.put("b", value.getBlue());
-
-        setMap(key, map, PropertyType.COLOR);
-    }
-
-    public Font getFont(String key) {
-        HashMap<String, Object> map = getMap(key);
-        if (map == null)
-            return null;
-
-        return new Font(
-                (String) map.get("name"),
-                (Integer) map.get("style"),
-                (Integer) map.get("size"));
-    }
-
-    public void setFont(String key, Font value) {
-        if (value == null)
-            return;
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("name", value.getName());
-        map.put("style", value.getStyle());
-        map.put("size", value.getSize());
-
-        setMap(key, map, PropertyType.FONT);
-    }
-
-    public Rectangle getRectangle(String key, int defX, int defY, int defWidth, int defHeight) {
-        HashMap<String, Object> map = getMap(key);
-        if (map == null) {
-            return new Rectangle(defX, defY, defWidth, defHeight);
-        } else {
-            return new Rectangle(
-                    (Integer) map.get("x"),
-                    (Integer) map.get("y"),
-                    (Integer) map.get("width"),
-                    (Integer) map.get("height"));
-        }
+    public void setString(String key, String value) {
+        setObject(key, value);
     }
 
     public void setRectangle(String key, Rectangle value) {
-        if (value == null)
-            return;
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("x", (int) value.getX());
-        map.put("y", (int) value.getY());
-        map.put("width", (int) value.getWidth());
-        map.put("height", (int) value.getHeight());
-
-        setMap(key, map, PropertyType.RECTANGLE);
+        String s = new Formatter().format("%d %d %d %d",
+                (int) value.getX(),
+                (int) value.getY(),
+                (int) value.getWidth(),
+                (int) value.getHeight()).toString();
+        setObject(key, s);
     }
 
-    @Entity("settings")
-    public class Property {
-        @Id
-        private int id = -1;
+    public void setColor(String key, Color value) {
+        String s = new Formatter().format(
+                "#%06X", value.getRGB() & 0xFFFFFF).toString();
+        setObject(key, s);
+    }
 
-        @Column
-        private String key;
-        @Column
-        private Object value;
-        @Column
-        private String type;
+    public void setFont(String key, Font value) {
+        String s = new Formatter().format(
+                "%s, %d, %d",
+                value.getName(), value.getStyle(),
+                value.getSize()).toString();
+        setObject(key, s);
+    }
 
-        private PropertyType propertyType;
+    public void setList(String key, ArrayList<String> value) {
+        setObject(key, value);
+    }
 
-        public int getId() {
-            return id;
-        }
+    public void setBoolean(String key, boolean value) {
+        setObject(key, value);
+    }
 
-        public void setId(int id) {
-            this.id = id;
-        }
+    public static void main(String[] args) throws IOException {
+        System.setProperty("java.util.logging.config.file", "resources/logging.properties");
+        Configuration config = new Configuration();
+        config.load();
+        Rectangle r = new Rectangle();
+        r.setRect(0.1, 0.123, 0.234, 0.567);
+        config.setRectangle("floatRect", r);
+        config.setColor("color", new Color(0x00AA00));
+        config.save();
 
-        public String getKey() {
-            return key;
-        }
-
-        public void setKey(String key) {
-            this.key = key;
-        }
-
-        public Object getValue() {
-            return value;
-        }
-
-        public void setValue(Object value) {
-            this.value = value;
-        }
-
-        public String getType() {
-            return propertyType.name();
-        }
-
-        public void setType(String type) {
-            this.type = type;
-            this.propertyType = PropertyType.valueOf(type);
-        }
-
-        public PropertyType getPropertyType() {
-            return propertyType;
-        }
-
-        public void setPropertyType(PropertyType propertyType) {
-            this.propertyType = propertyType;
-            this.type = propertyType.name();
-        }
+        System.out.println(config.getInt("some.int", -1));
+        System.out.println(config.getDouble("some.float", -1));
+        System.out.println(config.getColor("playlist.color", null));
+        System.out.println(config.getString("just.for.fun", "empty"));
+        System.out.println(config.getRectangle("window.size", new Rectangle()));
+        System.out.println(config.getFont("playlist.font", null));
     }
 }
+
+
