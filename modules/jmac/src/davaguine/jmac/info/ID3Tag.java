@@ -1,4 +1,21 @@
 /*
+ * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
  *  21.04.2004 Original verion. davagin@udm.ru.
  *-----------------------------------------------------------------------
  *  This program is free software; you can redistribute it and/or modify
@@ -32,21 +49,24 @@ import java.io.IOException;
  * Time: 14:51:31
  */
 public class ID3Tag {
-    public String Header;		    // should equal 'TAG'
-    public String Title;			// title
-    public String Artist;		    // artist
-    public String Album;			// album
-    public String Year; 			// year
-    public String Comment;  		// comment
-    public short Track;	            // track
-    public short Genre;	            // genre
+    public String Header;            // should equal 'TAG'
+    public String Title;            // title
+    public String Artist;            // artist
+    public String Album;            // album
+    public String Year;             // year
+    public String Comment;          // comment
+    public short Track;                // track
+    public short Genre;                // genre
 
     public static String defaultEncoding = "US-ASCII";
 
     public final static int ID3_TAG_BYTES = 128;
 
     public static ID3Tag read(final File file) throws IOException {
-        file.seek(file.length() - ID3_TAG_BYTES);
+        long offset = file.length() - ID3_TAG_BYTES;
+        if (offset < 0)
+            return null;
+        file.seek(offset);
         try {
             final ID3Tag tag = new ID3Tag();
             final ByteArrayReader reader = new ByteArrayReader(file, ID3_TAG_BYTES);
