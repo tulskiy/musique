@@ -17,8 +17,7 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.audio.io.PCMOutputStream;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -31,9 +30,10 @@ public interface Decoder {
      * Open the file and prepare for decoding.
      * This method sets the decoder to play the file from startIndex
      *
-     * @param inputFile
+     * @param track The Track to open
+     * @return true if file opened successfully
      */
-    public boolean open(Song inputFile);
+    public boolean open(Track track);
 
     /**
      * Get format of the PCM data. Usually it is 44100 kHz, 16 bit, signed,
@@ -48,7 +48,7 @@ public interface Decoder {
     /**
      * Decode chunk of PCM data and write to OutputStream
      *
-     * @param buf
+     * @param buf Buffer for data
      * @return true if success
      */
     public int decode(byte[] buf);

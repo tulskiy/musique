@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -31,22 +31,22 @@ public class ParameterExpression implements Expression {
 
     public ParameterExpression(String name) {
         try {
-            method = Song.class.getDeclaredMethod("get" + name);
+            method = Track.class.getDeclaredMethod("get" + name);
         } catch (NoSuchMethodException e) {
 //            e.printStackTrace();
             try {
-                method = Song.class.getDeclaredMethod("is" + name);
+                method = Track.class.getDeclaredMethod("is" + name);
             } catch (NoSuchMethodException e1) {
 //                e.printStackTrace();
             }
         }
     }
 
-    public String eval(Song song) {
+    public String eval(Track track) {
         if (method == null)
             return null;
         try {
-            Object o = method.invoke(song);
+            Object o = method.invoke(track);
             if (o == null)
                 return null;
             return o.toString();
@@ -62,7 +62,7 @@ public class ParameterExpression implements Expression {
     @Override
     public String toString() {
         return "ParameterExpression{" +
-                "method=" + method +
-                '}';
+               "method=" + method +
+               '}';
     }
 }

@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -35,7 +35,7 @@ public class MethodExpression implements Expression {
 
     public MethodExpression(String name) {
         try {
-            method = Methods.class.getDeclaredMethod(name, Song.class, ArrayList.class);
+            method = Methods.class.getDeclaredMethod(name, Track.class, ArrayList.class);
             expressions = new ArrayList<Expression>();
         } catch (NoSuchMethodException e) {
 //            e.printStackTrace();
@@ -50,10 +50,10 @@ public class MethodExpression implements Expression {
         return expressions;
     }
 
-    public Object eval(Song song) {
+    public Object eval(Track track) {
         try {
             if (method != null)
-                return method.invoke(methods, song, expressions);
+                return method.invoke(methods, track, expressions);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
@@ -65,8 +65,8 @@ public class MethodExpression implements Expression {
     @Override
     public String toString() {
         return "MethodExpression{" +
-                "method=" + method +
-                '}';
+               "method=" + method +
+               '}';
 
     }
 }

@@ -19,8 +19,7 @@ package com.tulskiy.musique.audio.formats.aac;
 
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.formats.aac.libjfaad.libjfaad;
-import com.tulskiy.musique.audio.io.PCMOutputStream;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import javax.sound.sampled.AudioFormat;
 
@@ -34,8 +33,8 @@ public class MP4Decoder implements Decoder {
     private int handler;
     private AudioFormat audioFormat;
 
-    public boolean open(Song inputFile) {
-        handler = lib.open(inputFile.getFile().getAbsolutePath());
+    public boolean open(Track track) {
+        handler = lib.open(track.getFile().getAbsolutePath());
 
         if (handler == -1) {
             return false;

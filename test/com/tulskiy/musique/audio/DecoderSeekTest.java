@@ -17,9 +17,7 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.audio.io.Buffer;
-import com.tulskiy.musique.playlist.Song;
-import com.tulskiy.musique.system.PluginLoader;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.AudioMath;
 import javazoom.jl.converter.WaveFile;
 
@@ -43,12 +41,12 @@ public class DecoderSeekTest {
     private static final int CASES_TO_TEST = 10;
     private int frameSize;
 
-    public DecoderSeekTest(Song song, Decoder decoder) {
+    public DecoderSeekTest(Track track, Decoder decoder) {
         this.decoder = decoder;
         assertNotNull("Decoder is null", decoder);
-        assertTrue("Decoder returned an error", this.decoder.open(song));
-        totalSamples = song.getTotalSamples();
-        System.out.println("File: " + song.getFile().getName() + ", Total samples: " + totalSamples);
+        assertTrue("Decoder returned an error", this.decoder.open(track));
+        totalSamples = track.getTotalSamples();
+        System.out.println("File: " + track.getFile().getName() + ", Total samples: " + totalSamples);
     }
 
     public void start() {
@@ -119,13 +117,12 @@ public class DecoderSeekTest {
         }
     }
 
-    private class SeekTestBuffer extends Buffer {
+    private class SeekTestBuffer {
         int currentSample = 0;
         boolean saveReference = false;
         String oFile;
         WaveFile waveFile = null;
 
-        @Override
         public void write(byte[] b, int off, int len) {
             if (saveReference) {
                 if (waveFile == null) {

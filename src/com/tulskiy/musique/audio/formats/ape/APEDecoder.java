@@ -18,8 +18,7 @@
 package com.tulskiy.musique.audio.formats.ape;
 
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.audio.io.PCMOutputStream;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import davaguine.jmac.decoder.IAPEDecompress;
 import davaguine.jmac.tools.File;
 import davaguine.jmac.tools.JMACException;
@@ -40,9 +39,9 @@ public class APEDecoder implements Decoder {
     private static final int BLOCKS_PER_DECODE = 4096 * 2;
     private int blockAlign;
 
-    public boolean open(Song inputFile) {
+    public boolean open(Track track) {
         try {
-            File apeInputFile = File.createFile(inputFile.getFile().getAbsolutePath(), "r");
+            File apeInputFile = File.createFile(track.getFile().getAbsolutePath(), "r");
             decoder = IAPEDecompress.CreateIAPEDecompress(apeInputFile);
             blockAlign = decoder.getApeInfoBlockAlign();
             return true;

@@ -18,7 +18,7 @@
 package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.gui.custom.SeparatorTable;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -54,7 +54,7 @@ public class SongInfoDialog extends JDialog {
     private JButton write;
     private JLabel status;
 
-    public SongInfoDialog(JFrame owner, final Song song) {
+    public SongInfoDialog(JFrame owner, final Track track) {
         super(owner, "Song Properties", true);
         setLayout(new BorderLayout());
 
@@ -81,7 +81,7 @@ public class SongInfoDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (changed) {
-                    saveSong(song);
+                    saveSong(track);
                     accept = true;
                 } else {
                     accept = false;
@@ -111,50 +111,50 @@ public class SongInfoDialog extends JDialog {
         setSize(400, 380);
         setLocationRelativeTo(owner);
 
-        loadSong(song);
+        loadSong(track);
     }
 
-    private void loadSong(Song song) {
+    private void loadSong(Track track) {
         changed = false;
-        tagValues[0] = song.getArtist();
-        tagValues[1] = song.getTitle();
-        tagValues[2] = song.getAlbum();
-        tagValues[3] = song.getYear();
-        tagValues[4] = song.getAlbumArtist();
-        tagValues[5] = song.getGenre();
-        tagValues[6] = song.getTrackNumber();
-        tagValues[7] = song.getTotalTracks();
-        tagValues[8] = song.getDiscNumber();
-        tagValues[9] = song.getTotalDiscs();
+//        tagValues[0] = track.getArtist();
+//        tagValues[1] = track.getTitle();
+//        tagValues[2] = track.getAlbum();
+//        tagValues[3] = track.getYear();
+//        tagValues[4] = track.getAlbumArtist();
+//        tagValues[5] = track.getGenre();
+//        tagValues[6] = track.getTrackNumber();
+//        tagValues[7] = track.getTotalTracks();
+//        tagValues[8] = track.getDiscNumber();
+//        tagValues[9] = track.getTotalDiscs();
 
-        propValues[0] = song.getFilePath();
-        propValues[1] = song.getCodec();
-        propValues[2] = song.getLength();
-        propValues[3] = String.valueOf(song.getTotalSamples());
-        propValues[4] = String.valueOf(song.getSamplerate()) + " Hz";
-        propValues[5] = String.valueOf(song.getBitrate()) + " kbps";
-        propValues[6] = String.valueOf(song.getSubsongIndex());
+//        propValues[0] = track.getFilePath();
+//        propValues[1] = track.getCodec();
+//        propValues[2] = track.getLength();
+        propValues[3] = String.valueOf(track.getTotalSamples());
+        propValues[4] = String.valueOf(track.getSampleRate()) + " Hz";
+//        propValues[5] = String.valueOf(track.getBitrate()) + " kbps";
+        propValues[6] = String.valueOf(track.getSubsongIndex());
 
-        if (song.getCueID() != -1) {
-            write.setEnabled(false);
-            status.setText("WARNING: Editing tags for CUE files is not implemented");
-        } else {
-            write.setEnabled(true);
-            status.setText("");
-        }
+//        if (track.getCueID() != -1) {
+//            write.setEnabled(false);
+//            status.setText("WARNING: Editing tags for CUE files is not implemented");
+//        } else {
+//            write.setEnabled(true);
+//            status.setText("");
+//        }
     }
 
-    private void saveSong(Song song) {
-        song.setArtist(tagValues[0]);
-        song.setTitle(tagValues[1]);
-        song.setAlbum(tagValues[2]);
-        song.setYear(tagValues[3]);
-        song.setAlbumArtist(tagValues[4]);
-        song.setGenre(tagValues[5]);
-        song.setTrackNumber(tagValues[6]);
-        song.setTotalTracks(tagValues[7]);
-        song.setDiscNumber(tagValues[8]);
-        song.setTotalDiscs(tagValues[9]);
+    private void saveSong(Track track) {
+        track.setArtist(tagValues[0]);
+        track.setTitle(tagValues[1]);
+        track.setAlbum(tagValues[2]);
+        track.setYear(tagValues[3]);
+        track.setAlbumArtist(tagValues[4]);
+        track.setGenre(tagValues[5]);
+        track.setTrackNumber(tagValues[6]);
+        track.setTotalTracks(tagValues[7]);
+        track.setDiscNumber(tagValues[8]);
+        track.setTotalDiscs(tagValues[9]);
     }
 
     public boolean showDialog() {
@@ -184,7 +184,7 @@ public class SongInfoDialog extends JDialog {
             public void keyPressed(KeyEvent e) {
                 if (table.isEditing() && (
                         e.getKeyCode() == KeyEvent.VK_DOWN ||
-                                e.getKeyCode() == KeyEvent.VK_UP)) {
+                        e.getKeyCode() == KeyEvent.VK_UP)) {
                     table.getCellEditor().stopCellEditing();
                 }
             }

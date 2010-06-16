@@ -18,8 +18,7 @@
 package com.tulskiy.musique.audio.formats.wavpack;
 
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.audio.io.PCMOutputStream;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.wavpack.decoder.Defines;
 import com.wavpack.decoder.WavPackUtils;
 import com.wavpack.decoder.WavpackContext;
@@ -44,9 +43,9 @@ public class WavPackDecoder implements Decoder {
     private int bps;
     private RandomAccessFile ras;
 
-    public boolean open(Song inputFile) {
+    public boolean open(Track track) {
         try {
-            ras = new RandomAccessFile(inputFile.getFile(), "r");
+            ras = new RandomAccessFile(track.getFile(), "r");
             wpc = WavPackUtils.WavpackOpenFileInput(ras);
             if (wpc.isError()) {
                 System.err.println("Error: " + wpc.getErrorMessage());

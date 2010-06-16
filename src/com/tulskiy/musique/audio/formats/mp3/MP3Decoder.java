@@ -46,7 +46,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     private javazoom.jl.decoder.Decoder decoder;
     private AudioFormat audioFormat;
     private Header readFrame;
-    private Song inputFile;
+    private Track inputFile;
 
     private long totalSamples;
     private long streamSize;
@@ -67,7 +67,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     }
 
     private int samplesToMinutes(long samples) {
-        return (int) (samples / inputFile.getSamplerate() / 60f);
+        return (int) (samples / inputFile.getSampleRate() / 60f);
     }
 
     @SuppressWarnings({"ResultOfMethodCallIgnored"})
@@ -87,7 +87,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             //then we get the seek table or create it if needed
             SeekTable seekTable = seekTableCache.get(file);
             if (seekTable == null &&
-                    samplesToMinutes(totalSamples) > 10) {
+                samplesToMinutes(totalSamples) > 10) {
                 seekTable = new SeekTable();
                 seekTableCache.put(file, seekTable);
             }
@@ -132,10 +132,10 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         return false;
     }
 
-    public boolean open(Song song) {
-        if (song == null)
+    public boolean open(Track track) {
+        if (track == null)
             return false;
-        this.inputFile = song;
+        this.inputFile = track;
         streamSize = inputFile.getFile().length();
         try {
             FileInputStream fis = new FileInputStream(inputFile.getFile());
@@ -153,8 +153,8 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        int sampleRate = song.getSamplerate();
-        int channels = song.getChannels();
+        int sampleRate = track.getSampleRate();
+        int channels = track.getChannels();
         audioFormat = new AudioFormat(sampleRate, 16, channels, true, false);
         createBitstream(0);
         currentSample = 0;

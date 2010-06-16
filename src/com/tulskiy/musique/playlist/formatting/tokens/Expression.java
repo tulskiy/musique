@@ -17,12 +17,12 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: Feb 6, 2010
  */
 public interface Expression {
-    public Object eval(Song song);
+    public Object eval(Track track);
 }

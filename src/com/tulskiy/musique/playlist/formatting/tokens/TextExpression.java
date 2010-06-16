@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 /**
  * @Author: Denis Tulskiy
@@ -30,14 +30,14 @@ public class TextExpression implements Expression {
         this.text = text;
     }
 
-    public String eval(Song song) {
+    public String eval(Track track) {
         return text;
     }
 
     @Override
     public String toString() {
         return "TextExpression{" +
-                "text='" + text + '\'' +
-                '}';
+               "text='" + text + '\'' +
+               '}';
     }
 }

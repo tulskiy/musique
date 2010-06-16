@@ -21,8 +21,7 @@ import com.jcraft.jorbis.Info;
 import com.jcraft.jorbis.JOrbisException;
 import com.jcraft.jorbis.VorbisFile;
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.audio.io.PCMOutputStream;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
@@ -35,9 +34,9 @@ public class VorbisDecoder implements Decoder {
     private VorbisFile vorbisFile;
     private AudioFormat audioFormat;
 
-    public boolean open(Song inputFile) {
+    public boolean open(Track track) {
         try {
-            vorbisFile = new VorbisFile(inputFile.getFile().getAbsolutePath());
+            vorbisFile = new VorbisFile(track.getFile().getAbsolutePath());
             Info info = vorbisFile.getInfo()[0];
             audioFormat = new AudioFormat(info.rate, 16, info.channels, true, false);
         } catch (JOrbisException e) {

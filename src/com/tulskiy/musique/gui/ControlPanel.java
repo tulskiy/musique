@@ -19,7 +19,7 @@ package com.tulskiy.musique.gui;
 
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.util.GlobalTimer;
 import com.tulskiy.musique.util.Util;
@@ -196,9 +196,9 @@ public class ControlPanel extends JPanel {
                         progressSlider.setValue(progressSlider.getMinimum());
                         break;
                     case FILE_OPENED:
-                        Song song = player.getSong();
-                        if (song != null)
-                            progressSlider.setMaximum((int) song.getTotalSamples());
+                        Track track = player.getSong();
+                        if (track != null)
+                            progressSlider.setMaximum((int) track.getTotalSamples());
                         progressSlider.setValue((int) player.getCurrentSample());
                         break;
                 }
@@ -215,9 +215,9 @@ public class ControlPanel extends JPanel {
     }
 
     private void showToolTip(MouseEvent e) {
-        Song s = player.getSong();
+        Track s = player.getSong();
         if (s != null) {
-            toolTip.setTipText(Util.samplesToTime(progressSlider.getValue() - progressSlider.getMinimum(), s.getSamplerate(), 1));
+            toolTip.setTipText(Util.samplesToTime(progressSlider.getValue() - progressSlider.getMinimum(), s.getSampleRate(), 1));
             int x = e.getXOnScreen();
             x = Math.max(x, progressSlider.getLocationOnScreen().x);
             x = Math.min(x, progressSlider.getLocationOnScreen().x + progressSlider.getWidth() - toolTip.getWidth());

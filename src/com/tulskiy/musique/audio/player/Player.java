@@ -18,7 +18,7 @@
 package com.tulskiy.musique.audio.player;
 
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.PluginLoader;
 import com.tulskiy.musique.util.AudioMath;
 
@@ -44,13 +44,13 @@ public class Player {
     private float volumeValue = 1f;
     private boolean linearVolume = false;
 
-    public void open(Song song) {
-        playerThread.open(song, true);
+    public void open(Track track) {
+        playerThread.open(track, true);
     }
 
     public void play() {
         if (state != PlayerState.PAUSED)
-            open(playerThread.currentSong);
+            open(playerThread.currentTrack);
 
         playerThread.play();
     }
@@ -71,7 +71,7 @@ public class Player {
     }
 
     public void next() {
-        Song s = order.next(playerThread.currentSong);
+        Track s = order.next(playerThread.currentTrack);
         if (s != null) {
             playerThread.open(s, true);
             playerThread.play();
@@ -81,7 +81,7 @@ public class Player {
     }
 
     public void prev() {
-        Song s = order.prev(playerThread.currentSong);
+        Track s = order.prev(playerThread.currentTrack);
         if (s != null) {
             playerThread.open(s, true);
             playerThread.play();
@@ -109,8 +109,8 @@ public class Player {
         return playerThread.getCurrentSample();
     }
 
-    public Song getSong() {
-        return playerThread.currentSong;
+    public Track getSong() {
+        return playerThread.currentTrack;
     }
 
     public boolean isPlaying() {
@@ -197,8 +197,8 @@ public class Player {
         private FloatControl volume;
         private long currentByte = 0;
         private boolean paused = true;
-        private Song currentSong;
-        private Song nextSong;
+        private Track currentTrack;
+        private Track nextTrack;
         private Decoder decoder;
         private long cueTotalBytes;
         private Mixer mixer;
@@ -225,27 +225,27 @@ public class Player {
                         setState(PlayerState.PLAYING);
 
                         while (!paused) {
-                            if (nextSong != null) {
-                                open(nextSong, false);
-                                nextSong = null;
+                            if (nextTrack != null) {
+                                open(nextTrack, false);
+                                nextTrack = null;
                             }
 
                             len = decoder.decode(buf);
 
                             if (len == -1) {
-                                nextSong = order.next(currentSong);
-                                if (nextSong == null)
+                                nextTrack = order.next(currentTrack);
+                                if (nextTrack == null)
                                     stopPlaying();
                                 continue;
                             }
 
-                            if (currentSong.getCueID() != -1) {
+                            if (currentTrack.getCueID() != -1) {
                                 if (cueTotalBytes <= currentByte + len) {
-                                    Song s = order.next(currentSong);
+                                    Track s = order.next(currentTrack);
 
                                     if (s != null) {
                                         len = (int) (cueTotalBytes - currentByte);
-                                        nextSong = s;
+                                        nextTrack = s;
                                     } else {
                                         stopPlaying();
                                         continue;
@@ -315,8 +315,8 @@ public class Player {
             }
 
             if (paused) {
-                if (currentSong == null && order != null) {
-                    Song s = order.next(currentSong);
+                if (currentTrack == null && order != null) {
+                    Track s = order.next(currentTrack);
                     if (s != null)
                         open(s, true);
                     else
@@ -342,7 +342,7 @@ public class Player {
                 line.flush();
 
             if (decoder != null) {
-                decoder.seekSample(currentSong.getStartPosition() + sample);
+                decoder.seekSample(currentTrack.getStartPosition() + sample);
                 currentByte = AudioMath.samplesToBytes(sample, decoder.getAudioFormat().getFrameSize());
 
                 if (oldState == PlayerState.PLAYING) {
@@ -351,7 +351,7 @@ public class Player {
             }
         }
 
-        public synchronized void open(Song song, boolean force) {
+        public synchronized void open(Track track, boolean force) {
             if (force) {
                 if (line != null && line.isOpen())
                     line.flush();
@@ -367,23 +367,23 @@ public class Player {
                     decoder.close();
                 }
 
-                if (song != null) {
-                    if (!song.getFile().exists()) {
+                if (track != null) {
+                    if (!track.getFile().exists()) {
                         decoder = null;
                         return;
                     }
-                    decoder = PluginLoader.getDecoder(song);
-                    currentSong = song;
+                    decoder = PluginLoader.getDecoder(track);
+                    currentTrack = track;
                     currentByte = 0;
 
-                    if (decoder == null || !decoder.open(song)) {
-                        currentSong = null;
+                    if (decoder == null || !decoder.open(track)) {
+                        currentTrack = null;
                         return;
                     }
 
-                    decoder.seekSample(song.getStartPosition());
-                    if (song.getCueID() != -1) {
-                        cueTotalBytes = AudioMath.samplesToBytes(song.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
+                    decoder.seekSample(track.getStartPosition());
+                    if (track.getCueID() != -1) {
+                        cueTotalBytes = AudioMath.samplesToBytes(track.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
                     } else {
                         cueTotalBytes = 0;
                     }

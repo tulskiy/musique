@@ -17,14 +17,14 @@
 
 package com.tulskiy.musique.audio.player;
 
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: 01.07.2009
  */
 public interface PlaybackOrder {
-    public Song next(Song file);
+    public Track next(Track file);
 
-    public Song prev(Song file);
+    public Track prev(Track file);
 }

@@ -20,7 +20,7 @@ package com.tulskiy.musique.gui;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.util.GlobalTimer;
 import com.tulskiy.musique.util.Util;
@@ -63,9 +63,9 @@ public class StatusBar extends JPanel {
         GlobalTimer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (player.isPlaying()) {
-                    Song song = player.getSong();
-                    String s = Util.samplesToTime(player.getCurrentSample(), song.getSamplerate(), 0);
-                    s += " / " + Util.samplesToTime(song.getTotalSamples(), song.getSamplerate(), 0);
+                    Track track = player.getSong();
+                    String s = Util.samplesToTime(player.getCurrentSample(), track.getSampleRate(), 0);
+                    s += " / " + Util.samplesToTime(track.getTotalSamples(), track.getSampleRate(), 0);
                     time.setText(s);
                 }
             }

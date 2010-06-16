@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui.playlist.dnd;
 
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -33,7 +33,7 @@ public class SongsSelection implements Transferable {
     private static DataFlavor[] flavor;
     private static String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList";
 
-    private ArrayList<Song> songs;
+    private ArrayList<Track> tracks;
 
     public static DataFlavor getFlavor() {
         if (flavor == null) {
@@ -45,8 +45,8 @@ public class SongsSelection implements Transferable {
         return flavor[0];
     }
 
-    public SongsSelection(ArrayList<Song> songs) {
-        this.songs = songs;
+    public SongsSelection(ArrayList<Track> tracks) {
+        this.tracks = tracks;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class SongsSelection implements Transferable {
     @Override
     public Object getTransferData(DataFlavor flavor) throws UnsupportedFlavorException, IOException {
         if (isDataFlavorSupported(flavor))
-            return songs;
+            return tracks;
         else
             return null;
     }

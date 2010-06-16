@@ -21,7 +21,7 @@ import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Playlist;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
@@ -40,7 +40,6 @@ import java.util.List;
 @SuppressWarnings({"unchecked"})
 public class PlaylistTransferHandler extends TransferHandler {
     private DataFlavor fileListFlavor;
-    private static DBMapper<Song> songMapper = DBMapper.create(Song.class);
     private PlaylistTable table;
 
     public PlaylistTransferHandler(PlaylistTable table) {
@@ -83,12 +82,12 @@ public class PlaylistTransferHandler extends TransferHandler {
             return false;
 
         Transferable t = support.getTransferable();
-        List<Song> songs = null;
+        List<Track> tracks = null;
         List<File> files = null;
 
         try {
             if (support.isDataFlavorSupported(SongsSelection.getFlavor())) {
-                songs = (List<Song>) t.getTransferData(SongsSelection.getFlavor());
+                tracks = (List<Track>) t.getTransferData(SongsSelection.getFlavor());
             } else if (support.isDataFlavorSupported(fileListFlavor)) {
                 String data = (String) t.getTransferData(fileListFlavor);
                 files = new ArrayList<File>();
@@ -104,7 +103,7 @@ public class PlaylistTransferHandler extends TransferHandler {
                 return true;
             }
 
-            if (songs != null) {
+            if (tracks != null) {
                 Playlist playlist = table.getPlaylist();
                 int insertRow;
 
@@ -120,26 +119,26 @@ public class PlaylistTransferHandler extends TransferHandler {
 
                     if (insertRow != -1) {
                         int toSubstract = 0;
-                        for (Song song : songs) {
-                            if (playlist.indexOf(song) < insertRow)
+                        for (Track track : tracks) {
+                            if (playlist.indexOf(track) < insertRow)
                                 toSubstract++;
                         }
 
                         insertRow -= toSubstract;
                     }
 
-                    playlist.removeAll(songs);
+                    playlist.removeAll(tracks);
                 } else {
-                    insertRow = table.getSelectedRow();
+                    insertRow = table.getSelectedRow() + 1;
                 }
 
                 if (insertRow == -1)
                     insertRow = playlist.size();
 
-                playlist.addAll(insertRow, songs);
-                table.setRowSelectionInterval(insertRow, insertRow + songs.size() - 1);
-                songs.clear();
+                playlist.addAll(insertRow, tracks);
                 table.update();
+                table.setRowSelectionInterval(insertRow, insertRow + tracks.size() - 1);
+                tracks.clear();
                 return true;
             }
 
@@ -158,20 +157,20 @@ public class PlaylistTransferHandler extends TransferHandler {
         System.out.println("export done " + action + "Move is " + MOVE);
         try {
             if (data.isDataFlavorSupported(SongsSelection.getFlavor())) {
-                List<Song> songs = (List<Song>) data.getTransferData(SongsSelection.getFlavor());
+                List<Track> tracks = (List<Track>) data.getTransferData(SongsSelection.getFlavor());
                 Playlist playlist = table.getPlaylist();
 
                 if (action == MOVE) {
-                    playlist.removeAll(songs);
+                    playlist.removeAll(tracks);
                     table.update();
                 } else if (action == COPY) {
-                    ArrayList<Song> temp = new ArrayList<Song>();
-                    for (Song song : songs) {
-                        temp.add(songMapper.copyOf(song));
+                    ArrayList<Track> temp = new ArrayList<Track>();
+                    for (Track track : tracks) {
+                        temp.add(track.copy());
                     }
                     //switcherooo
-                    songs.clear();
-                    songs.addAll(temp);
+                    tracks.clear();
+                    tracks.addAll(temp);
                 }
             }
         } catch (UnsupportedFlavorException e) {

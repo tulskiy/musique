@@ -18,8 +18,7 @@
 package com.tulskiy.musique.audio.formats.uncompressed;
 
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.audio.io.PCMOutputStream;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -33,12 +32,12 @@ import java.io.IOException;
  */
 public class PCMDecoder implements Decoder {
     private AudioInputStream audioInputStream;
-    private Song inputFile;
+    private Track inputFile;
 
-    public boolean open(Song inputFile) {
+    public boolean open(Track track) {
         try {
-            this.inputFile = inputFile;
-            audioInputStream = AudioSystem.getAudioInputStream(inputFile.getFile());
+            this.inputFile = track;
+            audioInputStream = AudioSystem.getAudioInputStream(track.getFile());
             audioInputStream = AudioSystem.getAudioInputStream(new AudioFormat(audioInputStream.getFormat().getSampleRate(), audioInputStream.getFormat().getSampleSizeInBits(), audioInputStream.getFormat().getChannels(), true, false), audioInputStream);
             return true;
         } catch (UnsupportedAudioFileException e) {

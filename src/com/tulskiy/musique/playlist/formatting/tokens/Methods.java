@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 
 import javax.swing.*;
@@ -33,44 +33,44 @@ public class Methods {
     private static ImageIcon pausedIcon = new ImageIcon("resources/images/pause.png");
     private Application app = Application.getInstance();
 
-    public String if3(Song song, ArrayList<Expression> args) {
+    public String if3(Track track, ArrayList<Expression> args) {
         for (Expression t : args) {
-            String s = (String) t.eval(song);
+            String s = (String) t.eval(track);
             if (notEmpty(s))
                 return s;
         }
         return null;
     }
 
-    public String if1(Song song, ArrayList<Expression> args) {
+    public String if1(Track track, ArrayList<Expression> args) {
         if (args.size() != 3)
             return null;
-        if (notEmpty((String) args.get(0).eval(song))) {
-            return (String) args.get(1).eval(song);
+        if (notEmpty((String) args.get(0).eval(track))) {
+            return (String) args.get(1).eval(track);
         } else {
-            return (String) args.get(2).eval(song);
+            return (String) args.get(2).eval(track);
         }
     }
 
-    public String strcmp(Song song, ArrayList<Expression> args) {
+    public String strcmp(Track track, ArrayList<Expression> args) {
         if (args.size() != 2)
             return null;
 
-        if (args.get(0).eval(song).equals(
-                args.get(1).eval(song)
+        if (args.get(0).eval(track).equals(
+                args.get(1).eval(track)
         ))
             return "1";
 
         return null;
     }
 
-    public Object eval(Song song, ArrayList<Expression> args) {
+    public Object eval(Track track, ArrayList<Expression> args) {
         if (args.size() == 1)
-            return args.get(0).eval(song);
+            return args.get(0).eval(track);
 
         StringBuilder sb = new StringBuilder();
         for (Expression expression : args) {
-            String str = (String) expression.eval(song);
+            String str = (String) expression.eval(track);
             if (str != null)
                 sb.append(str);
         }
@@ -84,11 +84,11 @@ public class Methods {
         return str != null && str.length() > 0;
     }
 
-    public String notNull(Song song, ArrayList<Expression> args) {
+    public String notNull(Track track, ArrayList<Expression> args) {
         StringBuilder sb = new StringBuilder();
         boolean notEmpty = true;
         for (Expression expression : args) {
-            String str = (String) expression.eval(song);
+            String str = (String) expression.eval(track);
             if (!(expression instanceof TextExpression))
                 notEmpty &= notEmpty(str);
             sb.append(str);
@@ -100,14 +100,14 @@ public class Methods {
             return "";
     }
 
-    public Object isPlaying(Song song, ArrayList<Expression> args) {
-        if (app.getPlayer().getSong() == song) {
+    public Object isPlaying(Track track, ArrayList<Expression> args) {
+        if (app.getPlayer().getSong() == track) {
             if (app.getPlayer().isPaused())
                 return pausedIcon;
             if (app.getPlayer().isPlaying())
                 return playingIcon;
-        } else if (song.getQueuePosition() != -1) {
-            return song.getQueuePosition();
+        } else if (track.getQueuePosition() != -1) {
+            return track.getQueuePosition();
         }
 
         return null;

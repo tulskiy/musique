@@ -18,8 +18,7 @@
 package com.tulskiy.musique.audio.formats.flac;
 
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.audio.io.PCMOutputStream;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.kc7bfi.jflac.frame.Frame;
 import org.kc7bfi.jflac.io.RandomFileInputStream;
 import org.kc7bfi.jflac.metadata.Metadata;
@@ -43,9 +42,9 @@ public class FLACDecoder implements Decoder {
     private ByteData byteData;
     private int offset = -1;
 
-    public synchronized boolean open(Song iFile) {
+    public synchronized boolean open(Track track) {
         try {
-            inputFile = new RandomAccessFile(iFile.getFile(), "r");
+            inputFile = new RandomAccessFile(track.getFile(), "r");
 //            ogg = iFile.getAudioHeader().getCodec().equals("Ogg FLAC");
 //            if (ogg) {
 //                oggDecoder = new OggFlacDecoder();
@@ -282,8 +281,8 @@ public class FLACDecoder implements Decoder {
             /* find the closest seekPosition point <= target_sample, if it exists */
             for (i = seekTable.numberOfPoints() - 1; i >= 0; i--) {
                 if (seekTable.getSeekPoint(i).getFrameSamples() > 0 && /* defense against bad seekpoints */
-                        (total_samples <= 0 || seekTable.getSeekPoint(i).getSampleNumber() < total_samples) && /* defense against bad seekpoints */
-                        seekTable.getSeekPoint(i).getSampleNumber() <= target_sample)
+                    (total_samples <= 0 || seekTable.getSeekPoint(i).getSampleNumber() < total_samples) && /* defense against bad seekpoints */
+                    seekTable.getSeekPoint(i).getSampleNumber() <= target_sample)
                     break;
             }
             if (i >= 0) { /* i.e. we found a suitable seekPosition point... */
@@ -294,8 +293,8 @@ public class FLACDecoder implements Decoder {
             /* find the closest seekPosition point > target_sample, if it exists */
             for (i = 0; i < seekTable.numberOfPoints(); i++) {
                 if (seekTable.getSeekPoint(i).getFrameSamples() > 0 && /* defense against bad seekpoints */
-                        (total_samples <= 0 || seekTable.getSeekPoint(i).getSampleNumber() < total_samples) && /* defense against bad seekpoints */
-                        seekTable.getSeekPoint(i).getSampleNumber() > target_sample)
+                    (total_samples <= 0 || seekTable.getSeekPoint(i).getSampleNumber() < total_samples) && /* defense against bad seekpoints */
+                    seekTable.getSeekPoint(i).getSampleNumber() > target_sample)
                     break;
             }
             if (i < seekTable.numberOfPoints()) { /* i.e. we found a suitable seekPosition point... */
@@ -335,7 +334,7 @@ public class FLACDecoder implements Decoder {
                 Frame frame = decoder.readNextFrame();
 //                System.out.println("Found: " + frame.header.sampleNumber);
                 if (frame.header.sampleNumber <= target_sample &&
-                        target_sample <= frame.header.sampleNumber + frame.header.blockSize) {
+                    target_sample <= frame.header.sampleNumber + frame.header.blockSize) {
 //                    System.out.println("Done seeking");
                     offset = (int) (target_sample - frame.header.sampleNumber) * frame.header.channels * frame.header.bitsPerSample / 8;
                     byteData = decoder.decodeFrame(frame, null);
