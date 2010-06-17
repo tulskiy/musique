@@ -18,7 +18,7 @@
 package com.tulskiy.musique.audio.formats.ape;
 
 import com.tulskiy.musique.audio.AudioTagWriter;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 
 import java.io.IOException;
 
@@ -30,9 +30,9 @@ public class APETagWriter extends AudioTagWriter {
     private APETagProcessor tagProcessor = new APETagProcessor();
 
     @Override
-    public void write(Song song) {
+    public void write(Track track) {
         try {
-            tagProcessor.writeAPEv2Tag(song);
+            tagProcessor.writeAPEv2Tag(track);
         } catch (IOException e) {
             e.printStackTrace();
         }

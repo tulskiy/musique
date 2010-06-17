@@ -17,19 +17,41 @@
 
 package com.tulskiy.musique.playlist;
 
+import com.tulskiy.musique.playlist.formatting.tokens.Methods;
 import com.tulskiy.musique.util.Util;
 
 import java.io.File;
 import java.util.Formatter;
-import java.util.HashMap;
 
 /**
  * Author: Denis Tulskiy
  * Date: Jun 15, 2010
  */
-public class Track {
-    private HashMap<String, String> meta = new HashMap<String, String>(14, 1.0f);
 
+/**
+ * Class used to represent track information
+ * <p/>
+ * <p><p><strong>Warning: getMeta(key) returns raw value of the variable,
+ * getters, eg. getTrackNumber(), may return different values</strong>
+ * <p/>
+ * <p>I know it's stupid, but that's the way my title formatting works
+ */
+public class Track implements Cloneable {
+
+    //meta fields
+    private String artist;
+    private String album;
+    private String title;
+    private String albumArtist;
+    private String trackNumber;
+    private String totalTracks;
+    private String discNumber;
+    private String totalDiscs;
+    private String year;
+    private String genre;
+    private String comment;
+
+    //song info
     private int sampleRate;
     private int channels;
     private int bps;
@@ -37,25 +59,19 @@ public class Track {
     private long startPosition;
     private long totalSamples;
     private File file;
+
+    //runtime stuff
     private String cueSheet;
+    private String track;
+    private String length;
+    private String fileName;
 
-    public Track() {
-    }
-
-    public String getMeta(String key) {
-        return meta.get(key);
-    }
-
-    public void setMeta(String key, String value) {
-        if (value == null) {
-            meta.remove(key);
+    public Track copy() {
+        try {
+            return (Track) this.clone();
+        } catch (CloneNotSupportedException ignored) {
+            return null;
         }
-        meta.put(key, value);
-    }
-
-    public void addMeta(String key, String value) {
-        String o = meta.get(key);
-        meta.put(key, Util.longest(value, o));
     }
 
     public int getSampleRate() {
@@ -112,103 +128,130 @@ public class Track {
 
     public void setFile(File file) {
         this.file = file;
-    }
-
-    public Track copy() {
-        Track track = new Track();
-        track.meta.putAll(meta);
-
-        track.sampleRate = sampleRate;
-        track.channels = channels;
-        track.bps = bps;
-        track.subsongIndex = subsongIndex;
-        track.startPosition = startPosition;
-        track.totalSamples = totalSamples;
-        track.file = file;
-
-        return track;
-    }
-
-    public HashMap<String, String> getMeta() {
-        return meta;
+        fileName = Util.removeExt(file.getName());
     }
 
     public String getArtist() {
-        return null;
+        return Util.firstNotEmpty(artist, albumArtist);
     }
 
     public void setArtist(String artist) {
+        this.artist = artist;
     }
 
     public String getAlbum() {
-        return null;
+        return album;
     }
 
     public void setAlbum(String album) {
+        this.album = album;
     }
 
     public String getTitle() {
-        return null;
+        return Util.firstNotEmpty(title, fileName);
     }
 
     public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getAlbumArtist() {
-        return null;
+        return Util.firstNotEmpty(albumArtist, artist);
     }
 
     public void setAlbumArtist(String albumArtist) {
+        this.albumArtist = albumArtist;
     }
 
+    /**
+     * @return track number formatted to two digits
+     */
     public String getTrackNumber() {
-        return null;
+        return track;
     }
 
     public void setTrackNumber(String trackNumber) {
         if (trackNumber != null) {
             String[] s = trackNumber.split("/");
             if (s.length > 0) {
-                String value;
                 try {
                     int i = Integer.parseInt(s[0]);
-                    value = new Formatter().format("%02d", i).toString();
+                    this.track = new Formatter().format("%02d", i).toString();
                 } catch (NumberFormatException ignored) {
-                    value = s[0];
                 }
 
-                setMeta("tracknumber", value);
+                this.trackNumber = s[0];
+
             }
 
             if (s.length > 1)
-                setMeta("totaltracks", s[1]);
+                this.totalTracks = s[1];
         }
     }
 
     public String getTotalTracks() {
-        return null;
+        return totalTracks;
     }
 
     public void setTotalTracks(String totalTracks) {
+        this.totalTracks = totalTracks;
     }
 
     public String getDiscNumber() {
-        return null;
+        return discNumber;
     }
 
     public void setDiscNumber(String discNumber) {
         if (discNumber != null && discNumber.length() > 0) {
             String[] s = discNumber.split("/");
             if (s.length > 0)
-                setMeta("discnumber", s[0]);
+                this.discNumber = s[0];
             if (s.length > 1)
-                setMeta("totaldiscs", s[1]);
+                this.totalDiscs = s[1];
         }
     }
 
+    public String getTotalDiscs() {
+        return totalDiscs;
+    }
+
+    public void setTotalDiscs(String totalDiscs) {
+        this.totalDiscs = totalDiscs;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getCueSheet() {
+        return cueSheet;
+    }
+
+    public void setCueSheet(String cueSheet) {
+        this.cueSheet = cueSheet;
+    }
+
     public String getTrack() {
-        String trackNumber = getMeta("trackNumber");
-        String totalTracks = getMeta("totaltracks");
         if (trackNumber != null) {
             if (totalTracks != null && !totalTracks.isEmpty()) {
                 return trackNumber + "/" + totalTracks;
@@ -221,8 +264,6 @@ public class Track {
     }
 
     public String getDisc() {
-        String discNumber = getMeta("discnumber");
-        String totalDiscs = getMeta("totalDiscs");
         if (discNumber != null) {
             if (totalDiscs != null && !totalDiscs.isEmpty()) {
                 return discNumber + "/" + totalDiscs;
@@ -232,6 +273,16 @@ public class Track {
         }
 
         return "";
+    }
+
+    public String getLength() {
+        if (length == null)
+            length = Util.samplesToTime(totalSamples, sampleRate, 0);
+        return length;
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 
     private int queuePosition = -1;
@@ -244,54 +295,27 @@ public class Track {
         return queuePosition;
     }
 
-    public String getTotalDiscs() {
+    //OK, this is a hack, but I don't want to redo all this stuff
+
+    public void addMeta(String key, String value) {
+        setMeta(key, Util.longest(getMeta(key), value));
+    }
+
+    public String getMeta(String key) {
+        try {
+            Object o = getClass().getDeclaredField(key).get(this);
+            if (o != null)
+                return o.toString();
+        } catch (Exception ignored) {
+        }
         return null;
     }
 
-    public void setTotalDiscs(String totalDiscs) {
-    }
-
-    public String getYear() {
-        return null;
-    }
-
-    public void setYear(String year) {
-    }
-
-    public String getGenre() {
-        return null;
-    }
-
-    public void setGenre(String genre) {
-    }
-
-    public String getComment() {
-        return null;
-    }
-
-    public void setComment(String comment) {
-    }
-
-    public void setCueSheet(String cueSheet) {
-        this.cueSheet = cueSheet;
-    }
-
-    public String getCueSheet() {
-        return cueSheet;
-    }
-
-    public void setCue(CUESheet sheet) {
-    }
-
-    public int getSongID() {
-        return 0;
-    }
-
-    public String getFilePath() {
-        return null;
-    }
-
-    public int getCueID() {
-        return 0;
+    public void setMeta(String key, String value) {
+        try {
+            getClass().getDeclaredField(key).set(this, value);
+        } catch (Exception ignored) {
+            ignored.printStackTrace();
+        }
     }
 }

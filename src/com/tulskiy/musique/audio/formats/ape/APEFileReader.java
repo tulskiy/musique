@@ -19,12 +19,10 @@ package com.tulskiy.musique.audio.formats.ape;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import davaguine.jmac.info.APEFileInfo;
 import davaguine.jmac.info.APEHeader;
 import davaguine.jmac.tools.RandomAccessFile;
-
-import java.io.IOException;
 
 /**
  * @Author: Denis Tulskiy
@@ -38,19 +36,19 @@ public class APEFileReader extends AudioFileReader {
         setUseNativeDecoder(false);
     }
 
-    public Song readSingle(Song song) {
+    public Track readSingle(Track track) {
         try {
-            RandomAccessFile ras = new RandomAccessFile(song.getFile(), "r");
+            RandomAccessFile ras = new RandomAccessFile(track.getFile(), "r");
             APEHeader header = new APEHeader(ras);
             APEFileInfo fileInfo = new APEFileInfo();
             header.Analyze(fileInfo);
-            parseInfo(song, fileInfo);
+            parseInfo(track, fileInfo);
 
-            tagProcessor.readAPEv2Tag(song);
+            tagProcessor.readAPEv2Tag(track);
             ras.close();
-            return song;
+            return track;
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + song.getFilePath());
+            System.out.println("Couldn't read file: " + track.getFile());
         }
         return null;
     }
@@ -68,16 +66,10 @@ public class APEFileReader extends AudioFileReader {
         return decoder;
     }
 
-    private void parseInfo(Song song, APEFileInfo fileInfo) {
-        song.setBitrate(fileInfo.nAverageBitrate);
-        song.setChannels(fileInfo.nChannels);
-        song.setCodec("Monkey's audio");
-        song.setSamplerate(fileInfo.nSampleRate);
-//        song.setCustomHeaderField("codec_profile", codec_profiles[fileInfo.nCompressionLevel / 1000]);
-        song.setTotalSamples(fileInfo.nTotalBlocks);
-//        song.setCustomHeaderNumber("flags", fileInfo.nFormatFlags);
-        song.setStartPosition(0);
-//        if (fileInfo.spAPEDescriptor != null)
-//            song.setCustomHeaderField("version", String.valueOf(fileInfo.spAPEDescriptor.nVersion / 1000f));
+    private void parseInfo(Track track, APEFileInfo fileInfo) {
+        track.setChannels(fileInfo.nChannels);
+        track.setSampleRate(fileInfo.nSampleRate);
+        track.setTotalSamples(fileInfo.nTotalBlocks);
+        track.setStartPosition(0);
     }
 }

@@ -19,7 +19,7 @@ package com.tulskiy.musique.audio.formats.aac;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.mp4.Mp4FileReader;
 
@@ -39,28 +39,27 @@ public class MP4FileReader extends AudioFileReader {
     }
 
     @Override
-    public Song readSingle(Song song) {
+    public Track readSingle(Track track) {
         Mp4FileReader reader = new Mp4FileReader();
         try {
-            org.jaudiotagger.audio.AudioFile audioFile = reader.read(song.getFile());
-            copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), song);
+            org.jaudiotagger.audio.AudioFile audioFile = reader.read(track.getFile());
+            copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), track);
             org.jaudiotagger.tag.Tag tag = audioFile.getTag();
-            copyTagFields(tag, song);
-            song.setTrackNumber(tag.getFirstTrack());
-            song.setDiscNumber(tag.getFirst("disk"));
-            song.setAlbumArtist(tag.getFirst("aART"));
-//            song.setCustomHeaderField("tool", audioFile.getTag().getFirst(Mp4FieldKey.ENCODER.getFieldName()));
+            copyTagFields(tag, track);
+            track.setTrackNumber(tag.getFirstTrack());
+            track.setDiscNumber(tag.getFirst("disk"));
+            track.setAlbumArtist(tag.getFirst("aART"));
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + song.getFilePath());
+            System.out.println("Couldn't read file: " + track.getFile());
         }
 
-        return song;
+        return track;
     }
 
     @Override
     public boolean isFileSupported(String ext) {
         return decoder != null &&
-                (ext.equalsIgnoreCase("mp4") || ext.equalsIgnoreCase("m4a"));
+               (ext.equalsIgnoreCase("mp4") || ext.equalsIgnoreCase("m4a"));
     }
 
     @Override

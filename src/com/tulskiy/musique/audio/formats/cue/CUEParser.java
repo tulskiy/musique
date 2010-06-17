@@ -20,7 +20,7 @@ package com.tulskiy.musique.audio.formats.cue;
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.playlist.CUESheet;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.PluginLoader;
 import jwbroek.cuelib.*;
 
@@ -35,9 +35,8 @@ import java.util.List;
  */
 public class CUEParser {
     private DBMapper<CUESheet> cueSheetDBMapper = DBMapper.create(CUESheet.class);
-    private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
 
-    public void parse(List<Song> list, Song file, LineNumberReader cueStream, boolean embedded) {
+    public void parse(List<Track> list, Track file, LineNumberReader cueStream, boolean embedded) {
         try {
             CueSheet cueSheet = CueParser.parse(cueStream);
             List<FileData> datas = cueSheet.getFileData();
@@ -63,38 +62,38 @@ public class CUEParser {
                     int size = fileData.getTrackData().size();
                     for (int i = 0; i < size; i++) {
                         TrackData trackData = fileData.getTrackData().get(i);
-                        Song song = songDBMapper.copyOf(file);
-                        song.setCue(sheet);
+                        Track track = file.copy();
+//                        track.setCue(sheet);
 
                         String album = trackData.getMetaData(CueSheet.MetaDataField.ALBUMTITLE);
                         if (album.length() > 0)
-                            song.setAlbum(album);
+                            track.setAlbum(album);
                         String artist = trackData.getPerformer();
-                        song.setArtist(artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
-                        song.setAlbumArtist(cueSheet.getPerformer());
-                        song.setComment(cueSheet.getComment());
-                        song.setTitle(trackData.getTitle());
+                        track.setArtist(artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
+                        track.setAlbumArtist(cueSheet.getPerformer());
+                        track.setComment(cueSheet.getComment());
+                        track.setTitle(trackData.getTitle());
                         String year = trackData.getMetaData(CueSheet.MetaDataField.YEAR);
                         if (year.length() > 0)
-                            song.setYear(year);
-                        song.setTrackNumber(String.valueOf(trackData.getNumber()));
+                            track.setYear(year);
+                        track.setTrackNumber(String.valueOf(trackData.getNumber()));
                         String genre = trackData.getMetaData(CueSheet.MetaDataField.GENRE);
                         if (genre.length() > 0)
-                            song.setGenre(genre);
-                        int sampleRate = song.getSamplerate();
+                            track.setGenre(genre);
+                        int sampleRate = track.getSampleRate();
                         long startPosition = indexToSample(trackData.getIndex(1), sampleRate);
 //                        System.out.println(song.getFile().getName() + " " + startPosition);
                         long endPosition;
                         if (i >= size - 1) {
-                            endPosition = song.getTotalSamples();
+                            endPosition = track.getTotalSamples();
                         } else {
                             TrackData nextTrack = fileData.getTrackData().get(i + 1);
                             endPosition = indexToSample(nextTrack.getIndex(1), sampleRate);
                         }
-                        song.setTotalSamples(endPosition - startPosition);
-                        song.setSubsongIndex(i + 1);
-                        song.setStartPosition(startPosition);
-                        list.add(song);
+                        track.setTotalSamples(endPosition - startPosition);
+                        track.setSubsongIndex(i + 1);
+                        track.setStartPosition(startPosition);
+                        list.add(track);
                     }
                 }
             }

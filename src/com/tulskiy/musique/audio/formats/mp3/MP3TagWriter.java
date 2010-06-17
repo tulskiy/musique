@@ -19,7 +19,7 @@ package com.tulskiy.musique.audio.formats.mp3;
 
 import com.tulskiy.musique.audio.AudioTagWriter;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagFieldKey;
 
@@ -34,12 +34,12 @@ public class MP3TagWriter extends AudioTagWriter {
     private APETagProcessor apeTagProcessor = new APETagProcessor();
 
     @Override
-    public void write(Song song) {
-        File file = song.getFile();
+    public void write(Track track) {
+        File file = track.getFile();
 
         if (/*song.getCustomHeaderField("hasApeTag") != null*/false) {
             try {
-                apeTagProcessor.writeAPEv2Tag(song);
+                apeTagProcessor.writeAPEv2Tag(track);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -49,11 +49,11 @@ public class MP3TagWriter extends AudioTagWriter {
                 mp3File = new MP3File(file, MP3File.LOAD_IDV2TAG, false);
 
                 org.jaudiotagger.tag.Tag id3v2tag = mp3File.getTagOrCreateAndSetDefault();
-                copyCommonFields(id3v2tag, song);
+                copyCommonFields(id3v2tag, track);
 
-                id3v2tag.setTrack(song.getTrack());
-                id3v2tag.set(id3v2tag.createTagField(TagFieldKey.DISC_NO, song.getDisc()));
-                id3v2tag.set(id3v2tag.createTagField(TagFieldKey.ALBUM_ARTIST, song.getAlbumArtist()));
+                id3v2tag.setTrack(track.getTrack());
+                id3v2tag.set(id3v2tag.createTagField(TagFieldKey.DISC_NO, track.getDisc()));
+                id3v2tag.set(id3v2tag.createTagField(TagFieldKey.ALBUM_ARTIST, track.getMeta("albumArtist")));
                 mp3File.commit();
             } catch (Exception e) {
                 e.printStackTrace();

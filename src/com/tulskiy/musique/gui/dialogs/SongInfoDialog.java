@@ -116,32 +116,30 @@ public class SongInfoDialog extends JDialog {
 
     private void loadSong(Track track) {
         changed = false;
-//        tagValues[0] = track.getArtist();
-//        tagValues[1] = track.getTitle();
-//        tagValues[2] = track.getAlbum();
-//        tagValues[3] = track.getYear();
-//        tagValues[4] = track.getAlbumArtist();
-//        tagValues[5] = track.getGenre();
-//        tagValues[6] = track.getTrackNumber();
-//        tagValues[7] = track.getTotalTracks();
-//        tagValues[8] = track.getDiscNumber();
-//        tagValues[9] = track.getTotalDiscs();
+        tagValues[0] = track.getArtist();
+        tagValues[1] = track.getTitle();
+        tagValues[2] = track.getAlbum();
+        tagValues[3] = track.getYear();
+        tagValues[4] = track.getAlbumArtist();
+        tagValues[5] = track.getGenre();
+        tagValues[6] = track.getTrackNumber();
+        tagValues[7] = track.getTotalTracks();
+        tagValues[8] = track.getDiscNumber();
+        tagValues[9] = track.getTotalDiscs();
 
-//        propValues[0] = track.getFilePath();
-//        propValues[1] = track.getCodec();
-//        propValues[2] = track.getLength();
+        propValues[0] = track.getFile().getPath();
+        propValues[2] = track.getLength();
         propValues[3] = String.valueOf(track.getTotalSamples());
         propValues[4] = String.valueOf(track.getSampleRate()) + " Hz";
-//        propValues[5] = String.valueOf(track.getBitrate()) + " kbps";
         propValues[6] = String.valueOf(track.getSubsongIndex());
 
-//        if (track.getCueID() != -1) {
-//            write.setEnabled(false);
-//            status.setText("WARNING: Editing tags for CUE files is not implemented");
-//        } else {
-//            write.setEnabled(true);
-//            status.setText("");
-//        }
+        if (track.getSubsongIndex() > 0) {
+            write.setEnabled(false);
+            status.setText("WARNING: Editing tags for CUE files is not implemented");
+        } else {
+            write.setEnabled(true);
+            status.setText("");
+        }
     }
 
     private void saveSong(Track track) {

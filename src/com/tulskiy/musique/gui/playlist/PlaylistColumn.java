@@ -20,7 +20,7 @@ package com.tulskiy.musique.gui.playlist;
 import com.tulskiy.musique.db.Column;
 import com.tulskiy.musique.db.Entity;
 import com.tulskiy.musique.db.Id;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 
@@ -59,8 +59,8 @@ public class PlaylistColumn {
         setExpression(expression);
     }
 
-    public Object getValue(Song song) {
-        return expr.eval(song);
+    public Object getValue(Track track) {
+        return expr.eval(track);
     }
 
     public int getId() {

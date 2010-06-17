@@ -25,7 +25,7 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.db.DBManager;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import javax.swing.*;
@@ -70,7 +70,7 @@ public class Application {
     }
 
     private void loadSettings() {
-        player.setVolume((float) configuration.getDouble("player.volume", 1));
+        player.setVolume(configuration.getDouble("player.volume", 1));
         UIManager.put("Slider.paintValue", Boolean.FALSE);
         TextEncoding.getInstanceOf().setDefaultNonUnicode(
                 configuration.getString("tag.defaultEncoding", "windows-1251"));
@@ -78,12 +78,7 @@ public class Application {
         try {
             String laf = configuration.getString("gui.LAF", "");
             if (laf.isEmpty()) {
-//                String os = System.getProperty("os.name");
-//                if (os.startsWith("Linux")) {
-//                    laf = UIManager.getSystemLookAndFeelClassName();
-//                } else {
                 laf = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
-//                }
             }
             UIManager.setLookAndFeel(laf);
         } catch (Exception e) {
@@ -93,10 +88,11 @@ public class Application {
 
     private void saveSettings() {
         configuration.setDouble("player.volume", player.getVolume());
-        Song lastPlayed = player.getSong();
-        if (lastPlayed != null) {
-            configuration.setInt("player.lastPlayed", lastPlayed.getSongID());
-        }
+        Track lastPlayed = player.getSong();
+//        if (lastPlayed != null) {
+        //todo fix me here
+//            configuration.setInt("player.lastPlayed", lastPlayed.getSongID());
+//        }
         configuration.setString("gui.LAF", UIManager.getLookAndFeel().getClass().getCanonicalName());
     }
 
@@ -146,9 +142,5 @@ public class Application {
 
     public DBManager getDbManager() {
         return dbManager;
-    }
-
-    public void error(String s, Object... params) {
-        System.err.printf("Error: " + s, params);
     }
 }

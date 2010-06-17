@@ -19,9 +19,12 @@ package com.tulskiy.musique.audio.formats.cue;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -30,25 +33,30 @@ import java.util.List;
  */
 public class CUEFileReader extends AudioFileReader {
     private static CUEParser cueParser;
+    private Charset charset;
 
-    public void read(File f, List<Song> list) {
-        Song song = new Song();
-        song.setFile(f);
+    public CUEFileReader() {
+        Configuration conf = Application.getInstance().getConfiguration();
+        String enc = conf.getString("cue.externalEncoding", "windows-1251");
+        charset = Charset.forName(enc);
+    }
+
+    public void read(File f, List<Track> list) {
+        Track track = new Track();
+        track.setFile(f);
         if (cueParser == null)
             cueParser = new CUEParser();
         try {
-            LineNumberReader numberReader =
-                    new LineNumberReader(new InputStreamReader(new FileInputStream(f), "windows-1251"));
-            //todo load encoding from configuration
-            cueParser.parse(list, song, numberReader, false);
+            LineNumberReader numberReader = new LineNumberReader(
+                    new InputStreamReader(
+                            new FileInputStream(f), charset));
+            cueParser.parse(list, track, numberReader, false);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
     }
 
-    public Song readSingle(Song song) {
+    public Track readSingle(Track track) {
         //do nothing here
         return null;
     }

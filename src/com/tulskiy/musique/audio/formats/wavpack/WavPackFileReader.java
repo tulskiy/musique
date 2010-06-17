@@ -20,7 +20,7 @@ package com.tulskiy.musique.audio.formats.wavpack;
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.wavpack.WavPackReader;
 
@@ -32,16 +32,16 @@ public class WavPackFileReader extends AudioFileReader {
     private static Decoder decoder = new WavPackDecoder();
     private static APETagProcessor apeTagProcessor = new APETagProcessor();
 
-    public Song readSingle(Song song) {
+    public Track readSingle(Track track) {
         WavPackReader reader = new WavPackReader();
         try {
-            apeTagProcessor.readAPEv2Tag(song);
-            org.jaudiotagger.audio.AudioFile audioFile = reader.read(song.getFile());
-            copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), song);
+            apeTagProcessor.readAPEv2Tag(track);
+            org.jaudiotagger.audio.AudioFile audioFile = reader.read(track.getFile());
+            copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), track);
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + song.getFilePath());
+            System.out.println("Couldn't read file: " + track.getFile());
         }
-        return song;
+        return track;
     }
 
     public boolean isFileSupported(String ext) {

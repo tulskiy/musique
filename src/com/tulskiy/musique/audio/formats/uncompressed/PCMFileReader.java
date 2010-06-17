@@ -19,15 +19,13 @@ package com.tulskiy.musique.audio.formats.uncompressed;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
-import java.io.IOException;
 
 /**
  * @Author: Denis Tulskiy
@@ -36,30 +34,27 @@ import java.io.IOException;
 public class PCMFileReader extends AudioFileReader {
     private static Decoder decoder = new PCMDecoder();
 
-    public Song readSingle(Song song) {
-        File file = song.getFile();
+    public Track readSingle(Track track) {
+        File file = track.getFile();
 
         String title = Util.removeExt(file.getName());
-        song.setTitle(title);
+        track.setMeta("title", title);
         try {
             AudioFileFormat format = AudioSystem.getAudioFileFormat(file);
             AudioFormat aFormat = format.getFormat();
-            song.setStartPosition(0);
-            song.setSamplerate((int) format.getFormat().getSampleRate());
-            song.setTotalSamples(format.getFrameLength());
-            song.setChannels(aFormat.getChannels());
-            song.setCodec("PCM");
-            if (format.getFrameLength() > 0)
-                song.setBitrate((int) (file.length() / format.getFrameLength() / format.getFormat().getSampleRate()));
+            track.setStartPosition(0);
+            track.setSampleRate((int) format.getFormat().getSampleRate());
+            track.setTotalSamples(format.getFrameLength());
+            track.setChannels(aFormat.getChannels());
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + song.getFilePath());
+            System.out.println("Couldn't read file: " + track.getFile());
         }
-        return song;
+        return track;
     }
 
     public boolean isFileSupported(String ext) {
         return ext.equalsIgnoreCase("wav") || ext.equalsIgnoreCase("au")
-                || ext.equalsIgnoreCase("aiff");
+               || ext.equalsIgnoreCase("aiff");
     }
 
     @Override

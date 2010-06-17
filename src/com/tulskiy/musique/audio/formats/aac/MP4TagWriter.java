@@ -18,7 +18,7 @@
 package com.tulskiy.musique.audio.formats.aac;
 
 import com.tulskiy.musique.audio.AudioTagWriter;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.mp4.field.Mp4DiscNoField;
@@ -31,16 +31,16 @@ import org.jaudiotagger.tag.mp4.field.Mp4TrackField;
  */
 public class MP4TagWriter extends AudioTagWriter {
     @Override
-    public void write(Song song) {
+    public void write(Track track) {
         try {
-            org.jaudiotagger.audio.AudioFile af1 = AudioFileIO.read(song.getFile());
+            org.jaudiotagger.audio.AudioFile af1 = AudioFileIO.read(track.getFile());
             Tag abstractTag = af1.getTag();
 
-            copyCommonFields(abstractTag, song);
+            copyCommonFields(abstractTag, track);
 
-            abstractTag.set(new Mp4TagTextField("aART", song.getAlbumArtist()));
-            abstractTag.set(new Mp4DiscNoField(song.getDisc()));
-            abstractTag.set(new Mp4TrackField(song.getTrack()));
+            abstractTag.set(new Mp4TagTextField("aART", track.getMeta("albumArtist")));
+            abstractTag.set(new Mp4DiscNoField(track.getDisc()));
+            abstractTag.set(new Mp4TrackField(track.getTrack()));
 
             AudioFileIO.write(af1);
         } catch (Exception e) {

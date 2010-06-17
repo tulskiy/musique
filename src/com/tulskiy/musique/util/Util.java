@@ -130,64 +130,12 @@ public class Util {
         return longest;
     }
 
-    public static HashMap<String, Object> loadFields(String field) {
-        if (field == null)
-            return null;
-
-        final HashMap<String, Object> map = new LinkedHashMap<String, Object>(2);
-
-        try {
-            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-            parser.parse(new InputSource(new StringReader(field)), new DefaultHandler() {
-                @Override
-                public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-                    if (qName.equals("field")) {
-                        String name = attributes.getValue("name");
-                        String value = attributes.getValue("value");
-
-                        String attr = attributes.getValue("type");
-                        if (attr.equals("string")) {
-                            map.put(name, value);
-                        } else if (attr.equals("int")) {
-                            map.put(name, Integer.valueOf(value));
-                        } else if (attr.equals("long")) {
-                            map.put(name, Long.valueOf(value));
-                        }
-                    }
-                }
-            });
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (NumberFormatException e) {
-            e.printStackTrace();
+    public static String firstNotEmpty(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isEmpty())
+                return value;
         }
 
-        return map;
-    }
-
-    public static String getFields(HashMap<String, Object> map) {
-        if (map == null)
-            return "";
-        StringBuilder sb = new StringBuilder("<root>");
-        for (String key : map.keySet()) {
-            Object o = map.get(key);
-            sb.append("<field name=\"").append(key).
-                    append("\" value=\"").append(stringToHTMLString(o.toString())).
-                    append("\" type=\"");
-            if (o instanceof String)
-                sb.append("string");
-            else if (o instanceof Integer)
-                sb.append("int");
-            else if (o instanceof Long)
-                sb.append("long");
-            sb.append("\" />");
-        }
-        sb.append("</root>");
-
-        return sb.toString();
+        return null;
     }
 }

@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.Tag;
 
@@ -26,18 +26,18 @@ import org.jaudiotagger.tag.Tag;
  * @Date: Oct 9, 2009
  */
 public abstract class AudioTagWriter {
-    public abstract void write(Song song);
+    public abstract void write(Track track);
 
     public abstract boolean isFileSupported(String ext);
 
-    protected void copyCommonFields(Tag abstractTag, Song song) {
+    protected void copyCommonFields(Tag abstractTag, Track track) {
         try {
-            abstractTag.setAlbum(song.getAlbum());
-            abstractTag.setArtist(song.getArtist());
-            abstractTag.setComment(song.getComment());
-            abstractTag.setGenre(song.getGenre());
-            abstractTag.setTitle(song.getTitle());
-            abstractTag.setYear(song.getYear());
+            abstractTag.setAlbum(track.getMeta("album"));
+            abstractTag.setArtist(track.getMeta("artist"));
+            abstractTag.setComment(track.getMeta("comment"));
+            abstractTag.setGenre(track.getMeta("genre"));
+            abstractTag.setTitle(track.getMeta("title"));
+            abstractTag.setYear(track.getMeta("year"));
         } catch (FieldDataInvalidException e) {
             e.printStackTrace();
         }

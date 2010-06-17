@@ -23,7 +23,7 @@ import com.tulskiy.musique.gui.dialogs.SearchDialog;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
@@ -83,15 +83,16 @@ public class PlaylistPanel extends JPanel {
         add(tabbedPane, BorderLayout.NORTH);
         add(table.getScrollPane(), BorderLayout.CENTER);
 
-        int sortingColumn = config.getInt("playlist.sortingColumn", -1);
-        if (sortingColumn != -1 && sortingColumn < columns.size()) {
-            ArrayList<RowSorter.SortKey> list = new ArrayList<RowSorter.SortKey>(1);
-            list.add(new RowSorter.SortKey(sortingColumn, SortOrder.ASCENDING));
-            table.getRowSorter().setSortKeys(list);
-        }
+//        int sortingColumn = config.getInt("playlist.sortingColumn", -1);
+//        if (sortingColumn != -1 && sortingColumn < columns.size()) {
+//            ArrayList<RowSorter.SortKey> list = new ArrayList<RowSorter.SortKey>(1);
+//            list.add(new RowSorter.SortKey(sortingColumn, SortOrder.ASCENDING));
+//            table.getRowSorter().setSortKeys(list);
+//        }
 
         int lastPlayed = config.getInt("player.lastPlayed", -1);
-        table.setLastPlayed(new Song(lastPlayed));
+        //todo fix me here
+//        table.setLastPlayed(new Track(lastPlayed));
     }
 
     private void setUpDndCCP() {
@@ -118,11 +119,6 @@ public class PlaylistPanel extends JPanel {
 
         for (PlaylistColumn c : columns) {
             columnDBMapper.save(c);
-        }
-
-        List<? extends RowSorter.SortKey> keys = table.getRowSorter().getSortKeys();
-        if (!keys.isEmpty()) {
-            config.setInt("playlist.sortingColumn", keys.get(0).getColumn());
         }
     }
 

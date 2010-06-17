@@ -22,27 +22,25 @@ import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.gui.custom.SeparatorTable;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
 import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
 import com.tulskiy.musique.playlist.Playlist;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.PluginLoader;
 
 import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableRowSorter;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 /**
@@ -76,8 +74,8 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     private TableRowSorter<PlaylistModel> sorter;
     private PlaylistModel model;
     private Order order = Order.DEFAULT;
-    private LinkedList<Song> queue = new LinkedList<Song>();
-    private Song lastPlayed;
+    private LinkedList<Track> queue = new LinkedList<Track>();
+    private Track lastPlayed;
 
     private JScrollPane scrollPane;
 
@@ -87,12 +85,15 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
 
         model = new PlaylistModel();
         setModel(model);
-        sorter = new TableRowSorter<PlaylistModel>(model);
-        setRowSorter(sorter);
         getTableHeader().setPreferredSize(new Dimension(10000, 20));
         scrollPane = new JScrollPane(this);
         buildActions();
         buildMenus();
+    }
+
+    public void createSorter() {
+        sorter = new TableRowSorter<PlaylistModel>(model);
+        setRowSorter(sorter);
     }
 
     public void buildActions() {
@@ -132,9 +133,9 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         aMap.put("playSelected", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ArrayList<Song> songs = getSelectedSongs();
-                if (!songs.isEmpty()) {
-                    player.open(songs.get(0));
+                ArrayList<Track> tracks = getSelectedSongs();
+                if (!tracks.isEmpty()) {
+                    player.open(tracks.get(0));
                     player.play();
                 }
             }
@@ -168,16 +169,16 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         aMap.put("enqueue", new AbstractAction("Add to Queue") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (Song song : getSelectedSongs()) {
-                    enqueue(song);
+                for (Track track : getSelectedSongs()) {
+                    enqueue(track);
                 }
             }
         });
         aMap.put("clearQueue", new AbstractAction("Clear Playback Queue") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (Song song : queue) {
-                    song.setQueuePosition(-1);
+                for (Track track : queue) {
+                    track.setQueuePosition(-1);
                 }
                 queue.clear();
                 updateQueuePositions();
@@ -214,6 +215,27 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
                 }
             }
         });
+
+        getTableHeader().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                TableColumnModel model = getTableHeader().getColumnModel();
+                int index = model.getColumnIndexAtX(e.getX());
+                final int col = model.getColumn(index).getModelIndex();
+                final PlaylistColumn pc = columns.get(col);
+                Collections.sort(playlist, new Comparator<Track>() {
+                    @Override
+                    public int compare(Track o1, Track o2) {
+                        Object v1 = pc.getValue(o1);
+                        Object v2 = pc.getValue(o2);
+                        if (v1 != null && v2 != null) {
+                            return v1.toString().compareTo(v2.toString());
+                        }
+                        return 0;
+                    }
+                });
+            }
+        });
     }
 
 
@@ -241,7 +263,8 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     }
 
     public void setPlaylist(Playlist playlist) {
-        sorter.setRowFilter(null);
+        if (sorter != null)
+            sorter.setRowFilter(null);
         this.playlist = playlist;
         model.fireTableDataChanged();
         update();
@@ -262,27 +285,27 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         repaint();
     }
 
-    public int indexOf(Song song) {
-        int index = playlist.indexOf(song);
+    public int indexOf(Track track) {
+        int index = playlist.indexOf(track);
         if (index != -1)
             index = convertRowIndexToView(index);
 
         return index;
     }
 
-    public void scrollToSong(Song song) {
-        int index = indexOf(song);
+    public void scrollToSong(Track track) {
+        int index = indexOf(track);
         if (index != -1)
             scrollToRow(index);
     }
 
-    public ArrayList<Song> getSelectedSongs() {
+    public ArrayList<Track> getSelectedSongs() {
         int[] rows = getSelectedRows();
-        ArrayList<Song> songs = new ArrayList<Song>();
+        ArrayList<Track> tracks = new ArrayList<Track>();
         for (int row : rows) {
-            songs.add(playlist.get(convertRowIndexToModel(row)));
+            tracks.add(playlist.get(convertRowIndexToModel(row)));
         }
-        return songs;
+        return tracks;
     }
 
     private void selectSongsAt(Point p) {
@@ -294,7 +317,6 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
 
     //stuff for popup menu
 
-    private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
     private TableColumn selectedColumn;
     private JFrame parentFrame;
 
@@ -305,15 +327,14 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         return parentFrame;
     }
 
-    public void showInfo(ArrayList<Song> songs) {
-        if (songs.isEmpty())
+    public void showInfo(ArrayList<Track> tracks) {
+        if (tracks.isEmpty())
             return;
-        Song s = songs.get(0);
+        Track s = tracks.get(0);
         SongInfoDialog dialog = new SongInfoDialog(getParentFrame(), s);
         if (dialog.showDialog()) {
             try {
-                songDBMapper.save(s);
-                PluginLoader.getAudioFileWriter(s.getFilePath()).write(s);
+                PluginLoader.getAudioFileWriter(s.getFile().getAbsolutePath()).write(s);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -378,13 +399,6 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         hideScrollbar.setSelected(!config.getBoolean("playlist.hideScrollBar", false));
         hideScrollbar.doClick();
 
-        headerMenu.add(new JMenuItem("Disable Sort")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                sorter.setSortKeys(null);
-            }
-        });
-
         header.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -413,10 +427,10 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (Song song : getSelectedSongs()) {
-                    if (song.getCueID() == -1) {
-                        AudioFileReader reader = PluginLoader.getAudioFileReader(song.getFile().getName());
-                        reader.readSingle(song);
+                for (Track track : getSelectedSongs()) {
+                    if (track.getSubsongIndex() == 0) {
+                        AudioFileReader reader = PluginLoader.getAudioFileReader(track.getFile().getName());
+                        reader.readSingle(track);
                         update();
                     }
                 }
@@ -451,7 +465,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         this.order = order;
     }
 
-    public void setLastPlayed(Song lastPlayed) {
+    public void setLastPlayed(Track lastPlayed) {
         this.lastPlayed = lastPlayed;
         int index = indexOf(lastPlayed);
         if (index != -1) {
@@ -460,8 +474,8 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         }
     }
 
-    public void enqueue(Song song) {
-        queue.add(song);
+    public void enqueue(Track track) {
+        queue.add(track);
         updateQueuePositions();
     }
 
@@ -473,26 +487,32 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     }
 
     @Override
-    public Song next(Song file) {
+    public Track next(Track file) {
         int index;
 
         if (!queue.isEmpty()) {
-            Song song = queue.poll();
-            song.setQueuePosition(-1);
+            Track track = queue.poll();
+            track.setQueuePosition(-1);
             updateQueuePositions();
-            return song;
+            return track;
         }
 
         if (file == null) {
             index = indexOf(lastPlayed);
             if (index == -1)
-                index = indexOf(new Song(0));
+                index = 0;
+            //todo check me!
+//                index = indexOf(new Track(0));
         } else {
             index = indexOf(file);
             if (index == -1)
                 return null;
 
-            int size = sorter.getViewRowCount();
+            int size;
+            if (sorter != null)
+                size = sorter.getViewRowCount();
+            else
+                size = playlist.size();
 
             switch (order) {
                 case DEFAULT:
@@ -513,12 +533,16 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     }
 
     @Override
-    public Song prev(Song file) {
+    public Track prev(Track file) {
         int index = indexOf(file);
         if (index == -1)
             return null;
 
-        int size = sorter.getViewRowCount();
+        int size;
+        if (sorter != null)
+            size = sorter.getViewRowCount();
+        else
+            size = playlist.size();
 
         switch (order) {
             case DEFAULT:

@@ -20,7 +20,7 @@ package com.tulskiy.musique.audio.formats.flac;
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.formats.flac.oggflac.OggFlacDecoder;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.flac.FlacFileReader;
@@ -42,17 +42,16 @@ import java.util.HashMap;
 public class FLACFileReader extends AudioFileReader {
     private static FLACDecoder decoder = new FLACDecoder();
 
-    public Song readSingle(Song song) {
+    public Track readSingle(Track track) {
         try {
-            if (Util.getFileExt(song.getFile()).equalsIgnoreCase("oga")) {
+            if (Util.getFileExt(track.getFile()).equalsIgnoreCase("oga")) {
                 OggFlacDecoder dec = new OggFlacDecoder();
-                dec.open(new RandomAccessFile(song.getFile(), "r"));
+                dec.open(new RandomAccessFile(track.getFile(), "r"));
                 StreamInfo streamInfo = dec.getStreamInfo();
-                song.setSamplerate(streamInfo.getSampleRate());
-                song.setCodec("Ogg FLAC");
-                song.setBps(streamInfo.getBitsPerSample());
-                song.setChannels(streamInfo.getChannels());
-                song.setTotalSamples(streamInfo.getTotalSamples());
+                track.setSampleRate(streamInfo.getSampleRate());
+                track.setBps(streamInfo.getBitsPerSample());
+                track.setChannels(streamInfo.getChannels());
+                track.setTotalSamples(streamInfo.getTotalSamples());
 
                 for (Metadata m : dec.getMetadata()) {
                     if (m instanceof VorbisComment) {
@@ -67,24 +66,24 @@ public class FLACFileReader extends AudioFileReader {
                                 vorbisTag.add(vorbisTag.createTagField(key, map.get(key)));
                             }
                         }
-                        copyTagFields(vorbisTag, song);
+                        copyTagFields(vorbisTag, track);
                     }
                 }
             } else {
                 FlacFileReader reader = new FlacFileReader();
-                AudioFile af1 = reader.read(song.getFile());
+                AudioFile af1 = reader.read(track.getFile());
                 Tag tag = af1.getTag();
-                copyTagFields(tag, song);
-                song.setTotalTracks(tag.getFirst("TOTALTRACKS"));
-                song.setDiscNumber(tag.getFirst("DISCNUMBER"));
-                song.setTotalDiscs(tag.getFirst("TOTALDISCS"));
+                copyTagFields(tag, track);
+                track.setTotalTracks(tag.getFirst("TOTALTRACKS"));
+                track.setDiscNumber(tag.getFirst("DISCNUMBER"));
+                track.setTotalDiscs(tag.getFirst("TOTALDISCS"));
                 GenericAudioHeader audioHeader = (GenericAudioHeader) af1.getAudioHeader();
-                copyHeaderFields(audioHeader, song);
+                copyHeaderFields(audioHeader, track);
             }
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + song.getFilePath());
+            System.out.println("Couldn't read file: " + track.getFile());
         }
-        return song;
+        return track;
     }
 
     public boolean isFileSupported(String ext) {

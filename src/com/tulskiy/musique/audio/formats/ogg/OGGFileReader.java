@@ -19,7 +19,7 @@ package com.tulskiy.musique.audio.formats.ogg;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.ogg.OggFileReader;
@@ -32,20 +32,20 @@ import org.jaudiotagger.tag.Tag;
 public class OGGFileReader extends AudioFileReader {
     private static VorbisDecoder vorbisdecoder = new VorbisDecoder();
 
-    public Song readSingle(Song song) {
+    public Track readSingle(Track track) {
         try {
             OggFileReader reader = new OggFileReader();
-            AudioFile af1 = reader.read(song.getFile());
+            AudioFile af1 = reader.read(track.getFile());
             Tag tag = af1.getTag();
-            copyTagFields(tag, song);
-            song.setTotalTracks(tag.getFirst("TOTALTRACKS"));
-            song.setDiscNumber(tag.getFirst("DISCNUMBER"));
-            song.setTotalDiscs(tag.getFirst("TOTALDISCS"));
-            copyHeaderFields((GenericAudioHeader) af1.getAudioHeader(), song);
+            copyTagFields(tag, track);
+            track.setMeta("totaltracks", tag.getFirst("TOTALTRACKS"));
+            track.setDiscNumber(tag.getFirst("DISCNUMBER"));
+            track.setMeta("totaldiscs", tag.getFirst("TOTALDISCS"));
+            copyHeaderFields((GenericAudioHeader) af1.getAudioHeader(), track);
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + song.getFilePath());
+            System.out.println("Couldn't read file: " + track.getFile());
         }
-        return song;
+        return track;
     }
 
     public boolean isFileSupported(String ext) {

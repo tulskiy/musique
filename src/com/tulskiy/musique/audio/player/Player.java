@@ -239,7 +239,7 @@ public class Player {
                                 continue;
                             }
 
-                            if (currentTrack.getCueID() != -1) {
+                            if (currentTrack.getSubsongIndex() > 0) {
                                 if (cueTotalBytes <= currentByte + len) {
                                     Track s = order.next(currentTrack);
 
@@ -382,7 +382,7 @@ public class Player {
                     }
 
                     decoder.seekSample(track.getStartPosition());
-                    if (track.getCueID() != -1) {
+                    if (track.getSubsongIndex() > 0) {
                         cueTotalBytes = AudioMath.samplesToBytes(track.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
                     } else {
                         cueTotalBytes = 0;

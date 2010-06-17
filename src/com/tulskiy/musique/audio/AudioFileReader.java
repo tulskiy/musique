@@ -18,12 +18,13 @@
 package com.tulskiy.musique.audio;
 
 import com.tulskiy.musique.audio.formats.cue.CUEParser;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.tag.Tag;
 
 import java.io.*;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: Denis Tulskiy
@@ -32,23 +33,23 @@ import java.util.List;
 public abstract class AudioFileReader {
     private static CUEParser cueParser;
 
-    public void read(File f, List<Song> list) {
-        Song audioFile = readSingle(f);
-        String cueSheet = audioFile.getCueSheet();
+    public void read(File f, List<Track> list) {
+        Track track = readSingle(f);
+        String cueSheet = track.getCueSheet();
         if (cueSheet != null && cueSheet.length() > 0) {
             if (cueParser == null)
                 cueParser = new CUEParser();
             LineNumberReader reader = new LineNumberReader(new StringReader(cueSheet));
-            cueParser.parse(list, audioFile, reader, true);
+            cueParser.parse(list, track, reader, true);
         } else {
-            list.add(audioFile);
+            list.add(track);
         }
     }
 
-    public abstract Song readSingle(Song song);
+    public abstract Track readSingle(Track track);
 
-    public Song readSingle(File file) {
-        Song s = new Song();
+    public Track readSingle(File file) {
+        Track s = new Track();
         s.setFile(file);
         return readSingle(s);
     }
@@ -57,33 +58,26 @@ public abstract class AudioFileReader {
 
     public abstract Decoder getDecoder();
 
-    protected void copyTagFields(Tag abstractTag, Song song) throws IOException {
-        if (abstractTag != null && song != null) {
-            song.setAlbum(abstractTag.getFirstAlbum());
-            song.setArtist(abstractTag.getFirstArtist());
-            song.setComment(abstractTag.getFirstComment());
-            song.setTitle(abstractTag.getFirstTitle());
-            song.setYear(abstractTag.getFirstYear());
-            song.setCueSheet(abstractTag.getFirst("CUESHEET"));
-            song.setGenre(abstractTag.getFirstGenre());
-            song.setAlbumArtist(abstractTag.getFirst("ALBUM ARTIST"));
-            song.setTrackNumber(abstractTag.getFirstTrack());
-
-
-//            for (Artwork art : abstractTag.getArtworkList()) {
-//                    tag.addAlbumart(art.getImage());
-//            }
+    protected void copyTagFields(Tag abstractTag, Track track) throws IOException {
+        if (abstractTag != null && track != null) {
+            track.addMeta("album", abstractTag.getFirstAlbum());
+            track.addMeta("artist", abstractTag.getFirstArtist());
+            track.addMeta("comment", abstractTag.getFirstComment());
+            track.addMeta("title", abstractTag.getFirstTitle());
+            track.addMeta("year", abstractTag.getFirstYear());
+            track.setCueSheet(abstractTag.getFirst("CUESHEET"));
+            track.addMeta("genre", abstractTag.getFirstGenre());
+            track.addMeta("albumArtist", abstractTag.getFirst("ALBUM ARTIST"));
+            track.setTrackNumber(abstractTag.getFirstTrack());
         }
     }
 
-    protected void copyHeaderFields(GenericAudioHeader header, Song song) {
-        if (header != null && song != null) {
-            song.setBitrate((int) header.getBitRateAsNumber());
-            song.setChannels(header.getChannelNumber());
-            song.setCodec(header.getEncodingType());
-            song.setTotalSamples((long) (header.getPreciseLength() * header.getSampleRateAsNumber()));
-            song.setSamplerate(header.getSampleRateAsNumber());
-            song.setStartPosition(0);
+    protected void copyHeaderFields(GenericAudioHeader header, Track track) {
+        if (header != null && track != null) {
+            track.setChannels(header.getChannelNumber());
+            track.setTotalSamples((long) (header.getPreciseLength() * header.getSampleRateAsNumber()));
+            track.setSampleRate(header.getSampleRateAsNumber());
+            track.setStartPosition(0);
         }
     }
 }

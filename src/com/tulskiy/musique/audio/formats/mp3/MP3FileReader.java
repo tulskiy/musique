@@ -20,7 +20,7 @@ package com.tulskiy.musique.audio.formats.mp3;
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
-import com.tulskiy.musique.playlist.Song;
+import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.mp3.LameFrame;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -40,34 +40,31 @@ public class MP3FileReader extends AudioFileReader {
     private static Decoder decoder;
     private APETagProcessor apeTagProcessor = new APETagProcessor();
 
-    public Song readSingle(Song song) {
+    public Track readSingle(Track track) {
         MP3File mp3File = null;
         try {
-            mp3File = new MP3File(song.getFile(), MP3File.LOAD_IDV2TAG, true);
+            mp3File = new MP3File(track.getFile(), MP3File.LOAD_IDV2TAG, true);
         } catch (Exception ignored) {
-            System.out.println("Couldn't read file: " + song.getFilePath());
+            System.out.println("Couldn't read file: " + track.getFile());
         }
-
 
         if (mp3File != null) {
             try {
                 ID3v24Tag v24Tag = mp3File.getID3v2TagAsv24();
                 if (v24Tag != null) {
-                    copyTagFields(v24Tag, song);
-                    if (song.getYear() == null || song.getYear().length() == 0) {
-                        song.setYear(v24Tag.getFirst(TagFieldKey.DATE).trim());
-                    }
-                    song.setAlbumArtist(v24Tag.getFirst(TagFieldKey.ALBUM_ARTIST).trim());
-                    song.setDiscNumber(v24Tag.getFirst(TagFieldKey.DISC_NO));
+                    copyTagFields(v24Tag, track);
+                    track.addMeta("year", v24Tag.getFirst(TagFieldKey.DATE).trim());
+                    track.addMeta("albumArtist", v24Tag.getFirst(TagFieldKey.ALBUM_ARTIST).trim());
+                    track.setDiscNumber(v24Tag.getFirst(TagFieldKey.DISC_NO));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             MP3AudioHeader mp3AudioHeader = mp3File.getMP3AudioHeader();
-            copyHeaderFields(mp3AudioHeader, song);
+            copyHeaderFields(mp3AudioHeader, track);
 
-            long totalSamples = song.getTotalSamples();
+            long totalSamples = track.getTotalSamples();
             int enc_delay = GAPLESS_DELAY;
 
             XingFrame xingFrame = mp3AudioHeader.getXingFrame();
@@ -88,16 +85,16 @@ public class MP3FileReader extends AudioFileReader {
             }
 
             totalSamples -= enc_delay;
-            song.setTotalSamples(totalSamples);
+            track.setTotalSamples(totalSamples);
         }
 
         try {
-            apeTagProcessor.readAPEv2Tag(song);
+            apeTagProcessor.readAPEv2Tag(track);
         } catch (IOException ignored) {
 
         }
 
-        return song;
+        return track;
     }
 
     public boolean isFileSupported(String ext) {

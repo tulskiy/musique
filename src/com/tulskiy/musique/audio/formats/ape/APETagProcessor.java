@@ -17,8 +17,7 @@
 
 package com.tulskiy.musique.audio.formats.ape;
 
-import com.tulskiy.musique.playlist.Song;
-import com.tulskiy.musique.util.Util;
+import com.tulskiy.musique.playlist.Track;
 import davaguine.jmac.info.APETag;
 import davaguine.jmac.info.ID3Tag;
 import davaguine.jmac.tools.RandomAccessFile;
@@ -35,32 +34,24 @@ public class APETagProcessor {
         ID3Tag.setDefaultEncoding("windows-1251");
     }
 
-    public boolean readAPEv2Tag(Song song) throws IOException {
+    public boolean readAPEv2Tag(Track track) throws IOException {
         RandomAccessFile ras = null;
         try {
-            ras = new RandomAccessFile(song.getFile(), "r");
+            ras = new RandomAccessFile(track.getFile(), "r");
             APETag tag = new APETag(ras, true);
             if (tag.GetHasAPETag() || tag.GetHasID3Tag()) {
-                if (empty(song.getAlbum())) song.setAlbum(tag.GetFieldString(APETag.APE_TAG_FIELD_ALBUM));
-                if (empty(song.getArtist())) song.setArtist(tag.GetFieldString(APETag.APE_TAG_FIELD_ARTIST));
-                if (empty(song.getComment())) song.setComment(tag.GetFieldString(APETag.APE_TAG_FIELD_COMMENT));
-                if (empty(song.getTitle())) song.setTitle(tag.GetFieldString(APETag.APE_TAG_FIELD_TITLE));
-                if (empty(song.getYear())) song.setYear(tag.GetFieldString(APETag.APE_TAG_FIELD_YEAR));
-                if (empty(song.getGenre())) song.setGenre(tag.GetFieldString(APETag.APE_TAG_FIELD_GENRE));
-                if (empty(song.getAlbumArtist())) song.setAlbumArtist(tag.GetFieldString("ALBUM ARTIST"));
-                if (empty(song.getDiscNumber())) song.setDiscNumber(tag.GetFieldString("DISC"));
-                if (empty(song.getTrackNumber())) song.setTrackNumber(tag.GetFieldString(APETag.APE_TAG_FIELD_TRACK));
+                track.addMeta("album", tag.GetFieldString(APETag.APE_TAG_FIELD_ALBUM));
+                track.addMeta("artist", tag.GetFieldString(APETag.APE_TAG_FIELD_ARTIST));
+                track.addMeta("comment", tag.GetFieldString(APETag.APE_TAG_FIELD_COMMENT));
+                track.addMeta("title", tag.GetFieldString(APETag.APE_TAG_FIELD_TITLE));
+                track.addMeta("year", tag.GetFieldString(APETag.APE_TAG_FIELD_YEAR));
+                track.addMeta("genre", tag.GetFieldString(APETag.APE_TAG_FIELD_GENRE));
+                track.addMeta("albumArtist", tag.GetFieldString("ALBUM ARTIST"));
+                track.setDiscNumber(tag.GetFieldString("DISC"));
+                track.setTrackNumber(tag.GetFieldString(APETag.APE_TAG_FIELD_TRACK));
 
-                if (empty(song.getCueSheet())) song.setCueSheet(tag.GetFieldString("CUESHEET"));
-//                byte[] artwork = tag.GetFieldBinary(APETag.APE_TAG_FIELD_COVER_ART_FRONT);
-//                if (artwork != null) {
-//                    ImageIcon icon = new ImageIcon(artwork);
-//                    tt.addAlbumart(icon.getImage());
-//                }
+                track.setCueSheet(tag.GetFieldString("CUESHEET"));
                 if (tag.GetHasAPETag())
-//                    song.setCustomHeaderField("hasApeTag", "");
-//                if (tag.GetHasID3Tag())
-//                    tt.addTagFormat(Tag.ID3V1);
                     return tag.GetHasAPETag();
             }
         } catch (IOException e) {
@@ -72,25 +63,21 @@ public class APETagProcessor {
         return false;
     }
 
-    private boolean empty(String field) {
-        return field == null || field.isEmpty();
-    }
-
-    public boolean writeAPEv2Tag(Song song) throws IOException {
+    public boolean writeAPEv2Tag(Track track) throws IOException {
         RandomAccessFile ras = null;
         try {
-            ras = new RandomAccessFile(song.getFile(), "rw");
+            ras = new RandomAccessFile(track.getFile(), "rw");
             APETag tag = new APETag(ras, true);
-            tag.SetFieldString(APETag.APE_TAG_FIELD_ALBUM, song.getAlbum());
-            tag.SetFieldString(APETag.APE_TAG_FIELD_ARTIST, song.getArtist());
-            tag.SetFieldString(APETag.APE_TAG_FIELD_COMMENT, song.getComment());
-            tag.SetFieldString(APETag.APE_TAG_FIELD_GENRE, song.getGenre());
-            tag.SetFieldString(APETag.APE_TAG_FIELD_TITLE, song.getTitle());
-            tag.SetFieldString(APETag.APE_TAG_FIELD_TRACK, song.getTrack());
-            tag.SetFieldString(APETag.APE_TAG_FIELD_YEAR, song.getYear());
-            tag.SetFieldString("ALBUM ARTIST", song.getAlbumArtist());
-            tag.SetFieldString("DISC", song.getDisc());
-            tag.SetFieldString("CUESHEET", song.getCueSheet());
+            tag.SetFieldString(APETag.APE_TAG_FIELD_ALBUM, track.getMeta("album"));
+            tag.SetFieldString(APETag.APE_TAG_FIELD_ARTIST, track.getMeta("artist"));
+            tag.SetFieldString(APETag.APE_TAG_FIELD_COMMENT, track.getMeta("comment"));
+            tag.SetFieldString(APETag.APE_TAG_FIELD_GENRE, track.getMeta("genre"));
+            tag.SetFieldString(APETag.APE_TAG_FIELD_TITLE, track.getMeta("title"));
+            tag.SetFieldString(APETag.APE_TAG_FIELD_TRACK, track.getTrack());
+            tag.SetFieldString(APETag.APE_TAG_FIELD_YEAR, track.getMeta("year"));
+            tag.SetFieldString("ALBUM ARTIST", track.getMeta("albumArtist"));
+            tag.SetFieldString("DISC", track.getDisc());
+            tag.SetFieldString("CUESHEET", track.getCueSheet());
 
             tag.Save();
         } catch (IOException e) {
