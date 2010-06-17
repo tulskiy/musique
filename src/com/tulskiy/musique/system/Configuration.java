@@ -108,9 +108,9 @@ public class Configuration {
             } else if (value instanceof List) {
                 w.println();
 
-                List<String> list = (List<String>) value;
-                for (String s : list) {
-                    w.println("  " + s);
+                List<Object> list = (List<Object>) value;
+                for (Object o : list) {
+                    w.println("  " + o);
                 }
             }
         }
@@ -194,10 +194,12 @@ public class Configuration {
     @SuppressWarnings({"unchecked"})
     public ArrayList<String> getList(String key, ArrayList<String> def) {
         try {
-            return (ArrayList<String>) map.get(key);
-        } catch (Exception e) {
-            return def;
+            ArrayList<String> strings = (ArrayList<String>) map.get(key);
+            if (strings != null)
+                return strings;
+        } catch (Exception ignored) {
         }
+        return def;
     }
 
     public void setObject(String key, Object value) {
@@ -239,8 +241,12 @@ public class Configuration {
         setObject(key, s);
     }
 
-    public void setList(String key, ArrayList<String> value) {
-        setObject(key, value);
+    public void setList(String key, ArrayList<?> value) {
+        ArrayList<String> s = new ArrayList<String>(value.size());
+        for (Object o : value) {
+            s.add(o.toString());
+        }
+        map.put(key, s);
     }
 
     public void setBoolean(String key, boolean value) {
