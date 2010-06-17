@@ -19,7 +19,6 @@ package com.tulskiy.musique.playlist;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.system.PluginLoader;
-import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,7 +32,7 @@ import java.util.LinkedList;
  */
 public class TagProcessor {
     private final LinkedList<File> files;
-    private final ArrayList<Song> audioFiles = new ArrayList<Song>();
+    private final ArrayList<Track> audioFiles = new ArrayList<Track>();
     private Playlist playlist;
 
     public File getCurrentFile() {
@@ -65,9 +64,11 @@ public class TagProcessor {
                 e.printStackTrace();
             }
 
-        audioFiles.remove(null);
-        Collections.sort(audioFiles, new Comparator<Song>() {
-            public int compare(Song o1, Song o2) {
+        ArrayList<File> list = new ArrayList<File>();
+        list.add(null);
+        audioFiles.removeAll(list);
+        Collections.sort(audioFiles, new Comparator<Track>() {
+            public int compare(Track o1, Track o2) {
                 return o1.getFile().getAbsolutePath().compareToIgnoreCase(o2.getFile().getAbsolutePath());
             }
         });
