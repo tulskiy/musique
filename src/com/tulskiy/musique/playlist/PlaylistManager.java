@@ -21,19 +21,20 @@
  */
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.logging.Logger;
 
 public class PlaylistManager {
+    public static final String PLAYLISTS_PATH = "playlists/";
+
+    private Logger logger = Logger.getLogger(getClass().getName());
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private Configuration config = Application.getInstance().getConfiguration();
     private Playlist currentPlaylist;
-    private DBMapper<Playlist> playlistDBMapper = new DBMapper<Playlist>(Playlist.class);
-    private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
 
     public ArrayList<Playlist> getPlaylists() {
         return playlists;
@@ -48,26 +49,45 @@ public class PlaylistManager {
     }
 
     public void loadPlaylists() {
-        playlistDBMapper.loadAll(playlists);
-        Collections.sort(playlists);
-
-        for (Playlist playlist : playlists) {
-            playlist.load();
+        ArrayList<String> list = config.getList("playlists", new ArrayList<String>());
+        for (int i = 0; i < list.size(); i++) {
+            String name = list.get(i);
+            Playlist playlist = new Playlist();
+            playlist.setName(name);
+            playlist.load(new File(PLAYLISTS_PATH + i + ".dat"));
+            playlists.add(playlist);
         }
 
         if (playlists.size() == 0) {
-            currentPlaylist = addPlaylist("Default");
-            savePlaylists();
+            selectPlaylist(addPlaylist("Default"));
         }
 
         int index = config.getInt("playlist.currentPlaylist", -1);
-        selectPlaylist(playlists.get(0));
-        for (Playlist playlist : playlists) {
-            if (playlist.getPlaylistID() == index) {
-                selectPlaylist(playlist);
-                break;
+        if (index < 0 || index >= playlists.size())
+            index = 0;
+        selectPlaylist(playlists.get(index));
+    }
+
+    public void savePlaylists() {
+        File dir = new File(PLAYLISTS_PATH);
+        //noinspection ResultOfMethodCallIgnored
+        dir.mkdir();
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            if (file.getName().endsWith(".dat")) {
+                if (!file.delete()) {
+                    logger.severe("Could not delete old playlist. Check file permissions");
+                }
             }
         }
+
+        for (int i = 0; i < playlists.size(); i++) {
+            Playlist playlist = playlists.get(i);
+            playlist.save(new File(PLAYLISTS_PATH + i + ".dat"));
+        }
+
+        config.setList("playlists", playlists);
+        config.setInt("playlist.currentPlaylist", playlists.indexOf(currentPlaylist));
     }
 
     public int getTotalPlaylists() {
@@ -81,14 +101,11 @@ public class PlaylistManager {
     public Playlist addPlaylist(String name) {
         Playlist playlist = new Playlist();
         playlist.setName(name);
-        playlistDBMapper.save(playlist);
         playlists.add(playlist);
         return playlist;
     }
 
     public void removePlaylist(Playlist pl) {
-        pl.clear();
-        playlistDBMapper.delete(pl);
         playlists.remove(pl);
     }
 
@@ -100,24 +117,5 @@ public class PlaylistManager {
             to++;
         playlists.add(to, p);
         playlists.remove(from);
-    }
-
-    public void savePlaylists() {
-        for (int i = 0; i < playlists.size(); i++) {
-            Playlist playlist = playlists.get(i);
-            playlist.setPosition(i);
-            playlist.save();
-            playlistDBMapper.save(playlist);
-        }
-
-        //remove songs that do not belong to any playlist
-        ArrayList<Song> removed = new ArrayList<Song>();
-        songDBMapper.loadAll("select * from songs where playlistID=-1", removed);
-
-        for (Song song : removed) {
-            songDBMapper.delete(song);
-        }
-
-        config.setInt("playlist.currentPlaylist", currentPlaylist.getPlaylistID());
     }
 }

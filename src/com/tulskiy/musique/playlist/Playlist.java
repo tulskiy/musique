@@ -17,42 +17,98 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.db.Column;
-import com.tulskiy.musique.db.DBMapper;
-import com.tulskiy.musique.db.Entity;
-import com.tulskiy.musique.db.Id;
-
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: Dec 30, 2009
  */
-@SuppressWarnings({"serial"})
-@Entity("playlists")
-public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
-    private DBMapper<Song> songDBMapper = DBMapper.create(Song.class);
-    private DBMapper<CUESheet> cueSheetDBMapper = DBMapper.create(CUESheet.class);
+public class Playlist extends ArrayList<Track> {
+    private static final int VERSION = 1;
+    private static String[] metaMap = {
+            "artist", "album", "albumArtist", "title",
+            "trackNumber", "totalTracks", "discNumber", "totalDiscs",
+            "year", "genre", "comment"
+    };
 
-    @Id
-    private int playlistID = -1;
-    @Column
+    private Logger logger = Logger.getLogger(Playlist.class.getName());
     private String name;
-    @Column
-    private int position;
 
-    public void load() {
-        clear();
-        songDBMapper.loadAll("select * from songs where playlistID=" + playlistID + " order by playlistPosition", this);
+    public void save(File file) {
+        try {
+            DataOutputStream dos = new DataOutputStream(
+                    new BufferedOutputStream(new FileOutputStream(file)));
+            dos.writeInt(VERSION);
+            dos.writeInt(size());
+            HashMap<String, String> meta = new HashMap<String, String>();
+            for (Track track : this) {
+                dos.writeUTF(track.getFile().getAbsolutePath());
+                dos.writeLong(track.getStartPosition());
+                dos.writeLong(track.getTotalSamples());
+                dos.writeInt(track.getBps());
+                dos.writeInt(track.getChannels());
+                dos.writeInt(track.getSampleRate());
+
+                meta.clear();
+                for (String key : metaMap) {
+                    String value = track.getMeta(key);
+                    if (value != null && !value.isEmpty()) {
+                        meta.put(key, value);
+                    }
+                }
+
+                dos.writeInt(meta.size());
+                for (Map.Entry<String, String> e : meta.entrySet()) {
+                    dos.writeUTF(e.getKey());
+                    dos.writeUTF(e.getValue());
+                }
+            }
+
+            dos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void save() {
-        for (int i = 0; i < size(); i++) {
-            Song song = get(i);
-            song.setPlaylistID(playlistID);
-            song.setPlaylistPosition(i);
-            songDBMapper.save(song);
+    public void load(File file) {
+        try {
+            logger.info("Loading playlist: " + file.getName());
+            DataInputStream dis = new DataInputStream(
+                    new BufferedInputStream(new FileInputStream(file)));
+
+            int version = dis.readInt();
+            if (version != VERSION) {
+                logger.severe("Wrong playlist version: " + version);
+                return;
+            }
+            int size = dis.readInt();
+            for (int i = 0; i < size; i++) {
+                Track track = new Track();
+                track.setFile(new File(dis.readUTF()));
+                track.setStartPosition(dis.readLong());
+                track.setTotalSamples(dis.readLong());
+                track.setBps(dis.readInt());
+                track.setChannels(dis.readInt());
+                track.setSampleRate(dis.readInt());
+
+                int metaSize = dis.readInt();
+
+                for (int j = 0; j < metaSize; j++) {
+                    String key = dis.readUTF();
+                    String value = dis.readUTF();
+                    track.setMeta(key, value);
+                }
+
+                add(track);
+            }
+
+            dis.close();
+        } catch (IOException e) {
+            logger.warning("Failed to load playlist " + file.getName());
         }
     }
 
@@ -60,74 +116,8 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
         return name;
     }
 
-    public int getPlaylistID() {
-        return playlistID;
-    }
-
-    @SuppressWarnings({"UnusedDeclaration"})
-    public void setPlaylistID(int playlistID) {
-        this.playlistID = playlistID;
-    }
-
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getPosition() {
-        return position;
-    }
-
-    public void setPosition(int position) {
-        this.position = position;
-    }
-
-    @Override
-    public boolean add(Song song) {
-        song.setPlaylistID(playlistID);
-        return super.add(song);
-    }
-
-    @Override
-    public boolean addAll(Collection<? extends Song> c) {
-        for (Song s : c) {
-            s.setPlaylistID(playlistID);
-        }
-
-        return super.addAll(c);
-    }
-
-    @Override
-    public boolean addAll(int index, Collection<? extends Song> c) {
-        for (Song s : c) {
-            s.setPlaylistID(playlistID);
-        }
-        return super.addAll(index, c);
-    }
-
-    @Override
-    public void clear() {
-        for (Song song : this) {
-            songDBMapper.delete(song);
-            song.setCueID(-1);
-        }
-        //hack to delete CUE sheets
-        ArrayList<CUESheet> list = new ArrayList<CUESheet>();
-        cueSheetDBMapper.loadAll(list);
-        for (CUESheet cueSheet : list) {
-            cueSheetDBMapper.delete(cueSheet);
-        }
-
-        super.clear();
-    }
-
-    @Override
-    public boolean removeAll(Collection<?> c) {
-        for (Object o : c) {
-            Song s = (Song) o;
-            s.setPlaylistID(-1);
-            songDBMapper.save(s);
-        }
-        return super.removeAll(c);
     }
 
     @Override
@@ -139,9 +129,5 @@ public class Playlist extends ArrayList<Song> implements Comparable<Playlist> {
     public String toString() {
         return name;
     }
-
-    @Override
-    public int compareTo(Playlist o) {
-        return ((Integer) position).compareTo(o.getPosition());
-    }
 }
+
