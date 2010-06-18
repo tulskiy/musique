@@ -17,13 +17,11 @@
 
 package com.tulskiy.musique.gui.playlist;
 
-import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
-import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
@@ -35,14 +33,19 @@ import java.awt.event.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: Feb 6, 2010
  */
 public class PlaylistPanel extends JPanel {
-    private DBMapper<PlaylistColumn> columnDBMapper = DBMapper.create(PlaylistColumn.class);
+    private PlaylistColumn[] defaultColumns = {
+            new PlaylistColumn("Playing", 55, "$isPlaying()"),
+            new PlaylistColumn("Name", 325, "[%artist% - ]%title%"),
+            new PlaylistColumn("Length", 70, "%length%"),
+            new PlaylistColumn("Album", 225, "%album%"),
+            new PlaylistColumn("Date", 55, "%year%")
+    };
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
@@ -56,21 +59,7 @@ public class PlaylistPanel extends JPanel {
         playlistManager = app.getPlaylistManager();
         playlist = playlistManager.getCurrentPlaylist();
 
-        columns = new ArrayList<PlaylistColumn>() {
-            @Override
-            public boolean add(PlaylistColumn playlistColumn) {
-                columnDBMapper.save(playlistColumn);
-                return super.add(playlistColumn);
-            }
-
-            @Override
-            public PlaylistColumn remove(int index) {
-                PlaylistColumn pc = get(index);
-                columnDBMapper.delete(pc);
-                return super.remove(index);
-            }
-        };
-        columnDBMapper.loadAll("select * from playlist_columns order by position", columns);
+        columns = loadColumns();
 
         table = new PlaylistTable(playlist, columns);
         app.getPlayer().setPlaybackOrder(table);
@@ -83,16 +72,22 @@ public class PlaylistPanel extends JPanel {
         add(tabbedPane, BorderLayout.NORTH);
         add(table.getScrollPane(), BorderLayout.CENTER);
 
-//        int sortingColumn = config.getInt("playlist.sortingColumn", -1);
-//        if (sortingColumn != -1 && sortingColumn < columns.size()) {
-//            ArrayList<RowSorter.SortKey> list = new ArrayList<RowSorter.SortKey>(1);
-//            list.add(new RowSorter.SortKey(sortingColumn, SortOrder.ASCENDING));
-//            table.getRowSorter().setSortKeys(list);
-//        }
-
-        int lastPlayed = config.getInt("player.lastPlayed", -1);
+//        int lastPlayed = config.getInt("player.lastPlayed", -1);
         //todo fix me here
 //        table.setLastPlayed(new Track(lastPlayed));
+    }
+
+    private ArrayList<PlaylistColumn> loadColumns() {
+        ArrayList<String> list = config.getList("playlist.columns", null);
+        ArrayList<PlaylistColumn> res = new ArrayList<PlaylistColumn>();
+        if (list == null) {
+            res.addAll(Arrays.asList(defaultColumns));
+        } else {
+            for (String s : list) {
+                res.add(new PlaylistColumn(s));
+            }
+        }
+        return res;
     }
 
     private void setUpDndCCP() {
@@ -117,9 +112,7 @@ public class PlaylistPanel extends JPanel {
     public void shutdown() {
         table.saveColumns();
 
-        for (PlaylistColumn c : columns) {
-            columnDBMapper.save(c);
-        }
+        config.setList("playlist.columns", columns);
     }
 
     private JMenuItem newItem(String name, String hotkey, ActionListener al) {

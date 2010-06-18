@@ -17,40 +17,49 @@
 
 package com.tulskiy.musique.gui.playlist;
 
-import com.tulskiy.musique.db.Column;
-import com.tulskiy.musique.db.Entity;
-import com.tulskiy.musique.db.Id;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
+
+import java.text.ChoiceFormat;
+import java.text.MessageFormat;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: Feb 12, 2010
  */
-@Entity("playlist_columns")
-public class PlaylistColumn {
+public class PlaylistColumn implements Comparable<PlaylistColumn> {
     private static Parser parser = new Parser();
+    private static MessageFormat format = new MessageFormat("''{0}'' ''{1}'' {2,number,integer} {3}");
+    private static ChoiceFormat choice = new ChoiceFormat(new double[]{0, 2, 4}, new String[]{"CENTER", "LEFT", "RIGHT"});
 
-    @Id
-    private int id = -1;
+    static {
+        format.setFormatByArgumentIndex(3, choice);
+    }
 
-    @Column
     private String name;
-    @Column
     private String expression;
-    @Column
     private int size = 150;
-    @Column
+    private int allign = 2; //LEFT by default
+
+    //position in the model, used for sorting purposes only
     private int position;
-    @Column
-    private int orientation;
-    @Column
-    private boolean editable;
 
     private Expression expr;
 
     public PlaylistColumn() {
+    }
+
+    public PlaylistColumn(String fmt) {
+        try {
+            Object[] objects = format.parse(fmt);
+            setName((String) objects[0]);
+            setExpression((String) objects[1]);
+            setSize(((Long) objects[2]).intValue());
+            setAllign(((Double) objects[3]).intValue());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public PlaylistColumn(String name, int size, String expression) {
@@ -61,14 +70,6 @@ public class PlaylistColumn {
 
     public Object getValue(Track track) {
         return expr.eval(track);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -97,27 +98,25 @@ public class PlaylistColumn {
         this.size = size;
     }
 
-    public int getPosition() {
-        return position;
+    public int getAllign() {
+        return allign;
+    }
+
+    public void setAllign(int allign) {
+        this.allign = allign;
     }
 
     public void setPosition(int position) {
         this.position = position;
     }
 
-    public int getOrientation() {
-        return orientation;
+    @Override
+    public String toString() {
+        return format.format(new Object[]{getName(), getExpression(), getSize(), getAllign()});
     }
 
-    public void setOrientation(int orientation) {
-        this.orientation = orientation;
-    }
-
-    public boolean isEditable() {
-        return editable;
-    }
-
-    public void setEditable(boolean editable) {
-        this.editable = editable;
+    @Override
+    public int compareTo(PlaylistColumn o) {
+        return ((Integer) position).compareTo(o.position);
     }
 }

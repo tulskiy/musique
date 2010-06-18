@@ -589,5 +589,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
             pc.setPosition(i);
             pc.setSize(tc.getWidth());
         }
+
+        Collections.sort(columns);
     }
 }
