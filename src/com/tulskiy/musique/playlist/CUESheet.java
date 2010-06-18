@@ -17,33 +17,15 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.db.Column;
-import com.tulskiy.musique.db.Entity;
-import com.tulskiy.musique.db.Id;
-
 /**
  * @Author: Denis Tulskiy
  * @Date: Jan 6, 2010
  */
 
-@Entity("cue_sheets")
 public class CUESheet {
-    @Id
-    private int cueID = -1;
-    @Column
     private boolean embedded;
-    @Column
     String fileName;
-    @Column
     String cueSheet;
-
-    public int getCueID() {
-        return cueID;
-    }
-
-    public void setCueID(int cueID) {
-        this.cueID = cueID;
-    }
 
     public boolean isEmbedded() {
         return embedded;

@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Class-Path: lib/hsqldb.jar lib/jaudiotagger.jar lib/wavpack.jar lib/cu
- elib.jar lib/javalayer.jar lib/jflac.jar lib/jmac.jar lib/jorbis.jar
+Class-Path: lib/jaudiotagger.jar lib/wavpack.jar lib/cuelib.jar lib/ja
+ valayer.jar lib/jflac.jar lib/jmac.jar lib/jorbis.jar
 Main-Class: com.tulskiy.musique.system.Main
 

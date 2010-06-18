@@ -239,7 +239,7 @@ public class Player {
                                 continue;
                             }
 
-                            if (currentTrack.getSubsongIndex() > 0) {
+                            if (currentTrack.getSubsongIndex() != 0) {
                                 if (cueTotalBytes <= currentByte + len) {
                                     Track s = order.next(currentTrack);
 

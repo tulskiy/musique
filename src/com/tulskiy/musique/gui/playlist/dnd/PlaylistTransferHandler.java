@@ -17,7 +17,6 @@
 
 package com.tulskiy.musique.gui.playlist.dnd;
 
-import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Playlist;

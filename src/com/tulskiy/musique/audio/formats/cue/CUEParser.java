@@ -18,7 +18,6 @@
 package com.tulskiy.musique.audio.formats.cue;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.db.DBMapper;
 import com.tulskiy.musique.playlist.CUESheet;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.PluginLoader;
@@ -34,14 +33,12 @@ import java.util.List;
  * @Date: 29.06.2009
  */
 public class CUEParser {
-    private DBMapper<CUESheet> cueSheetDBMapper = DBMapper.create(CUESheet.class);
-
     public void parse(List<Track> list, Track file, LineNumberReader cueStream, boolean embedded) {
         try {
             CueSheet cueSheet = CueParser.parse(cueStream);
             List<FileData> datas = cueSheet.getFileData();
             if (datas.size() > 0) {
-                CUESheet sheet = cueSheetDBMapper.newInstance();
+                CUESheet sheet = new CUESheet();
                 sheet.setEmbedded(embedded);
 
                 for (FileData fileData : datas) {
@@ -57,7 +54,6 @@ public class CUEParser {
                     } else {
                         sheet.setCueSheet(file.getCueSheet());
                     }
-                    cueSheetDBMapper.save(sheet);
 
                     int size = fileData.getTrackData().size();
                     for (int i = 0; i < size; i++) {

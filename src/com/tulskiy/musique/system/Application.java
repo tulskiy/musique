@@ -22,14 +22,12 @@
 package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.player.Player;
-import com.tulskiy.musique.db.DBManager;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import javax.swing.*;
-import java.io.File;
 
 public class Application {
     private static Application ourInstance = new Application();
@@ -37,7 +35,6 @@ public class Application {
     private Player player;
     private Configuration configuration;
     private PlaylistManager playlistManager;
-    private DBManager dbManager;
     private MainWindow mainWindow;
 
     public static Application getInstance() {
@@ -49,15 +46,6 @@ public class Application {
     }
 
     public void load() {
-        boolean firstRun = !new File("resources/db/library.script").exists();
-
-        dbManager = new DBManager();
-        dbManager.connect();
-
-        if (firstRun) {
-            installDB();
-        }
-
         configuration = new Configuration();
         configuration.load();
 
@@ -88,7 +76,7 @@ public class Application {
 
     private void saveSettings() {
         configuration.setDouble("player.volume", player.getVolume());
-        Track lastPlayed = player.getSong();
+//        Track lastPlayed = player.getSong();
 //        if (lastPlayed != null) {
         //todo fix me here
 //            configuration.setInt("player.lastPlayed", lastPlayed.getSongID());
@@ -117,19 +105,11 @@ public class Application {
         playlistManager.savePlaylists();
         saveSettings();
         configuration.save();
-        dbManager.closeConnection();
         System.exit(0);
     }
 
     public Player getPlayer() {
         return player;
-    }
-
-    public void installDB() {
-        if (dbManager != null) {
-            System.out.println("Installing database");
-            dbManager.runScript("install.sql");
-        }
     }
 
     public Configuration getConfiguration() {
@@ -138,9 +118,5 @@ public class Application {
 
     public PlaylistManager getPlaylistManager() {
         return playlistManager;
-    }
-
-    public DBManager getDbManager() {
-        return dbManager;
     }
 }
