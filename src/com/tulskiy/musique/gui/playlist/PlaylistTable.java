@@ -263,8 +263,6 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
     }
 
     public void setPlaylist(Playlist playlist) {
-        if (sorter != null)
-            sorter.setRowFilter(null);
         this.playlist = playlist;
         model.fireTableDataChanged();
         update();

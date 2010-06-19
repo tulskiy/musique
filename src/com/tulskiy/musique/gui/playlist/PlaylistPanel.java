@@ -53,7 +53,7 @@ public class PlaylistPanel extends JPanel {
     private PlaylistManager playlistManager;
     private ArrayList<PlaylistColumn> columns;
     private Playlist playlist;
-    private JTabbedPane tabbedPane;
+    private TabbedPane tabbedPane;
 
     public PlaylistPanel() {
         playlistManager = app.getPlaylistManager();
