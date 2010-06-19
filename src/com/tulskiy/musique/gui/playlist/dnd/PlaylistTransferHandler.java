@@ -102,7 +102,7 @@ public class PlaylistTransferHandler extends TransferHandler {
                 return true;
             }
 
-            if (tracks != null) {
+            if (tracks != null && !tracks.isEmpty()) {
                 Playlist playlist = table.getPlaylist();
                 int insertRow;
 
@@ -153,7 +153,6 @@ public class PlaylistTransferHandler extends TransferHandler {
 
     @Override
     protected void exportDone(JComponent source, Transferable data, int action) {
-        System.out.println("export done " + action + "Move is " + MOVE);
         try {
             if (data.isDataFlavorSupported(SongsSelection.getFlavor())) {
                 List<Track> tracks = (List<Track>) data.getTransferData(SongsSelection.getFlavor());
