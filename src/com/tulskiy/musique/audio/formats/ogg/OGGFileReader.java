@@ -38,9 +38,9 @@ public class OGGFileReader extends AudioFileReader {
             AudioFile af1 = reader.read(track.getFile());
             Tag tag = af1.getTag();
             copyTagFields(tag, track);
-            track.setMeta("totaltracks", tag.getFirst("TOTALTRACKS"));
+            track.setMeta("totalTracks", tag.getFirst("TOTALTRACKS"));
             track.setDiscNumber(tag.getFirst("DISCNUMBER"));
-            track.setMeta("totaldiscs", tag.getFirst("TOTALDISCS"));
+            track.setMeta("totalDiscs", tag.getFirst("TOTALDISCS"));
             copyHeaderFields((GenericAudioHeader) af1.getAudioHeader(), track);
         } catch (Exception e) {
             System.out.println("Couldn't read file: " + track.getFile());
