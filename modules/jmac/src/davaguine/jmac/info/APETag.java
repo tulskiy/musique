@@ -1,4 +1,21 @@
 /*
+ * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
  *  21.04.2004 Original verion. davagin@udm.ru.
  *-----------------------------------------------------------------------
  *  This program is free software; you can redistribute it and/or modify
@@ -75,6 +92,7 @@ public class APETag implements Comparator {
     // create an APE tag
     // bAnalyze determines whether it will analyze immediately or on the first request
     // be careful with multiple threads / file pointer movement if you don't analyze immediately
+
     public APETag(File pIO) throws IOException {
         this(pIO, true);
     }
@@ -98,6 +116,7 @@ public class APETag implements Comparator {
     }
 
     // save the tag to the I/O source (bUseOldID3 forces it to save as an ID3v1.1 tag instead of an APE tag)
+
     public void Save() throws IOException {
         Save(false);
     }
@@ -146,6 +165,7 @@ public class APETag implements Comparator {
     }
 
     // removes any tags from the file (bUpdate determines whether is should re-analyze after removing the tag)
+
     public void Remove() throws IOException {
         Remove(true);
     }
@@ -230,6 +250,7 @@ public class APETag implements Comparator {
     }
 
     // gets the value of a field (returns -1 and an empty buffer if the field doesn't exist)
+
     public byte[] GetFieldBinary(String pFieldName) throws IOException {
         if (!m_bAnalyzed)
             Analyze();
@@ -261,7 +282,7 @@ public class APETag implements Comparator {
             else {
                 if (pAPETagField.GetIsUTF8Text() || (m_nAPETagVersion < 2000)) {
 //                    if (m_nAPETagVersion >= 2000)
-                        ret = new String(b, 0, b.length + boundary, "UTF-8");
+                    ret = new String(b, 0, b.length + boundary, "UTF-8");
 //                    else
 //                        ret = new String(b, 0, b.length + boundary);
                 } else
@@ -272,6 +293,7 @@ public class APETag implements Comparator {
     }
 
     // remove a specific field
+
     public void RemoveField(String pFieldName) throws IOException {
         RemoveField(GetTagFieldIndex(pFieldName));
     }
@@ -281,12 +303,14 @@ public class APETag implements Comparator {
     }
 
     // clear all the fields
+
     public void ClearFields() {
         m_aryFields.clear();
     }
 
     // get the total tag bytes in the file from the last analyze
     // need to call Save() then Analyze() to update any changes
+
     public int GetTagBytes() throws IOException {
         if (!m_bAnalyzed)
             Analyze();
@@ -295,6 +319,7 @@ public class APETag implements Comparator {
     }
 
     // see whether the file has an ID3 or APE tag
+
     public boolean GetHasID3Tag() throws IOException {
         if (!m_bAnalyzed)
             Analyze();
@@ -313,6 +338,7 @@ public class APETag implements Comparator {
 
     // gets a desired tag field (returns NULL if not found)
     // again, be careful, because this a pointer to the actual field in this class
+
     public APETagField GetTagField(String pFieldName) throws IOException {
         int nIndex = GetTagFieldIndex(pFieldName);
         return (nIndex != -1) ? (APETagField) m_aryFields.get(nIndex) : null;
@@ -333,6 +359,7 @@ public class APETag implements Comparator {
     }
 
     // fills in an ID3_TAG using the current fields (useful for quickly converting the tag)
+
     public void CreateID3Tag(ID3Tag pID3Tag) throws IOException {
         if (pID3Tag == null)
             return;
@@ -359,6 +386,7 @@ public class APETag implements Comparator {
     }
 
     // private functions
+
     private void Analyze() throws IOException {
         // clean-up
         ClearFields();
@@ -389,9 +417,9 @@ public class APETag implements Comparator {
             SetFieldID3String(APE_TAG_FIELD_YEAR, tag.Year);
             SetFieldString(APE_TAG_FIELD_TRACK, String.valueOf(tag.Track));
 
-            if ((tag.Genre == ID3Genre.GENRE_UNDEFINED) || (tag.Genre >= ID3Genre.genreCount()))
-                SetFieldString(APE_TAG_FIELD_GENRE, APE_TAG_GENRE_UNDEFINED);
-            else
+            if ((tag.Genre == ID3Genre.GENRE_UNDEFINED) || (tag.Genre >= ID3Genre.genreCount())) {
+//                SetFieldString(APE_TAG_FIELD_GENRE, APE_TAG_GENRE_UNDEFINED);
+            } else
                 SetFieldString(APE_TAG_FIELD_GENRE, ID3Genre.genreString(tag.Genre));
         }
 
@@ -473,6 +501,7 @@ public class APETag implements Comparator {
     }
 
     // helper set / get field functions
+
     private String GetFieldID3String(String pFieldName) throws IOException {
         return GetFieldString(pFieldName);
     }
