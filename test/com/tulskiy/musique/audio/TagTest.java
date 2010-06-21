@@ -18,9 +18,9 @@
 package com.tulskiy.musique.audio;
 
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.PluginLoader;
 import com.tulskiy.musique.util.Util;
 
+import static com.tulskiy.musique.system.TrackIO.*;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -74,7 +74,7 @@ public class TagTest {
 
 
     private void testRead(String file) {
-        Track track = PluginLoader.getAudioFileReader(file).readSingle(new File(file));
+        Track track = getAudioFileReader(file).readSingle(new File(file));
 
         assertEquals("artist", track.getArtist());
         assertEquals("title", track.getTitle());
@@ -82,7 +82,7 @@ public class TagTest {
         assertEquals("date", track.getYear());
         assertEquals("genre", track.getGenre());
         assertEquals("album artist", track.getAlbumArtist());
-        assertEquals("1", track.getTrackNumber());
+        assertEquals("1", track.getMeta("trackNumber"));
         assertEquals("2", track.getTotalTracks());
         assertEquals("3", track.getDiscNumber());
         assertEquals("4", track.getTotalDiscs());
@@ -106,7 +106,7 @@ public class TagTest {
         File fo = new File("testfiles/temp." + Util.getFileExt(name));
         copy(file, fo);
         track.setFile(fo);
-        PluginLoader.getAudioFileWriter(fo.getName()).write(track);
+        getAudioFileWriter(fo.getName()).write(track);
 
         testRead(fo.getPath());
         fo.delete();

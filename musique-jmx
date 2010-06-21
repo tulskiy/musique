@@ -1,1 +1,0 @@
-java -Xms60m -Xmx60m -Dcom.sun.management.jmxremote -Djava.library.path=native:/usr/lib -Djna.library.path=native:/usr/lib -jar musique.jar

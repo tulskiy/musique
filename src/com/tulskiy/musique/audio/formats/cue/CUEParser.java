@@ -20,7 +20,7 @@ package com.tulskiy.musique.audio.formats.cue;
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.playlist.CUESheet;
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.PluginLoader;
+import com.tulskiy.musique.system.TrackIO;
 import jwbroek.cuelib.*;
 
 import java.io.File;
@@ -48,7 +48,7 @@ public class CUEParser {
                         if (!referencedFile.exists())
                             continue;
                         sheet.setFileName(referencedFile.getAbsolutePath());
-                        AudioFileReader reader = PluginLoader.getAudioFileReader(referencedFile.getName());
+                        AudioFileReader reader = TrackIO.getAudioFileReader(referencedFile.getName());
                         if (reader == null) break;
                         file = reader.readSingle(referencedFile);
                     } else {

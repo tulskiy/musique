@@ -29,7 +29,7 @@ import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
-import com.tulskiy.musique.system.PluginLoader;
+import com.tulskiy.musique.system.TrackIO;
 
 import javax.swing.*;
 import javax.swing.table.*;
@@ -335,7 +335,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         SongInfoDialog dialog = new SongInfoDialog(getParentFrame(), s);
         if (dialog.showDialog()) {
             try {
-                PluginLoader.getAudioFileWriter(s.getFile().getAbsolutePath()).write(s);
+                TrackIO.getAudioFileWriter(s.getFile().getAbsolutePath()).write(s);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -430,7 +430,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
             public void actionPerformed(ActionEvent e) {
                 for (Track track : getSelectedSongs()) {
                     if (track.getSubsongIndex() == 0) {
-                        AudioFileReader reader = PluginLoader.getAudioFileReader(track.getFile().getName());
+                        AudioFileReader reader = TrackIO.getAudioFileReader(track.getFile().getName());
                         reader.readSingle(track);
                         update();
                     }

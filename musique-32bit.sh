@@ -7,4 +7,4 @@ cd "$MUSIQUE_HOME"
 # and CPU usage, and set JAVA_PATH to eg. /usr/lib/jvm/ia32-java-6-sun/bin/java
 export JAVA_PATH="/usr/lib/jvm/ia32-java-6-sun/bin/java"
 
-exec padsp $JAVA_PATH -client -Xms30m -Xmx60m -Djava.library.path=native:/usr/lib -jar musique.jar
+exec padsp $JAVA_PATH -client -Xms15m -Xmx40m -jar musique.jar

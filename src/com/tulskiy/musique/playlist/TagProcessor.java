@@ -18,7 +18,9 @@
 package com.tulskiy.musique.playlist;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.system.PluginLoader;
+import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.TrackIO;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,6 +48,9 @@ public class TagProcessor {
     private File currentFile;
 
     public TagProcessor(LinkedList<File> files, Playlist playlist) {
+        Application app = Application.getInstance();
+        TextEncoding.getInstanceOf().setDefaultNonUnicode(
+                app.getConfiguration().getString("tag.defaultEncoding", "windows-1251"));
         this.files = files;
         this.playlist = playlist;
     }
@@ -95,7 +100,7 @@ public class TagProcessor {
                 }
 
                 synchronized (audioFiles) {
-                    AudioFileReader reader = PluginLoader.getAudioFileReader(file.getName());
+                    AudioFileReader reader = TrackIO.getAudioFileReader(file.getName());
                     currentFile = file;
                     if (reader != null)
                         reader.read(file, audioFiles);

@@ -22,72 +22,49 @@ import com.tulskiy.musique.audio.AudioTagWriter;
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.formats.aac.MP4FileReader;
 import com.tulskiy.musique.audio.formats.aac.MP4TagWriter;
+import com.tulskiy.musique.audio.formats.ape.APEDecoder;
 import com.tulskiy.musique.audio.formats.ape.APEFileReader;
 import com.tulskiy.musique.audio.formats.ape.APETagWriter;
 import com.tulskiy.musique.audio.formats.cue.CUEFileReader;
+import com.tulskiy.musique.audio.formats.flac.FLACDecoder;
 import com.tulskiy.musique.audio.formats.flac.FLACFileReader;
+import com.tulskiy.musique.audio.formats.mp3.MP3Decoder;
+import com.tulskiy.musique.audio.formats.ogg.VorbisDecoder;
 import com.tulskiy.musique.audio.formats.ogg.VorbisTagWriter;
 import com.tulskiy.musique.audio.formats.mp3.MP3FileReader;
 import com.tulskiy.musique.audio.formats.mp3.MP3TagWriter;
 import com.tulskiy.musique.audio.formats.ogg.OGGFileReader;
+import com.tulskiy.musique.audio.formats.uncompressed.PCMDecoder;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMFileReader;
+import com.tulskiy.musique.audio.formats.wavpack.WavPackDecoder;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackFileReader;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: 24.06.2009
  */
-public class PluginLoader {
-    private static ArrayList<AudioFileReader> readers;
-    private static ArrayList<AudioTagWriter> writers;
+public class Decoders {
+    private static HashMap<String, Decoder> decoders = new HashMap<String, Decoder>();
 
     static {
-        readers = new ArrayList<AudioFileReader>();
-        readers.add(new MP3FileReader());
-        readers.add(new MP4FileReader());
-        readers.add(new APEFileReader());
-        readers.add(new CUEFileReader());
-        readers.add(new FLACFileReader());
-        readers.add(new OGGFileReader());
-        readers.add(new PCMFileReader());
-        readers.add(new WavPackFileReader());
-
-        writers = new ArrayList<AudioTagWriter>();
-        writers.add(new MP3TagWriter());
-        writers.add(new APETagWriter());
-        writers.add(new VorbisTagWriter());
-        writers.add(new MP4TagWriter());
+        decoders.put("mp3", new MP3Decoder());
+        decoders.put("ogg", new VorbisDecoder());
+        PCMDecoder pcmDecoder = new PCMDecoder();
+        decoders.put("wav", pcmDecoder);
+        decoders.put("au", pcmDecoder);
+        decoders.put("aiff", pcmDecoder);
+        decoders.put("flac", new FLACDecoder());
+        decoders.put("ape", new APEDecoder());
+        decoders.put("wv", new WavPackDecoder());
     }
 
-    public static AudioFileReader getAudioFileReader(String fileName) {
-        String ext = Util.getFileExt(fileName);
-        for (AudioFileReader reader : readers) {
-            if (reader.isFileSupported(ext))
-                return reader;
-        }
-
-        return null;
-    }
-
-    public static AudioTagWriter getAudioFileWriter(String fileName) {
-        String ext = Util.getFileExt(fileName);
-        for (AudioTagWriter writer : writers) {
-            if (writer.isFileSupported(ext))
-                return writer;
-        }
-
-        return null;
-    }
-
-    public static Decoder getDecoder(Track audioFile) {
-        AudioFileReader reader = getAudioFileReader(audioFile.getFile().getName());
-        if (reader != null)
-            return reader.getDecoder();
-        else
-            return null;
+    public static Decoder getDecoder(Track track) {
+        String ext = Util.getFileExt(track.getFile()).toLowerCase();
+        return decoders.get(ext);
     }
 }
