@@ -320,7 +320,10 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
 
     public JFrame getParentFrame() {
         if (parentFrame == null) {
-            parentFrame = (JFrame) getRootPane().getParent();
+            try {
+                parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+            } catch (Exception ignored) {
+            }
         }
         return parentFrame;
     }
