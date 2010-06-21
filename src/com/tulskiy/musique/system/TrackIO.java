@@ -19,8 +19,6 @@ package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.AudioTagWriter;
-import com.tulskiy.musique.audio.formats.aac.MP4FileReader;
-import com.tulskiy.musique.audio.formats.aac.MP4TagWriter;
 import com.tulskiy.musique.audio.formats.ape.APEFileReader;
 import com.tulskiy.musique.audio.formats.ape.APETagWriter;
 import com.tulskiy.musique.audio.formats.cue.CUEFileReader;
@@ -46,7 +44,6 @@ public class TrackIO {
     static {
         readers = new ArrayList<AudioFileReader>();
         readers.add(new MP3FileReader());
-        readers.add(new MP4FileReader());
         readers.add(new APEFileReader());
         readers.add(new CUEFileReader());
         readers.add(new FLACFileReader());
@@ -58,7 +55,6 @@ public class TrackIO {
         writers.add(new MP3TagWriter());
         writers.add(new APETagWriter());
         writers.add(new VorbisTagWriter());
-        writers.add(new MP4TagWriter());
     }
 
     public static AudioFileReader getAudioFileReader(String fileName) {

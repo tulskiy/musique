@@ -66,11 +66,11 @@ public class TagTest {
         testWrite("testfiles/ogg/sample_notag.ogg");
     }
 
-    @Test
-    public void testMP4() {
-        testRead("testfiles/aac/sample.mp4");
-        testWrite("testfiles/aac/sample_notag.mp4");
-    }
+//    @Test
+//    public void testMP4() {
+//        testRead("testfiles/aac/sample.mp4");
+//        testWrite("testfiles/aac/sample_notag.mp4");
+//    }
 
 
     private void testRead(String file) {

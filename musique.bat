@@ -1,1 +1,1 @@
-start javaw -client -Xms40m -Xmx60m -Djava.library.path=native -jar musique.jar
+start javaw -client -Xms10m -Xmx40m -jar musique.jar

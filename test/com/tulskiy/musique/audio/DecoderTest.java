@@ -17,7 +17,6 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.audio.formats.aac.MP4FileReader;
 import com.tulskiy.musique.audio.formats.ape.APEFileReader;
 import com.tulskiy.musique.audio.formats.flac.FLACFileReader;
 import com.tulskiy.musique.audio.formats.mp3.MP3FileReader;
@@ -42,11 +41,11 @@ public class DecoderTest {
 
 //    @Test
 
-    public void testNativeMP3() {
-        MP3FileReader mp3FileReader = new MP3FileReader();
+//    public void testNativeMP3() {
+//        MP3FileReader mp3FileReader = new MP3FileReader();
 //        mp3FileReader.setUseNativeDecoder(true);
-        test(mp3FileReader, "testfiles/mp3/sample.mp3");
-    }
+//        test(mp3FileReader, "testfiles/mp3/sample.mp3");
+//    }
 
     @Test
     public void testFLAC() {
@@ -61,11 +60,11 @@ public class DecoderTest {
 
 //    @Test
 
-    public void testAPENative() {
-        APEFileReader fileReader = new APEFileReader();
-        fileReader.setUseNativeDecoder(true);
-        test(fileReader, "testfiles/ape/sample.ape");
-    }
+//    public void testAPENative() {
+//        APEFileReader fileReader = new APEFileReader();
+//        fileReader.setUseNativeDecoder(true);
+//        test(fileReader, "testfiles/ape/sample.ape");
+//    }
 
     @Test
     public void testWavPack() {
@@ -80,17 +79,16 @@ public class DecoderTest {
     @Test
     public void testPCM() {
         test(new PCMFileReader(), "testfiles/uncompressed/sample.aiff");
-        test(new PCMFileReader(), "testfiles/uncompressed/sample.aiff");
         test(new PCMFileReader(), "testfiles/uncompressed/sample.au");
         test(new PCMFileReader(), "testfiles/uncompressed/sample.wav");
     }
 
-    @Test
-    public void testAAC() {
-        test(new MP4FileReader(), "testfiles/aac/sample.mp4");
+//    @Test
+//    public void testAAC() {
+//        test(new MP4FileReader(), "testfiles/aac/sample.mp4");
 //        test(new MP4FileReader(), "testfiles/aac/sample_faac.mp4");
 //        test(new MP4FileReader(), "testfiles/aac/sample_itunes.m4a");
-    }
+//    }
 
     private void test(AudioFileReader reader, String fileName) {
         Track file = reader.readSingle(new File(fileName));

@@ -17,31 +17,16 @@
 
 package com.tulskiy.musique.system;
 
-import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.AudioTagWriter;
 import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.audio.formats.aac.MP4FileReader;
-import com.tulskiy.musique.audio.formats.aac.MP4TagWriter;
 import com.tulskiy.musique.audio.formats.ape.APEDecoder;
-import com.tulskiy.musique.audio.formats.ape.APEFileReader;
-import com.tulskiy.musique.audio.formats.ape.APETagWriter;
-import com.tulskiy.musique.audio.formats.cue.CUEFileReader;
 import com.tulskiy.musique.audio.formats.flac.FLACDecoder;
-import com.tulskiy.musique.audio.formats.flac.FLACFileReader;
 import com.tulskiy.musique.audio.formats.mp3.MP3Decoder;
 import com.tulskiy.musique.audio.formats.ogg.VorbisDecoder;
-import com.tulskiy.musique.audio.formats.ogg.VorbisTagWriter;
-import com.tulskiy.musique.audio.formats.mp3.MP3FileReader;
-import com.tulskiy.musique.audio.formats.mp3.MP3TagWriter;
-import com.tulskiy.musique.audio.formats.ogg.OGGFileReader;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMDecoder;
-import com.tulskiy.musique.audio.formats.uncompressed.PCMFileReader;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackDecoder;
-import com.tulskiy.musique.audio.formats.wavpack.WavPackFileReader;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**

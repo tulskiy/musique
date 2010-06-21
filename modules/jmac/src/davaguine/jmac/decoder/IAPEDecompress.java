@@ -1,4 +1,21 @@
 /*
+ * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
  *  21.04.2004 Original verion. davagin@udm.ru.
  *-----------------------------------------------------------------------
  *  This program is free software; you can redistribute it and/or modify
@@ -46,6 +63,7 @@ public abstract class IAPEDecompress {
     //	int * pBlocksRetrieved
     //		the number of blocks actually retrieved (could be less at end of file or on critical failure)
     //////////////////////////////////////////////////////////////////////////////////////////////
+
     public abstract int GetData(byte[] pBuffer, int nBlocks) throws IOException;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,6 +73,7 @@ public abstract class IAPEDecompress {
     //	int nBlockOffset
     //		the block to seek to (see note at intro about blocks vs. samples)
     //////////////////////////////////////////////////////////////////////////////////////////////
+
     public abstract void Seek(int nBlockOffset) throws IOException;
 
     /**
@@ -142,10 +161,10 @@ public abstract class IAPEDecompress {
         IAPEDecompress pAPEDecompress = null;
         if (pAPEInfo != null) {
             if (pAPEInfo.getApeInfoFileVersion() >= 3930) {
-                if (Globals.isNative())
-                    pAPEDecompress = new APEDecompressNative(pAPEInfo, nStartBlock, nFinishBlock);
-                else
-                    pAPEDecompress = new APEDecompress(pAPEInfo, nStartBlock, nFinishBlock);
+//                if (Globals.isNative())
+//                    pAPEDecompress = new APEDecompressNative(pAPEInfo, nStartBlock, nFinishBlock);
+//                else
+                pAPEDecompress = new APEDecompress(pAPEInfo, nStartBlock, nFinishBlock);
             } else
                 pAPEDecompress = new APEDecompressOld(pAPEInfo, nStartBlock, nFinishBlock);
         }
@@ -163,7 +182,7 @@ public abstract class IAPEDecompress {
 
             // take the appropriate action (based on the extension)
             if (pExtension.toLowerCase().equals(".mac") || pExtension.toLowerCase().equals(".ape"))
-            // plain .ape file
+                // plain .ape file
                 pAPEInfo = new APEInfo(in);
         } else
             pAPEInfo = new APEInfo(in);
@@ -201,7 +220,7 @@ public abstract class IAPEDecompress {
                     nFinishBlock = APELink.GetFinishBlock();
                 }
             } else if (pExtension.toLowerCase().equals(".mac") || pExtension.toLowerCase().equals(".ape"))
-            // plain .ape file
+                // plain .ape file
                 pAPEInfo = new APEInfo(in);
         } else
             pAPEInfo = new APEInfo(in);
