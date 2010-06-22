@@ -1,21 +1,16 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * THIS FILE IS PART OF THE OggVorbis SOFTWARE CODEC SOURCE CODE.
+ * USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS
+ * GOVERNED BY A BSD-STYLE SOURCE LICENSE INCLUDED WITH THIS SOURCE
+ * IN 'COPYING'. PLEASE READ THESE TERMS BEFORE DISTRIBUTING.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+ * THE OggVorbis SOURCE CODE IS (C) COPYRIGHT 1994-2002
+ * by the Xiph.Org Foundation http://www.xiph.org/
  */
 
-package org.xiph;import org.xiph.libogg.ogg_packet;
+package org.xiph;
+
+import org.xiph.libogg.ogg_packet;
 import org.xiph.libogg.ogg_page;
 import org.xiph.libogg.ogg_stream_state;
 import org.xiph.libvorbis.*;

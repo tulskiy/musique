@@ -1,7 +1,7 @@
 <component name="CopyrightManager">
   <settings default="">
     <module2copyright>
-      <element module="All" copyright="LGPL 3" />
+      <element module="musique" copyright="LGPL 3" />
     </module2copyright>
     <LanguageOptions name="Properties">
       <option name="fileTypeOverride" value="1" />
