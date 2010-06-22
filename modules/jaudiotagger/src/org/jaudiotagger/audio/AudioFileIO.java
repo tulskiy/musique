@@ -1,20 +1,18 @@
 /*
- * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
- * 
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- *  
- * This library is distributed in the hope that it will be useful,
+ * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- * 
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.jaudiotagger.audio;
 
@@ -27,11 +25,8 @@ import org.jaudiotagger.audio.flac.FlacFileWriter;
 import org.jaudiotagger.audio.generic.*;
 import org.jaudiotagger.audio.mp3.MP3FileReader;
 import org.jaudiotagger.audio.mp3.MP3FileWriter;
-import org.jaudiotagger.audio.mp4.Mp4FileReader;
-import org.jaudiotagger.audio.mp4.Mp4FileWriter;
 import org.jaudiotagger.audio.ogg.OggFileReader;
 import org.jaudiotagger.audio.ogg.OggFileWriter;
-import org.jaudiotagger.audio.wav.WavFileReader;
 import org.jaudiotagger.tag.TagException;
 
 import java.io.File;
@@ -203,15 +198,11 @@ public class AudioFileIO {
         readers.put(SupportedFileFormat.OGG.getFilesuffix(), new OggFileReader());
         readers.put(SupportedFileFormat.FLAC.getFilesuffix(), new FlacFileReader());
         readers.put(SupportedFileFormat.MP3.getFilesuffix(), new MP3FileReader());
-        readers.put(SupportedFileFormat.MP4.getFilesuffix(), new Mp4FileReader());
-        readers.put(SupportedFileFormat.M4A.getFilesuffix(), new Mp4FileReader());
 
         // Tag Writers
         writers.put(SupportedFileFormat.OGG.getFilesuffix(), new OggFileWriter());
         writers.put(SupportedFileFormat.FLAC.getFilesuffix(), new FlacFileWriter());
         writers.put(SupportedFileFormat.MP3.getFilesuffix(), new MP3FileWriter());
-        writers.put(SupportedFileFormat.M4A.getFilesuffix(), new Mp4FileWriter());
-        writers.put(SupportedFileFormat.MP4.getFilesuffix(), new Mp4FileWriter());
 
 
         // Register modificationHandler
