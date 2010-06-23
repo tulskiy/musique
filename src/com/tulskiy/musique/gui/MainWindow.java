@@ -33,6 +33,7 @@ public class MainWindow extends JFrame {
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private PlaylistPanel playlistPanel;
+    private Tray tray;
 
     public MainWindow() {
         super("Musique");
@@ -56,10 +57,29 @@ public class MainWindow extends JFrame {
         setLocation((int) r.getX(), (int) r.getY());
         setSize((int) r.getWidth(), (int) r.getHeight());
         setExtendedState(config.getInt("gui.mainWindowState", 0));
+
+        boolean trayEnabled = config.getBoolean("tray.enabled", false);
+        if (trayEnabled && tray == null) {
+            tray = new Tray();
+            tray.install();
+
+            tray.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (e.getButton() == MouseEvent.BUTTON1) {
+                        setVisible(true);
+                    }
+                }
+            });
+        }
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                app.exit();
+                if (tray == null) {
+                    app.exit();
+                } else {
+                    setVisible(false);
+                }
             }
         });
     }
