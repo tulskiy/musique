@@ -19,20 +19,22 @@ package com.tulskiy.musique.gui.playlist;
 
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
-import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * @Author: Denis Tulskiy
@@ -49,32 +51,53 @@ public class PlaylistPanel extends JPanel {
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
-    private PlaylistTable table;
-    private PlaylistManager playlistManager;
     private ArrayList<PlaylistColumn> columns;
-    private Playlist playlist;
-    private TabbedPane tabbedPane;
+    private PlaylistTabs tabs;
+    private TableColumnModel columnModel;
 
     public PlaylistPanel() {
-        playlistManager = app.getPlaylistManager();
-        playlist = playlistManager.getCurrentPlaylist();
-
         columns = loadColumns();
-
-        table = new PlaylistTable(playlist, columns);
-        app.getPlayer().setPlaybackOrder(table);
-        setUpDndCCP();
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
 
-        tabbedPane = new TabbedPane();
-        add(tabbedPane, BorderLayout.NORTH);
-        add(table.getScrollPane(), BorderLayout.CENTER);
+        tabs = new PlaylistTabs(columns);
+        add(tabs, BorderLayout.CENTER);
 
-//        int lastPlayed = config.getInt("player.lastPlayed", -1);
-        //todo fix me here
-//        table.setLastPlayed(new Track(lastPlayed));
+        PlaylistManager playlistManager = app.getPlaylistManager();
+        ArrayList<Playlist> playlists = playlistManager.getPlaylists();
+        ArrayList<String> bounds = config.getList("playlist.tabs.bounds", null);
+
+        for (int i = 0; i < playlists.size(); i++) {
+            Playlist pl = playlists.get(i);
+            PlaylistTable newTable = new PlaylistTable(pl, columns);
+            newTable.setUpDndCCP();
+            if (columnModel == null) {
+                columnModel = newTable.getColumnModel();
+            } else {
+                newTable.setColumnModel(columnModel);
+            }
+
+            //try to set last position
+            try {
+                String s = bounds.get(i);
+                Integer y = Integer.valueOf(s);
+                newTable.scrollRectToVisible(new Rectangle(0, y, 0, 0));
+            } catch (Exception ignored) {
+            }
+
+            tabs.add(pl.getName(), newTable.getScrollPane());
+        }
+
+        Playlist playlist = playlistManager.getCurrentPlaylist();
+
+        tabs.setSelectedIndex(-1);
+        tabs.setSelectedIndex(playlists.indexOf(playlist));
+
+        int lastPlayed = config.getInt("player.lastPlayed", -1);
+        if (lastPlayed >= 0 && lastPlayed < playlist.size()) {
+            tabs.getSelectedTable().setLastPlayed(playlist.get(lastPlayed));
+        }
     }
 
     private ArrayList<PlaylistColumn> loadColumns() {
@@ -90,29 +113,29 @@ public class PlaylistPanel extends JPanel {
         return res;
     }
 
-    private void setUpDndCCP() {
-        table.setDragEnabled(true);
-        table.setDropMode(DropMode.INSERT_ROWS);
-        table.setTransferHandler(new PlaylistTransferHandler(table));
-        ActionMap map = table.getActionMap();
+    public void saveSettings() {
+        for (int i = 0; i < columnModel.getColumnCount(); i++) {
+            TableColumn tc = columnModel.getColumn(i);
+            PlaylistColumn pc = columns.get(tc.getModelIndex());
+            pc.setPosition(i);
+            pc.setSize(tc.getWidth());
+        }
 
-        Action cutAction = TransferHandler.getCutAction();
-        map.put(cutAction.getValue(Action.NAME), cutAction);
-        Action copyAction = TransferHandler.getCopyAction();
-        map.put(copyAction.getValue(Action.NAME), copyAction);
-        Action pasteAction = TransferHandler.getPasteAction();
-        map.put(pasteAction.getValue(Action.NAME), pasteAction);
-
-        InputMap iMap = table.getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        iMap.put(KeyStroke.getKeyStroke("ctrl X"), cutAction.getValue(Action.NAME));
-        iMap.put(KeyStroke.getKeyStroke("ctrl C"), copyAction.getValue(Action.NAME));
-        iMap.put(KeyStroke.getKeyStroke("ctrl V"), pasteAction.getValue(Action.NAME));
-    }
-
-    public void shutdown() {
-        table.saveColumns();
-
+        Collections.sort(columns);
         config.setList("playlist.columns", columns);
+
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        for (int i = 0; i < tabs.getTabCount(); i++) {
+            PlaylistTable t = tabs.getTableAt(i);
+            list.add(t.getVisibleRect().y);
+        }
+        config.setList("playlist.tabs.bounds", list);
+
+        Track track = app.getPlayer().getSong();
+        if (track != null) {
+            int index = app.getPlaylistManager().getCurrentPlaylist().indexOf(track);
+            config.setInt("player.lastPlayed", index);
+        }
     }
 
     private JMenuItem newItem(String name, String hotkey, ActionListener al) {
@@ -121,6 +144,17 @@ public class PlaylistPanel extends JPanel {
         item.addActionListener(al);
 
         return item;
+    }
+
+    private Action tableAction(final String name) {
+        return new AbstractAction(name) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table != null)
+                    table.runAction(name);
+            }
+        };
     }
 
     public void addMenu(JMenuBar menuBar) {
@@ -132,9 +166,8 @@ public class PlaylistPanel extends JPanel {
         menuBar.add(viewMenu);
         JMenu playbackMenu = new JMenu("Playback");
         menuBar.add(playbackMenu);
-        final ActionMap aMap = table.getActionMap();
 
-        ActionMap tMap = tabbedPane.getActionMap();
+        ActionMap tMap = tabs.getActionMap();
         fileMenu.add(tMap.get("newPlaylist"));
         fileMenu.add(tMap.get("removePlaylist"));
         fileMenu.addSeparator();
@@ -146,9 +179,13 @@ public class PlaylistPanel extends JPanel {
                 fc.setMultiSelectionEnabled(true);
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int retVal = fc.showOpenDialog(null);
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table == null)
+                    return;
+
                 if (retVal == JFileChooser.APPROVE_OPTION) {
                     ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding files");
-                    dialog.addFiles(playlist, Arrays.asList(fc.getSelectedFiles()));
+                    dialog.addFiles(table.getPlaylist(), Arrays.asList(fc.getSelectedFiles()));
                     table.update();
                 }
 
@@ -168,18 +205,18 @@ public class PlaylistPanel extends JPanel {
         editMenu.add("Clear").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Playlist pl = playlistManager.getCurrentPlaylist();
-                pl.clear();
+                PlaylistTable table = tabs.getSelectedTable();
+                table.getPlaylist().clear();
                 table.update();
             }
         });
-        editMenu.add(aMap.get("removeSelected"));
+        editMenu.add(tableAction("removeSelected"));
         editMenu.addSeparator();
-        editMenu.add(aMap.get("clearQueue"));
+        editMenu.add(tableAction("clearQueue"));
         editMenu.add(newItem("Search", "ctrl F", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SearchDialog(table).setVisible(true);
+                new SearchDialog(tabs.getSelectedTable()).setVisible(true);
             }
         }));
 
@@ -196,7 +233,7 @@ public class PlaylistPanel extends JPanel {
                     } else {
                         UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
                     }
-                    shutdown();
+                    saveSettings();
                     app.start();
                 } catch (Exception e1) {
                     e1.printStackTrace();
@@ -216,7 +253,7 @@ public class PlaylistPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 JMenuItem item = (JMenuItem) e.getSource();
                 PlaylistTable.Order o = PlaylistTable.Order.valueOf(item.getName());
-                table.setOrder(o);
+                tabs.getSelectedTable().setOrder(o);
                 config.setInt("player.playbackOrder", o.ordinal());
             }
         };
@@ -228,7 +265,7 @@ public class PlaylistPanel extends JPanel {
             JCheckBoxMenuItem item = new JCheckBoxMenuItem(o.getText());
             if (o.ordinal() == index) {
                 item.setSelected(true);
-                table.setOrder(o);
+//                table.setOrder(o);
             }
             item.addActionListener(orderListener);
             item.setName(o.toString());
@@ -239,177 +276,14 @@ public class PlaylistPanel extends JPanel {
         JMenu controlMenu = new JMenu("Control");
         playbackMenu.add(controlMenu);
 
-        controlMenu.add(aMap.get("next"));
-        controlMenu.add(aMap.get("play"));
-        controlMenu.add(aMap.get("pause"));
-        controlMenu.add(aMap.get("stop"));
-        controlMenu.add(aMap.get("prev"));
+        controlMenu.add(tableAction("next"));
+        controlMenu.add(tableAction("play"));
+        controlMenu.add(tableAction("pause"));
+        controlMenu.add(tableAction("stop"));
+        controlMenu.add(tableAction("prev"));
 
         playbackMenu.addSeparator();
 
-        playbackMenu.add(aMap.get("showNowPlaying"));
+        playbackMenu.add(tableAction("showNowPlaying"));
     }
-
-    class TabbedPane extends JTabbedPane {
-        private ArrayList<Playlist> playlists;
-        private int dragTo = -1;
-        private int dragFrom;
-
-        TabbedPane() {
-            playlists = playlistManager.getPlaylists();
-            for (Playlist pl : playlists) {
-                add(pl.getName(), null);
-            }
-
-            if (UIManager.getLookAndFeel().getName().contains("GTK")) {
-                setPreferredSize(new Dimension(10000, 30));
-            } else {
-                setPreferredSize(new Dimension(10000, 25));
-            }
-            setFocusable(false);
-            setSelectedIndex(playlists.indexOf(playlist));
-
-            buildListeners();
-            createPopupMenu();
-        }
-
-        private void buildListeners() {
-            addChangeListener(new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    int index = tabbedPane.getSelectedIndex();
-                    if (index == -1) return;
-                    playlist = playlistManager.getPlaylist(index);
-                    table.setPlaylist(playlist);
-                    playlistManager.selectPlaylist(playlist);
-                }
-            });
-
-            addMouseMotionListener(new MouseMotionListener() {
-                @Override
-                public void mouseDragged(MouseEvent e) {
-                    dragTo = tabbedPane.indexAtLocation(e.getX(), e.getY());
-                    tabbedPane.repaint();
-                }
-
-                @Override
-                public void mouseMoved(MouseEvent e) {
-                }
-            });
-
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
-                        playlistManager.movePlaylist(dragFrom, dragTo);
-
-                        for (int i = 0; i < playlists.size(); i++) {
-                            Playlist pl = playlists.get(i);
-                            tabbedPane.setTitleAt(i, pl.getName());
-                        }
-
-                        tabbedPane.setSelectedIndex(dragTo);
-                    }
-                    dragTo = -1;
-                }
-
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    dragFrom = tabbedPane.indexAtLocation(e.getX(), e.getY());
-                }
-            });
-        }
-
-        private void createPopupMenu() {
-            final JPopupMenu tabMenu = new JPopupMenu();
-            ActionMap aMap = getActionMap();
-            aMap.put("newPlaylist", new AbstractAction("New Playlist") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    String name = JOptionPane.showInputDialog("Enter Playlist Name", "New Playlist");
-                    addPlaylist(name);
-                }
-            });
-            aMap.put("renamePlaylist", new AbstractAction("Rename") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    int index = getSelectedIndex();
-                    if (index != -1) {
-                        Playlist pl = playlistManager.getPlaylist(index);
-                        String name = JOptionPane.showInputDialog("Rename", pl.getName());
-                        if (name != null && !name.isEmpty()) {
-                            pl.setName(name);
-                            setTitleAt(index, name);
-                        }
-                    }
-                }
-            });
-            aMap.put("removePlaylist", new AbstractAction("Remove Playlist") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    int index = getSelectedIndex();
-                    if (index != -1) {
-                        Playlist pl = playlistManager.getPlaylist(index);
-                        tabbedPane.remove(index);
-                        playlistManager.removePlaylist(pl);
-                        if (playlistManager.getTotalPlaylists() == 0) {
-                            addPlaylist("Default");
-                        }
-                    }
-                }
-            });
-
-            tabMenu.add(aMap.get("newPlaylist"));
-            tabMenu.add(aMap.get("renamePlaylist"));
-            tabMenu.add(aMap.get("removePlaylist"));
-
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mousePressed(MouseEvent e) {
-                    show(e);
-                }
-
-                @Override
-                public void mouseReleased(MouseEvent e) {
-                    show(e);
-                }
-
-                public void show(MouseEvent e) {
-                    if (e.isPopupTrigger()) {
-                        int index = tabbedPane.indexAtLocation(e.getX(), e.getY());
-                        if (index != -1)
-                            setSelectedIndex(index);
-                        tabMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
-            });
-        }
-
-        private void addPlaylist(String name) {
-            if (name == null || name.isEmpty()) return;
-            playlist = playlistManager.addPlaylist(name);
-
-            tabbedPane.add(name, null);
-            tabbedPane.setSelectedIndex(playlistManager.getTotalPlaylists() - 1);
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            if (dragTo != -1 && dragFrom != -1 && dragTo != dragFrom) {
-                Rectangle b = tabbedPane.getBoundsAt(dragTo);
-                g.setColor(Color.GRAY);
-                int x = (int) (b.getX());
-                if (dragTo > dragFrom)
-                    x += b.getWidth();
-                int y = (int) b.getY();
-                g.fillRect(x - 1, y + 2, 3, (int) b.getHeight() - 2);
-
-                int[] xP = {x - 1, x - 5, x + 5, x + 1};
-                int[] yP = {y + 2, y - 5, y - 5, y + 2};
-                g.fillPolygon(xP, yP, xP.length);
-            }
-        }
-    }
-
 }

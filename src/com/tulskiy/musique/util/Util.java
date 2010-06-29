@@ -35,55 +35,6 @@ import java.util.*;
  * @Date: 21.11.2008
  */
 public class Util {
-
-    public static String stringToHTMLString(String string) {
-        StringBuffer sb = new StringBuffer(string.length());
-        // true if last char was blank
-        int len = string.length();
-        char c;
-
-        for (int i = 0; i < len; i++) {
-            c = string.charAt(i);
-
-            //
-            // HTML Special Chars
-            if (c == '"')
-                sb.append("&quot;");
-            else if (c == '&')
-                sb.append("&amp;");
-            else if (c == '<')
-                sb.append("&lt;");
-            else if (c == '>')
-                sb.append("&gt;");
-            else if (c == '\n')
-                // Handle Newline
-                sb.append("&lt;br/&gt;");
-            else {
-                int ci = 0xffff & c;
-                if (ci < 160)
-                    // nothing special only 7 Bit
-                    sb.append(c);
-                else {
-                    // Not 7 Bit use the unicode system
-                    sb.append("&#");
-                    sb.append(Integer.toString(ci));
-                    sb.append(';');
-                }
-            }
-        }
-        return sb.toString();
-    }
-
-    public static String htmlToString(String string) {
-        String ans = string.replaceAll("&quot;", "\"");
-        ans = ans.replaceAll("&amp;", "&");
-        ans = ans.replaceAll("&lt;", "<");
-        ans = ans.replaceAll("&gt;", ">");
-        ans = ans.replaceAll("<br />", "");
-
-        return ans;
-    }
-
     public static String samplesToTime(long samples, int sampleRate, int precision) {
         double seconds = AudioMath.samplesToMillis(samples, sampleRate) / 1000d;
         int min = (int) (seconds / 60);
@@ -97,13 +48,7 @@ public class Util {
         builder.append(min).append(":");
         int n = precision + ((precision == 0) ? 2 : 3);
         String fmt = "%0" + n + "." + precision + "f";
-//        if (precision)
         builder.append(new Formatter().format(Locale.US, fmt, seconds));
-//        else
-//            builder.append(new Formatter().format(Locale.US, "%02.0f", seconds));
-//        String s = new Formatter().format(Locale.US, "%02d:%04.1f", min, seconds).toString();
-//        if (hrs > 0)
-//            s = hrs + ":" + s;
         return builder.toString();
     }
 
@@ -137,5 +82,9 @@ public class Util {
         }
 
         return null;
+    }
+
+    public static boolean isEmpty(String s) {
+        return s == null || s.trim().isEmpty();
     }
 }

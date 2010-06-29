@@ -88,7 +88,7 @@ public class MainWindow extends JFrame {
         setVisible(false);
         config.setRectangle("gui.mainWindowPosition", new Rectangle(getX(), getY(), getWidth(), getHeight()));
         config.setInt("gui.mainWindowState", getExtendedState());
-        playlistPanel.shutdown();
+        playlistPanel.saveSettings();
     }
 }
 

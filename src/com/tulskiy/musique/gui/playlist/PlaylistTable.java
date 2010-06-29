@@ -25,6 +25,7 @@ import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.custom.SeparatorTable;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
 import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
+import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
@@ -137,6 +138,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
                 if (!tracks.isEmpty()) {
                     player.open(tracks.get(0));
                     player.play();
+                    app.getPlaylistManager().selectPlaylist(playlist);
                 }
             }
         });
@@ -253,6 +255,21 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
             }
         }
     }
+
+    public void setUpDndCCP() {
+        setDragEnabled(true);
+        setDropMode(DropMode.INSERT_ROWS);
+        setTransferHandler(new PlaylistTransferHandler(this));
+        ActionMap map = getActionMap();
+
+        Action cutAction = TransferHandler.getCutAction();
+        map.put(cutAction.getValue(Action.NAME), cutAction);
+        Action copyAction = TransferHandler.getCopyAction();
+        map.put(copyAction.getValue(Action.NAME), copyAction);
+        Action pasteAction = TransferHandler.getPasteAction();
+        map.put(pasteAction.getValue(Action.NAME), pasteAction);
+    }
+
 
     public void filter(String text) {
         try {
@@ -470,7 +487,7 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         this.lastPlayed = lastPlayed;
         int index = indexOf(lastPlayed);
         if (index != -1) {
-            scrollToRow(index);
+//            scrollToRow(index);
             setRowSelectionInterval(index, index);
         }
     }
