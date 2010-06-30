@@ -2,9 +2,16 @@
 MUSIQUE_HOME=`dirname "$0"`
 cd "$MUSIQUE_HOME"
 
+# uncomment to use OSS emulation, fixes sound problems with Sun JRE's
+# DSP="padsp"
+
 # change this to use alternative JRE. If you are using 64-bit JRE,
 # it is recommended to install ia32-sun-java6-jre to reduce memory
 # and CPU usage, and set JAVA_PATH to eg. /usr/lib/jvm/ia32-java-6-sun/bin/java
-export JAVA_PATH="java"
+if [ -z "$JAVA_PATH" ]; then
+    JAVA_PATH="java"
+fi
+ARGS=`tr '\n' ' ' < musique.vmoptions`
+JVM_ARGS="$ARGS $JVM_ARGS"
 
-exec $JAVA_PATH -client -Xms10m -Xmx40m -jar musique.jar
+exec $DSP $JAVA_PATH $JVM_ARGS -jar musique.jar

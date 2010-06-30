@@ -1,0 +1,12 @@
+-client
+-Xms15m
+-Xmx40m
+-XX:+UnlockExperimentalVMOptions
+-XX:+CMSClassUnloadingEnabled
+-XX:+TieredCompilation
+-XX:+AggressiveOpts
+-XX:+UseAdaptiveSizePolicy
+-Dsun.java2d.noddraw=false
+-Dswing.aatext=true
+-XX:MaxHeapFreeRatio=10
+-XX:MinHeapFreeRatio=10 

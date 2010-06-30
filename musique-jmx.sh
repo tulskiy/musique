@@ -1,1 +1,2 @@
-/usr/lib/jvm/ia32-java-6-sun/bin/java -client -Xms10m -Xmx40m -Dcom.sun.management.jmxremote -jar musique.jar
+JVM_ARGS=-Dcom.sun.management.jmxremote
+source musique-ia32.sh
