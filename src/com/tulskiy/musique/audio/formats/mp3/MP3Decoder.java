@@ -136,8 +136,8 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         if (track == null)
             return false;
         this.inputFile = track;
-        streamSize = inputFile.getFile().length();
         try {
+            streamSize = inputFile.getFile().length();
             FileInputStream fis = new FileInputStream(inputFile.getFile());
             Bitstream bs = new Bitstream(fis);
             Header header = bs.readFrame();
@@ -150,14 +150,16 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             totalSamples -= encDelay;
             bs.close();
             fis.close();
+            int sampleRate = track.getSampleRate();
+            int channels = track.getChannels();
+            audioFormat = new AudioFormat(sampleRate, 16, channels, true, false);
+            createBitstream(0);
+            currentSample = 0;
+
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-        int sampleRate = track.getSampleRate();
-        int channels = track.getChannels();
-        audioFormat = new AudioFormat(sampleRate, 16, channels, true, false);
-        createBitstream(0);
-        currentSample = 0;
 
         return true;
     }
