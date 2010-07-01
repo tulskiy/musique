@@ -144,6 +144,10 @@ public class Player {
         this.order = order;
     }
 
+    public PlaybackOrder getPlaybackOrder() {
+        return order;
+    }
+
     void setState(PlayerState state) {
         this.state = state;
         PlayerEvent.PlayerEventCode code = null;
@@ -389,6 +393,8 @@ public class Player {
                     }
 
                     initLine();
+
+                    track.setPlayed(true);
 
                     fireEvent(FILE_OPENED);
                 }

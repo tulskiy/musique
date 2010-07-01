@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.gui.playlist;
 
+import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
 import com.tulskiy.musique.playlist.Playlist;
@@ -107,7 +108,7 @@ public class PlaylistPanel extends JPanel {
 
         int lastPlayed = config.getInt("player.lastPlayed", -1);
         if (lastPlayed >= 0 && lastPlayed < playlist.size()) {
-            tabs.getSelectedTable().setLastPlayed(playlist.get(lastPlayed));
+            tabs.getSelectedTable().setRowSelectionInterval(lastPlayed, lastPlayed);
         }
     }
 
@@ -263,20 +264,20 @@ public class PlaylistPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JMenuItem item = (JMenuItem) e.getSource();
-                PlaylistTable.Order o = PlaylistTable.Order.valueOf(item.getName());
-                tabs.getSelectedTable().setOrder(o);
+                PlaybackOrder.Order o = PlaybackOrder.Order.valueOf(item.getName());
+                app.getPlayer().getPlaybackOrder().setOrder(o);
                 config.setInt("player.playbackOrder", o.ordinal());
             }
         };
 
         int index = config.getInt("player.playbackOrder", 0);
-        PlaylistTable.Order[] orders = PlaylistTable.Order.values();
+        PlaybackOrder.Order[] orders = PlaybackOrder.Order.values();
         ButtonGroup gr = new ButtonGroup();
-        for (PlaylistTable.Order o : orders) {
+        for (PlaybackOrder.Order o : orders) {
             JCheckBoxMenuItem item = new JCheckBoxMenuItem(o.getText());
             if (o.ordinal() == index) {
                 item.setSelected(true);
-//                table.setOrder(o);
+                app.getPlayer().getPlaybackOrder().setOrder(o);
             }
             item.addActionListener(orderListener);
             item.setName(o.toString());

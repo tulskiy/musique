@@ -33,8 +33,10 @@ public class PlaylistManager {
 
     private Logger logger = Logger.getLogger(getClass().getName());
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
-    private Configuration config = Application.getInstance().getConfiguration();
+    private Application app = Application.getInstance();
+    private Configuration config = app.getConfiguration();
     private Playlist currentPlaylist;
+    private PlaylistOrder order = new PlaylistOrder();
 
     public ArrayList<Playlist> getPlaylists() {
         return playlists;
@@ -42,6 +44,7 @@ public class PlaylistManager {
 
     public void selectPlaylist(Playlist playlist) {
         currentPlaylist = playlist;
+        order.setPlaylist(playlist);
     }
 
     public Playlist getCurrentPlaylist() {
@@ -66,9 +69,15 @@ public class PlaylistManager {
         if (index < 0 || index >= playlists.size())
             index = 0;
         selectPlaylist(playlists.get(index));
+        app.getPlayer().setPlaybackOrder(order);
+
+        int lastPlayed = config.getInt("player.lastPlayed", 0);
+        if (lastPlayed >= 0 && lastPlayed < currentPlaylist.size()) {
+            order.setLastPlayed(currentPlaylist.get(lastPlayed));
+        }
     }
 
-    public void savePlaylists() {
+    public void saveSettings() {
         File dir = new File(PLAYLISTS_PATH);
         //noinspection ResultOfMethodCallIgnored
         dir.mkdir();
@@ -88,6 +97,12 @@ public class PlaylistManager {
 
         config.setList("playlists", playlists);
         config.setInt("playlist.currentPlaylist", playlists.indexOf(currentPlaylist));
+
+        Track lastPlayed = app.getPlayer().getSong();
+        if (lastPlayed != null) {
+            int index = currentPlaylist.indexOf(lastPlayed);
+            config.setInt("player.lastPlayed", index);
+        }
     }
 
     public int getTotalPlaylists() {

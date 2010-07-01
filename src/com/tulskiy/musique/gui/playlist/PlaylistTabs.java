@@ -83,8 +83,6 @@ public class PlaylistTabs extends JTabbedPane {
                 if (index == -1)
                     return;
                 selectedTable = getTableAt(index);
-                app.getPlayer().setPlaybackOrder(selectedTable);
-//                playlistManager.selectPlaylist(playlist);
             }
         });
 

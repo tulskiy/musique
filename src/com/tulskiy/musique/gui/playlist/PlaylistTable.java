@@ -18,7 +18,6 @@
 package com.tulskiy.musique.gui.playlist;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -28,6 +27,7 @@ import com.tulskiy.musique.gui.dialogs.ColumnDialog;
 import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.PlaylistOrder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -43,30 +43,12 @@ import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedList;
 
 /**
  * Author: Denis Tulskiy
  * Date: May 13, 2010
  */
-public class PlaylistTable extends GroupTable implements PlaybackOrder {
-    enum Order {
-        DEFAULT("Default"),
-        REPEAT("Repeat"),
-        REPEAT_TRACK("Repeat Track"),
-        SHUFFLE("Random");
-
-        private String text;
-
-        Order(String text) {
-            this.text = text;
-        }
-
-        public String getText() {
-            return text;
-        }
-    }
-
+public class PlaylistTable extends GroupTable {
     private Application app = Application.getInstance();
     private Player player = app.getPlayer();
     private Configuration config = app.getConfiguration();
@@ -75,9 +57,6 @@ public class PlaylistTable extends GroupTable implements PlaybackOrder {
     private ArrayList<PlaylistColumn> columns;
     private TableRowSorter<PlaylistModel> sorter;
     private PlaylistModel model;
-    private Order order = Order.DEFAULT;
-    private LinkedList<Track> queue = new LinkedList<Track>();
-    private Track lastPlayed;
 
     private JScrollPane scrollPane;
 
@@ -173,18 +152,16 @@ public class PlaylistTable extends GroupTable implements PlaybackOrder {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (Track track : getSelectedSongs()) {
-                    enqueue(track);
+                    PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                    order.enqueue(track, playlist);
                 }
             }
         });
         aMap.put("clearQueue", new AbstractAction("Clear Playback Queue") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (Track track : queue) {
-                    track.setQueuePosition(-1);
-                }
-                queue.clear();
-                updateQueuePositions();
+                PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                order.flushQueue();
             }
         });
 
@@ -479,110 +456,6 @@ public class PlaylistTable extends GroupTable implements PlaybackOrder {
                 }
             }
         });
-    }
-
-    // playback order
-
-    public void setOrder(Order order) {
-        this.order = order;
-    }
-
-    public void setLastPlayed(Track lastPlayed) {
-        this.lastPlayed = lastPlayed;
-        int index = indexOf(lastPlayed);
-        if (index != -1) {
-//            scrollToRow(index);
-            setRowSelectionInterval(index, index);
-        }
-    }
-
-    public void enqueue(Track track) {
-        queue.add(track);
-        updateQueuePositions();
-    }
-
-    private void updateQueuePositions() {
-        for (int i = 0; i < queue.size(); i++) {
-            queue.get(i).setQueuePosition(i + 1);
-        }
-        update();
-    }
-
-    @Override
-    public Track next(Track file) {
-        int index;
-
-        if (!queue.isEmpty()) {
-            Track track = queue.poll();
-            track.setQueuePosition(-1);
-            updateQueuePositions();
-            return track;
-        }
-
-        if (file == null) {
-            index = indexOf(lastPlayed);
-            if (index == -1)
-                index = 0;
-            //todo check me!
-//                index = indexOf(new Track(0));
-        } else {
-            index = indexOf(file);
-            if (index == -1)
-                return null;
-
-            int size;
-            if (sorter != null)
-                size = sorter.getViewRowCount();
-            else
-                size = playlist.size();
-
-            switch (order) {
-                case DEFAULT:
-                    index = index < size - 1 ? index + 1 : -1;
-                    break;
-                case REPEAT:
-                    index = (index + 1) % size;
-                    break;
-                case REPEAT_TRACK:
-                    break;
-                case SHUFFLE:
-                    index = (int) (Math.random() * size);
-                    break;
-            }
-        }
-
-        return index != -1 ? playlist.get(convertRowIndexToModel(index)) : null;
-    }
-
-    @Override
-    public Track prev(Track file) {
-        int index = indexOf(file);
-        if (index == -1)
-            return null;
-
-        int size;
-        if (sorter != null)
-            size = sorter.getViewRowCount();
-        else
-            size = playlist.size();
-
-        switch (order) {
-            case DEFAULT:
-                index--;
-                break;
-            case REPEAT:
-                index--;
-                if (index < 0)
-                    index += size;
-                break;
-            case REPEAT_TRACK:
-                break;
-            case SHUFFLE:
-                index = (int) (Math.random() * size);
-                break;
-        }
-
-        return index > -1 ? playlist.get(convertRowIndexToModel(index)) : null;
     }
 
     class PlaylistModel extends AbstractTableModel {

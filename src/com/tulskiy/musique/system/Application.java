@@ -47,10 +47,11 @@ public class Application {
         configuration = new Configuration();
         configuration.load();
 
+        player = new Player();
+
         playlistManager = new PlaylistManager();
         playlistManager.loadPlaylists();
 
-        player = new Player();
 
         loadSettings();
     }
@@ -72,11 +73,6 @@ public class Application {
 
     private void saveSettings() {
         configuration.setDouble("player.volume", player.getVolume());
-//        Track lastPlayed = player.getSong();
-//        if (lastPlayed != null) {
-        //todo fix me here
-//            configuration.setInt("player.lastPlayed", lastPlayed.getSongID());
-//        }
         configuration.setString("gui.LAF", UIManager.getLookAndFeel().getClass().getCanonicalName());
     }
 
@@ -98,7 +94,7 @@ public class Application {
         player.stop();
         if (mainWindow != null)
             mainWindow.shutdown();
-        playlistManager.savePlaylists();
+        playlistManager.saveSettings();
         saveSettings();
         configuration.save();
         System.exit(0);

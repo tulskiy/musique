@@ -22,6 +22,7 @@ import com.tulskiy.musique.util.Util;
 
 import java.io.File;
 import java.util.Formatter;
+import java.util.Random;
 
 /**
  * Author: Denis Tulskiy
@@ -66,9 +67,37 @@ public class Track implements Cloneable {
     private String length;
     private String fileName;
 
+    private static Random random;
+    private int shuffleRating = nextRandom();
+    private boolean played = false;
+
+    public static int nextRandom() {
+        if (random == null)
+            random = new Random();
+        return random.nextInt();
+    }
+
+    public int getShuffleRating() {
+        return shuffleRating;
+    }
+
+    public void setShuffleRating(int shuffleRating) {
+        this.shuffleRating = shuffleRating;
+    }
+
+    public boolean isPlayed() {
+        return played;
+    }
+
+    public void setPlayed(boolean played) {
+        this.played = played;
+    }
+
     public Track copy() {
         try {
-            return (Track) this.clone();
+            Track t = (Track) this.clone();
+            t.shuffleRating = nextRandom();
+            return t;
         } catch (CloneNotSupportedException ignored) {
             return null;
         }
