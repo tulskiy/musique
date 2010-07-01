@@ -21,15 +21,8 @@ package com.tulskiy.musique.gui.custom;
  * @Author: Denis Tulskiy
  * @Date: Sep 29, 2009
  */
-public class Separator {
-    private String value;
+public interface Separator {
+    public String getGroupName();
 
-    public Separator(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return value;
-    }
+    public int getGroupSize();
 }

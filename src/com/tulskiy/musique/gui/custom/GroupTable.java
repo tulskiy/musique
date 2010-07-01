@@ -17,17 +17,12 @@
 
 package com.tulskiy.musique.gui.custom;
 
-import sun.swing.DefaultLookup;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.plaf.synth.Region;
-import javax.swing.plaf.synth.SynthContext;
-import javax.swing.plaf.synth.SynthLookAndFeel;
-import javax.swing.plaf.synth.SynthStyle;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -37,7 +32,7 @@ import java.awt.geom.Rectangle2D;
  * @Author: Denis Tulskiy
  * @Date: Sep 30, 2009
  */
-public class SeparatorTable extends JTable {
+public class GroupTable extends JTable {
     private static final double FACTOR = 0.90;
 
     private Color bgColor1;
@@ -49,31 +44,41 @@ public class SeparatorTable extends JTable {
     private Color separatorColor;
     private final Font defaultFont = getFont();
 
-    public SeparatorTable() {
+    private boolean trackSelection = true;
+
+    public GroupTable() {
         initUI();
         buildListeners();
     }
 
-//    private boolean isSeparator(int row) {
-//        return getModel().getValueAt(row, 0) instanceof Separator;
-//    }
+    protected boolean isSeparator(int row) {
+        return getRowCount() > 0 && getColumnCount() > 0 && getModel().getValueAt(row, 0) instanceof Separator;
+    }
+
+    public void setTrackSelection(boolean trackSelection) {
+        this.trackSelection = trackSelection;
+    }
 
     private void buildListeners() {
-//        getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//            public void valueChanged(ListSelectionEvent e) {
-//                if (getSelectedRowCount() == 1) {
-//                    if (isSeparator(getSelectedRow())) {
-//                        int row = getSelectedRow() + 1;
-//
-//                        while (row < getModel().getRowCount() && !isSeparator(row)) {
-//                            row++;
-//                        }
-//
-//                        getSelectionModel().setSelectionInterval(getSelectedRow(), row - 1);
-//                    }
-//                }
-//            }
-//        });
+        getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                // workaround for search dialog
+                if (trackSelection && getSelectedRowCount() == 1) {
+                    if (isSeparator(getSelectedRow())) {
+                        Separator value = (Separator) getModel().getValueAt(getSelectedRow(), 0);
+                        int size = value.getGroupSize();
+                        int row = getSelectedRow() + 1;
+
+                        while (size > 0 && row < getModel().getRowCount() && !isSeparator(row)) {
+                            row++;
+                            size--;
+                        }
+
+                        getSelectionModel().setSelectionInterval(getSelectedRow(), row - 1);
+                    }
+                }
+            }
+        });
 
         InputMap imap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ActionMap amap = getActionMap();
@@ -116,7 +121,7 @@ public class SeparatorTable extends JTable {
     }
 
     private void initUI() {
-//        setUI(new SpanTableUI());
+        setUI(new GroupTableUI());
 
         setBackground(Color.white);
         setIntercellSpacing(new Dimension(0, 0));
@@ -134,7 +139,7 @@ public class SeparatorTable extends JTable {
 //        setDefaultRenderer(ImageIcon.class, new IconCellRenderer());
         setDefaultRenderer(Object.class, new DefaultCellRenderer());
 
-        //fix dropLine colors, I fucking hate Nimbus
+        //fix dropLine colors, I hate Nimbus
         Color droplineColor = UIManager.getColor("Table.dropLineShortColor");
         UIManager.getDefaults().put("Table.dropLineColor", droplineColor);
         UIDefaults defaults = new UIDefaults();
@@ -151,7 +156,7 @@ public class SeparatorTable extends JTable {
         else
             newFont = font;
         super.setFont(newFont);
-        separatorFont = newFont.deriveFont(newFont.getSize() + 3);
+        separatorFont = newFont.deriveFont(Font.BOLD, newFont.getSize() + 2f);
         setRowHeight(newFont.getSize() + 10);
     }
 
@@ -188,7 +193,7 @@ public class SeparatorTable extends JTable {
         Rectangle visible = getVisibleRect();
 
         return visible.y <= r.y
-                && visible.y + visible.height >= r.y + r.height;
+               && visible.y + visible.height >= r.y + r.height;
     }
 
     private void center(Rectangle r) {
@@ -223,7 +228,7 @@ public class SeparatorTable extends JTable {
         scrollRectToVisible(visible);
     }
 
-    /*public Rectangle getCellRect(int row, int column, boolean includeSpacing) {
+    public Rectangle getCellRect(int row, int column, boolean includeSpacing) {
         final TableModel eventTableModel = getModel();
 
         // sometimes JTable asks for a cellrect that doesn't exist anymore, due
@@ -245,20 +250,7 @@ public class SeparatorTable extends JTable {
         } else {
             return super.getCellRect(row, column, includeSpacing);
         }
-    }*/
-
-/*
-    public Object getValueAt(int row, int column) {
-        final Object rowValue = getModel().getValueAt(row, 0);
-
-        // if it's the separator row, return the value directly
-        if (rowValue instanceof Separator)
-            return rowValue;
-
-        // otherwise it's business as usual
-        return super.getValueAt(row, column);
     }
-*/
 
     class DefaultCellRenderer extends DefaultTableCellRenderer {
         private SeparatorCellRenderer separatorCellRenderer = new SeparatorCellRenderer();
@@ -307,25 +299,27 @@ public class SeparatorTable extends JTable {
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (isSelected) {
-                setBorder(BorderFactory.createLineBorder(Color.gray, 1));
+                setBorder(BorderFactory.createLineBorder(Color.lightGray, 1));
             } else {
                 setBorder(BorderFactory.createEmptyBorder());
             }
 
             setFont(separatorFont);
             setForeground(separatorColor);
-            this.value = value.toString();
+            this.value = ((Separator) value).getGroupName();
             return this;
         }
 
         @Override
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
-            FontMetrics fm = g.getFontMetrics(separatorFont);
+            Graphics2D g2d = (Graphics2D) g;
+            FontMetrics fm = g2d.getFontMetrics(separatorFont);
             Rectangle2D bounds = fm.getStringBounds(value, g);
-//            System.out.println(bounds);
-            g.drawString(value, 5, getHeight() - 5);
-            g.drawLine((int) (bounds.getWidth() + 20), getHeight() / 2, getWidth(), getHeight() / 2);
+            g2d.drawLine((int) (bounds.getWidth() + 20), getHeight() / 2, getWidth(), getHeight() / 2);
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, // Anti-alias!
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2d.drawString(value, 5, getHeight() - (getHeight() - fm.getAscent()) / 2 - fm.getDescent() + 2);
         }
     }
 }

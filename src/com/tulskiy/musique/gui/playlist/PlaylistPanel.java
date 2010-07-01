@@ -63,6 +63,17 @@ public class PlaylistPanel extends JPanel {
 
         tabs = new PlaylistTabs(columns);
         add(tabs, BorderLayout.CENTER);
+        JButton button = new JButton("Populate");
+        button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Playlist playlist = tabs.getSelectedTable().getPlaylist();
+                for (int i = 0; i < playlist.size(); i += 20) {
+                    playlist.add(i, new SeparatorTrack("Separator #" + i, 15));
+                }
+            }
+        });
+        add(button, BorderLayout.SOUTH);
 
         PlaylistManager playlistManager = app.getPlaylistManager();
         ArrayList<Playlist> playlists = playlistManager.getPlaylists();
@@ -146,13 +157,13 @@ public class PlaylistPanel extends JPanel {
         return item;
     }
 
-    private Action tableAction(final String name) {
+    private Action tableAction(final String actionName, String name) {
         return new AbstractAction(name) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 PlaylistTable table = tabs.getSelectedTable();
                 if (table != null)
-                    table.runAction(name);
+                    table.runAction(actionName);
             }
         };
     }
@@ -210,9 +221,9 @@ public class PlaylistPanel extends JPanel {
                 table.update();
             }
         });
-        editMenu.add(tableAction("removeSelected"));
+        editMenu.add(tableAction("removeSelected", "Remove"));
         editMenu.addSeparator();
-        editMenu.add(tableAction("clearQueue"));
+        editMenu.add(tableAction("clearQueue", "Clear Playback Queue"));
         editMenu.add(newItem("Search", "ctrl F", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -273,17 +284,8 @@ public class PlaylistPanel extends JPanel {
             orderMenu.add(item);
         }
 
-        JMenu controlMenu = new JMenu("Control");
-        playbackMenu.add(controlMenu);
-
-        controlMenu.add(tableAction("next"));
-        controlMenu.add(tableAction("play"));
-        controlMenu.add(tableAction("pause"));
-        controlMenu.add(tableAction("stop"));
-        controlMenu.add(tableAction("prev"));
-
         playbackMenu.addSeparator();
 
-        playbackMenu.add(tableAction("showNowPlaying"));
+        playbackMenu.add(tableAction("showNowPlaying", "Scroll to Now Playing"));
     }
 }

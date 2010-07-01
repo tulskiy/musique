@@ -17,8 +17,11 @@
 
 package com.tulskiy.musique.playlist;
 
+import com.tulskiy.musique.gui.playlist.SeparatorTrack;
+
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -40,6 +43,9 @@ public class Playlist extends ArrayList<Track> {
 
     public void save(File file) {
         try {
+            //remove the garbage
+            cleanUp();
+
             DataOutputStream dos = new DataOutputStream(
                     new BufferedOutputStream(new FileOutputStream(file)));
             dos.writeInt(VERSION);
@@ -72,6 +78,10 @@ public class Playlist extends ArrayList<Track> {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void cleanUp() {
+        removeAll(Collections.singleton(new SeparatorTrack(null, 0)));
     }
 
     public void load(File file) {

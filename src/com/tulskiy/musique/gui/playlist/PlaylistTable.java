@@ -22,7 +22,8 @@ import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.custom.SeparatorTable;
+import com.tulskiy.musique.gui.custom.Separator;
+import com.tulskiy.musique.gui.custom.GroupTable;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
 import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
@@ -48,7 +49,7 @@ import java.util.LinkedList;
  * Author: Denis Tulskiy
  * Date: May 13, 2010
  */
-public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
+public class PlaylistTable extends GroupTable implements PlaybackOrder {
     enum Order {
         DEFAULT("Default"),
         REPEAT("Repeat"),
@@ -318,7 +319,10 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         int[] rows = getSelectedRows();
         ArrayList<Track> tracks = new ArrayList<Track>();
         for (int row : rows) {
-            tracks.add(playlist.get(convertRowIndexToModel(row)));
+            Track track = playlist.get(convertRowIndexToModel(row));
+            if (!(track instanceof Separator)) {
+                tracks.add(track);
+            }
         }
         return tracks;
     }
@@ -596,7 +600,11 @@ public class PlaylistTable extends SeparatorTable implements PlaybackOrder {
         }
 
         public Object getValueAt(int rowIndex, int columnIndex) {
-            return columns.get(columnIndex).getValue(playlist.get(rowIndex));
+            Track track = playlist.get(rowIndex);
+            if (track instanceof Separator)
+                return track;
+            else
+                return columns.get(columnIndex).getValue(track);
         }
     }
 

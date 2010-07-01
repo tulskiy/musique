@@ -58,6 +58,7 @@ public class SearchDialog extends JDialog {
         playlist = playlistTable.getPlaylist();
         table = new PlaylistTable(empty, columns);
         table.createSorter();
+        table.setTrackSelection(false);
 
         add(searchField, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);

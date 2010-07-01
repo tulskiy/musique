@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.tulskiy.musique.gui.custom.SeparatorTable;
+import com.tulskiy.musique.gui.custom.GroupTable;
 import com.tulskiy.musique.playlist.Track;
 
 import javax.swing.*;
@@ -161,7 +161,7 @@ public class SongInfoDialog extends JDialog {
     }
 
     private JComponent createTable(TableModel model) {
-        final SeparatorTable table = new SeparatorTable();
+        final GroupTable table = new GroupTable();
         table.setModel(model);
 
         table.getColumn("Key").setPreferredWidth(100);
