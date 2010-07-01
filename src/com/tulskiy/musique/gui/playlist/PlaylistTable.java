@@ -154,6 +154,7 @@ public class PlaylistTable extends GroupTable {
                 for (Track track : getSelectedSongs()) {
                     PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
                     order.enqueue(track, playlist);
+                    update();
                 }
             }
         });
@@ -162,6 +163,7 @@ public class PlaylistTable extends GroupTable {
             public void actionPerformed(ActionEvent e) {
                 PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
                 order.flushQueue();
+                update();
             }
         });
 
