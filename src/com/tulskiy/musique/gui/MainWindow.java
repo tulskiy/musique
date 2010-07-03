@@ -67,7 +67,15 @@ public class MainWindow extends JFrame {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if (e.getButton() == MouseEvent.BUTTON1) {
-                        setVisible(true);
+                        int state = getExtendedState();
+                        if ((state & ICONIFIED) != 0) {
+                            state &= ~ICONIFIED;
+                            setExtendedState(state);
+                        } else {
+                            setVisible(!isVisible());
+                        }
+                    } else if (e.getButton() == MouseEvent.BUTTON2) {
+                        app.getPlayer().pause();
                     }
                 }
             });
