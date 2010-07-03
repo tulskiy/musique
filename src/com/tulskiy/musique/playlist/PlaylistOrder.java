@@ -31,11 +31,11 @@ import java.util.LinkedList;
  * Date: Jul 1, 2010
  */
 public class PlaylistOrder implements PlaybackOrder {
-    class Tuple {
+    class QueueTuple {
         Track track;
         Playlist playlist;
 
-        Tuple(Track track, Playlist playlist) {
+        QueueTuple(Track track, Playlist playlist) {
             this.track = track;
             this.playlist = playlist;
         }
@@ -43,7 +43,7 @@ public class PlaylistOrder implements PlaybackOrder {
 
     private Playlist playlist;
     private Order order = Order.DEFAULT;
-    private LinkedList<Tuple> queue = new LinkedList<Tuple>();
+    private LinkedList<QueueTuple> queue = new LinkedList<QueueTuple>();
     private Track lastPlayed;
     private Track plMin, plMax;
 
@@ -60,7 +60,7 @@ public class PlaylistOrder implements PlaybackOrder {
     }
 
     public void enqueue(Track track, Playlist playlist) {
-        queue.add(new Tuple(track, playlist));
+        queue.add(new QueueTuple(track, playlist));
         updateQueuePositions();
     }
 
@@ -71,7 +71,7 @@ public class PlaylistOrder implements PlaybackOrder {
     }
 
     public void flushQueue() {
-        for (Tuple tuple : queue) {
+        for (QueueTuple tuple : queue) {
             tuple.track.setQueuePosition(-1);
         }
         queue.clear();
@@ -83,7 +83,7 @@ public class PlaylistOrder implements PlaybackOrder {
         int index;
 
         if (!queue.isEmpty()) {
-            Tuple tuple = queue.poll();
+            QueueTuple tuple = queue.poll();
             Track track = tuple.track;
             setPlaylist(tuple.playlist);
             track.setQueuePosition(-1);
@@ -119,26 +119,31 @@ public class PlaylistOrder implements PlaybackOrder {
                     index = (int) (Math.random() * size);
                     break;
                 case SHUFFLE:
-                    //find non played minimum
-                    Track min = null;
-                    for (Track track : playlist) {
-                        if (track instanceof SeparatorTrack || track.isPlayed())
-                            continue;
+                    return nextShuffle();
 
-                        if (min == null || track.getShuffleRating() < min.getShuffleRating()) {
-                            min = track;
-                        }
-                    }
-                    if (min == null) {
-                        reshuffle();
-                        min = plMin;
-                    }
-
-                    return min;
             }
         }
 
-        return index != -1 ? playlist.get(index) : null;
+        return getTrack(index);
+    }
+
+    private Track nextShuffle() {
+        //find non played minimum
+        Track min = null;
+        for (Track track : playlist) {
+            if (track instanceof SeparatorTrack || track.isPlayed())
+                continue;
+
+            if (min == null || track.getShuffleRating() < min.getShuffleRating()) {
+                min = track;
+            }
+        }
+        if (min == null) {
+            reshuffle();
+            min = plMin;
+        }
+
+        return min;
     }
 
     private void reshuffle() {
@@ -151,6 +156,19 @@ public class PlaylistOrder implements PlaybackOrder {
 
             if (plMax == null || track.getShuffleRating() > plMax.getShuffleRating())
                 plMax = track;
+        }
+    }
+
+    private Track getTrack(int index) {
+        if (index != -1) {
+            Track track = playlist.get(index);
+            // technically, separator can not be the last track
+            // so we just get the next track
+            if (track instanceof SeparatorTrack)
+                return playlist.get(index + 1);
+            return track;
+        } else {
+            return null;
         }
     }
 
@@ -180,40 +198,43 @@ public class PlaylistOrder implements PlaybackOrder {
                 index = (int) (Math.random() * size);
                 break;
             case SHUFFLE:
-                // find already played song with maximum shuffle rating below prev song
-                Track max = null;
-                Track amax = null;
-                currentTrack.setPlayed(false);
-                int rating = currentTrack.getShuffleRating();
-                for (Track track : playlist) {
-                    if (track instanceof SeparatorTrack)
-                        continue;
-                    if (track != currentTrack && track.isPlayed() &&
-                        (amax == null || track.getShuffleRating() > amax.getShuffleRating())) {
-                        amax = track;
-                    }
-
-                    if (track == currentTrack || track.getShuffleRating() > rating || !track.isPlayed()) {
-                        continue;
-                    }
-
-                    if (max == null || track.getShuffleRating() > max.getShuffleRating()) {
-                        max = track;
-                    }
-                }
-
-                if (max == null) {
-                    if (amax == null) {
-                        reshuffle();
-                        amax = plMax;
-                    }
-
-                    max = amax;
-                }
-
-                return max;
+                return prevShuffle(currentTrack);
         }
 
-        return index > -1 ? playlist.get(index) : null;
+        return getTrack(index);
+    }
+
+    private Track prevShuffle(Track currentTrack) {
+        // find already played song with maximum shuffle rating below prev song
+        Track max = null;
+        Track amax = null;
+        currentTrack.setPlayed(false);
+        int rating = currentTrack.getShuffleRating();
+        for (Track track : playlist) {
+            if (track instanceof SeparatorTrack)
+                continue;
+            if (track != currentTrack && track.isPlayed() &&
+                (amax == null || track.getShuffleRating() > amax.getShuffleRating())) {
+                amax = track;
+            }
+
+            if (track == currentTrack || track.getShuffleRating() > rating || !track.isPlayed()) {
+                continue;
+            }
+
+            if (max == null || track.getShuffleRating() > max.getShuffleRating()) {
+                max = track;
+            }
+        }
+
+        if (max == null) {
+            if (amax == null) {
+                reshuffle();
+                amax = plMax;
+            }
+
+            max = amax;
+        }
+        return max;
     }
 }
