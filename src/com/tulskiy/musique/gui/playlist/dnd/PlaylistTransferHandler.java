@@ -135,6 +135,7 @@ public class PlaylistTransferHandler extends TransferHandler {
                     insertRow = playlist.size();
 
                 playlist.addAll(insertRow, tracks);
+                playlist.firePlaylistChanged();
                 table.update();
                 table.setRowSelectionInterval(insertRow, insertRow + tracks.size() - 1);
                 tracks.clear();

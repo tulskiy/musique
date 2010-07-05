@@ -31,7 +31,7 @@ import java.awt.event.ActionListener;
 public class ColumnDialog extends JDialog {
     private static Object[] formats = new Object[]{
             "[%artist% -]%title%", "%title%", "%artist%", "%album%", "%year%",
-            "%length%", "$isPlaying", "%fileName%", "$if3(%albumArtist%, %artist%)\\%year%\\%album%%discNumber%%tracknumber%%title%%fileName%"
+            "%length%", "$isPlaying", "%fileName%", "%albumArtist% - %year% - %album% - %discNumber% - %tracknumber% - %title% - %fileName%"
     };
 
     private boolean accept = false;

@@ -79,6 +79,7 @@ public class TagProcessor {
         });
 
         playlist.addAll(audioFiles);
+        playlist.firePlaylistChanged();
     }
 
     public void cancel() {
