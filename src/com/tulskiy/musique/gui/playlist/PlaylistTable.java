@@ -142,6 +142,7 @@ public class PlaylistTable extends GroupTable {
 //                        getSelectionModel().getMaxSelectionIndex());
 
                 clearSelection();
+                playlist.firePlaylistChanged();
 
                 model.fireTableDataChanged();
                 update();
