@@ -37,6 +37,7 @@ public class MainWindow extends JFrame {
 
     public MainWindow() {
         super("Musique");
+        setIconImage(new ImageIcon("resources/images/icon.png").getImage());
 
         ControlPanel controlPanel = new ControlPanel();
         StatusBar statusBar = new StatusBar();
