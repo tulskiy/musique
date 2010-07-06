@@ -54,9 +54,8 @@ public class PlaylistManager {
     public void loadPlaylists() {
         ArrayList<String> list = config.getList("playlists", new ArrayList<String>());
         for (int i = 0; i < list.size(); i++) {
-            String name = list.get(i);
-            Playlist playlist = new Playlist();
-            playlist.setName(name);
+            String fmt = list.get(i);
+            Playlist playlist = new Playlist(fmt);
             playlist.load(new File(PLAYLISTS_PATH + i + ".dat"));
             playlists.add(playlist);
         }
@@ -74,6 +73,12 @@ public class PlaylistManager {
         int lastPlayed = config.getInt("player.lastPlayed", 0);
         if (lastPlayed >= 0 && lastPlayed < currentPlaylist.size()) {
             order.setLastPlayed(currentPlaylist.get(lastPlayed));
+        }
+
+        //need to do it here because lastPlayed index gets shifted
+        //after regrouping
+        for (Playlist playlist : playlists) {
+            playlist.firePlaylistChanged();
         }
     }
 

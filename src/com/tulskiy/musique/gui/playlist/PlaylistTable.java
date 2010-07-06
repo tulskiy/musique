@@ -21,8 +21,8 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.custom.Separator;
 import com.tulskiy.musique.gui.custom.GroupTable;
+import com.tulskiy.musique.gui.custom.Separator;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
 import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
@@ -42,7 +42,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 /**
  * Author: Denis Tulskiy
@@ -205,17 +204,7 @@ public class PlaylistTable extends GroupTable {
                 int index = model.getColumnIndexAtX(e.getX());
                 final int col = model.getColumn(index).getModelIndex();
                 final PlaylistColumn pc = columns.get(col);
-                Collections.sort(playlist, new Comparator<Track>() {
-                    @Override
-                    public int compare(Track o1, Track o2) {
-                        Object v1 = pc.getValue(o1);
-                        Object v2 = pc.getValue(o2);
-                        if (v1 != null && v2 != null) {
-                            return v1.toString().compareTo(v2.toString());
-                        }
-                        return 0;
-                    }
-                });
+                playlist.sort(pc.getExpression());
             }
         });
     }
@@ -335,7 +324,9 @@ public class PlaylistTable extends GroupTable {
         SongInfoDialog dialog = new SongInfoDialog(getParentFrame(), s);
         if (dialog.showDialog()) {
             try {
+                playlist.firePlaylistChanged();
                 TrackIO.getAudioFileWriter(s.getFile().getAbsolutePath()).write(s);
+                update();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -399,6 +390,121 @@ public class PlaylistTable extends GroupTable {
         });
         hideScrollbar.setSelected(!config.getBoolean("playlist.hideScrollBar", false));
         hideScrollbar.doClick();
+
+        final String[] groupItems = {"None", "Artist", "Album Artist", "Artist/Album",
+                "Artist/Album/Date", null, "Custom"};
+        final String[] groupValues = {null, "%artist%", "%albumArtist%", "%albumArtist%[ - %album%",
+                "%albumArtist%[ - %album%][ '['%year%']']"
+        };
+        JMenu groups = new JMenu("Groups");
+        ActionListener groupListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int row = rowAtPoint(getVisibleRect().getLocation());
+                Track firstVisibleTrack;
+                do {
+                    firstVisibleTrack = playlist.get(row++);
+                } while (firstVisibleTrack instanceof Separator);
+
+                JMenuItem src = (JMenuItem) e.getSource();
+                Integer index = (Integer) src.getClientProperty("index");
+                if (index < groupItems.length - 1) {
+                    playlist.groupBy(groupValues[index]);
+                } else {
+                    Object ret = JOptionPane.showInputDialog(getParentFrame(),
+                            "Select formatting",
+                            config.getString("playlist.groupBy", playlist.getGroupBy()));
+                    if (ret != null) {
+                        playlist.groupBy(ret.toString());
+                        config.setString("playlist.groupBy", ret.toString());
+                    }
+                }
+
+                int firstVisibleIndex = playlist.indexOf(firstVisibleTrack);
+                if (firstVisibleIndex != -1) {
+                    Rectangle cellRect = getCellRect(firstVisibleIndex, 0, true);
+                    Rectangle visibleRect = getVisibleRect();
+                    cellRect.setSize(visibleRect.width, visibleRect.height);
+                    scrollRectToVisible(cellRect);
+                }
+
+                update();
+            }
+        };
+
+        for (int i = 0; i < groupItems.length; i++) {
+            String groupValue = groupItems[i];
+            if (groupValue == null) {
+                groups.addSeparator();
+                continue;
+            }
+
+            AbstractButton item = groups.add(groupValue);
+            item.addActionListener(groupListener);
+            item.putClientProperty("index", i);
+        }
+
+        headerMenu.add(groups);
+
+        JMenu sort = new JMenu("Sort");
+        String[] sortItems = {
+                "Sort by...", "Randomize", "Reverse",
+                "Sort by Artist", "Sort by Album",
+                "Sort by File Path", "Sort by Title",
+                "Sort by Track Number", "Sort by Album Artist/Year/Album/Disc/Track/File Name"
+        };
+
+        final String[] sortValues = {
+                null, null, null, "%artist%", "%album%",
+                "%file%", "%title%", "%trackNumber%",
+                "%albumArtist% - %year% - %album% - %discNumber% - %trackNumber% - %fileName%"
+        };
+
+        ActionListener sortListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem src = (JMenuItem) e.getSource();
+                Integer index = (Integer) src.getClientProperty("index");
+                switch (index) {
+                    case 0:
+                        Object ret = JOptionPane.showInputDialog(getParentFrame(),
+                                "Sort By...",
+                                config.getString("playlist.sortString", ""));
+                        if (ret != null) {
+                            playlist.sort(ret.toString());
+                            config.setString("playlist.sortString", ret.toString());
+                        }
+
+                        break;
+                    case 1:
+                        Collections.shuffle(playlist);
+                        playlist.firePlaylistChanged();
+                        break;
+                    case 2:
+                        Collections.reverse(playlist);
+                        playlist.firePlaylistChanged();
+                        break;
+                    default:
+                        playlist.sort(sortValues[index]);
+                }
+
+                update();
+            }
+        };
+
+        for (int i = 0; i < sortItems.length; i++) {
+            String sortValue = sortItems[i];
+            if (sortValue == null) {
+                sort.addSeparator();
+                continue;
+            }
+
+            AbstractButton item = sort.add(sortValue);
+            item.addActionListener(sortListener);
+            item.putClientProperty("index", i);
+        }
+
+        headerMenu.add(sort);
 
         header.addMouseListener(new MouseAdapter() {
             @Override

@@ -18,12 +18,13 @@
 package com.tulskiy.musique.playlist;
 
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
+import com.tulskiy.musique.playlist.formatting.Parser;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
+import com.tulskiy.musique.util.Util;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.MessageFormat;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -31,6 +32,10 @@ import java.util.logging.Logger;
  * @Date: Dec 30, 2009
  */
 public class Playlist extends ArrayList<Track> {
+    private static Parser parser = new Parser();
+
+    private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\"");
+
     private static final int VERSION = 1;
     private static String[] metaMap = {
             "artist", "album", "albumArtist", "title",
@@ -40,6 +45,28 @@ public class Playlist extends ArrayList<Track> {
 
     private Logger logger = Logger.getLogger(Playlist.class.getName());
     private String name;
+    private boolean sortAscending = true;
+    private String sortBy;
+    private String groupBy;
+    private Expression groupExpression;
+
+    public Playlist(String fmt) {
+        try {
+            Object[] objects = format.parse(fmt);
+            setName((String) objects[0]);
+            groupBy((String) objects[1]);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Playlist() {
+
+    }
+
+    public void cleanUp() {
+        removeAll(Collections.singleton(new SeparatorTrack(null, 0)));
+    }
 
     public void save(File file) {
         try {
@@ -78,10 +105,6 @@ public class Playlist extends ArrayList<Track> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private void cleanUp() {
-        removeAll(Collections.singleton(new SeparatorTrack(null, 0)));
     }
 
     public void load(File file) {
@@ -130,14 +153,120 @@ public class Playlist extends ArrayList<Track> {
         this.name = name;
     }
 
+    public String getGroupBy() {
+        return groupBy;
+    }
+
+    public void sort(String expression) {
+        cleanUp();
+
+        if (expression.equals(sortBy)) {
+            sortAscending = !sortAscending;
+        } else {
+            sortAscending = true;
+            sortBy = expression;
+        }
+
+        final Expression e = parser.parse(expression);
+        Collections.sort(this, new Comparator<Track>() {
+            @Override
+            public int compare(Track o1, Track o2) {
+                try {
+                    Object v1 = e.eval(o1);
+                    Object v2 = e.eval(o2);
+                    if (v1 != null && v2 != null) {
+                        int i = v1.toString().compareTo(v2.toString());
+                        if (!sortAscending)
+                            i = -i;
+                        return i;
+                    }
+                } catch (Exception ignored) {
+                }
+                return 0;
+            }
+        });
+
+        firePlaylistChanged();
+    }
+
+    public void groupBy(String expression) {
+        groupBy = expression;
+        groupExpression = Util.isEmpty(expression) ? null : parser.parse(expression);
+
+        regroup();
+    }
+
+    public void firePlaylistChanged() {
+        regroup();
+    }
+
+    public void regroup() {
+        cleanUp();
+
+        if (groupExpression == null)
+            return;
+
+        int start = 0;
+        int size = 0;
+        final String unknown = "?";
+        String groupName = null;
+        for (int i = 0; i < size(); i++) {
+            Track track = get(i);
+            Object o = groupExpression.eval(track);
+            String value = null;
+            if (o != null)
+                value = o.toString();
+
+            if (Util.isEmpty(value))
+                value = unknown;
+
+            if (groupName == null) {
+                groupName = value;
+                start = i;
+                size = 1;
+                continue;
+            }
+
+            //noinspection ConstantConditions
+            boolean sameGroup = value.equalsIgnoreCase(groupName);
+            if (sameGroup)
+                size++;
+
+            if (!sameGroup) {
+                if (size > 0) {
+                    addGroup(groupName, start, size);
+                } else {
+                    i--;
+                }
+
+                groupName = null;
+            }
+        }
+
+        if (groupName != null)
+            addGroup(groupName, start, size);
+    }
+
+    private void addGroup(String groupName, int start, int size) {
+        SeparatorTrack group = new SeparatorTrack(groupName, size);
+        add(start, group);
+    }
+
     @Override
-    public boolean equals(Object o) {
-        return o instanceof Playlist && this == o;
+    public Track get(int index) {
+        return index >= 0 && index < size() ? super.get(index) : null;
     }
 
     @Override
     public String toString() {
-        return name;
+        if (groupBy == null)
+            groupBy = "";
+        return format.format(new Object[]{name, groupBy});
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof Playlist && this == o;
     }
 }
 

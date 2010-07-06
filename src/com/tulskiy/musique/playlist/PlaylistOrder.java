@@ -59,6 +59,10 @@ public class PlaylistOrder implements PlaybackOrder {
         this.lastPlayed = lastPlayed;
     }
 
+    public Track getLastPlayed() {
+        return lastPlayed;
+    }
+
     public void enqueue(Track track, Playlist playlist) {
         queue.add(new QueueTuple(track, playlist));
         updateQueuePositions();

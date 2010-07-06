@@ -22,6 +22,7 @@ import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
+import com.tulskiy.musique.playlist.PlaylistOrder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -64,17 +65,6 @@ public class PlaylistPanel extends JPanel {
 
         tabs = new PlaylistTabs(columns);
         add(tabs, BorderLayout.CENTER);
-        JButton button = new JButton("Populate");
-        button.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Playlist playlist = tabs.getSelectedTable().getPlaylist();
-                for (int i = 0; i < playlist.size(); i += 20) {
-                    playlist.add(i, new SeparatorTrack("Separator #" + i, 15));
-                }
-            }
-        });
-        add(button, BorderLayout.SOUTH);
 
         PlaylistManager playlistManager = app.getPlaylistManager();
         ArrayList<Playlist> playlists = playlistManager.getPlaylists();
@@ -106,9 +96,13 @@ public class PlaylistPanel extends JPanel {
         tabs.setSelectedIndex(-1);
         tabs.setSelectedIndex(playlists.indexOf(playlist));
 
-        int lastPlayed = config.getInt("player.lastPlayed", -1);
-        if (lastPlayed >= 0 && lastPlayed < playlist.size()) {
-            tabs.getSelectedTable().setRowSelectionInterval(lastPlayed, lastPlayed);
+        PlaylistOrder order = (PlaylistOrder) app.getPlayer().getPlaybackOrder();
+        Track lastPlayed = order.getLastPlayed();
+
+        if (lastPlayed != null) {
+            PlaylistTable table = tabs.getSelectedTable();
+            int index = table.getPlaylist().indexOf(lastPlayed);
+            table.setRowSelectionInterval(index, index);
         }
     }
 
@@ -142,12 +136,6 @@ public class PlaylistPanel extends JPanel {
             list.add(t.getVisibleRect().y);
         }
         config.setList("playlist.tabs.bounds", list);
-
-        Track track = app.getPlayer().getSong();
-        if (track != null) {
-            int index = app.getPlaylistManager().getCurrentPlaylist().indexOf(track);
-            config.setInt("player.lastPlayed", index);
-        }
     }
 
     private JMenuItem newItem(String name, String hotkey, ActionListener al) {
