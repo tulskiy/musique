@@ -109,7 +109,7 @@ public class Player {
         return playerThread.getCurrentSample();
     }
 
-    public Track getSong() {
+    public Track getTrack() {
         return playerThread.currentTrack;
     }
 
@@ -372,7 +372,7 @@ public class Player {
                 }
 
                 if (track != null) {
-                    if (!track.getFile().exists()) {
+                    if (track.isFile() && !track.getFile().exists()) {
                         decoder = null;
                         return;
                     }
@@ -385,7 +385,8 @@ public class Player {
                         return;
                     }
 
-                    decoder.seekSample(track.getStartPosition());
+                    if (track.getStartPosition() > 0)
+                        decoder.seekSample(track.getStartPosition());
                     if (track.getSubsongIndex() > 0) {
                         cueTotalBytes = AudioMath.samplesToBytes(track.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
                     } else {

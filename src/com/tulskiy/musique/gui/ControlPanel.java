@@ -37,7 +37,7 @@ import java.awt.event.*;
  */
 public class ControlPanel extends JPanel {
     private Application app = Application.getInstance();
-    private JSlider progressSlider = new JSlider();
+    private JSlider progressSlider;
     private JSlider volumeSlider;
     private JButton prevButton = new JButton();
     private JButton nextButton = new JButton();
@@ -47,17 +47,21 @@ public class ControlPanel extends JPanel {
     private Player player = app.getPlayer();
 
     private Popup popup;
-    private JToolTip toolTip = progressSlider.createToolTip();
+    private JToolTip toolTip;
     private PopupFactory popupFactory = PopupFactory.getSharedInstance();
 
     private boolean isSeeking = false;
+    private boolean progressEnabled = false;
 
     public ControlPanel() {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray));
 
+        progressSlider = new JSlider();
         progressSlider.setValue(0);
         progressSlider.setFocusable(false);
+        toolTip = progressSlider.createToolTip();
+
         for (MouseListener ml : progressSlider.getMouseListeners())
             progressSlider.removeMouseListener(ml);
 
@@ -130,9 +134,23 @@ public class ControlPanel extends JPanel {
             }
         });
 
+        volumeSlider.addMouseWheelListener(new MouseWheelListener() {
+            @Override
+            public void mouseWheelMoved(MouseWheelEvent e) {
+                int value = volumeSlider.getValue();
+                if (e.getWheelRotation() > 0)
+                    value -= 5;
+                else
+                    value += 5;
+                volumeSlider.setValue(value);
+            }
+        });
+
         progressSlider.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                if (!progressEnabled)
+                    return;
                 hideToolTip();
                 showToolTip(e);
             }
@@ -140,12 +158,16 @@ public class ControlPanel extends JPanel {
 
         progressSlider.addMouseListener(new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
+                if (!progressEnabled)
+                    return;
                 hideToolTip();
                 player.seek(progressSlider.getValue());
                 isSeeking = false;
             }
 
             public void mousePressed(MouseEvent e) {
+                if (!progressEnabled)
+                    return;
                 isSeeking = true;
                 progressSlider.setValue(getSliderValueForX(progressSlider, e.getX()));
                 hideToolTip();
@@ -156,6 +178,8 @@ public class ControlPanel extends JPanel {
         progressSlider.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
+                if (!progressEnabled)
+                    return;
                 progressSlider.setValue(getSliderValueForX(progressSlider, e.getX()));
             }
         });
@@ -193,12 +217,20 @@ public class ControlPanel extends JPanel {
             public void onEvent(PlayerEvent e) {
                 switch (e.getEventCode()) {
                     case STOPPED:
+                        progressEnabled = false;
                         progressSlider.setValue(progressSlider.getMinimum());
                         break;
                     case FILE_OPENED:
-                        Track track = player.getSong();
-                        if (track != null)
-                            progressSlider.setMaximum((int) track.getTotalSamples());
+                        Track track = player.getTrack();
+                        if (track != null) {
+                            int max = (int) track.getTotalSamples();
+                            if (max == -1) {
+                                progressEnabled = false;
+                            } else {
+                                progressEnabled = true;
+                                progressSlider.setMaximum(max);
+                            }
+                        }
                         progressSlider.setValue((int) player.getCurrentSample());
                         break;
                 }
@@ -207,7 +239,7 @@ public class ControlPanel extends JPanel {
 
         GlobalTimer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (player.isPlaying() && !isSeeking) {
+                if (progressEnabled && player.isPlaying() && !isSeeking) {
                     progressSlider.setValue((int) player.getCurrentSample());
                 }
             }
@@ -215,7 +247,7 @@ public class ControlPanel extends JPanel {
     }
 
     private void showToolTip(MouseEvent e) {
-        Track s = player.getSong();
+        Track s = player.getTrack();
         if (s != null) {
             toolTip.setTipText(Util.samplesToTime(progressSlider.getValue() - progressSlider.getMinimum(), s.getSampleRate(), 1));
             int x = e.getXOnScreen();

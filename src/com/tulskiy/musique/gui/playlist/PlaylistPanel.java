@@ -18,6 +18,9 @@
 package com.tulskiy.musique.gui.playlist;
 
 import com.tulskiy.musique.audio.player.PlaybackOrder;
+import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.audio.player.PlayerEvent;
+import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
 import com.tulskiy.musique.playlist.Playlist;
@@ -26,6 +29,7 @@ import com.tulskiy.musique.playlist.PlaylistOrder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import javax.swing.table.TableColumn;
@@ -91,7 +95,7 @@ public class PlaylistPanel extends JPanel {
             tabs.add(pl.getName(), newTable.getScrollPane());
         }
 
-        Playlist playlist = playlistManager.getCurrentPlaylist();
+        final Playlist playlist = playlistManager.getCurrentPlaylist();
 
         tabs.setSelectedIndex(-1);
         tabs.setSelectedIndex(playlists.indexOf(playlist));
@@ -101,9 +105,34 @@ public class PlaylistPanel extends JPanel {
 
         if (lastPlayed != null) {
             PlaylistTable table = tabs.getSelectedTable();
-            int index = table.getPlaylist().indexOf(lastPlayed);
-            table.setRowSelectionInterval(index, index);
+            if (table != null) {
+                int index = table.getPlaylist().indexOf(lastPlayed);
+                table.setRowSelectionInterval(index, index);
+            }
         }
+
+        final Player player = app.getPlayer();
+
+        final Timer update = new Timer(1000, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table != null)
+                    table.update();
+            }
+        });
+
+        player.addListener(new PlayerListener() {
+            @Override
+            public void onEvent(PlayerEvent e) {
+                Track track = player.getTrack();
+                if (track != null && track.isStream()) {
+                    update.start();
+                } else {
+                    update.stop();
+                }
+            }
+        });
     }
 
     private ArrayList<PlaylistColumn> loadColumns() {
@@ -194,6 +223,19 @@ public class PlaylistPanel extends JPanel {
                 table.update();
             }
         });
+        fileMenu.add("Add Location").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String ret = JOptionPane.showInputDialog("Add Location");
+                if (!Util.isEmpty(ret)) {
+                    PlaylistTable table = tabs.getSelectedTable();
+                    if (table == null)
+                        return;
+                    table.getPlaylist().addLocation(ret);
+                    table.update();
+                }
+            }
+        });
         fileMenu.addSeparator();
         fileMenu.add(newItem("Quit", "ctrl Q", new ActionListener() {
             @Override
@@ -206,6 +248,8 @@ public class PlaylistPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 PlaylistTable table = tabs.getSelectedTable();
+                if (table == null)
+                    return;
                 table.getPlaylist().clear();
                 table.update();
             }
@@ -216,7 +260,10 @@ public class PlaylistPanel extends JPanel {
         editMenu.add(newItem("Search", "ctrl F", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SearchDialog(tabs.getSelectedTable()).setVisible(true);
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table == null)
+                    return;
+                new SearchDialog(table).setVisible(true);
             }
         }));
 

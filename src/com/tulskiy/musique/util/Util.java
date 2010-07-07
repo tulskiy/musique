@@ -36,6 +36,8 @@ import java.util.*;
  */
 public class Util {
     public static String samplesToTime(long samples, int sampleRate, int precision) {
+        if (samples == -1 || sampleRate == 0)
+            return "-:--";
         double seconds = AudioMath.samplesToMillis(samples, sampleRate) / 1000d;
         int min = (int) (seconds / 60);
         int hrs = min / 60;

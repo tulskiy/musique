@@ -50,7 +50,7 @@ public abstract class AudioFileReader {
 
     public Track readSingle(File file) {
         Track s = new Track();
-        s.setFile(file);
+        s.setLocation(file.toURI());
         return readSingle(s);
     }
 

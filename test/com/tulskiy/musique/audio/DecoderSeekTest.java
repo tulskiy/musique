@@ -46,7 +46,7 @@ public class DecoderSeekTest {
         assertNotNull("Decoder is null", decoder);
         assertTrue("Decoder returned an error", this.decoder.open(track));
         totalSamples = track.getTotalSamples();
-        System.out.println("File: " + track.getFile().getName() + ", Total samples: " + totalSamples);
+        System.out.println("File: " + track.getLocation().getPath() + ", Total samples: " + totalSamples);
     }
 
     public void start() {
@@ -61,7 +61,7 @@ public class DecoderSeekTest {
             ref.waveFile.Close();
             System.out.println("Done first decoder pass. Samples decoded: " + ref.currentSample);
 //            assertTrue(totalSamples >= ref.currentSample);
-//            assertEquals(totalSamples, ref.currentSample);
+            assertEquals(totalSamples, ref.currentSample);
             if (totalSamples != ref.currentSample) {
                 System.out.println("Warning: decoded less samples than declared");
                 totalSamples = ref.currentSample;

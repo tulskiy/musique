@@ -101,7 +101,7 @@ public class Methods {
     }
 
     public Object isPlaying(Track track, ArrayList<Expression> args) {
-        if (app.getPlayer().getSong() == track) {
+        if (app.getPlayer().getTrack() == track) {
             if (app.getPlayer().isPaused())
                 return pausedIcon;
             if (app.getPlayer().isPlaying())

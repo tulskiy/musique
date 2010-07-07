@@ -17,14 +17,19 @@
 
 package com.tulskiy.musique.audio.formats.ogg;
 
+import com.jcraft.jorbis.Comment;
 import com.jcraft.jorbis.Info;
-import com.jcraft.jorbis.JOrbisException;
 import com.jcraft.jorbis.VorbisFile;
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
 
 import javax.sound.sampled.AudioFormat;
+import java.io.BufferedInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 
 /**
  * @Author: Denis Tulskiy
@@ -33,16 +38,64 @@ import java.io.IOException;
 public class VorbisDecoder implements Decoder {
     private VorbisFile vorbisFile;
     private AudioFormat audioFormat;
+    private boolean streaming = false;
+    private Track track;
 
     public boolean open(Track track) {
         try {
-            vorbisFile = new VorbisFile(track.getFile().getAbsolutePath());
+            this.track = track;
+            URI location = track.getLocation();
+            if (location.getScheme().equals("file")) {
+                //it's a file
+                vorbisFile = new VorbisFile(track.getFile().getAbsolutePath());
+                streaming = false;
+            } else {
+                URL url = location.toURL();
+                URLConnection urlConnection = url.openConnection();
+                if (!urlConnection.getContentType().equals("application/ogg")) {
+                    return false;
+                }
+                InputStream is = urlConnection.getInputStream();
+                BufferedInputStream bis = new BufferedInputStream(is);
+                vorbisFile = new VorbisFile(bis, null, 0);
+                streaming = true;
+                reloadComments(track);
+            }
             Info info = vorbisFile.getInfo()[0];
+            track.setSampleRate(info.rate);
+            track.setChannels(info.channels);
             audioFormat = new AudioFormat(info.rate, 16, info.channels, true, false);
-        } catch (JOrbisException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
         return true;
+    }
+
+    private void reloadComments(Track track) {
+        try {
+            Comment[] comments = vorbisFile.getComment();
+            for (Comment c : comments) {
+                for (int i = 0; i < c.comments; i++) {
+                    byte[] data = c.user_comments[i];
+                    String comment = new String(data, 0, data.length - 1, "UTF-8");
+                    String[] strings = comment.split("=");
+                    String key = strings[0].toLowerCase();
+                    String value = strings[1];
+
+                    if (key.equals("tracknumber"))
+                        track.setTrackNumber(value);
+                    else if (key.equals("albumartist"))
+                        track.setAlbumArtist(value);
+                    else if (key.equals("date"))
+                        track.setYear(value);
+                    else
+                        track.setMeta(key, value);
+                }
+            }
+        } catch (Exception e) {
+//            e.printStackTrace();
+        }
     }
 
     public AudioFormat getAudioFormat() {
@@ -55,8 +108,16 @@ public class VorbisDecoder implements Decoder {
 
     public int decode(byte[] buf) {
         int ret = vorbisFile.read(buf, buf.length);
-        if (ret <= 0)
+        if (ret <= 0) {
+            //it's a stream, open it again
+            if (streaming) {
+                if (!open(track))
+                    return -1;
+                else
+                    return 0;
+            }
             return -1;
+        }
         return ret;
     }
 

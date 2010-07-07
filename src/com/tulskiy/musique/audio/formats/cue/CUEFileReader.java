@@ -44,7 +44,7 @@ public class CUEFileReader extends AudioFileReader {
 
     public void read(File f, List<Track> list) {
         Track track = new Track();
-        track.setFile(f);
+        track.setLocation(f.toURI());
         if (cueParser == null)
             cueParser = new CUEParser();
         try {

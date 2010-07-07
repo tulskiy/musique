@@ -17,17 +17,17 @@
 
 package com.tulskiy.musique.audio.formats.mp3;
 
-import com.tulskiy.musique.playlist.*;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.AudioMath;
 import javazoom.jl.decoder.*;
-import javazoom.jl.decoder.Header;
 
 import javax.sound.sampled.AudioFormat;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
+import java.net.URI;
+import java.net.URLConnection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * @Author: Denis Tulskiy
@@ -41,6 +41,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             return size() > 10;
         }
     };
+    private static final Logger logger = Logger.getLogger(MP3Decoder.class.getName());
 
     private Bitstream bitstream;
     private javazoom.jl.decoder.Decoder decoder;
@@ -55,6 +56,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     private int sampleOffset = 0;
     private int encDelay;
     private long currentSample;
+    private boolean streaming = false;
 
     private Header skipFrame() throws BitstreamException {
         readFrame = bitstream.readFrame();
@@ -132,30 +134,148 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         return false;
     }
 
-    public boolean open(Track track) {
+    public String readLine(InputStream is) {
+        try {
+            int ch = is.read();
+
+            StringBuilder sb = new StringBuilder();
+            while (ch != '\n' && ch != '\r' && ch >= 0) {
+                sb.append((char) ch);
+                ch = is.read();
+            }
+
+            if (ch == '\n' || ch == '\r') {
+                //noinspection ResultOfMethodCallIgnored
+                is.read();
+            }
+            return sb.toString();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public boolean open(final Track track) {
         if (track == null)
             return false;
         this.inputFile = track;
         try {
-            streamSize = inputFile.getFile().length();
-            FileInputStream fis = new FileInputStream(inputFile.getFile());
-            Bitstream bs = new Bitstream(fis);
-            Header header = bs.readFrame();
+            URI location = track.getLocation();
+            InputStream fis;
+            if (location.getScheme().equals("file")) {
+                logger.info("Opening file: " + location);
+                streaming = false;
+                fis = new FileInputStream(inputFile.getFile());
+                streamSize = inputFile.getFile().length();
+            } else {
+                logger.info("Opening stream: " + location);
+                streaming = true;
+                URLConnection urlConnection = location.toURL().openConnection();
+                urlConnection.setRequestProperty("Icy-MetaData", "1");
+                fis = urlConnection.getInputStream();
+
+                String metaIntString = null;
+                String contentType = urlConnection.getContentType();
+                if (!contentType.equals("audio/mpeg")) {
+                    if (contentType.equals("unknown/unknown")) {
+                        //Java does not parse non-standart headers
+                        //used by SHOUTCast
+                        logger.fine("Reading SHOUTCast response");
+                        String s = readLine(fis);
+                        if (!s.equals("ICY 200 OK")) {
+                            logger.warning("SHOUTCast invalid response: " + s);
+                            return false;
+                        }
+
+                        while (true) {
+                            s = readLine(fis);
+
+                            if (s.isEmpty()) {
+                                break;
+                            }
+
+                            String[] ss = s.split(":");
+                            if (ss[0].equals("icy-metaint")) {
+                                metaIntString = ss[1];
+                            } else if (ss[0].equals("icy-genre")) {
+                                track.setGenre(ss[1]);
+                            } else if (ss[0].equals("icy-name")) {
+                                track.setAlbum(ss[1]);
+                            }
+                        }
+                    } else {
+                        return false;
+                    }
+                } else {
+                    metaIntString = urlConnection.getHeaderField("icy-metaint");
+                    track.setGenre(urlConnection.getHeaderField("icy-genre"));
+                    track.setAlbum(urlConnection.getHeaderField("icy-name"));
+                }
+                final int metaInt = Integer.valueOf(metaIntString);
+                if (metaInt > 0) {
+                    fis = new FilterInputStream(fis) {
+                        private int count = 0;
+
+                        @Override
+                        public int read(byte[] b, int off, int len) throws IOException {
+                            int bytesToMeta = metaInt - count;
+                            if (bytesToMeta == 0) {
+                                int size = read() * 16;
+                                if (size > 1) {
+                                    byte[] meta = new byte[size];
+                                    int i = super.read(meta, 0, size);
+                                    String metaString = new String(meta, 0, i, "UTF-8");
+                                    String title = "StreamTitle='";
+                                    if (metaString.startsWith(title)) {
+                                        String[] ss = metaString.substring(title.length(), metaString.indexOf(";") - 1).split(" - ");
+                                        if (ss.length > 0) {
+                                            if (ss.length > 1) {
+                                                track.setArtist(ss[0]);
+                                                track.setTitle(ss[1]);
+                                            } else {
+                                                track.setTitle(ss[0]);
+                                            }
+                                        }
+                                    }
+                                }
+                                count = 0;
+                            }
+
+                            if (bytesToMeta > 0 && bytesToMeta < len)
+                                len = bytesToMeta;
+
+                            int read = super.read(b, off, len);
+                            count += read;
+                            return read;
+                        }
+                    };
+                }
+
+                decoder = new Decoder();
+            }
+            bitstream = new Bitstream(fis);
+            Header header = bitstream.readFrame();
             encDelay = header.getEncDelay();
             int encPadding = header.getEncPadding();
+            int sampleRate = header.frequency();
+            int channels = header.mode() == Header.SINGLE_CHANNEL ? 1 : 2;
+            track.setSampleRate(sampleRate);
+            track.setChannels(channels);
             samplesPerFrame = (int) (header.ms_per_frame() * header.frequency() / 1000);
-            totalSamples = samplesPerFrame * (header.max_number_of_frames(streamSize) + header.min_number_of_frames(streamSize)) / 2;
-            if (encPadding < totalSamples)
-                totalSamples -= encPadding;
-            totalSamples -= encDelay;
-            bs.close();
-            fis.close();
-            int sampleRate = track.getSampleRate();
-            int channels = track.getChannels();
             audioFormat = new AudioFormat(sampleRate, 16, channels, true, false);
-            createBitstream(0);
-            currentSample = 0;
 
+            if (!streaming) {
+                totalSamples = samplesPerFrame * (header.max_number_of_frames(streamSize) + header.min_number_of_frames(streamSize)) / 2;
+                if (encPadding < totalSamples) {
+                    totalSamples -= encPadding;
+                }
+                totalSamples -= encDelay;
+                bitstream.close();
+                fis.close();
+                createBitstream(0);
+            }
+
+            currentSample = 0;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -179,7 +299,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             if (readFrame == null) {
                 return -1;
             }
-            if (currentSample >= totalSamples)
+            if (!streaming && currentSample >= totalSamples)
                 return -1;
             SampleBuffer output = (SampleBuffer) decoder.decodeFrame(readFrame, bitstream);
             bitstream.closeFrame();
@@ -192,7 +312,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             toByteArray(output.getBuffer(), 0, output.getBufferLength());
             currentSample += AudioMath.bytesToSamples(len, audioFormat.getFrameSize());
 
-            if (currentSample > totalSamples) {
+            if (!streaming && currentSample > totalSamples) {
                 len -= AudioMath.samplesToBytes(currentSample - totalSamples, audioFormat.getFrameSize());
             }
             System.arraycopy(buffer, sampleOffset, buf, 0, len);

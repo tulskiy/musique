@@ -63,7 +63,7 @@ public class StatusBar extends JPanel {
         GlobalTimer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (player.isPlaying()) {
-                    Track track = player.getSong();
+                    Track track = player.getTrack();
                     String s = Util.samplesToTime(player.getCurrentSample(), track.getSampleRate(), 0);
                     s += " / " + Util.samplesToTime(track.getTotalSamples(), track.getSampleRate(), 0);
                     time.setText(s);

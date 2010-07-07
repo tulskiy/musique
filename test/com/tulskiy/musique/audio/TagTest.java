@@ -105,7 +105,7 @@ public class TagTest {
         File file = new File(name);
         File fo = new File("testfiles/temp." + Util.getFileExt(name));
         copy(file, fo);
-        track.setFile(fo);
+        track.setLocation(fo.toURI());
         getAudioFileWriter(fo.getName()).write(track);
 
         testRead(fo.getPath());

@@ -187,6 +187,7 @@ public class PlaylistTabs extends JTabbedPane {
         if (!Util.isEmpty(name)) {
             Playlist playlist = playlistManager.addPlaylist(name);
             addPlaylist(playlist);
+            setSelectedIndex(getTabCount() - 1);
         }
     }
 

@@ -130,7 +130,7 @@ public class PlaylistTable extends GroupTable {
         aMap.put("showNowPlaying", new AbstractAction("Scroll to Now Playing") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                scrollToSong(player.getSong());
+                scrollToSong(player.getTrack());
             }
         });
         aMap.put("removeSelected", new AbstractAction("Remove") {

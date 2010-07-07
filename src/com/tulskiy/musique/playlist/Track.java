@@ -17,10 +17,10 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.playlist.formatting.tokens.Methods;
 import com.tulskiy.musique.util.Util;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Formatter;
 import java.util.Random;
 
@@ -59,7 +59,7 @@ public class Track implements Cloneable {
     private int subsongIndex;
     private long startPosition;
     private long totalSamples;
-    private File file;
+    private URI location;
 
     //runtime stuff
     private String cueSheet;
@@ -151,13 +151,25 @@ public class Track implements Cloneable {
         this.totalSamples = totalSamples;
     }
 
-    public File getFile() {
-        return file;
+    public URI getLocation() {
+        return location;
     }
 
-    public void setFile(File file) {
-        this.file = file;
-        fileName = Util.removeExt(file.getName());
+    public void setLocation(URI location) {
+        this.location = location;
+        fileName = Util.removeExt(location.getPath());
+    }
+
+    public File getFile() {
+        return isFile() ? new File(location) : null;
+    }
+
+    public boolean isFile() {
+        return "file".equals(location.getScheme());
+    }
+
+    public boolean isStream() {
+        return "http".equals(location.getScheme());
     }
 
     public String getArtist() {
@@ -345,7 +357,25 @@ public class Track implements Cloneable {
         try {
             getClass().getDeclaredField(key).set(this, value);
         } catch (Exception ignored) {
-            ignored.printStackTrace();
+//            ignored.printStackTrace();
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Track{" +
+               "artist='" + artist + '\'' +
+               ", album='" + album + '\'' +
+               ", title='" + title + '\'' +
+               ", albumArtist='" + albumArtist + '\'' +
+               ", trackNumber='" + trackNumber + '\'' +
+               ", year='" + year + '\'' +
+               ", genre='" + genre + '\'' +
+               ", sampleRate=" + sampleRate +
+               ", channels=" + channels +
+               ", subsongIndex=" + subsongIndex +
+               ", length='" + length + '\'' +
+               ", location=" + location +
+               '}';
     }
 }

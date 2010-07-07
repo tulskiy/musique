@@ -103,7 +103,7 @@ public class PlaylistManager {
         config.setList("playlists", playlists);
         config.setInt("playlist.currentPlaylist", playlists.indexOf(currentPlaylist));
 
-        Track lastPlayed = app.getPlayer().getSong();
+        Track lastPlayed = app.getPlayer().getTrack();
         if (lastPlayed != null) {
             int index = currentPlaylist.indexOf(lastPlayed);
             config.setInt("player.lastPlayed", index);

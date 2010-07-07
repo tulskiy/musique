@@ -20,9 +20,12 @@ package com.tulskiy.musique.playlist;
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
+import com.tulskiy.musique.system.Main;
 import com.tulskiy.musique.util.Util;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -43,7 +46,7 @@ public class Playlist extends ArrayList<Track> {
             "year", "genre", "comment"
     };
 
-    private Logger logger = Logger.getLogger(Playlist.class.getName());
+    private static final Logger logger = Logger.getLogger(Playlist.class.getName());
     private String name;
     private boolean sortAscending = true;
     private String sortBy;
@@ -79,7 +82,7 @@ public class Playlist extends ArrayList<Track> {
             dos.writeInt(size());
             HashMap<String, String> meta = new HashMap<String, String>();
             for (Track track : this) {
-                dos.writeUTF(track.getFile().getAbsolutePath());
+                dos.writeUTF(track.getLocation().toString());
                 dos.writeLong(track.getStartPosition());
                 dos.writeLong(track.getTotalSamples());
                 dos.writeInt(track.getBps());
@@ -121,7 +124,7 @@ public class Playlist extends ArrayList<Track> {
             int size = dis.readInt();
             for (int i = 0; i < size; i++) {
                 Track track = new Track();
-                track.setFile(new File(dis.readUTF()));
+                track.setLocation(new URI(dis.readUTF()));
                 track.setStartPosition(dis.readLong());
                 track.setTotalSamples(dis.readLong());
                 track.setBps(dis.readInt());
@@ -140,7 +143,7 @@ public class Playlist extends ArrayList<Track> {
             }
 
             dis.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.warning("Failed to load playlist " + file.getName());
         }
     }
@@ -155,6 +158,29 @@ public class Playlist extends ArrayList<Track> {
 
     public String getGroupBy() {
         return groupBy;
+    }
+
+    public void addLocation(String location) {
+        try {
+            URI loc = new URI(location);
+
+            String scheme = loc.getScheme();
+            if ("http".equals(scheme)) {
+                Track track = new Track();
+
+                String title = loc.getPath();
+                if (Util.isEmpty(title))
+                    title = loc.getHost();
+                track.setTitle(title);
+                track.setLocation(loc);
+                track.setTotalSamples(-1);
+                add(track);
+            } else if (scheme == null || "file".equals(scheme)) {
+
+            }
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sort(String expression) {

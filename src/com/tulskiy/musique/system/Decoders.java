@@ -27,7 +27,11 @@ import com.tulskiy.musique.audio.formats.wavpack.WavPackDecoder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.logging.Logger;
 
 /**
  * @Author: Denis Tulskiy
@@ -35,6 +39,7 @@ import java.util.HashMap;
  */
 public class Decoders {
     private static HashMap<String, Decoder> decoders = new HashMap<String, Decoder>();
+    private static final Logger logger = Logger.getLogger(Decoders.class.getName());
 
     static {
         decoders.put("mp3", new MP3Decoder());
@@ -49,7 +54,28 @@ public class Decoders {
     }
 
     public static Decoder getDecoder(Track track) {
-        String ext = Util.getFileExt(track.getFile()).toLowerCase();
+        URI location = track.getLocation();
+        if ("http".equals(location.getScheme())) {
+            try {
+                URLConnection con = location.toURL().openConnection();
+                String contentType = con.getContentType();
+
+                if ("audio/mpeg".equals(contentType) || "unknown/unknown".equals(contentType)) {
+                    // if ContentType is unknown, it is probably
+                    // shoutcast, let mp3 decoder decide
+                    return decoders.get("mp3");
+                }
+
+                if ("application/ogg".equals(contentType)) {
+                    return decoders.get("ogg");
+                }
+                logger.warning("Unsupported ContentType: " + contentType);
+                return null;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        String ext = Util.getFileExt(location.toString()).toLowerCase();
         return decoders.get(ext);
     }
 }
