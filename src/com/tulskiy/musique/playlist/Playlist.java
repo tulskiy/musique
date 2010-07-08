@@ -40,6 +40,7 @@ public class Playlist extends ArrayList<Track> {
     private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\"");
 
     private static final int VERSION = 1;
+    private static final byte[] MAGIC = "BARABASHKA".getBytes();
     private static String[] metaMap = {
             "artist", "album", "albumArtist", "title",
             "trackNumber", "totalTracks", "discNumber", "totalDiscs",
@@ -78,6 +79,7 @@ public class Playlist extends ArrayList<Track> {
 
             DataOutputStream dos = new DataOutputStream(
                     new BufferedOutputStream(new FileOutputStream(file)));
+            dos.write(MAGIC);
             dos.writeInt(VERSION);
             dos.writeInt(size());
             HashMap<String, String> meta = new HashMap<String, String>();
@@ -116,10 +118,16 @@ public class Playlist extends ArrayList<Track> {
             DataInputStream dis = new DataInputStream(
                     new BufferedInputStream(new FileInputStream(file)));
 
+            byte[] b = new byte[MAGIC.length];
+            dis.readFully(b);
+            if (!Arrays.equals(b, MAGIC)) {
+                logger.warning("Wrong magic word");
+                throw new RuntimeException();
+            }
             int version = dis.readInt();
             if (version != VERSION) {
-                logger.severe("Wrong playlist version: " + version);
-                return;
+                logger.warning("Wrong playlist version: " + version);
+                throw new RuntimeException();
             }
             int size = dis.readInt();
             for (int i = 0; i < size; i++) {
