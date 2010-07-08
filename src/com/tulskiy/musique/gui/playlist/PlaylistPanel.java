@@ -32,6 +32,7 @@ import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -197,8 +198,11 @@ public class PlaylistPanel extends JPanel {
         menuBar.add(playbackMenu);
 
         ActionMap tMap = tabs.getActionMap();
-        fileMenu.add(tMap.get("newPlaylist"));
+        fileMenu.add(tMap.get("newPlaylist")).setAccelerator(KeyStroke.getKeyStroke("ctrl N"));
         fileMenu.add(tMap.get("removePlaylist"));
+        fileMenu.add(tMap.get("loadPlaylist"));
+        fileMenu.add(tMap.get("savePlaylist")).setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
+
         fileMenu.addSeparator();
         fileMenu.add("Add Files").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {

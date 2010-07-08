@@ -20,17 +20,20 @@ package com.tulskiy.musique.gui.playlist;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.io.File;
 import java.util.ArrayList;
 
 /**
@@ -42,6 +45,7 @@ public class PlaylistTabs extends JTabbedPane {
     private ArrayList<PlaylistColumn> columns;
 
     private Application app = Application.getInstance();
+    private Configuration config = app.getConfiguration();
     private PlaylistManager playlistManager = app.getPlaylistManager();
 
     private PlaylistTable selectedTable;
@@ -122,7 +126,7 @@ public class PlaylistTabs extends JTabbedPane {
     private void createPopupMenu() {
         final JPopupMenu tabMenu = new JPopupMenu();
         ActionMap aMap = getActionMap();
-        aMap.put("newPlaylist", new AbstractAction("New Playlist") {
+        aMap.put("newPlaylist", new AbstractAction("Add New Playlist") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String name = JOptionPane.showInputDialog("Enter Playlist Name", "New Playlist");
@@ -156,10 +160,51 @@ public class PlaylistTabs extends JTabbedPane {
                 }
             }
         });
+        aMap.put("savePlaylist", new AbstractAction("Save Playlist") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser();
+                String path = config.getString("playlist.lastDir", "");
+                if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fc.setFileFilter(new FileNameExtensionFilter("Musique Playlist", "mus"));
+                Playlist playlist = selectedTable.getPlaylist();
+                String fileName = playlist.getName().toLowerCase().replaceAll("\\s+", "_") + ".mus";
+                fc.setSelectedFile(new File(fileName));
+
+                int ret = fc.showSaveDialog(getParent());
+                if (ret == JFileChooser.APPROVE_OPTION) {
+                    playlist.save(fc.getSelectedFile());
+                    config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
+                }
+            }
+        });
+        aMap.put("loadPlaylist", new AbstractAction("Load Playlist") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser fc = new JFileChooser();
+                String path = config.getString("playlist.lastDir", "");
+                if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                fc.setFileFilter(new FileNameExtensionFilter("Musique Playlist", "mus"));
+
+                int ret = fc.showOpenDialog(getParent());
+                if (ret == JFileChooser.APPROVE_OPTION) {
+                    File file = fc.getSelectedFile();
+                    Playlist playlist = addPlaylist(Util.removeExt(file.getName()));
+                    playlist.load(file);
+                    selectedTable.update();
+                    config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
+                }
+            }
+        });
 
         tabMenu.add(aMap.get("newPlaylist"));
         tabMenu.add(aMap.get("renamePlaylist"));
         tabMenu.add(aMap.get("removePlaylist"));
+        tabMenu.addSeparator();
+        tabMenu.add(aMap.get("savePlaylist"));
+        tabMenu.add(aMap.get("loadPlaylist"));
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -183,12 +228,14 @@ public class PlaylistTabs extends JTabbedPane {
         });
     }
 
-    public void addPlaylist(String name) {
+    public Playlist addPlaylist(String name) {
         if (!Util.isEmpty(name)) {
             Playlist playlist = playlistManager.addPlaylist(name);
             addPlaylist(playlist);
             setSelectedIndex(getTabCount() - 1);
+            return playlist;
         }
+        return null;
     }
 
     public void addPlaylist(Playlist playlist) {

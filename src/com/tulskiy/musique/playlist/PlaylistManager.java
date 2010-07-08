@@ -56,7 +56,7 @@ public class PlaylistManager {
         for (int i = 0; i < list.size(); i++) {
             String fmt = list.get(i);
             Playlist playlist = new Playlist(fmt);
-            playlist.load(new File(PLAYLISTS_PATH + i + ".dat"));
+            playlist.load(new File(PLAYLISTS_PATH + i + ".mus"));
             playlists.add(playlist);
         }
 
@@ -97,7 +97,7 @@ public class PlaylistManager {
 
         for (int i = 0; i < playlists.size(); i++) {
             Playlist playlist = playlists.get(i);
-            playlist.save(new File(PLAYLISTS_PATH + i + ".dat"));
+            playlist.save(new File(PLAYLISTS_PATH + i + ".mus"));
         }
 
         config.setList("playlists", playlists);
