@@ -38,7 +38,7 @@ public class ProgressDialog extends JDialog {
     private TagProcessor tagProcessor;
 
     public ProgressDialog(Frame owner, String message) {
-        super(owner, message, true);
+        super(owner, message, false);
 
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setSize(400, 100);

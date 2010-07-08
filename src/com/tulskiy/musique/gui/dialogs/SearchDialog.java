@@ -41,7 +41,7 @@ public class SearchDialog extends JDialog {
     private Playlist playlist;
 
     public SearchDialog(final PlaylistTable playlistTable) {
-        super(playlistTable.getParentFrame(), "Search", true);
+        super(playlistTable.getParentFrame(), "Search", false);
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setSize(600, 300);
         setLocationRelativeTo(playlistTable.getParentFrame());
