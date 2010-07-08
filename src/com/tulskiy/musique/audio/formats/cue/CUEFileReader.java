@@ -33,14 +33,6 @@ import java.util.List;
  */
 public class CUEFileReader extends AudioFileReader {
     private static CUEParser cueParser;
-    private Charset charset;
-
-    public CUEFileReader() {
-        //todo fix me! Throws an exception when running from a test
-//        Configuration conf = Application.getInstance().getConfiguration();
-//        String enc = conf.getString("cue.externalEncoding", "windows-1251");
-        charset = Charset.forName("windows-1251");
-    }
 
     public void read(File f, List<Track> list) {
         Track track = new Track();
@@ -50,7 +42,7 @@ public class CUEFileReader extends AudioFileReader {
         try {
             LineNumberReader numberReader = new LineNumberReader(
                     new InputStreamReader(
-                            new FileInputStream(f), charset));
+                            new FileInputStream(f), defaultCharset));
             cueParser.parse(list, track, numberReader, false);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -26,7 +26,9 @@ import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.audio.mp3.XingFrame;
 import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.TagOptionSingleton;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import java.io.IOException;
 
@@ -41,6 +43,7 @@ public class MP3FileReader extends AudioFileReader {
     private APETagProcessor apeTagProcessor = new APETagProcessor();
 
     public Track readSingle(Track track) {
+        TextEncoding.getInstanceOf().setDefaultNonUnicode(defaultCharset.name());
         MP3File mp3File = null;
         try {
             mp3File = new MP3File(track.getFile(), MP3File.LOAD_IDV2TAG, true);

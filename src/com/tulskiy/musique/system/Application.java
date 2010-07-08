@@ -21,11 +21,13 @@
  */
 package com.tulskiy.musique.system;
 
+import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
 
 import javax.swing.*;
+import java.nio.charset.Charset;
 
 public class Application {
     private static Application ourInstance = new Application();
@@ -59,6 +61,12 @@ public class Application {
     private void loadSettings() {
         player.setVolume(configuration.getDouble("player.volume", 1));
         UIManager.put("Slider.paintValue", Boolean.FALSE);
+        try {
+            Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
+            AudioFileReader.setDefaultCharset(charset);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         try {
             String laf = configuration.getString("gui.LAF", "");

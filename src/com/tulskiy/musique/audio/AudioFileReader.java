@@ -23,6 +23,7 @@ import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.tag.Tag;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import java.util.Map;
  */
 public abstract class AudioFileReader {
     private static CUEParser cueParser;
+    protected static Charset defaultCharset;
 
     public void read(File f, List<Track> list) {
         Track track = readSingle(f);
@@ -79,5 +81,9 @@ public abstract class AudioFileReader {
             track.setSampleRate(header.getSampleRateAsNumber());
             track.setStartPosition(0);
         }
+    }
+
+    public static void setDefaultCharset(Charset charset) {
+        defaultCharset = charset;
     }
 }
