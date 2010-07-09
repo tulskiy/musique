@@ -86,11 +86,11 @@ public final class Bitstream implements BitstreamErrors {
     //private int				last_frame_number;
 
     private final int bitmask[] = {0,    // dummy
-                                   0x00000001, 0x00000003, 0x00000007, 0x0000000F,
-                                   0x0000001F, 0x0000003F, 0x0000007F, 0x000000FF,
-                                   0x000001FF, 0x000003FF, 0x000007FF, 0x00000FFF,
-                                   0x00001FFF, 0x00003FFF, 0x00007FFF, 0x0000FFFF,
-                                   0x0001FFFF};
+            0x00000001, 0x00000003, 0x00000007, 0x0000000F,
+            0x0000001F, 0x0000003F, 0x0000007F, 0x000000FF,
+            0x000001FF, 0x000003FF, 0x000007FF, 0x00000FFF,
+            0x00001FFF, 0x00003FFF, 0x00007FFF, 0x0000FFFF,
+            0x0001FFFF};
 
     private final PushbackInputStream source;
 
@@ -111,7 +111,7 @@ public final class Bitstream implements BitstreamErrors {
      */
     public Bitstream(InputStream source) {
         this.source = new PushbackInputStream(
-                new BufferedInputStream(source), BUFFER_INT_SIZE);
+                new BufferedInputStream(source));
         skipID3v2();
         firstframe = true;
         closeFrame();
@@ -273,6 +273,7 @@ public final class Bitstream implements BitstreamErrors {
     // REVIEW: this class should provide inner classes to
     // parse the frame contents. Eventually, readBits will
     // be removed.
+
     public int readBits(int n) {
         return get_bits(n);
     }

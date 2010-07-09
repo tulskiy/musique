@@ -19,6 +19,7 @@ package com.tulskiy.musique.audio.formats.mp3;
 
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.AudioMath;
+import com.tulskiy.musique.util.Util;
 import javazoom.jl.decoder.*;
 
 import javax.sound.sampled.AudioFormat;
@@ -211,6 +212,8 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
                     track.setGenre(urlConnection.getHeaderField("icy-genre"));
                     track.setAlbum(urlConnection.getHeaderField("icy-name"));
                 }
+                if (Util.isEmpty(metaIntString))
+                    metaIntString = "0";
                 final int metaInt = Integer.valueOf(metaIntString);
                 if (metaInt > 0) {
                     fis = new FilterInputStream(fis) {
