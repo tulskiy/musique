@@ -201,11 +201,15 @@ public class PlaylistTable extends GroupTable {
         getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                TableColumnModel model = getTableHeader().getColumnModel();
-                int index = model.getColumnIndexAtX(e.getX());
-                final int col = model.getColumn(index).getModelIndex();
-                final PlaylistColumn pc = columns.get(col);
-                playlist.sort(pc.getExpression());
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    TableColumnModel model = getTableHeader().getColumnModel();
+                    int index = model.getColumnIndexAtX(e.getX());
+                    if (index != -1) {
+                        final int col = model.getColumn(index).getModelIndex();
+                        final PlaylistColumn pc = columns.get(col);
+                        playlist.sort(pc.getExpression());
+                    }
+                }
             }
         });
     }
@@ -369,9 +373,10 @@ public class PlaylistTable extends GroupTable {
             public void actionPerformed(ActionEvent e) {
                 if (selectedColumn == null) return;
                 saveColumns();
+                getTableHeader().setDraggedColumn(null);
                 columns.remove(selectedColumn.getModelIndex());
                 // trying to fix ArrayIndexOutOfBoundException
-                RepaintManager.currentManager(comp).markCompletelyClean(comp);
+                RepaintManager.currentManager(getTableHeader()).markCompletelyClean(getTableHeader());
                 createDefaultColumnsFromModel();
             }
         });
