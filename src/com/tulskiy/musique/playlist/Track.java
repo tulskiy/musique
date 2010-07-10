@@ -158,13 +158,17 @@ public class Track implements Cloneable {
     public void setLocation(URI location) {
         this.location = location;
         String path = location.getPath();
-        int start = path.lastIndexOf(File.separator);
-        if (start == -1)
-            start = 0;
-        int end = path.lastIndexOf(".");
-        if (end == -1)
-            end = path.length();
-        fileName = path.substring(start + 1, end);
+        if (path.length() < 2) {
+            fileName = location.toString();
+        } else {
+            int start = path.lastIndexOf(File.separator);
+            if (start == -1)
+                start = 0;
+            int end = path.lastIndexOf(".");
+            if (end == -1)
+                end = path.length();
+            fileName = path.substring(start + 1, end);
+        }
     }
 
     public File getFile() {
