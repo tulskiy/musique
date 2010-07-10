@@ -244,7 +244,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
                                 count = 0;
                             }
 
-                            if (bytesToMeta > 0 && bytesToMeta < len)
+                            if (bytesToMeta >= 0 && bytesToMeta < len)
                                 len = bytesToMeta;
 
                             int read = super.read(b, off, len);
