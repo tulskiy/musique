@@ -33,7 +33,7 @@ import java.util.Map;
  */
 public abstract class AudioFileReader {
     private static CUEParser cueParser;
-    protected static Charset defaultCharset;
+    protected static Charset defaultCharset = Charset.forName("iso8859-1");
 
     public void read(File f, List<Track> list) {
         Track track = readSingle(f);
