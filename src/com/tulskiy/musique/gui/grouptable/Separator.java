@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui.custom;
+package com.tulskiy.musique.gui.grouptable;
 
 /**
  * @Author: Denis Tulskiy
