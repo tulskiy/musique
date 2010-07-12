@@ -94,6 +94,8 @@ public class MainWindow extends JFrame {
     }
 
     public void shutdown() {
+        if (tray != null)
+            tray.uninstall();
         setVisible(false);
         config.setRectangle("gui.mainWindowPosition", new Rectangle(getX(), getY(), getWidth(), getHeight()));
         config.setInt("gui.mainWindowState", getExtendedState());
