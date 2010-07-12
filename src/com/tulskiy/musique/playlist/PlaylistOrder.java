@@ -98,11 +98,16 @@ public class PlaylistOrder implements PlaybackOrder {
         if (playlist == null || playlist.size() <= 0)
             return null;
 
+        if (lastPlayed != null) {
+            if (playlist.contains(lastPlayed)) {
+                Track track = lastPlayed;
+                lastPlayed = null;
+                return track;
+            }
+        }
+
         if (currentTrack == null) {
-            if (playlist.contains(lastPlayed))
-                return lastPlayed;
-            else
-                return playlist.get(0);
+            return playlist.get(0);
         } else {
             index = playlist.indexOf(currentTrack);
             if (index == -1)

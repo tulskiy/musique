@@ -21,12 +21,12 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.grouptable.GroupTable;
-import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.gui.grouptable.GroupTable;
+import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistOrder;
@@ -36,6 +36,8 @@ import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.TrackIO;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -195,7 +197,20 @@ public class PlaylistTable extends GroupTable {
                 update();
                 switch (e.getEventCode()) {
                     case FILE_OPENED:
-                        runAction("showNowPlaying");
+                        if (config.getBoolean("playlist.cursorFollowsPlayback", true)) {
+                            runAction("showNowPlaying");
+                        }
+
+                        if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
+                            PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                            order.setLastPlayed(null);
+                        }
+                        break;
+                    case STOPPED:
+                        int index = indexOf(player.getTrack());
+                        if (index != -1)
+                            setRowSelectionInterval(index, index);
+                        break;
                 }
             }
         });
@@ -211,6 +226,18 @@ public class PlaylistTable extends GroupTable {
                         final PlaylistColumn pc = columns.get(col);
                         playlist.sort(pc.getExpression());
                     }
+                }
+            }
+        });
+
+        getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                Track track = getSelectedSongs().get(0);
+                config.setObject("playlist.selectedTrack", track);
+                if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
+                    PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                    order.setLastPlayed(track);
                 }
             }
         });

@@ -100,18 +100,21 @@ public class Configuration {
         PrintWriter w = new PrintWriter(writer);
 
         for (String key : map.keySet()) {
-            w.printf("%s: ", key);
             Object value = map.get(key);
+            if (value == null) {
+                continue;
+            }
+            w.printf("%s: ", key);
 
-            if (value instanceof String) {
-                w.println(value);
-            } else if (value instanceof List) {
+            if (value instanceof List) {
                 w.println();
 
                 List<Object> list = (List<Object>) value;
                 for (Object o : list) {
                     w.println("  " + o);
                 }
+            } else {
+                w.println(value);
             }
         }
 
@@ -203,7 +206,7 @@ public class Configuration {
     }
 
     public void setObject(String key, Object value) {
-        map.put(key, value.toString());
+        map.put(key, value);
     }
 
     public void setInt(String key, int value) {

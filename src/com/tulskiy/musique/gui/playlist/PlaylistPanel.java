@@ -158,6 +158,7 @@ public class PlaylistPanel extends JPanel {
         }
 
         Collections.sort(columns);
+        config.setObject("playlist.selectedTrack", null);
         config.setList("playlist.columns", columns);
 
         ArrayList<Integer> list = new ArrayList<Integer>();
@@ -326,5 +327,31 @@ public class PlaylistPanel extends JPanel {
         playbackMenu.addSeparator();
 
         playbackMenu.add(tableAction("showNowPlaying", "Scroll to Now Playing"));
+        boolean selected = config.getBoolean("playlist.cursorFollowsPlayback", true);
+        playbackMenu.add(new JCheckBoxMenuItem("Cursor Follows Playback", selected)).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
+                config.setBoolean("playlist.cursorFollowsPlayback", item.isSelected());
+            }
+        });
+
+        selected = config.getBoolean("playlist.playbackFollowsCursor", false);
+        playbackMenu.add(new JCheckBoxMenuItem("Playback Follows Cursor", selected)).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
+                config.setBoolean("playlist.playbackFollowsCursor", item.isSelected());
+            }
+        });
+
+        selected = config.getBoolean("player.stopAfterCurrent", false);
+        playbackMenu.add(new JCheckBoxMenuItem("Stop After Current", selected)).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
+                config.setBoolean("player.stopAfterCurrent", item.isSelected());
+            }
+        });
     }
 }

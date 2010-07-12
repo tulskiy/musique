@@ -19,6 +19,8 @@ package com.tulskiy.musique.audio.player;
 
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.Decoders;
 import com.tulskiy.musique.util.AudioMath;
 
@@ -35,6 +37,8 @@ public class Player {
     private static enum PlayerState {
         PLAYING, PAUSED, STOPPED
     }
+
+    private Configuration config = Application.getInstance().getConfiguration();
 
     private PlayerState state = PlayerState.STOPPED;
     private static ArrayList<PlayerListener> listeners = new ArrayList<PlayerListener>();
@@ -232,6 +236,10 @@ public class Player {
                             if (nextTrack != null) {
                                 open(nextTrack, false);
                                 nextTrack = null;
+                                if (config != null && config.getBoolean("player.stopAfterCurrent", false)) {
+                                    stopPlaying();
+                                    continue;
+                                }
                             }
 
                             len = decoder.decode(buf);
