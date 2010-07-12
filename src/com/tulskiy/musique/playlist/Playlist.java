@@ -241,7 +241,7 @@ public class Playlist extends ArrayList<Track> {
         return items;
     }
 
-    public int insertItem(String address, int location, Map<String, Object> progress) {
+    public int insertItem(String address, int location, boolean recurse, Map<String, Object> progress) {
         ArrayList<Track> temp = new ArrayList<Track>();
         LinkedList<Object> queue = new LinkedList<Object>();
 
@@ -289,7 +289,7 @@ public class Playlist extends ArrayList<Track> {
                     else if (top instanceof File)
                         file = (File) top;
 
-                    if (file.isDirectory()) {
+                    if (recurse && file.isDirectory()) {
                         queue.addAll(0, Arrays.asList(file.listFiles()));
                     } else if (file.isFile()) {
                         AudioFileReader reader = TrackIO.getAudioFileReader(file.getName());

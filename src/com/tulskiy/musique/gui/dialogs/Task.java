@@ -55,7 +55,7 @@ public abstract class Task {
         public void start() {
             Playlist playlist = table.getPlaylist();
             for (File file : files) {
-                int ret = playlist.insertItem(file.toString(), location, map);
+                int ret = playlist.insertItem(file.toString(), location, true, map);
                 if (location != -1)
                     location += ret;
             }

@@ -234,7 +234,7 @@ public class PlaylistPanel extends JPanel {
                     PlaylistTable table = tabs.getSelectedTable();
                     if (table == null)
                         return;
-                    table.getPlaylist().insertItem(ret, -1, null);
+                    table.getPlaylist().insertItem(ret, -1, false, null);
                     table.update();
                 }
             }
