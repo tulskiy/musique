@@ -23,6 +23,7 @@ import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.PlaylistOrder;
@@ -32,7 +33,6 @@ import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -194,7 +194,7 @@ public class PlaylistPanel extends JPanel {
         menuBar.add(editMenu);
         JMenu viewMenu = new JMenu("View");
         menuBar.add(viewMenu);
-        JMenu playbackMenu = new JMenu("Playback");
+        final JMenu playbackMenu = new JMenu("Playback");
         menuBar.add(playbackMenu);
 
         ActionMap tMap = tabs.getActionMap();
@@ -206,20 +206,19 @@ public class PlaylistPanel extends JPanel {
         fileMenu.addSeparator();
         fileMenu.add("Add Files").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = new JFileChooser();
+                final JFileChooser fc = new JFileChooser();
                 String path = config.getString("playlist.lastDir", "");
                 if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
                 fc.setMultiSelectionEnabled(true);
                 fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
                 int retVal = fc.showOpenDialog(null);
-                PlaylistTable table = tabs.getSelectedTable();
+                final PlaylistTable table = tabs.getSelectedTable();
                 if (table == null)
                     return;
 
                 if (retVal == JFileChooser.APPROVE_OPTION) {
-                    ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding files");
-                    dialog.addFiles(table.getPlaylist(), Arrays.asList(fc.getSelectedFiles()));
-                    table.update();
+                    ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
+                    dialog.show(new Task.FileAddingTask(table, fc.getSelectedFiles(), -1));
                 }
 
                 config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
@@ -235,7 +234,7 @@ public class PlaylistPanel extends JPanel {
                     PlaylistTable table = tabs.getSelectedTable();
                     if (table == null)
                         return;
-                    table.getPlaylist().addLocation(ret);
+                    table.getPlaylist().insertItem(ret, -1, null);
                     table.update();
                 }
             }

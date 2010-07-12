@@ -17,15 +17,10 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.tulskiy.musique.playlist.Playlist;
-import com.tulskiy.musique.playlist.TagProcessor;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.LinkedList;
 
 /**
  * Author: Denis Tulskiy
@@ -34,99 +29,90 @@ import java.util.LinkedList;
 public class ProgressDialog extends JDialog {
     private JProgressBar progress;
     private JLabel status;
-    private boolean stopLoading = false;
-    private TagProcessor tagProcessor;
+    private Task task;
+    private Thread thread;
+    private boolean aborted;
 
     public ProgressDialog(Frame owner, String message) {
         super(owner, message, false);
 
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        setSize(400, 100);
-        setLocationRelativeTo(owner);
 
         progress = new JProgressBar(0, 100);
-        status = new JLabel("Scanning folders...");
-        status.setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, Color.gray));
+        status = new JLabel();
 
-        JButton cancel = new JButton("Cancel");
+        JButton cancel = new JButton("Abort");
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                stopLoading = true;
-                if (tagProcessor != null) {
-                    tagProcessor.cancel();
+                if (!aborted) {
+                    task.abort();
+                    aborted = true;
+                } else {
+                    /*
+                    I assume that a user will click this button
+                    twice only if the task does not respond,
+                    most probably waiting on IO,
+                    in this case, we interrupt the thread
+                    */
+                    thread.interrupt();
                 }
             }
         });
 
-        Box box = Box.createHorizontalBox();
+        Box box = Box.createVerticalBox();
+        Box statusBox = Box.createHorizontalBox();
+        statusBox.add(new JLabel("Processing: "));
+        statusBox.add(status);
+        statusBox.add(Box.createHorizontalGlue());
+        box.add(statusBox);
+        box.add(Box.createVerticalStrut(10));
         box.add(progress);
-        box.add(Box.createHorizontalStrut(10));
-        box.add(cancel);
+        Box buttonBox = Box.createHorizontalBox();
+        buttonBox.add(Box.createHorizontalGlue());
+        buttonBox.add(cancel);
+        box.add(buttonBox);
+        progress.setVisible(false);
 
         box.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
         add(box, BorderLayout.NORTH);
-        add(status, BorderLayout.SOUTH);
     }
 
-    public void addFiles(final Playlist playlist, final java.util.List<File> files) {
-        Thread t = new Thread(new Runnable() {
+    public void show(final Task task) {
+        this.task = task;
+        if (task.isIndeterminate())
+            progress.setVisible(false);
+        else
+            progress.setVisible(true);
+        pack();
+        setSize(500, getHeight());
+        setLocationRelativeTo(getParent());
+        aborted = false;
+        setVisible(true);
+
+        final Timer timer = new Timer(200, new ActionListener() {
             @Override
-            public void run() {
-                stopLoading = false;
-                progress.setIndeterminate(true);
-                LinkedList<File> list = new LinkedList<File>();
-                for (File f : files) {
-                    if (f.isDirectory()) {
-                        loadDirectory(f, list);
-                    } else if (f.isFile()) {
-                        list.add(f);
-                    }
-                }
-                progress.setIndeterminate(false);
-                progress.setMinimum(0);
-                progress.setMaximum(list.size());
-
-                tagProcessor = new TagProcessor(list, playlist);
-
-                Timer timer = new Timer(100, new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        progress.setValue(progress.getMaximum() - tagProcessor.getFilesLeft());
-                        File currentFile = tagProcessor.getCurrentFile();
-                        if (currentFile != null)
-                            status.setText(currentFile.getPath());
-                    }
-                });
-                timer.start();
-
-                tagProcessor.start();
-                setVisible(false);
+            public void actionPerformed(ActionEvent e) {
+                progress.setValue((int) (progress.getMaximum() * task.getProgress()));
+                status.setText(task.getStatus());
             }
         });
-        t.start();
+        timer.start();
 
-        setVisible(true);
-    }
-
-    private void loadDirectory(File dir, LinkedList<File> list) {
-        if (stopLoading) {
-            return;
-        }
-        if (dir.isDirectory()) {
-            File[] files = dir.listFiles();
-
-            for (File file : files) {
-                if (stopLoading) {
-                    break;
-                }
-                if (file.isFile()) {
-                    list.add(file);
-                } else {
-                    loadDirectory(file, list);
+        thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    task.start();
+                    timer.stop();
+                    setVisible(false);
+                    dispose();
+                } catch (Exception ignored) {
                 }
             }
-        }
+        });
+        thread.start();
     }
 }
+

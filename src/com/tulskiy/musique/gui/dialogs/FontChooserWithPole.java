@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui;
+package com.tulskiy.musique.gui.dialogs;
 
 import javax.accessibility.AccessibleContext;
 import javax.accessibility.AccessibleRole;
@@ -437,7 +437,7 @@ public class FontChooserWithPole extends JDialog {
                     String str = results.getString(index);
                     if (toTitleCase) {
                         str = Character.toUpperCase(str.charAt(0))
-                                + str.substring(1);
+                              + str.substring(1);
                     }
 
                     model.addElement(str);

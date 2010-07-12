@@ -21,10 +21,12 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.custom.GroupTable;
-import com.tulskiy.musique.gui.custom.Separator;
+import com.tulskiy.musique.gui.grouptable.GroupTable;
+import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
+import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistOrder;
@@ -367,7 +369,6 @@ public class PlaylistTable extends GroupTable {
                 }
             }
         });
-        final JComponent comp = this;
         headerMenu.add(new JMenuItem("Remove Column")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -540,13 +541,49 @@ public class PlaylistTable extends GroupTable {
         tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for (Track track : getSelectedSongs()) {
-                    if (track.getSubsongIndex() == 0) {
-                        AudioFileReader reader = TrackIO.getAudioFileReader(track.getFile().getName());
-                        reader.readSingle(track);
+                ProgressDialog dialog = new ProgressDialog(getParentFrame(), "Reloading Tags");
+                dialog.show(new Task() {
+                    String currentTrack;
+                    float progress = 0;
+                    boolean abort = false;
+
+                    @Override
+                    public String getStatus() {
+                        return currentTrack;
+                    }
+
+                    @Override
+                    public void abort() {
+                        abort = true;
+                    }
+
+                    @Override
+                    public void start() {
+                        ArrayList<Track> selectedSongs = getSelectedSongs();
+                        for (int i = 0; i < selectedSongs.size(); i++) {
+                            Track track = selectedSongs.get(i);
+                            if (abort)
+                                break;
+                            if (track.isFile() && track.getSubsongIndex() == 0) {
+                                currentTrack = track.getFile().getName();
+                                progress = (float) i / selectedSongs.size();
+                                AudioFileReader reader = TrackIO.getAudioFileReader(track.getFile().getName());
+                                reader.readSingle(track);
+                            }
+                        }
                         update();
                     }
-                }
+
+                    @Override
+                    public boolean isIndeterminate() {
+                        return false;
+                    }
+
+                    @Override
+                    public float getProgress() {
+                        return progress;
+                    }
+                });
             }
         });
         tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));

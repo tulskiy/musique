@@ -18,6 +18,7 @@
 package com.tulskiy.musique.gui.playlist.dnd;
 
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
@@ -69,10 +70,9 @@ public class PlaylistTransferHandler extends TransferHandler {
         return fileListSupported || urlListSupported || songListSupported;
     }
 
-    private void addFiles(PlaylistTable table, java.util.List<File> files) {
+    private void addFiles(PlaylistTable table, List<File> files, int insertRow) {
         ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
-        dialog.addFiles(table.getPlaylist(), files);
-        table.update();
+        dialog.show(new Task.FileAddingTask(table, files.toArray(new File[files.size()]), insertRow));
     }
 
     @Override
@@ -97,25 +97,28 @@ public class PlaylistTransferHandler extends TransferHandler {
                 files = (List<File>) t.getTransferData(DataFlavor.javaFileListFlavor);
             }
 
+            Playlist playlist = table.getPlaylist();
+            int insertRow = 0;
+            if (support.isDrop()) {
+                JTable.DropLocation dl = (JTable.DropLocation) support.getDropLocation();
+                int index = dl.getRow();
+                if (index == playlist.size()) {
+                    //corner case
+                    insertRow = index;
+                } else {
+                    insertRow = table.convertRowIndexToModel(index);
+                }
+            }
+
             if (files != null) {
-                addFiles(table, files);
+                if (insertRow == -1)
+                    insertRow = playlist.size();
+                addFiles(table, files, insertRow);
                 return true;
             }
 
             if (tracks != null && !tracks.isEmpty()) {
-                Playlist playlist = table.getPlaylist();
-                int insertRow;
-
                 if (support.isDrop()) {
-                    JTable.DropLocation dl = (JTable.DropLocation) support.getDropLocation();
-                    int index = dl.getRow();
-                    if (index == playlist.size()) {
-                        //corner case
-                        insertRow = index;
-                    } else {
-                        insertRow = table.convertRowIndexToModel(index);
-                    }
-
                     if (insertRow != -1) {
                         int toSubstract = 0;
                         for (Track track : tracks) {

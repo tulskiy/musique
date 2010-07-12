@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui.playlist;
 
-import com.tulskiy.musique.gui.custom.Separator;
+import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.playlist.Track;
 
 /**

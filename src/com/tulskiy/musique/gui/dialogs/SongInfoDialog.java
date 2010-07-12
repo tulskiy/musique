@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.tulskiy.musique.gui.custom.GroupTable;
+import com.tulskiy.musique.gui.grouptable.GroupTable;
 import com.tulskiy.musique.playlist.Track;
 
 import javax.swing.*;
@@ -127,7 +127,7 @@ public class SongInfoDialog extends JDialog {
         tagValues[8] = track.getDiscNumber();
         tagValues[9] = track.getTotalDiscs();
 
-        propValues[0] = track.getFile().getPath();
+        propValues[0] = track.getLocation().toString();
         propValues[2] = track.getLength();
         propValues[3] = String.valueOf(track.getTotalSamples());
         propValues[4] = String.valueOf(track.getSampleRate()) + " Hz";

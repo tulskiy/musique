@@ -17,15 +17,16 @@
 
 package com.tulskiy.musique.playlist;
 
+import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
-import com.tulskiy.musique.system.Main;
+import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
 
 import java.io.*;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.net.URL;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -168,27 +169,144 @@ public class Playlist extends ArrayList<Track> {
         return groupBy;
     }
 
-    public void addLocation(String location) {
+    public List<String> loadM3U(String location) {
+        Scanner fi;
+        ArrayList<String> items = new ArrayList<String>();
+
         try {
-            URI loc = new URI(location);
-
-            String scheme = loc.getScheme();
-            if ("http".equals(scheme)) {
-                Track track = new Track();
-
-                String title = loc.getPath();
-                if (Util.isEmpty(title))
-                    title = loc.getHost();
-                track.setTitle(title);
-                track.setLocation(loc);
-                track.setTotalSamples(-1);
-                add(track);
-            } else if (scheme == null || "file".equals(scheme)) {
-
+            File parent = null;
+            if (location.toLowerCase().startsWith("http://")) {
+                fi = new Scanner(new URL(location).openStream());
+            } else {
+                File source = new File(location);
+                fi = new Scanner(source);
+                parent = source.getParentFile().getAbsoluteFile();
             }
-        } catch (URISyntaxException e) {
+
+            while (fi.hasNextLine()) {
+                String line = fi.nextLine().trim();
+                if (line.isEmpty() || line.startsWith("#"))
+                    continue;
+                // skip utf8 BOM
+                if (((int) line.charAt(0)) == 0xFEFF) {
+                    line = line.substring(1);
+                }
+
+                if (line.toLowerCase().startsWith("http://")) {
+                    items.add(line);
+                } else {
+                    //it's a file, resolve it
+                    File file = new File(line);
+                    if (!file.isAbsolute())
+                        file = new File(parent, line);
+                    items.add(file.getAbsolutePath());
+                }
+            }
+            fi.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return items;
+    }
+
+    public List<String> loadPLS(String location) {
+        Scanner fi;
+        ArrayList<String> items = new ArrayList<String>();
+
+        try {
+            if (location.toLowerCase().startsWith("http://")) {
+                fi = new Scanner(new URL(location).openStream());
+            } else {
+                fi = new Scanner(new File(location));
+            }
+
+            if (!fi.nextLine().equalsIgnoreCase("[playlist]")) {
+                logger.warning("PLS has to start with [playlist]: " + location);
+                return items;
+            }
+
+            fi.useDelimiter("[=\\p{javaWhitespace}+]");
+            while (fi.hasNext()) {
+                String line = fi.next().trim();
+                if (line.toLowerCase().startsWith("file")) {
+                    items.add(fi.next());
+                }
+            }
+            fi.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return items;
+    }
+
+    public int insertItem(String address, int location, Map<String, Object> progress) {
+        ArrayList<Track> temp = new ArrayList<Track>();
+        LinkedList<Object> queue = new LinkedList<Object>();
+
+        if (location == -1)
+            location = size();
+        String ext = Util.getFileExt(address);
+        if (ext.equals("m3u") || ext.equals("m3u8")) {
+            queue.addAll(loadM3U(address));
+        } else if (ext.equals("pls")) {
+            queue.addAll(loadPLS(address));
+        } else if (ext.equals("mus")) {
+            Playlist newPl = new Playlist();
+            newPl.load(new File(address));
+            addAll(location, newPl);
+        } else {
+            queue.push(address);
+        }
+
+        while (!queue.isEmpty()) {
+            try {
+                Object top = queue.pop();
+                String topStr = top.toString();
+                if (progress != null) {
+                    if (progress.get("processing.stop") != null) {
+                        break;
+                    }
+                    progress.put("processing.file", topStr);
+                }
+
+                if (top instanceof String && topStr.startsWith("http://")) {
+                    Track track = new Track();
+
+                    URI uri = new URI(topStr);
+                    String title = uri.getPath();
+                    if (Util.isEmpty(title))
+                        title = uri.getHost();
+                    track.setTitle(title);
+                    track.setLocation(uri);
+                    track.setTotalSamples(-1);
+                    temp.add(track);
+                } else {
+                    File file = null;
+                    if (top instanceof String)
+                        file = new File(topStr);
+                    else if (top instanceof File)
+                        file = (File) top;
+
+                    if (file.isDirectory()) {
+                        queue.addAll(0, Arrays.asList(file.listFiles()));
+                    } else if (file.isFile()) {
+                        AudioFileReader reader = TrackIO.getAudioFileReader(file.getName());
+                        if (reader != null)
+                            reader.read(file, temp);
+                    }
+                }
+            } catch (Exception ignored) {
+            }
+        }
+
+        addAll(location, temp);
+        firePlaylistChanged();
+        int size = temp.size();
+        queue.clear();
+        temp.clear();
+        return size;
     }
 
     public void sort(String expression) {
