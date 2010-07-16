@@ -29,6 +29,7 @@ import com.tulskiy.musique.audio.formats.ogg.OGGFileReader;
 import com.tulskiy.musique.audio.formats.ogg.VorbisTagWriter;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMFileReader;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackFileReader;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
 import java.util.ArrayList;
@@ -75,5 +76,12 @@ public class TrackIO {
         }
 
         return null;
+    }
+
+    public static void write(Track track) {
+        if (track.isFile()) {
+            AudioTagWriter writer = TrackIO.getAudioFileWriter(track.getFile().getName());
+            writer.write(track);
+        }
     }
 }
