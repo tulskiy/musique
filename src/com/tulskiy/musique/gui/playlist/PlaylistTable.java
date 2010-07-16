@@ -18,6 +18,7 @@
 package com.tulskiy.musique.gui.playlist;
 
 import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -118,6 +119,8 @@ public class PlaylistTable extends GroupTable {
                 if (!tracks.isEmpty()) {
                     player.open(tracks.get(0));
                     player.play();
+                    PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                    order.setLastPlayed(null);
                     app.getPlaylistManager().selectPlaylist(playlist);
                 }
             }
