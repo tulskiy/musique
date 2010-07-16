@@ -131,6 +131,7 @@ public class TracksInfoDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 setVisible(false);
                 dispose();
+                parent.requestFocus();
             }
         });
 
@@ -176,7 +177,7 @@ public class TracksInfoDialog extends JDialog {
                 HashMap<File, ArrayList<Track>> cues = new HashMap<File, ArrayList<Track>>();
 
                 for (Track track : tracks) {
-                    if (track.isFile()) {
+                    if (!track.isFile()) {
                         processed++;
                         continue;
                     }
@@ -224,6 +225,7 @@ public class TracksInfoDialog extends JDialog {
                 parent.update();
                 setVisible(false);
                 dispose();
+                parent.requestFocus();
             }
         });
     }
