@@ -33,8 +33,14 @@ public class Util {
         int hrs = min / 60;
         if (min > 0) seconds -= min * 60;
         if (hrs > 0) min -= hrs * 60;
+        int days = hrs / 24;
+        if (days > 0) hrs -= days * 24;
+        int weeks = days / 7;
+        if (weeks > 0) days -= weeks * 7;
 
         StringBuilder builder = new StringBuilder();
+        if (weeks > 0) builder.append(weeks).append("wk ");
+        if (days > 0) builder.append(days).append("d ");
         if (hrs > 0) builder.append(hrs).append(":");
         if (hrs > 0 && min < 10) builder.append("0");
         builder.append(min).append(":");
@@ -78,5 +84,10 @@ public class Util {
 
     public static boolean isEmpty(String s) {
         return s == null || s.trim().isEmpty();
+    }
+
+    public static String humanize(String property) {
+        String s = property.replaceAll("(?=\\p{Upper})", " ");
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 }

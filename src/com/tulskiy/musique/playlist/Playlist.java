@@ -88,6 +88,12 @@ public class Playlist extends ArrayList<Track> {
                 dos.writeUTF(track.getLocation().toString());
                 dos.writeLong(track.getStartPosition());
                 dos.writeLong(track.getTotalSamples());
+                dos.writeInt(track.getSubsongIndex());
+                if (track.getSubsongIndex() > 0) {
+                    dos.writeBoolean(track.isCueEmbedded());
+                    if (!track.isCueEmbedded())
+                        dos.writeUTF(track.getCueLocation());
+                }
                 dos.writeInt(track.getBps());
                 dos.writeInt(track.getChannels());
                 dos.writeInt(track.getSampleRate());
@@ -136,6 +142,12 @@ public class Playlist extends ArrayList<Track> {
                 track.setLocation(new URI(dis.readUTF()));
                 track.setStartPosition(dis.readLong());
                 track.setTotalSamples(dis.readLong());
+                track.setSubsongIndex(dis.readInt());
+                if (track.getSubsongIndex() > 0) {
+                    track.setCueEmbedded(dis.readBoolean());
+                    if (!track.isCueEmbedded())
+                        track.setCueLocation(dis.readUTF());
+                }
                 track.setBps(dis.readInt());
                 track.setChannels(dis.readInt());
                 track.setSampleRate(dis.readInt());
@@ -327,7 +339,7 @@ public class Playlist extends ArrayList<Track> {
                     Object v1 = e.eval(o1);
                     Object v2 = e.eval(o2);
                     if (v1 != null && v2 != null) {
-                        int i = v1.toString().compareTo(v2.toString());
+                        int i = v1.toString().compareToIgnoreCase(v2.toString());
                         if (!sortAscending)
                             i = -i;
                         return i;

@@ -1,41 +1,32 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Cuelib library for manipulating cue sheets.
+ * Copyright (C) 2007-2008 Jan-Willem van den Broek
+ * 
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 package jwbroek.cuelib;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
-import java.util.TreeSet;
+import jwbroek.io.FileSelector;
+import jwbroek.util.LogUtil;
+
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import jwbroek.io.FileSelector;
-import jwbroek.util.LogUtil;
 
 /**
  * Parser for cue sheets.
@@ -617,7 +608,7 @@ final public class CueParser {
             // If first index of track, then number must be 0 or 1; if not first index of track, then number must be 1
             // higher than last one.
             if (trackIndices.isEmpty() && indexNumber > 1
-                    || !trackIndices.isEmpty() && trackIndices.get(trackIndices.size() - 1).getNumber() != indexNumber - 1
+                || !trackIndices.isEmpty() && trackIndices.get(trackIndices.size() - 1).getNumber() != indexNumber - 1
                     ) {
                 addWarning(input, WARNING_INVALID_INDEX_NUMBER);
             }
@@ -628,9 +619,9 @@ final public class CueParser {
 
             // Position of first index of file must be 00:00:00.
             if (fileIndices.isEmpty()
-                    && !(position.getMinutes() == 0
-                    && position.getSeconds() == 0
-                    && position.getFrames() == 0
+                && !(position.getMinutes() == 0
+                     && position.getSeconds() == 0
+                     && position.getFrames() == 0
             )
                     ) {
                 addWarning(input, WARNING_INVALID_FIRST_POSITION);
@@ -710,7 +701,7 @@ final public class CueParser {
             // First check file data, as getLastFileData will create a FileData instance if there is none
             // and we don't actually want to create such an instance.
             if (input.getAssociatedSheet().getFileData().size() == 0
-                    || getLastFileData(input).getTrackData().size() == 0
+                || getLastFileData(input).getTrackData().size() == 0
                     ) {
                 // Performer of album.
                 if (input.getAssociatedSheet().getPerformer() != null) {
@@ -975,7 +966,7 @@ final public class CueParser {
             // First check file data, as getLastFileData will create a FileData instance if there is none
             // and we don't actually want to create such an instance.
             if (input.getAssociatedSheet().getFileData().size() == 0
-                    || getLastFileData(input).getTrackData().size() == 0
+                || getLastFileData(input).getTrackData().size() == 0
                     ) {
                 // Songwriter of album.
                 if (input.getAssociatedSheet().getSongwriter() != null) {
@@ -1029,7 +1020,7 @@ final public class CueParser {
             // First check file data, as getLastFileData will create a FileData instance if there is none
             // and we don't actually want to create such an instance.
             if (input.getAssociatedSheet().getFileData().size() == 0
-                    || getLastFileData(input).getTrackData().size() == 0
+                || getLastFileData(input).getTrackData().size() == 0
                     ) {
                 // Title of album.
                 if (input.getAssociatedSheet().getTitle() != null) {
@@ -1093,7 +1084,7 @@ final public class CueParser {
 
             // First track must have number 1; all next ones sequential.
             if (trackDataList.isEmpty() && trackNumber != 1
-                    || !trackDataList.isEmpty() && trackDataList.get(trackDataList.size() - 1).getNumber() != trackNumber - 1
+                || !trackDataList.isEmpty() && trackDataList.get(trackDataList.size() - 1).getNumber() != trackNumber - 1
                     ) {
                 addWarning(input, WARNING_INVALID_TRACK_NUMBER);
             }
@@ -1131,8 +1122,8 @@ final public class CueParser {
             int frames = Integer.parseInt(framesString);
 
             if (!(minutesString.length() == 2
-                    && secondsString.length() == 2
-                    && framesString.length() == 2
+                  && secondsString.length() == 2
+                  && framesString.length() == 2
             )
                     ) {
                 addWarning(input, WARNING_WRONG_NUMBER_OF_DIGITS);
@@ -1231,7 +1222,7 @@ final public class CueParser {
             FileFilter cueFilter = new FileFilter() {
                 public boolean accept(final File file) {
                     return file.getName().length() >= 4
-                            && file.getName().substring(file.getName().length() - 4).equalsIgnoreCase(".cue");
+                           && file.getName().substring(file.getName().length() - 4).equalsIgnoreCase(".cue");
                 }
             };
 
@@ -1253,7 +1244,7 @@ final public class CueParser {
                     System.out.println(message);
                 }
 
-//        System.out.println((new CueSheetSerializer()).serializeCueSheet(sheet));
+                System.out.println((new CueSheetSerializer()).serializeCueSheet(sheet));
                 xmlSerializer.serializeCueSheet(sheet, System.out);
             }
         }

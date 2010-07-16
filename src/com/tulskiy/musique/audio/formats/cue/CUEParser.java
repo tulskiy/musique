@@ -18,7 +18,6 @@
 package com.tulskiy.musique.audio.formats.cue;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.playlist.CUESheet;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.TrackIO;
 import jwbroek.cuelib.*;
@@ -37,29 +36,26 @@ public class CUEParser {
         try {
             CueSheet cueSheet = CueParser.parse(cueStream);
             List<FileData> datas = cueSheet.getFileData();
+            String cueLocation = file.getFile().getAbsolutePath();
             if (datas.size() > 0) {
-                CUESheet sheet = new CUESheet();
-                sheet.setEmbedded(embedded);
-
                 for (FileData fileData : datas) {
                     if (!embedded) {
                         String parent = file.getFile().getParent();
                         File referencedFile = new File(parent, fileData.getFile());
                         if (!referencedFile.exists())
                             continue;
-                        sheet.setFileName(referencedFile.getAbsolutePath());
                         AudioFileReader reader = TrackIO.getAudioFileReader(referencedFile.getName());
                         if (reader == null) break;
                         file = reader.readSingle(referencedFile);
-                    } else {
-                        sheet.setCueSheet(file.getCueSheet());
                     }
 
                     int size = fileData.getTrackData().size();
                     for (int i = 0; i < size; i++) {
                         TrackData trackData = fileData.getTrackData().get(i);
                         Track track = file.copy();
-//                        track.setCue(sheet);
+                        track.setCueEmbedded(embedded);
+                        if (!embedded)
+                            track.setCueLocation(cueLocation);
 
                         String album = trackData.getMetaData(CueSheet.MetaDataField.ALBUMTITLE);
                         if (album.length() > 0)

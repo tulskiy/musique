@@ -33,14 +33,14 @@ public class ProgressDialog extends JDialog {
     private Thread thread;
     private boolean aborted;
 
-    public ProgressDialog(Frame owner, String message) {
-        super(owner, message, false);
+    public ProgressDialog(Component owner, String message) {
+        super(SwingUtilities.windowForComponent(owner), message);
 
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         progress = new JProgressBar(0, 100);
         status = new JLabel();
-
+        status.setFont(status.getFont().deriveFont(11f));
         JButton cancel = new JButton("Abort");
         cancel.addActionListener(new ActionListener() {
             @Override
@@ -106,9 +106,10 @@ public class ProgressDialog extends JDialog {
                 try {
                     task.start();
                     timer.stop();
+                } catch (Exception ignored) {
+                } finally {
                     setVisible(false);
                     dispose();
-                } catch (Exception ignored) {
                 }
             }
         });

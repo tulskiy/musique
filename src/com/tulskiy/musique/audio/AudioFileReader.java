@@ -86,4 +86,8 @@ public abstract class AudioFileReader {
     public static void setDefaultCharset(Charset charset) {
         defaultCharset = charset;
     }
+
+    public static Charset getDefaultCharset() {
+        return defaultCharset;
+    }
 }

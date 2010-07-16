@@ -21,10 +21,7 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.dialogs.ColumnDialog;
-import com.tulskiy.musique.gui.dialogs.ProgressDialog;
-import com.tulskiy.musique.gui.dialogs.SongInfoDialog;
-import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.gui.dialogs.*;
 import com.tulskiy.musique.gui.grouptable.GroupTable;
 import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
@@ -125,10 +122,15 @@ public class PlaylistTable extends GroupTable {
                 }
             }
         });
+        final PlaylistTable comp = this;
         aMap.put("showProperties", new AbstractAction("Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showInfo(getSelectedSongs());
+                ArrayList<Track> tracks = getSelectedSongs();
+                if (tracks.isEmpty())
+                    return;
+                TracksInfoDialog dialog = new TracksInfoDialog(comp, tracks);
+                dialog.setVisible(true);
             }
         });
         aMap.put("showNowPlaying", new AbstractAction("Scroll to Now Playing") {
@@ -233,7 +235,10 @@ public class PlaylistTable extends GroupTable {
         getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
-                Track track = getSelectedSongs().get(0);
+                ArrayList<Track> tracks = getSelectedSongs();
+                if (tracks.isEmpty())
+                    return;
+                Track track = tracks.get(0);
                 config.setObject("playlist.selectedTrack", track);
                 if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
                     PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
@@ -349,22 +354,6 @@ public class PlaylistTable extends GroupTable {
             }
         }
         return parentFrame;
-    }
-
-    public void showInfo(ArrayList<Track> tracks) {
-        if (tracks.isEmpty())
-            return;
-        Track s = tracks.get(0);
-        SongInfoDialog dialog = new SongInfoDialog(getParentFrame(), s);
-        if (dialog.showDialog()) {
-            try {
-                playlist.firePlaylistChanged();
-                TrackIO.getAudioFileWriter(s.getFile().getAbsolutePath()).write(s);
-                update();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public void buildMenus() {

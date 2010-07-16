@@ -17,6 +17,8 @@
 
 package com.tulskiy.musique.playlist;
 
+import com.tulskiy.musique.audio.AudioTagWriter;
+import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
 
 import java.io.File;
@@ -60,6 +62,8 @@ public class Track implements Cloneable {
     private long startPosition;
     private long totalSamples;
     private URI location;
+    private boolean cueEmbedded;
+    private String cueLocation;
 
     //runtime stuff
     private String cueSheet;
@@ -334,6 +338,26 @@ public class Track implements Cloneable {
         return length;
     }
 
+    public boolean isCueEmbedded() {
+        return cueEmbedded;
+    }
+
+    public void setCueEmbedded(boolean cueEmbedded) {
+        this.cueEmbedded = cueEmbedded;
+    }
+
+    public String getCueLocation() {
+        return cueLocation;
+    }
+
+    public void setCueLocation(String cueLocation) {
+        this.cueLocation = cueLocation;
+    }
+
+    public boolean isCue() {
+        return subsongIndex > 0;
+    }
+
     public String getFileName() {
         return fileName;
     }
@@ -361,7 +385,7 @@ public class Track implements Cloneable {
                 return o.toString();
         } catch (Exception ignored) {
         }
-        return null;
+        return "";
     }
 
     public void setMeta(String key, String value) {
@@ -376,16 +400,7 @@ public class Track implements Cloneable {
     public String toString() {
         return "Track{" +
                "artist='" + artist + '\'' +
-               ", album='" + album + '\'' +
                ", title='" + title + '\'' +
-               ", albumArtist='" + albumArtist + '\'' +
-               ", trackNumber='" + trackNumber + '\'' +
-               ", year='" + year + '\'' +
-               ", genre='" + genre + '\'' +
-               ", sampleRate=" + sampleRate +
-               ", channels=" + channels +
-               ", subsongIndex=" + subsongIndex +
-               ", length='" + length + '\'' +
                ", location=" + location +
                '}';
     }
