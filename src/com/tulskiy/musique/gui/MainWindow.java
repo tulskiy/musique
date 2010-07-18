@@ -59,11 +59,29 @@ public class MainWindow extends JFrame {
         setSize((int) r.getWidth(), (int) r.getHeight());
         setExtendedState(config.getInt("gui.mainWindowState", 0));
 
-        boolean trayEnabled = config.getBoolean("tray.enabled", false);
-        if (trayEnabled && tray == null) {
-            tray = new Tray();
-            tray.install();
+        updateTray();
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                if (tray == null || !config.getBoolean("tray.minimizeOnClose", true)) {
+                    app.exit();
+                } else {
+                    setVisible(false);
+                }
+            }
+        });
+    }
+
+    public void updateTray() {
+        if (config.getBoolean("tray.enabled", false)) {
+            if (tray == null) {
+                tray = new Tray();
+            } else {
+                tray.uninstall();
+            }
+
+            tray.install();
             tray.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -80,17 +98,9 @@ public class MainWindow extends JFrame {
                     }
                 }
             });
+        } else if (tray != null) {
+            tray.uninstall();
         }
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                if (tray == null) {
-                    app.exit();
-                } else {
-                    setVisible(false);
-                }
-            }
-        });
     }
 
     public void shutdown() {

@@ -18,7 +18,6 @@
 package com.tulskiy.musique.gui.playlist;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -50,9 +49,9 @@ import java.util.Collections;
  * Date: May 13, 2010
  */
 public class PlaylistTable extends GroupTable {
-    private Application app = Application.getInstance();
-    private Player player = app.getPlayer();
-    private Configuration config = app.getConfiguration();
+    private static Application app = Application.getInstance();
+    private static Player player = app.getPlayer();
+    private static Configuration config = app.getConfiguration();
 
     private Playlist playlist;
     private ArrayList<PlaylistColumn> columns;
@@ -146,9 +145,6 @@ public class PlaylistTable extends GroupTable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 playlist.removeAll(getSelectedSongs());
-//                sorter.rowsDeleted(
-//                        getSelectionModel().getMinSelectionIndex(),
-//                        getSelectionModel().getMaxSelectionIndex());
 
                 clearSelection();
                 playlist.firePlaylistChanged();
@@ -309,6 +305,36 @@ public class PlaylistTable extends GroupTable {
         getTableHeader().repaint();
         revalidate();
         repaint();
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+
+        Color text = config.getColor("gui.color.text", null);
+        if (text != null) {
+            setForeground(text);
+        }
+
+        Color background = config.getColor("gui.color.background", null);
+        if (background != null) {
+            setBackground(background);
+        }
+
+        Color selection = config.getColor("gui.color.selection", null);
+        if (selection != null) {
+            setSelectionBackground(selection);
+        }
+
+        Color highlight = config.getColor("gui.color.highlight", null);
+        if (highlight != null) {
+            setSeparatorColor(highlight);
+        }
+
+        Font defaultFont = config.getFont("gui.font.default", null);
+        if (defaultFont != null) {
+            setFont(defaultFont);
+        }
     }
 
     public int indexOf(Track track) {
@@ -549,6 +575,7 @@ public class PlaylistTable extends GroupTable {
                     if (index != -1) {
                         selectedColumn = header.getColumnModel().getColumn(index);
                     }
+                    headerMenu.updateUI();
                     headerMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -622,6 +649,7 @@ public class PlaylistTable extends GroupTable {
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     selectSongsAt(e.getPoint());
+                    tableMenu.updateUI();
                     tableMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }

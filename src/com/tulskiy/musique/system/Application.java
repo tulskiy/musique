@@ -119,4 +119,8 @@ public class Application {
     public PlaylistManager getPlaylistManager() {
         return playlistManager;
     }
+
+    public MainWindow getMainWindow() {
+        return mainWindow;
+    }
 }

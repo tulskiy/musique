@@ -23,6 +23,7 @@ import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
+import com.tulskiy.musique.gui.dialogs.SettingsDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -189,12 +190,10 @@ public class PlaylistPanel extends JPanel {
     }
 
     public void addMenu(JMenuBar menuBar) {
-        JMenu fileMenu = new JMenu("File");
+        JMenu fileMenu = new JMenu("File ");
         menuBar.add(fileMenu);
-        JMenu editMenu = new JMenu("Edit");
+        JMenu editMenu = new JMenu("Edit ");
         menuBar.add(editMenu);
-        JMenu viewMenu = new JMenu("View");
-        menuBar.add(viewMenu);
         final JMenu playbackMenu = new JMenu("Playback");
         menuBar.add(playbackMenu);
 
@@ -270,32 +269,15 @@ public class PlaylistPanel extends JPanel {
                 new SearchDialog(table).setVisible(true);
             }
         }));
-
-        JMenu laf = new JMenu("Look and Feel");
-        ActionListener lafListener = new ActionListener() {
+        JMenuItem propsItem = editMenu.add("Properties");
+        propsItem.setAccelerator(KeyStroke.getKeyStroke("ctrl P"));
+        final JComponent comp = this;
+        propsItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    String cmd = e.getActionCommand();
-                    if (cmd.equals("Metal")) {
-                        UIManager.setLookAndFeel("javax.swing.plaf.metal.MetalLookAndFeel");
-                    } else if (cmd.equals("Nimbus")) {
-                        UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-                    } else {
-                        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-                    }
-                    saveSettings();
-                    app.start();
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+                new SettingsDialog(comp).setVisible(true);
             }
-        };
-
-        laf.add("Metal").addActionListener(lafListener);
-        laf.add("Nimbus").addActionListener(lafListener);
-        laf.add("Native").addActionListener(lafListener);
-        viewMenu.add(laf);
+        });
 
         JMenu orderMenu = new JMenu("Order");
         playbackMenu.add(orderMenu);

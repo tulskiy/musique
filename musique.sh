@@ -1,5 +1,5 @@
 #!/bin/sh
-MUSIQUE_HOME=`dirname "$0"`
+MUSIQUE_HOME=$(dirname "$0")
 cd "$MUSIQUE_HOME"
 
 # uncomment to use OSS emulation, fixes sound problems with Sun JRE's
@@ -11,7 +11,7 @@ cd "$MUSIQUE_HOME"
 if [ -z "$JAVA_PATH" ]; then
     JAVA_PATH="java"
 fi
-ARGS=`tr '\n' ' ' < musique.vmoptions`
+ARGS=$(tr '\n' ' ' < musique.vmoptions)
 JVM_ARGS="$ARGS $JVM_ARGS"
 
 exec $DSP $JAVA_PATH $JVM_ARGS -jar musique.jar

@@ -100,6 +100,26 @@ public class ControlPanel extends JPanel {
         buildListeners();
     }
 
+    @Override
+    public void updateUI() {
+        super.updateUI();
+
+        JButton buttons[] = new JButton[]{
+                stopButton, prevButton, playButton, pauseButton, nextButton
+        };
+        if (UIManager.getLookAndFeel().getName().contains("GTK")) {
+            for (JButton b : buttons) {
+                if (b != null)
+                    b.setBorderPainted(false);
+            }
+        } else {
+            for (JButton b : buttons) {
+                if (b != null)
+                    b.setBorderPainted(true);
+            }
+        }
+    }
+
     private JButton createButton(String path) {
         JButton b = new JButton();
         Dimension buttonSize = new Dimension(30, 30);

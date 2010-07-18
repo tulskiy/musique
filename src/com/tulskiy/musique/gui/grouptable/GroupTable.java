@@ -47,7 +47,8 @@ public class GroupTable extends JTable {
     private boolean trackSelection = true;
 
     public GroupTable() {
-        initUI();
+        setDefaultRenderer(Object.class, new DefaultCellRenderer());
+
         buildListeners();
     }
 
@@ -133,11 +134,9 @@ public class GroupTable extends JTable {
         setOpaque(false);
         setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         setFont(getFont());
-        setBackground(getBackground());
         setForeground(getForeground());
         setSelectionBackground(getSelectionBackground());
-//        setDefaultRenderer(ImageIcon.class, new IconCellRenderer());
-        setDefaultRenderer(Object.class, new DefaultCellRenderer());
+        setSeparatorColor(getForeground());
 
         //fix dropLine colors, I hate Nimbus
         Color droplineColor = UIManager.getColor("Table.dropLineShortColor");
@@ -149,22 +148,52 @@ public class GroupTable extends JTable {
     }
 
     @Override
+    public void updateUI() {
+        setForeground(null);
+        setBackground(null);
+        setFont(null);
+        try {
+            setSelectionBackground(null);
+            setSelectionForeground(null);
+        } catch (Exception e) {
+            //NPE will happen here
+            //but it's ok
+        }
+
+        super.updateUI();
+        initUI();
+    }
+
+    @Override
     public void setFont(Font font) {
-        Font newFont;
-        if (defaultFont != null)
-            newFont = defaultFont.deriveFont(font.getAttributes());
-        else
-            newFont = font;
-        super.setFont(newFont);
-        separatorFont = newFont.deriveFont(Font.BOLD, newFont.getSize() + 2f);
-        setRowHeight(newFont.getSize() + 10);
+        if (font == null) {
+            super.setFont(font);
+        } else {
+            Font newFont;
+            if (defaultFont != null)
+                newFont = defaultFont.deriveFont(font.getAttributes());
+            else
+                newFont = font;
+            super.setFont(newFont);
+            separatorFont = newFont.deriveFont(Font.BOLD, newFont.getSize() + 2f);
+            setRowHeight(newFont.getSize() + 10);
+        }
     }
 
     @Override
     public void setSelectionBackground(Color selectionBackground) {
         super.setSelectionBackground(selectionBackground);
-        selectBgColor1 = selectionBackground;
-        selectBgColor2 = darker(selectionBackground);
+        if (selectionBackground != null) {
+            setSelectionForeground(getContrastColor(selectionBackground));
+            selectBgColor1 = new Color(selectionBackground.getRGB());
+            selectBgColor2 = darker(selectionBackground);
+        }
+    }
+
+    public Color getContrastColor(Color bg) {
+        int threshold = 105;
+        int delta = (int) (bg.getRed() * 0.299 + bg.getGreen() * 0.587 + bg.getBlue() * 0.114);
+        return (255 - delta < threshold) ? Color.black : Color.white;
     }
 
     public void setSeparatorColor(Color color) {
@@ -173,8 +202,10 @@ public class GroupTable extends JTable {
 
     public void setBackground(Color color) {
         super.setBackground(color);
-        bgColor1 = color;
-        bgColor2 = darker(color);
+        if (color != null) {
+            bgColor1 = color;
+            bgColor2 = darker(color);
+        }
     }
 
     private Color darker(Color c) {
@@ -270,8 +301,11 @@ public class GroupTable extends JTable {
 
             if (!isSelected) {
                 c.setBackground(row % 2 == 0 ? bgColor1 : bgColor2);
-            } else if (table.getSelectedRowCount() > 1 && !(value instanceof Separator)) {
-                c.setBackground(row % 2 == 0 ? selectBgColor1 : selectBgColor2);
+            } else if (!(value instanceof Separator)) {
+                if (table.getSelectedRowCount() > 1)
+                    c.setBackground(row % 2 == 0 ? selectBgColor1 : selectBgColor2);
+                else
+                    c.setBackground(selectBgColor1);
             }
 
             return c;
@@ -299,7 +333,7 @@ public class GroupTable extends JTable {
 
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             if (isSelected) {
-                setBorder(BorderFactory.createLineBorder(Color.lightGray, 1));
+                setBorder(BorderFactory.createLineBorder(selectBgColor1, 1));
             } else {
                 setBorder(BorderFactory.createEmptyBorder());
             }

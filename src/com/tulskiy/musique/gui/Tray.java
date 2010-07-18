@@ -40,7 +40,7 @@ public class Tray {
 
     public void install() {
         try {
-            if (SystemTray.isSupported()) {
+            if (trayIcon == null && SystemTray.isSupported()) {
                 SystemTray systemTray = SystemTray.getSystemTray();
                 Dimension size = systemTray.getTrayIconSize();
                 trayIcon = createTrayIcon(size);
@@ -116,6 +116,7 @@ public class Tray {
     public void uninstall() {
         if (SystemTray.isSupported()) {
             SystemTray.getSystemTray().remove(trayIcon);
+            trayIcon = null;
         }
     }
 

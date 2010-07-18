@@ -231,17 +231,25 @@ public class Configuration {
     }
 
     public void setColor(String key, Color value) {
-        String s = new Formatter().format(
-                "#%06X", value.getRGB() & 0xFFFFFF).toString();
-        setObject(key, s);
+        if (value == null)
+            setObject(key, value);
+        else {
+            String s = new Formatter().format(
+                    "#%06X", value.getRGB() & 0xFFFFFF).toString();
+            setObject(key, s);
+        }
     }
 
     public void setFont(String key, Font value) {
-        String s = new Formatter().format(
-                "%s, %d, %d",
-                value.getName(), value.getStyle(),
-                value.getSize()).toString();
-        setObject(key, s);
+        if (value == null)
+            setObject(key, value);
+        else {
+            String s = new Formatter().format(
+                    "%s, %d, %d",
+                    value.getName(), value.getStyle(),
+                    value.getSize()).toString();
+            setObject(key, s);
+        }
     }
 
     public void setList(String key, ArrayList<?> value) {
