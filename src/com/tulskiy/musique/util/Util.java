@@ -55,7 +55,9 @@ public class Util {
     }
 
     public static String removeExt(String s) {
-        return s.replaceAll("\\.[^\\.]*", "");
+        int index = s.lastIndexOf(".");
+        if (index == -1) index = s.length();
+        return s.substring(0, index);
     }
 
     public static String getFileExt(String fileName) {

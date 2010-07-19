@@ -48,7 +48,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     private javazoom.jl.decoder.Decoder decoder;
     private AudioFormat audioFormat;
     private Header readFrame;
-    private Track inputFile;
+    private Track track;
 
     private long totalSamples;
     private long streamSize;
@@ -58,6 +58,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     private int encDelay;
     private long currentSample;
     private boolean streaming = false;
+    private int oldBitrate;
 
     private Header skipFrame() throws BitstreamException {
         readFrame = bitstream.readFrame();
@@ -70,7 +71,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     }
 
     private int samplesToMinutes(long samples) {
-        return (int) (samples / inputFile.getSampleRate() / 60f);
+        return (int) (samples / track.getSampleRate() / 60f);
     }
 
     @SuppressWarnings({"ResultOfMethodCallIgnored"})
@@ -79,7 +80,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             bitstream.close();
         bitstream = null;
         try {
-            File file = inputFile.getFile();
+            File file = track.getFile();
             FileInputStream fis = new FileInputStream(file);
 
             //so we compute target frame first
@@ -159,16 +160,17 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     public boolean open(final Track track) {
         if (track == null)
             return false;
-        this.inputFile = track;
+        this.track = track;
         try {
             URI location = track.getLocation();
             InputStream fis;
-            if (location.getScheme().equals("file")) {
+            if (track.isFile()) {
                 logger.info("Opening file: " + location);
                 streaming = false;
-                fis = new FileInputStream(inputFile.getFile());
-                streamSize = inputFile.getFile().length();
+                fis = new FileInputStream(this.track.getFile());
+                streamSize = this.track.getFile().length();
             } else {
+                track.setCodec("MP3 Stream");
                 logger.info("Opening stream: " + location);
                 streaming = true;
                 URLConnection urlConnection = location.toURL().openConnection();
@@ -264,6 +266,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             int channels = header.mode() == Header.SINGLE_CHANNEL ? 1 : 2;
             track.setSampleRate(sampleRate);
             track.setChannels(channels);
+            oldBitrate = track.getBitrate();
             samplesPerFrame = (int) (header.ms_per_frame() * header.frequency() / 1000);
             audioFormat = new AudioFormat(sampleRate, 16, channels, true, false);
 
@@ -299,9 +302,14 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     public int decode(byte[] buf) {
         try {
             readFrame = bitstream.readFrame();
+
             if (readFrame == null) {
                 return -1;
             }
+
+            if (readFrame.bitrate_instant() > 0)
+                track.setBitrate(readFrame.bitrate_instant() / 1000);
+
             if (!streaming && currentSample >= totalSamples)
                 return -1;
             SampleBuffer output = (SampleBuffer) decoder.decodeFrame(readFrame, bitstream);
@@ -333,6 +341,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
     public void close() {
         if (bitstream != null)
             bitstream.close();
+        track.setBitrate(oldBitrate);
         readFrame = null;
     }
 

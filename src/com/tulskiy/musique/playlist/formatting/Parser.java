@@ -30,7 +30,7 @@ import java.util.StringTokenizer;
  * @Date: Feb 6, 2010
  */
 public class Parser {
-    public Expression parse(String text) {
+    public static Expression parse(String text) {
         text = text.replaceAll("\\s*,\\s*", ",");
         StringTokenizer st = new StringTokenizer(text, "$%,\'[])", true);
         MethodExpression root = new MethodExpression("eval");

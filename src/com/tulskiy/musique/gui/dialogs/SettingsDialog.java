@@ -72,7 +72,7 @@ public class SettingsDialog extends JDialog {
         add(buttons, BorderLayout.SOUTH);
 
         pack();
-        setSize(500, getHeight());
+        setSize(600, getHeight());
         setLocationRelativeTo(owner);
     }
 
@@ -85,10 +85,11 @@ public class SettingsDialog extends JDialog {
         panel.setName("GUI");
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 100));
 
-        JPanel mainPanel = new JPanel(new GridLayout(2, 2, 10, 10));
-        mainPanel.setBorder(BorderFactory.createTitledBorder(""));
+        Box mainBox = Box.createVerticalBox();
+        JPanel misc = new JPanel(new GridLayout(2, 2, 10, 10));
+        mainBox.add(misc);
 
-        mainPanel.add(new JLabel("Look and Feel"));
+        misc.add(new JLabel("Look and Feel"));
         final UIManager.LookAndFeelInfo[] lafs = UIManager.getInstalledLookAndFeels();
         Vector<String> lafsVector = new Vector<String>();
         for (UIManager.LookAndFeelInfo laf : lafs) {
@@ -99,14 +100,26 @@ public class SettingsDialog extends JDialog {
         if (name.contains("GTK"))
             name = "GTK+";
         laf.setSelectedItem(name);
-        mainPanel.add(laf);
+        misc.add(laf);
 
         final JCheckBox trayEnabled = new JCheckBox("Enable System Tray", config.getBoolean("tray.enabled", false));
-        mainPanel.add(trayEnabled);
+        misc.add(trayEnabled);
         final JCheckBox minimizeOnClose = new JCheckBox("Minimize to Tray on close", config.getBoolean("tray.minimizeOnClose", true));
-        mainPanel.add(minimizeOnClose);
+        misc.add(minimizeOnClose);
 
-        panel.add(mainPanel, BorderLayout.NORTH);
+        Box format = Box.createVerticalBox();
+        format.setBorder(BorderFactory.createTitledBorder("Display Formatting"));
+        format.add(new JLabel("Window Title"));
+        final JTextField window = new JTextField(config.getString("format.window", ""));
+        format.add(window);
+        format.add(new JLabel("Status Bar"));
+        final JTextField status = new JTextField(config.getString("format.statusBar", ""));
+        format.add(status);
+
+        mainBox.add(Box.createVerticalStrut(20));
+        mainBox.add(format);
+
+        panel.add(mainBox, BorderLayout.NORTH);
 
         final JDialog comp = this;
         saveButton.addActionListener(new ActionListener() {
@@ -125,7 +138,10 @@ public class SettingsDialog extends JDialog {
 
                 config.setBoolean("tray.enabled", trayEnabled.isSelected());
                 config.setBoolean("tray.minimizeOnClose", minimizeOnClose.isSelected());
+                config.setString("format.window", window.getText());
+                config.setString("format.statusBar", status.getText());
                 app.getMainWindow().updateTray();
+                app.getMainWindow().updateDisplayFormat();
             }
         });
 

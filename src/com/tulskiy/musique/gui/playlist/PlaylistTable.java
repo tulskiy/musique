@@ -219,7 +219,7 @@ public class PlaylistTable extends GroupTable {
                     if (index != -1) {
                         final int col = model.getColumn(index).getModelIndex();
                         final PlaylistColumn pc = columns.get(col);
-                        playlist.sort(pc.getExpression());
+                        playlist.sort(pc.getExpression(), true);
                     }
                 }
             }
@@ -497,7 +497,7 @@ public class PlaylistTable extends GroupTable {
                                 "Sort By...",
                                 config.getString("playlist.sortString", ""));
                         if (ret != null) {
-                            playlist.sort(ret.toString());
+                            playlist.sort(ret.toString(), false);
                             config.setString("playlist.sortString", ret.toString());
                         }
 
@@ -511,7 +511,7 @@ public class PlaylistTable extends GroupTable {
                         playlist.firePlaylistChanged();
                         break;
                     default:
-                        playlist.sort(sortValues[index]);
+                        playlist.sort(sortValues[index], false);
                 }
 
                 update();

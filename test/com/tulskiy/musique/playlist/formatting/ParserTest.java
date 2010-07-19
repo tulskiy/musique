@@ -31,7 +31,6 @@ import org.junit.Test;
  */
 public class ParserTest {
     Track s;
-    Parser parser = new Parser();
 
     @Before
     public void setUp() {
@@ -40,7 +39,7 @@ public class ParserTest {
 
     @Test
     public void testBrackets() {
-        Expression t = parser.parse("[%artist% - ]%title%");
+        Expression t = Parser.parse("[%artist% - ]%title%");
 
         s.setTitle("title");
         assertEquals("title", t.eval(s));
@@ -51,7 +50,7 @@ public class ParserTest {
 
     @Test
     public void testIf3() {
-        Expression t = parser.parse("$if3(%artist%, %title%, %albumArtist%, unknown)");
+        Expression t = Parser.parse("$if3(%artist%, %title%, %albumArtist%, unknown)");
 
         s.setArtist("artist");
         assertEquals("artist", t.eval(s));
@@ -68,7 +67,7 @@ public class ParserTest {
 
     @Test
     public void testIf1() {
-        Expression t = parser.parse("$if1(%artist%,%artist%,%title%)");
+        Expression t = Parser.parse("$if1(%artist%,%artist%,%title%)");
 
         s.setArtist("artist");
         s.setTitle("title");
@@ -80,7 +79,7 @@ public class ParserTest {
 
     @Test
     public void testQuot() {
-        Expression t = parser.parse("'%artist%'%title%");
+        Expression t = Parser.parse("'%artist%'%title%");
 
         s.setArtist("artist here");
         s.setTitle("title here");
@@ -90,7 +89,7 @@ public class ParserTest {
 
     @Test
     public void testSmth() {
-        Expression t = parser.parse("$if1($strcmp(%albumArtist%,%artist%),%artist%,$if3(%album%,Unknown))");
+        Expression t = Parser.parse("$if1($strcmp(%albumArtist%,%artist%),%artist%,$if3(%album%,Unknown))");
 
         s.setAlbumArtist("album artist");
         s.setYear("year");

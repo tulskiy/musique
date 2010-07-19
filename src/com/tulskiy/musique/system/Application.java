@@ -36,6 +36,7 @@ public class Application {
     private Configuration configuration;
     private PlaylistManager playlistManager;
     private MainWindow mainWindow;
+    private static final String VERSION = "0.2pre";
 
     public static Application getInstance() {
         return ourInstance;
@@ -122,5 +123,9 @@ public class Application {
 
     public MainWindow getMainWindow() {
         return mainWindow;
+    }
+
+    public String getVersion() {
+        return VERSION;
     }
 }

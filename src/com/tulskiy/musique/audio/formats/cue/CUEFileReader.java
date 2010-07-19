@@ -18,13 +18,9 @@
 package com.tulskiy.musique.audio.formats.cue;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -58,8 +54,4 @@ public class CUEFileReader extends AudioFileReader {
         return ext.equalsIgnoreCase("cue");
     }
 
-    @Override
-    public Decoder getDecoder() {
-        return null;
-    }
 }

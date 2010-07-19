@@ -58,8 +58,6 @@ public abstract class AudioFileReader {
 
     public abstract boolean isFileSupported(String ext);
 
-    public abstract Decoder getDecoder();
-
     protected void copyTagFields(Tag abstractTag, Track track) throws IOException {
         if (abstractTag != null && track != null) {
             track.addMeta("album", abstractTag.getFirstAlbum());
@@ -80,6 +78,8 @@ public abstract class AudioFileReader {
             track.setTotalSamples((long) (header.getPreciseLength() * header.getSampleRateAsNumber()));
             track.setSampleRate(header.getSampleRateAsNumber());
             track.setStartPosition(0);
+            track.setCodec(header.getFormat());
+            track.setBitrate((int) header.getBitRateAsNumber());
         }
     }
 

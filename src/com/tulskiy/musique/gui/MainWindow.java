@@ -17,7 +17,11 @@
 
 package com.tulskiy.musique.gui;
 
+import com.tulskiy.musique.audio.player.PlayerEvent;
+import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.playlist.PlaylistPanel;
+import com.tulskiy.musique.playlist.formatting.Parser;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
@@ -34,6 +38,8 @@ public class MainWindow extends JFrame {
     private Configuration config = app.getConfiguration();
     private PlaylistPanel playlistPanel;
     private Tray tray;
+    private Expression windowFormat;
+    private StatusBar statusBar;
 
     public MainWindow() {
         super("Musique");
@@ -50,7 +56,8 @@ public class MainWindow extends JFrame {
         panel.setOpaque(true);
         panel.add(playlistPanel);
         add(controlPanel, BorderLayout.NORTH);
-        add(statusBar, BorderLayout.SOUTH);
+        this.statusBar = statusBar;
+        add(this.statusBar, BorderLayout.SOUTH);
         add(panel, BorderLayout.CENTER);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -61,6 +68,17 @@ public class MainWindow extends JFrame {
 
         updateTray();
 
+        updateDisplayFormat();
+        app.getPlayer().addListener(new PlayerListener() {
+            @Override
+            public void onEvent(PlayerEvent e) {
+                switch (e.getEventCode()) {
+                    case FILE_OPENED:
+                        setTitle(windowFormat.eval(app.getPlayer().getTrack()) + " [Musique " + app.getVersion() + "]");
+                        break;
+                }
+            }
+        });
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -71,6 +89,11 @@ public class MainWindow extends JFrame {
                 }
             }
         });
+    }
+
+    public void updateDisplayFormat() {
+        windowFormat = Parser.parse(config.getString("format.window", ""));
+        statusBar.updateFormat();
     }
 
     public void updateTray() {

@@ -29,7 +29,6 @@ import org.jaudiotagger.audio.wavpack.WavPackReader;
  * @Date: 01.07.2009
  */
 public class WavPackFileReader extends AudioFileReader {
-    private static Decoder decoder = new WavPackDecoder();
     private static APETagProcessor apeTagProcessor = new APETagProcessor();
 
     public Track readSingle(Track track) {
@@ -48,8 +47,4 @@ public class WavPackFileReader extends AudioFileReader {
         return ext.equalsIgnoreCase("wv");
     }
 
-    @Override
-    public Decoder getDecoder() {
-        return decoder;
-    }
 }

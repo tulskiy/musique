@@ -17,8 +17,6 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.audio.AudioTagWriter;
-import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
 
 import java.io.File;
@@ -39,6 +37,7 @@ import java.util.Random;
  * <p/>
  * <p>I know it's stupid, but that's the way my title formatting works
  */
+@SuppressWarnings({"UnusedDeclaration"})
 public class Track implements Cloneable {
 
     //meta fields
@@ -58,18 +57,22 @@ public class Track implements Cloneable {
     private int sampleRate;
     private int channels;
     private int bps;
+    private int bitrate;
     private int subsongIndex;
     private long startPosition;
     private long totalSamples;
     private URI location;
     private boolean cueEmbedded;
     private String cueLocation;
+    private String codec;
 
     //runtime stuff
     private String cueSheet;
     private String track;
     private String length;
     private String fileName;
+    private File file;
+    private String directory;
 
     private static Random random;
     private int shuffleRating = nextRandom();
@@ -119,6 +122,17 @@ public class Track implements Cloneable {
         return channels;
     }
 
+    public String getChannelsAsString() {
+        switch (getChannels()) {
+            case 1:
+                return "Mono";
+            case 2:
+                return "Stereo";
+            default:
+                return getChannels() + " ch";
+        }
+    }
+
     public void setChannels(int channels) {
         this.channels = channels;
     }
@@ -161,26 +175,19 @@ public class Track implements Cloneable {
 
     public void setLocation(URI location) {
         this.location = location;
-        String path = location.getPath();
-        if (path.length() < 2) {
-            fileName = location.toString();
-        } else {
-            int start = path.lastIndexOf(File.separator);
-            if (start == -1)
-                start = 0;
-            int end = path.lastIndexOf(".");
-            if (end == -1)
-                end = path.length();
-            fileName = path.substring(start + 1, end);
+        if (isFile()) {
+            this.file = new File(location.getPath());
+            fileName = Util.removeExt(file.getName());
+            directory = file.getParentFile().getName();
         }
     }
 
     public File getFile() {
-        return isFile() ? new File(location) : null;
+        return file;
     }
 
     public boolean isFile() {
-        return "file".equals(location.getScheme());
+        return !isStream();
     }
 
     public boolean isStream() {
@@ -306,6 +313,30 @@ public class Track implements Cloneable {
 
     public void setCueSheet(String cueSheet) {
         this.cueSheet = cueSheet;
+    }
+
+    public int getBitrate() {
+        return bitrate;
+    }
+
+    public void setBitrate(int bitrate) {
+        this.bitrate = bitrate;
+    }
+
+    public String getCodec() {
+        return codec;
+    }
+
+    public void setCodec(String codec) {
+        this.codec = codec;
+    }
+
+    public String getDirectory() {
+        return directory;
+    }
+
+    public void setDirectory(String directory) {
+        this.directory = directory;
     }
 
     public String getTrack() {

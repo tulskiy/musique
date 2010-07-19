@@ -60,6 +60,7 @@ public class VorbisDecoder implements Decoder {
                 vorbisFile = new VorbisFile(bis, null, 0);
                 streaming = true;
                 reloadComments(track);
+                track.setCodec("OGG Vorbis Stream");
             }
             Info info = vorbisFile.getInfo()[0];
             track.setSampleRate(info.rate);

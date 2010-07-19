@@ -41,11 +41,14 @@ public class PCMFileReader extends AudioFileReader {
         track.setMeta("title", title);
         try {
             AudioFileFormat format = AudioSystem.getAudioFileFormat(file);
-            AudioFormat aFormat = format.getFormat();
             track.setStartPosition(0);
-            track.setSampleRate((int) format.getFormat().getSampleRate());
+            AudioFormat audioFormat = format.getFormat();
+            track.setSampleRate((int) audioFormat.getSampleRate());
             track.setTotalSamples(format.getFrameLength());
-            track.setChannels(aFormat.getChannels());
+            track.setChannels(audioFormat.getChannels());
+            track.setCodec(Util.getFileExt(file).toUpperCase());
+            if (format.getFrameLength() > 0)
+                track.setBitrate((int) (format.getByteLength() / format.getFrameLength() * audioFormat.getSampleRate() / 100));
         } catch (Exception e) {
             System.out.println("Couldn't read file: " + track.getFile());
         }
@@ -57,8 +60,4 @@ public class PCMFileReader extends AudioFileReader {
                || ext.equalsIgnoreCase("aiff");
     }
 
-    @Override
-    public Decoder getDecoder() {
-        return decoder;
-    }
 }

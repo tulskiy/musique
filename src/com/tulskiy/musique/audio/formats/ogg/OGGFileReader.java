@@ -18,7 +18,6 @@
 package com.tulskiy.musique.audio.formats.ogg;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
@@ -52,8 +51,4 @@ public class OGGFileReader extends AudioFileReader {
         return ext.equalsIgnoreCase("ogg");
     }
 
-    @Override
-    public Decoder getDecoder() {
-        return vorbisdecoder;
-    }
 }

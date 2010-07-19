@@ -17,8 +17,10 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
+import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -86,11 +88,11 @@ public class Methods {
 
     public String notNull(Track track, ArrayList<Expression> args) {
         StringBuilder sb = new StringBuilder();
-        boolean notEmpty = true;
+        boolean notEmpty = false;
         for (Expression expression : args) {
             String str = (String) expression.eval(track);
             if (!(expression instanceof TextExpression))
-                notEmpty &= notEmpty(str);
+                notEmpty |= notEmpty(str);
             sb.append(str);
         }
 
@@ -111,5 +113,14 @@ public class Methods {
         }
 
         return null;
+    }
+
+    public String playingTime(Track track, ArrayList<Expression> args) {
+        Player player = app.getPlayer();
+        if (player.isPlaying()) {
+            return Util.samplesToTime(player.getCurrentSample(), player.getTrack().getSampleRate(), 0);
+        } else {
+            return null;
+        }
     }
 }

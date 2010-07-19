@@ -36,8 +36,6 @@ import java.util.logging.Logger;
  * @Date: Dec 30, 2009
  */
 public class Playlist extends ArrayList<Track> {
-    private static Parser parser = new Parser();
-
     private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\"");
 
     private static final int VERSION = 1;
@@ -45,7 +43,7 @@ public class Playlist extends ArrayList<Track> {
     private static String[] metaMap = {
             "artist", "album", "albumArtist", "title",
             "trackNumber", "totalTracks", "discNumber", "totalDiscs",
-            "year", "genre", "comment"
+            "year", "genre", "comment", "codec"
     };
 
     private static final Logger logger = Logger.getLogger(Playlist.class.getName());
@@ -97,6 +95,7 @@ public class Playlist extends ArrayList<Track> {
                 dos.writeInt(track.getBps());
                 dos.writeInt(track.getChannels());
                 dos.writeInt(track.getSampleRate());
+                dos.writeInt(track.getBitrate());
 
                 meta.clear();
                 for (String key : metaMap) {
@@ -151,13 +150,20 @@ public class Playlist extends ArrayList<Track> {
                 track.setBps(dis.readInt());
                 track.setChannels(dis.readInt());
                 track.setSampleRate(dis.readInt());
+                track.setBitrate(dis.readInt());
 
                 int metaSize = dis.readInt();
 
                 for (int j = 0; j < metaSize; j++) {
                     String key = dis.readUTF();
                     String value = dis.readUTF();
-                    track.setMeta(key, value);
+                    if (key.equals("trackNumber"))
+                        track.setTrackNumber(value);
+                    else if (key.equals("discNumber")) {
+                        track.setDiscNumber(value);
+                    } else {
+                        track.setMeta(key, value);
+                    }
                 }
 
                 add(track);
@@ -321,17 +327,17 @@ public class Playlist extends ArrayList<Track> {
         return size;
     }
 
-    public void sort(String expression) {
+    public void sort(String expression, boolean toggle) {
         cleanUp();
 
-        if (expression.equals(sortBy)) {
+        if (toggle && expression.equals(sortBy)) {
             sortAscending = !sortAscending;
         } else {
             sortAscending = true;
             sortBy = expression;
         }
 
-        final Expression e = parser.parse(expression);
+        final Expression e = Parser.parse(expression);
         Collections.sort(this, new Comparator<Track>() {
             @Override
             public int compare(Track o1, Track o2) {
@@ -355,7 +361,7 @@ public class Playlist extends ArrayList<Track> {
 
     public void groupBy(String expression) {
         groupBy = expression;
-        groupExpression = Util.isEmpty(expression) ? null : parser.parse(expression);
+        groupExpression = Util.isEmpty(expression) ? null : Parser.parse(expression);
 
         regroup();
     }

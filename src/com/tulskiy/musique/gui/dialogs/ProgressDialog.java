@@ -91,7 +91,7 @@ public class ProgressDialog extends JDialog {
         aborted = false;
         setVisible(true);
 
-        final Timer timer = new Timer(200, new ActionListener() {
+        final Timer timer = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 progress.setValue((int) (progress.getMaximum() * task.getProgress()));

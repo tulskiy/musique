@@ -29,7 +29,6 @@ import java.text.MessageFormat;
  * @Date: Feb 12, 2010
  */
 public class PlaylistColumn implements Comparable<PlaylistColumn> {
-    private static Parser parser = new Parser();
     private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\" {2,number,integer} {3}");
     private static ChoiceFormat choice = new ChoiceFormat(new double[]{0, 2, 4}, new String[]{"CENTER", "LEFT", "RIGHT"});
 
@@ -86,7 +85,7 @@ public class PlaylistColumn implements Comparable<PlaylistColumn> {
 
     public void setExpression(String expression) {
         if (expression != null)
-            expr = parser.parse(expression);
+            expr = Parser.parse(expression);
         this.expression = expression;
     }
 

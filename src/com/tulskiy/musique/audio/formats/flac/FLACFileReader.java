@@ -18,7 +18,6 @@
 package com.tulskiy.musique.audio.formats.flac;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.formats.flac.oggflac.OggFlacDecoder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
@@ -40,8 +39,6 @@ import java.util.HashMap;
  * @Date: 26.06.2009
  */
 public class FLACFileReader extends AudioFileReader {
-    private static FLACDecoder decoder = new FLACDecoder();
-
     public Track readSingle(Track track) {
         try {
             if (Util.getFileExt(track.getFile()).equalsIgnoreCase("oga")) {
@@ -91,8 +88,4 @@ public class FLACFileReader extends AudioFileReader {
         return ext.equalsIgnoreCase("flac")/* || ext.equalsIgnoreCase("oga")*/;
     }
 
-    @Override
-    public Decoder getDecoder() {
-        return decoder;
-    }
 }

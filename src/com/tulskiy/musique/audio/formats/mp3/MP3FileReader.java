@@ -26,7 +26,6 @@ import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.audio.mp3.XingFrame;
 import org.jaudiotagger.tag.TagFieldKey;
-import org.jaudiotagger.tag.TagOptionSingleton;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
@@ -39,7 +38,6 @@ import java.io.IOException;
 public class MP3FileReader extends AudioFileReader {
     private static final int GAPLESS_DELAY = 529;
 
-    private static Decoder decoder;
     private APETagProcessor apeTagProcessor = new APETagProcessor();
 
     public Track readSingle(Track track) {
@@ -104,11 +102,4 @@ public class MP3FileReader extends AudioFileReader {
         return ext.equalsIgnoreCase("mp3");
     }
 
-    @Override
-    public Decoder getDecoder() {
-        if (decoder == null) {
-            decoder = new MP3Decoder();
-        }
-        return decoder;
-    }
 }

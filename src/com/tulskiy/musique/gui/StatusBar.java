@@ -21,7 +21,10 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.formatting.Parser;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.GlobalTimer;
 import com.tulskiy.musique.util.Util;
 
@@ -38,35 +41,38 @@ public class StatusBar extends JPanel {
     private JLabel info;
     private JLabel time;
 
-    private Player player = Application.getInstance().getPlayer();
+    private Application app = Application.getInstance();
+    private Player player = app.getPlayer();
+    private Configuration config = app.getConfiguration();
+    private Expression statusFormat;
 
     public StatusBar() {
-        info = new JLabel(" ");
-        time = new JLabel("0:00");
+        info = new JLabel("Stopped");
 
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(10, 23));
         setBackground(new Color(238, 238, 238));
+        setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, Color.lightGray));
 
         Box box = new Box(BoxLayout.X_AXIS);
         box.add(info);
         box.add(Box.createGlue());
-        box.add(time);
         box.add(Box.createHorizontalStrut(20));
-
+        updateFormat();
         add(box);
 
         buildListeners();
+    }
+
+    public void updateFormat() {
+        statusFormat = Parser.parse(config.getString("format.statusBar", ""));
     }
 
     private void buildListeners() {
         GlobalTimer.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (player.isPlaying()) {
-                    Track track = player.getTrack();
-                    String s = Util.samplesToTime(player.getCurrentSample(), track.getSampleRate(), 0);
-                    s += " / " + Util.samplesToTime(track.getTotalSamples(), track.getSampleRate(), 0);
-                    time.setText(s);
+                    info.setText((String) statusFormat.eval(player.getTrack()));
                 }
             }
         });
@@ -75,36 +81,9 @@ public class StatusBar extends JPanel {
             public void onEvent(PlayerEvent e) {
                 switch (e.getEventCode()) {
                     case STOPPED:
-                        time.setText("0:00");
+                        info.setText("Stopped");
                 }
             }
         });
-    }
-
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        int y = 0;
-        g.setColor(new Color(156, 154, 140));
-        g.drawLine(0, y, getWidth(), y);
-        y++;
-        g.setColor(new Color(196, 194, 183));
-        g.drawLine(0, y, getWidth(), y);
-        y++;
-        g.setColor(new Color(218, 215, 201));
-        g.drawLine(0, y, getWidth(), y);
-        y++;
-        g.setColor(new Color(233, 231, 217));
-        g.drawLine(0, y, getWidth(), y);
-
-        y = getHeight() - 3;
-        g.setColor(new Color(233, 232, 218));
-        g.drawLine(0, y, getWidth(), y);
-        y++;
-        g.setColor(new Color(233, 231, 216));
-        g.drawLine(0, y, getWidth(), y);
-        y = getHeight() - 1;
-        g.setColor(new Color(221, 221, 220));
-        g.drawLine(0, y, getWidth(), y);
     }
 }

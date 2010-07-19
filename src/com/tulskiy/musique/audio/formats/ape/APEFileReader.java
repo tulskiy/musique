@@ -18,7 +18,6 @@
 package com.tulskiy.musique.audio.formats.ape;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
 import davaguine.jmac.info.APEFileInfo;
 import davaguine.jmac.info.APEHeader;
@@ -29,12 +28,7 @@ import davaguine.jmac.tools.RandomAccessFile;
  * @Date: 26.06.2009
  */
 public class APEFileReader extends AudioFileReader {
-    private static APEDecoder decoder = new APEDecoder();
     private APETagProcessor tagProcessor = new APETagProcessor();
-
-    public APEFileReader() {
-        setUseNativeDecoder(false);
-    }
 
     public Track readSingle(Track track) {
         try {
@@ -57,19 +51,12 @@ public class APEFileReader extends AudioFileReader {
         return ext.equalsIgnoreCase("ape");
     }
 
-    public void setUseNativeDecoder(boolean useNativeDecoder) {
-        System.setProperty("jmac.NATIVE", String.valueOf(useNativeDecoder));
-    }
-
-    @Override
-    public Decoder getDecoder() {
-        return decoder;
-    }
-
     private void parseInfo(Track track, APEFileInfo fileInfo) {
         track.setChannels(fileInfo.nChannels);
         track.setSampleRate(fileInfo.nSampleRate);
         track.setTotalSamples(fileInfo.nTotalBlocks);
         track.setStartPosition(0);
+        track.setCodec("Monkey's Audio");
+        track.setBitrate(fileInfo.nAverageBitrate);
     }
 }
