@@ -20,6 +20,8 @@ package com.tulskiy.musique.gui.dialogs;
 import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -27,7 +29,10 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
 /**
@@ -35,9 +40,14 @@ import java.util.ArrayList;
  * Date: Jun 9, 2010
  */
 public class SearchDialog extends JDialog {
+    private final String[] fields = {
+            "artist", "title", "album", "albumArtist", "year", "genre", "fileName"
+    };
+
     private JTextField searchField;
     private PlaylistTable table;
-    private Playlist empty = new Playlist();
+    private Playlist view = new Playlist();
+    private ArrayList<Integer> viewToModel = new ArrayList<Integer>();
     private Playlist playlist;
 
     public SearchDialog(final PlaylistTable playlistTable) {
@@ -56,12 +66,42 @@ public class SearchDialog extends JDialog {
         columns.add(new PlaylistColumn("Album", 100, "%album%"));
 
         playlist = playlistTable.getPlaylist();
-        table = new PlaylistTable(empty, columns);
-        table.createSorter();
+        table = new PlaylistTable(view, columns);
         table.setTrackSelection(false);
 
         add(searchField, BorderLayout.NORTH);
         add(new JScrollPane(table), BorderLayout.CENTER);
+
+        final ListSelectionListener listener = new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int[] rows = table.getSelectedRows();
+                int[] toSelect = new int[rows.length];
+                for (int i = 0; i < rows.length; i++) {
+                    toSelect[i] = viewToModel.get(rows[i]);
+                }
+                playlistTable.clearSelection();
+                if (toSelect.length > 0)
+                    playlistTable.scrollToRow(toSelect[0]);
+                for (int row : toSelect) {
+                    playlistTable.addRowSelectionInterval(row, row);
+                }
+            }
+        };
+        table.getSelectionModel().addListSelectionListener(listener);
+        table.addKeyboardAction(KeyStroke.getKeyStroke("ESCAPE"), "escape", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setVisible(false);
+            }
+        });
+
+        table.addKeyboardAction(KeyStroke.getKeyStroke("ENTER"), "playSelected", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playlistTable.runAction("playSelected");
+            }
+        });
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -80,14 +120,30 @@ public class SearchDialog extends JDialog {
             }
 
             private void filter() {
-                String text = searchField.getText();
-                if (text.isEmpty()) {
-                    table.setPlaylist(empty);
-                } else if (table.getPlaylist() == empty) {
-                    table.setPlaylist(playlist);
+                String text = searchField.getText().toLowerCase().trim();
+                view.clear();
+                viewToModel.clear();
+                if (!text.isEmpty()) {
+                    for (int i = 0; i < playlist.size(); i++) {
+                        Track track = playlist.get(i);
+
+                        for (String field : fields) {
+                            String value = track.getMeta(field);
+                            if (!Util.isEmpty(value)) {
+                                if (value.toLowerCase().contains(text)) {
+                                    view.add(track);
+                                    viewToModel.add(i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
                 }
-                table.filter(text);
-                table.selectAll();
+                table.update();
+                if (!view.isEmpty()) {
+                    table.setRowSelectionInterval(0, 0);
+                    listener.valueChanged(null);
+                }
             }
         });
         searchField.addKeyListener(new KeyAdapter() {
@@ -95,7 +151,7 @@ public class SearchDialog extends JDialog {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_DOWN) {
                     searchField.transferFocus();
-                    if (table.getRowSorter().getViewRowCount() > 0)
+                    if (!view.isEmpty())
                         table.setRowSelectionInterval(0, 0);
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     setVisible(false);
@@ -105,30 +161,7 @@ public class SearchDialog extends JDialog {
         searchField.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                table.runAction("playSelected");
-            }
-        });
-
-        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                int[] rows = table.getSelectedRows();
-                int[] toSelect = new int[rows.length];
-                for (int i = 0; i < rows.length; i++) {
-                    toSelect[i] = table.convertRowIndexToModel(rows[i]);
-                }
-                playlistTable.clearSelection();
-                if (toSelect.length > 0)
-                    playlistTable.scrollToRow(toSelect[0]);
-                for (int row : toSelect) {
-                    playlistTable.addRowSelectionInterval(row, row);
-                }
-            }
-        });
-        table.addKeyboardAction(KeyStroke.getKeyStroke("ESCAPE"), "escape", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setVisible(false);
+                playlistTable.runAction("playSelected");
             }
         });
     }

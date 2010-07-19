@@ -55,7 +55,6 @@ public class PlaylistTable extends GroupTable {
 
     private Playlist playlist;
     private ArrayList<PlaylistColumn> columns;
-    private TableRowSorter<PlaylistModel> sorter;
     private PlaylistModel model;
 
     private JScrollPane scrollPane;
@@ -70,11 +69,6 @@ public class PlaylistTable extends GroupTable {
         scrollPane = new JScrollPane(this);
         buildActions();
         buildMenus();
-    }
-
-    public void createSorter() {
-        sorter = new TableRowSorter<PlaylistModel>(model);
-        setRowSorter(sorter);
     }
 
     public void buildActions() {
@@ -247,7 +241,6 @@ public class PlaylistTable extends GroupTable {
         });
     }
 
-
     public JScrollPane getScrollPane() {
         return scrollPane;
     }
@@ -275,21 +268,6 @@ public class PlaylistTable extends GroupTable {
         map.put(copyAction.getValue(Action.NAME), copyAction);
         Action pasteAction = TransferHandler.getPasteAction();
         map.put(pasteAction.getValue(Action.NAME), pasteAction);
-    }
-
-
-    public void filter(String text) {
-        try {
-            sorter.setRowFilter(RowFilter.regexFilter("(?iu)" + text));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void setPlaylist(Playlist playlist) {
-        this.playlist = playlist;
-        model.fireTableDataChanged();
-        update();
     }
 
     public Playlist getPlaylist() {
@@ -338,11 +316,7 @@ public class PlaylistTable extends GroupTable {
     }
 
     public int indexOf(Track track) {
-        int index = playlist.indexOf(track);
-        if (index != -1)
-            index = convertRowIndexToView(index);
-
-        return index;
+        return playlist.indexOf(track);
     }
 
     public void scrollToSong(Track track) {
@@ -355,7 +329,7 @@ public class PlaylistTable extends GroupTable {
         int[] rows = getSelectedRows();
         ArrayList<Track> tracks = new ArrayList<Track>();
         for (int row : rows) {
-            Track track = playlist.get(convertRowIndexToModel(row));
+            Track track = playlist.get(row);
             if (!(track instanceof Separator)) {
                 tracks.add(track);
             }
