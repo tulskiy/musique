@@ -25,7 +25,7 @@ import java.awt.event.ActionListener;
  * @Date: 15.06.2009
  */
 public class GlobalTimer {
-    private static Timer timer = new Timer(500, null);
+    private static Timer timer = new Timer(400, null);
 
     static {
         timer.start();
