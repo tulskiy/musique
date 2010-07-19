@@ -40,6 +40,7 @@ public class VorbisDecoder implements Decoder {
     private AudioFormat audioFormat;
     private boolean streaming = false;
     private Track track;
+    private int oldBitrate;
 
     public boolean open(Track track) {
         try {
@@ -49,6 +50,7 @@ public class VorbisDecoder implements Decoder {
                 //it's a file
                 vorbisFile = new VorbisFile(track.getFile().getAbsolutePath());
                 streaming = false;
+                oldBitrate = track.getBitrate();
             } else {
                 URL url = location.toURL();
                 URLConnection urlConnection = url.openConnection();
@@ -109,6 +111,7 @@ public class VorbisDecoder implements Decoder {
 
     public int decode(byte[] buf) {
         int ret = vorbisFile.read(buf, buf.length);
+        track.setBitrate(vorbisFile.bitrate_instant() / 1000);
         if (ret <= 0) {
             //it's a stream, open it again
             if (streaming) {
@@ -124,8 +127,10 @@ public class VorbisDecoder implements Decoder {
 
     public void close() {
         try {
-            if (vorbisFile != null)
+            if (vorbisFile != null) {
                 vorbisFile.close();
+                track.setBitrate(oldBitrate);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
