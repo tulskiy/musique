@@ -140,8 +140,6 @@ public class SettingsDialog extends JDialog {
                 config.setBoolean("tray.minimizeOnClose", minimizeOnClose.isSelected());
                 config.setString("format.window", window.getText());
                 config.setString("format.statusBar", status.getText());
-                app.getMainWindow().updateTray();
-                app.getMainWindow().updateDisplayFormat();
             }
         });
 
@@ -209,7 +207,6 @@ public class SettingsDialog extends JDialog {
                 config.setFont("gui.font.default", defaultFont.getFont());
                 config.setColor("tray.bgColor1", trayBg1.getColor());
                 config.setColor("tray.bgColor2", trayBg2.getColor());
-                app.getMainWindow().updateTray();
                 SwingUtilities.updateComponentTreeUI(SwingUtilities.getRoot(owner));
             }
         });
@@ -223,6 +220,8 @@ public class SettingsDialog extends JDialog {
                     selection.setColor(null);
                     highlight.setColor(null);
                     defaultFont.setFont(null);
+                    trayBg1.setColor(null);
+                    trayBg2.setColor(null);
                 }
             }
         });

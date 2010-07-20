@@ -34,12 +34,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Author: Denis Tulskiy
  * Date: Jul 19, 2010
  */
 public class AlbumArtPanel extends JPanel {
+    private static Logger logger = Logger.getLogger(AlbumArtPanel.class.getName());
+
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private final ArrayList<String> stubDefaults = new ArrayList<String>(Arrays.asList(
@@ -92,8 +96,17 @@ public class AlbumArtPanel extends JPanel {
         config.addPropertyChangeListener("playlist.selectedTrack", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getNewValue() instanceof Track)
-                    setTrack((Track) evt.getNewValue());
+                if (evt.getNewValue() instanceof Track) {
+                    track = (Track) evt.getNewValue();
+                    timer.restart();
+                }
+            }
+        });
+
+        config.addPropertyChangeListener("albumart.stubs", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                updateStubs();
             }
         });
         add(canvas, BorderLayout.CENTER);
@@ -114,8 +127,11 @@ public class AlbumArtPanel extends JPanel {
                                 continue;
                             image = cache.get(file);
                             if (image == null) {
+                                logger.info("Loading Album Art from file: " + file);
                                 image = new ImageIcon(file.getAbsolutePath());
                                 cache.put(file, image);
+                            } else {
+                                logger.info("Loading Album Art from cache for file: " + file);
                             }
                             break;
                         } catch (Exception ignored) {
@@ -134,28 +150,5 @@ public class AlbumArtPanel extends JPanel {
         for (String s : list) {
             stubs.add(Parser.parse(s));
         }
-    }
-
-    public void setTrack(Track track) {
-        this.track = track;
-        timer.restart();
-    }
-
-    public static void main(String[] args) {
-        Application app = Application.getInstance();
-        app.load();
-        JFrame f = new JFrame();
-        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        f.setLayout(new BorderLayout());
-        AlbumArtPanel aa = new AlbumArtPanel();
-        aa.setImage(new ImageIcon("/windows/Users/tulskiy/Music/Tic Tac Toe/2000 - Ist der Ruf erst ruiniert/front.jpg"));
-        f.add(aa, BorderLayout.CENTER);
-
-        f.setSize(300, 300);
-        f.setVisible(true);
-    }
-
-    private void setImage(ImageIcon image) {
-        this.image = image;
     }
 }

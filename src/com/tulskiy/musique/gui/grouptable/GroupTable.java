@@ -17,6 +17,8 @@
 
 package com.tulskiy.musique.gui.grouptable;
 
+import com.tulskiy.musique.util.Util;
+
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -184,16 +186,10 @@ public class GroupTable extends JTable {
     public void setSelectionBackground(Color selectionBackground) {
         super.setSelectionBackground(selectionBackground);
         if (selectionBackground != null) {
-            setSelectionForeground(getContrastColor(selectionBackground));
+            setSelectionForeground(Util.getContrastColor(selectionBackground));
             selectBgColor1 = new Color(selectionBackground.getRGB());
             selectBgColor2 = darker(selectionBackground);
         }
-    }
-
-    public Color getContrastColor(Color bg) {
-        int threshold = 105;
-        int delta = (int) (bg.getRed() * 0.299 + bg.getGreen() * 0.587 + bg.getBlue() * 0.114);
-        return (255 - delta < threshold) ? Color.black : Color.white;
     }
 
     public void setSeparatorColor(Color color) {

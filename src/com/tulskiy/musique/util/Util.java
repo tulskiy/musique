@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.util;
 
+import java.awt.*;
 import java.io.File;
 import java.util.*;
 
@@ -91,5 +92,11 @@ public class Util {
     public static String humanize(String property) {
         String s = property.replaceAll("(?=\\p{Upper})", " ");
         return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
+    public static Color getContrastColor(Color bg) {
+        int threshold = 105;
+        int delta = (int) (bg.getRed() * 0.299 + bg.getGreen() * 0.587 + bg.getBlue() * 0.114);
+        return (255 - delta < threshold) ? Color.black : Color.white;
     }
 }

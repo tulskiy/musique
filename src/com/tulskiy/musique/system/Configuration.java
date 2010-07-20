@@ -125,8 +125,9 @@ public class Configuration {
     }
 
     public void put(String key, Object value) {
-        changeSupport.firePropertyChange(key, get(key), value);
+        Object old = get(key);
         map.put(key, value);
+        changeSupport.firePropertyChange(key, old, value);
     }
 
     public Object get(String key) {
@@ -278,6 +279,10 @@ public class Configuration {
 
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
     }
 
     public static void main(String[] args) throws IOException {

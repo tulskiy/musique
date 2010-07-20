@@ -20,14 +20,21 @@ package com.tulskiy.musique.gui;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.playlist.PlaylistPanel;
+import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * @Author: Denis Tulskiy
@@ -39,27 +46,23 @@ public class MainWindow extends JFrame {
     private PlaylistPanel playlistPanel;
     private Tray tray;
     private Expression windowFormat;
-    private StatusBar statusBar;
 
     public MainWindow() {
-        super("Musique");
         setIconImage(new ImageIcon("resources/images/icon.png").getImage());
         ControlPanel controlPanel = new ControlPanel();
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
-        JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new AlbumArtPanel(), playlistPanel);
-        center.setDividerSize(4);
-        center.setDividerLocation(200);
+        JSplitPane side = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new LyricsPanel(), new AlbumArtPanel());
+        side.setDividerLocation(400);
+        side.setDividerSize(5);
+        JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, side, playlistPanel);
+        center.setDividerSize(5);
+        center.setDividerLocation(300);
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         playlistPanel.addMenu(menuBar);
-//        JPanel panel = new JPanel();
-//        panel.setLayout(new BorderLayout());
-//        panel.setOpaque(true);
-//        panel.add(playlistPanel);
         add(controlPanel, BorderLayout.NORTH);
-        this.statusBar = statusBar;
-        add(this.statusBar, BorderLayout.SOUTH);
+        add(statusBar, BorderLayout.SOUTH);
         add(center, BorderLayout.CENTER);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -70,14 +73,22 @@ public class MainWindow extends JFrame {
 
         updateTray();
 
-        updateDisplayFormat();
+        updateTitleFormat();
         app.getPlayer().addListener(new PlayerListener() {
             @Override
             public void onEvent(PlayerEvent e) {
-                switch (e.getEventCode()) {
-                    case FILE_OPENED:
-                        setTitle(windowFormat.eval(app.getPlayer().getTrack()) + " [Musique " + app.getVersion() + "]");
-                        break;
+                formatTitle();
+            }
+        });
+
+        config.addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                String prop = evt.getPropertyName();
+                if (prop.startsWith("tray.")) {
+                    updateTray();
+                } else if (prop.equals("format.window")) {
+                    updateTitleFormat();
                 }
             }
         });
@@ -93,12 +104,25 @@ public class MainWindow extends JFrame {
         });
     }
 
-    public void updateDisplayFormat() {
-        windowFormat = Parser.parse(config.getString("format.window", ""));
-        statusBar.updateFormat();
+    private void formatTitle() {
+        Track track = app.getPlayer().getTrack();
+        String value = null;
+        if (track != null)
+            value = (String) windowFormat.eval(track);
+
+        if (Util.isEmpty(value) || app.getPlayer().isStopped()) {
+            setTitle(app.getVersion());
+        } else {
+            setTitle(value + " [" + app.getVersion() + "]");
+        }
     }
 
-    public void updateTray() {
+    private void updateTitleFormat() {
+        windowFormat = Parser.parse(config.getString("format.window", ""));
+        formatTitle();
+    }
+
+    private void updateTray() {
         if (config.getBoolean("tray.enabled", false)) {
             if (tray == null) {
                 tray = new Tray();
