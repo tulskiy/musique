@@ -60,7 +60,7 @@ public class Application {
     }
 
     private void loadSettings() {
-        player.setVolume(configuration.getDouble("player.volume", 1));
+        player.setVolume(configuration.getFloat("player.volume", 1));
         UIManager.put("Slider.paintValue", Boolean.FALSE);
         try {
             Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
@@ -81,7 +81,7 @@ public class Application {
     }
 
     private void saveSettings() {
-        configuration.setDouble("player.volume", player.getVolume());
+        configuration.setFloat("player.volume", player.getVolume());
         configuration.setString("gui.LAF", UIManager.getLookAndFeel().getClass().getCanonicalName());
     }
 

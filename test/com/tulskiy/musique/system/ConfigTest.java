@@ -69,7 +69,7 @@ public class ConfigTest {
         int anInt = config.getInt("int", -1);
         assertEquals(12345, anInt);
 
-        float aFloat = config.getDouble("float", -1);
+        float aFloat = config.getFloat("float", -1);
         assertEquals(1.2345, aFloat, 0.00001);
 
         String string = config.getString("string", null);
@@ -97,7 +97,7 @@ public class ConfigTest {
         int anInt = config.getInt("doesNotExist", -1);
         assertEquals(-1, anInt);
 
-        float aFloat = config.getDouble("doesNotExist", -1);
+        float aFloat = config.getFloat("doesNotExist", -1);
         assertEquals(-1, aFloat, 0.00001);
 
         String string = config.getString("doesNotExist", null);
@@ -107,7 +107,7 @@ public class ConfigTest {
     @Test
     public void testSave() {
         config.setInt("newInt", 123);
-        config.setDouble("newFloat", 1.23);
+        config.setFloat("newFloat", 1.23f);
         config.setString("newString", "new string");
         config.setColor("newColor", new Color(0xD017AA));
         config.setFont("newFont", new Font("Serif", 0, 14));
@@ -128,7 +128,7 @@ public class ConfigTest {
         int anInt = config.getInt("newInt", -1);
         assertEquals(123, anInt);
 
-        float aFloat = config.getDouble("newFloat", -1);
+        float aFloat = config.getFloat("newFloat", -1);
         assertEquals(1.23, aFloat, 0.00001);
 
         String string = config.getString("newString", null);

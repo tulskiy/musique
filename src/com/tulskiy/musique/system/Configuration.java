@@ -18,6 +18,8 @@
 package com.tulskiy.musique.system;
 
 import java.awt.*;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.*;
 import java.util.*;
 import java.util.List;
@@ -31,6 +33,7 @@ import java.util.logging.Logger;
 public class Configuration {
     private static final String CONFIG_PATH = "resources/config";
     private Logger logger = Logger.getLogger(getClass().getName());
+    private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     private Map<String, Object> map = new TreeMap<String, Object>();
 
@@ -100,7 +103,7 @@ public class Configuration {
         PrintWriter w = new PrintWriter(writer);
 
         for (String key : map.keySet()) {
-            Object value = map.get(key);
+            Object value = get(key);
             if (value == null) {
                 continue;
             }
@@ -121,42 +124,73 @@ public class Configuration {
         w.close();
     }
 
+    public void put(String key, Object value) {
+        changeSupport.firePropertyChange(key, get(key), value);
+        map.put(key, value);
+    }
+
+    public Object get(String key) {
+        return map.get(key);
+    }
+
     public int getInt(String key, int def) {
         try {
-            return Integer.valueOf(map.get(key).toString());
+            return Integer.valueOf(get(key).toString());
         } catch (Exception e) {
             return def;
         }
     }
 
-    public float getDouble(String key, float def) {
+    public void setInt(String key, int value) {
+        put(key, value);
+    }
+
+    public float getFloat(String key, float def) {
         try {
-            return Float.valueOf(map.get(key).toString());
+            return Float.valueOf(get(key).toString());
         } catch (Exception e) {
             return def;
         }
+    }
+
+    public void setFloat(String key, float value) {
+        put(key, value);
     }
 
     public String getString(String key, String def) {
         try {
-            return map.get(key).toString();
+            return get(key).toString();
         } catch (Exception e) {
             return def;
         }
     }
 
+    public void setString(String key, String value) {
+        put(key, value);
+    }
+
     public Color getColor(String key, Color def) {
         try {
-            String s = map.get(key).toString().substring(1);
+            String s = get(key).toString().substring(1);
             return new Color(Integer.parseInt(s, 16));
         } catch (Exception e) {
             return def;
         }
     }
 
+    public void setColor(String key, Color value) {
+        if (value == null)
+            put(key, value);
+        else {
+            String s = new Formatter().format(
+                    "#%06X", value.getRGB() & 0xFFFFFF).toString();
+            put(key, s);
+        }
+    }
+
     public Rectangle getRectangle(String key, Rectangle def) {
         try {
-            String value = map.get(key).toString();
+            String value = get(key).toString();
             String[] tokens = value.split(" ");
             if (tokens.length != 4)
                 throw new NumberFormatException();
@@ -172,9 +206,18 @@ public class Configuration {
         }
     }
 
+    public void setRectangle(String key, Rectangle value) {
+        String s = new Formatter().format("%d %d %d %d",
+                (int) value.getX(),
+                (int) value.getY(),
+                (int) value.getWidth(),
+                (int) value.getHeight()).toString();
+        put(key, s);
+    }
+
     public Font getFont(String key, Font def) {
         try {
-            String value = map.get(key).toString();
+            String value = get(key).toString();
             String[] tokens = value.split(", ");
 
             return new Font(tokens[0],
@@ -185,19 +228,35 @@ public class Configuration {
         }
     }
 
+    public void setFont(String key, Font value) {
+        if (value == null)
+            put(key, value);
+        else {
+            String s = new Formatter().format(
+                    "%s, %d, %d",
+                    value.getName(), value.getStyle(),
+                    value.getSize()).toString();
+            put(key, s);
+        }
+    }
+
     public boolean getBoolean(String key, boolean def) {
         try {
-            String value = map.get(key).toString();
+            String value = get(key).toString();
             return Boolean.parseBoolean(value);
         } catch (Exception e) {
             return def;
         }
     }
 
+    public void setBoolean(String key, boolean value) {
+        put(key, value);
+    }
+
     @SuppressWarnings({"unchecked"})
     public ArrayList<String> getList(String key, ArrayList<String> def) {
         try {
-            ArrayList<String> strings = (ArrayList<String>) map.get(key);
+            ArrayList<String> strings = (ArrayList<String>) get(key);
             if (strings != null)
                 return strings;
         } catch (Exception ignored) {
@@ -205,63 +264,20 @@ public class Configuration {
         return def;
     }
 
-    public void setObject(String key, Object value) {
-        map.put(key, value);
-    }
-
-    public void setInt(String key, int value) {
-        setObject(key, value);
-    }
-
-    public void setDouble(String key, double value) {
-        setObject(key, value);
-    }
-
-    public void setString(String key, String value) {
-        setObject(key, value);
-    }
-
-    public void setRectangle(String key, Rectangle value) {
-        String s = new Formatter().format("%d %d %d %d",
-                (int) value.getX(),
-                (int) value.getY(),
-                (int) value.getWidth(),
-                (int) value.getHeight()).toString();
-        setObject(key, s);
-    }
-
-    public void setColor(String key, Color value) {
-        if (value == null)
-            setObject(key, value);
-        else {
-            String s = new Formatter().format(
-                    "#%06X", value.getRGB() & 0xFFFFFF).toString();
-            setObject(key, s);
-        }
-    }
-
-    public void setFont(String key, Font value) {
-        if (value == null)
-            setObject(key, value);
-        else {
-            String s = new Formatter().format(
-                    "%s, %d, %d",
-                    value.getName(), value.getStyle(),
-                    value.getSize()).toString();
-            setObject(key, s);
-        }
-    }
-
     public void setList(String key, ArrayList<?> value) {
         ArrayList<String> s = new ArrayList<String>(value.size());
         for (Object o : value) {
             s.add(o.toString());
         }
-        map.put(key, s);
+        put(key, s);
     }
 
-    public void setBoolean(String key, boolean value) {
-        setObject(key, value);
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(propertyName, listener);
     }
 
     public static void main(String[] args) throws IOException {
@@ -275,7 +291,7 @@ public class Configuration {
         config.save();
 
         System.out.println(config.getInt("some.int", -1));
-        System.out.println(config.getDouble("some.float", -1));
+        System.out.println(config.getFloat("some.float", -1));
         System.out.println(config.getColor("playlist.color", null));
         System.out.println(config.getString("just.for.fun", "empty"));
         System.out.println(config.getRectangle("window.size", new Rectangle()));

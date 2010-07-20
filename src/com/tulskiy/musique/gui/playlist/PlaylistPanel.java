@@ -159,7 +159,7 @@ public class PlaylistPanel extends JPanel {
         }
 
         Collections.sort(columns);
-        config.setObject("playlist.selectedTrack", null);
+        config.put("playlist.selectedTrack", null);
         config.setList("playlist.columns", columns);
 
         ArrayList<Integer> list = new ArrayList<Integer>();

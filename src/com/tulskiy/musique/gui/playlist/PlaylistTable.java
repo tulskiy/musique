@@ -232,7 +232,7 @@ public class PlaylistTable extends GroupTable {
                 if (tracks.isEmpty())
                     return;
                 Track track = tracks.get(0);
-                config.setObject("playlist.selectedTrack", track);
+                config.put("playlist.selectedTrack", track);
                 if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
                     PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
                     order.setLastPlayed(track);
