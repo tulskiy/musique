@@ -95,18 +95,16 @@ public class Tray {
         BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D d = img.createGraphics();
 
-        if (config.getBoolean("tray.overrideBackground", false)) {
-            Color color1 = config.getColor("tray.bgColor1", null);
+        Color color1 = config.getColor("tray.bgColor1", null);
+        if (color1 != null) {
             Color color2 = config.getColor("tray.bgColor2", null);
 
-            if (color1 != null) {
-                if (color2 == null)
-                    color2 = color1;
-                Paint old = d.getPaint();
-                d.setPaint(new GradientPaint(0, 0, color1, 0, size.height, color2));
-                d.fillRect(0, 0, size.width, size.height);
-                d.setPaint(old);
-            }
+            if (color2 == null)
+                color2 = color1;
+            Paint old = d.getPaint();
+            d.setPaint(new GradientPaint(0, 0, color1, 0, size.height, color2));
+            d.fillRect(0, 0, size.width, size.height);
+            d.setPaint(old);
         }
 
         d.drawImage(icon.getImage(), 0, 0, size.width, size.height, icon.getImageObserver());
