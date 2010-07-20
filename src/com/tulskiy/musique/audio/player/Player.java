@@ -125,6 +125,10 @@ public class Player {
         return state == PlayerState.PAUSED;
     }
 
+    public boolean isStopped() {
+        return state == PlayerState.STOPPED;
+    }
+
     public float getVolume() {
         FloatControl volume = playerThread.volume;
         if (volume != null) {
