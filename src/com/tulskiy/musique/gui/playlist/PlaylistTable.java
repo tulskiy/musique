@@ -321,8 +321,10 @@ public class PlaylistTable extends GroupTable {
 
     public void scrollToSong(Track track) {
         int index = indexOf(track);
-        if (index != -1)
+        if (index != -1) {
             scrollToRow(index);
+            setRowSelectionInterval(index, index);
+        }
     }
 
     public ArrayList<Track> getSelectedSongs() {

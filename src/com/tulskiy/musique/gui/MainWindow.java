@@ -44,21 +44,23 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         super("Musique");
         setIconImage(new ImageIcon("resources/images/icon.png").getImage());
-
         ControlPanel controlPanel = new ControlPanel();
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
+        JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, new AlbumArtPanel(), playlistPanel);
+        center.setDividerSize(4);
+        center.setDividerLocation(200);
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         playlistPanel.addMenu(menuBar);
-        JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.setOpaque(true);
-        panel.add(playlistPanel);
+//        JPanel panel = new JPanel();
+//        panel.setLayout(new BorderLayout());
+//        panel.setOpaque(true);
+//        panel.add(playlistPanel);
         add(controlPanel, BorderLayout.NORTH);
         this.statusBar = statusBar;
         add(this.statusBar, BorderLayout.SOUTH);
-        add(panel, BorderLayout.CENTER);
+        add(center, BorderLayout.CENTER);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         Rectangle r = config.getRectangle("gui.mainWindowPosition", new Rectangle(0, 0, 790, 480));
