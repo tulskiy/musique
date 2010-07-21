@@ -49,6 +49,7 @@ public class SearchDialog extends JDialog {
     private Playlist view = new Playlist();
     private ArrayList<Integer> viewToModel = new ArrayList<Integer>();
     private Playlist playlist;
+    private Timer timer;
 
     public SearchDialog(final PlaylistTable playlistTable) {
         super(playlistTable.getParentFrame(), "Search", false);
@@ -95,11 +96,52 @@ public class SearchDialog extends JDialog {
                 setVisible(false);
             }
         });
-
         table.addKeyboardAction(KeyStroke.getKeyStroke("ENTER"), "playSelected", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 playlistTable.runAction("playSelected");
+            }
+        });
+
+        timer = new Timer(300, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String str = searchField.getText().toLowerCase().trim();
+                String[] text = str.split("\\s+");
+                view.clear();
+                viewToModel.clear();
+                if (!str.isEmpty() && text.length > 0) {
+                    for (int i = 0; i < playlist.size(); i++) {
+                        Track track = playlist.get(i);
+
+                        boolean hasText[] = new boolean[text.length];
+                        for (String field : fields) {
+                            String value = track.getMeta(field);
+                            if (!Util.isEmpty(value)) {
+                                value = value.toLowerCase();
+                                for (int j = 0, textLength = text.length; j < textLength; j++) {
+                                    String s = text[j];
+                                    if (value.contains(s)) {
+                                        hasText[j] = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        boolean toAdd = true;
+                        for (boolean b : hasText) {
+                            toAdd &= b;
+                        }
+
+                        if (toAdd) {
+                            view.add(track);
+                            viewToModel.add(i);
+                        }
+                    }
+                }
+                table.update();
+                table.selectAll();
+                timer.stop();
             }
         });
 
@@ -120,30 +162,7 @@ public class SearchDialog extends JDialog {
             }
 
             private void filter() {
-                String text = searchField.getText().toLowerCase().trim();
-                view.clear();
-                viewToModel.clear();
-                if (!text.isEmpty()) {
-                    for (int i = 0; i < playlist.size(); i++) {
-                        Track track = playlist.get(i);
-
-                        for (String field : fields) {
-                            String value = track.getMeta(field);
-                            if (!Util.isEmpty(value)) {
-                                if (value.toLowerCase().contains(text)) {
-                                    view.add(track);
-                                    viewToModel.add(i);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                table.update();
-                if (!view.isEmpty()) {
-                    table.setRowSelectionInterval(0, 0);
-                    listener.valueChanged(null);
-                }
+                timer.restart();
             }
         });
         searchField.addKeyListener(new KeyAdapter() {
