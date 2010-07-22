@@ -1,21 +1,4 @@
 /*
- * Copyright (c) 2008, 2009 Denis Tulskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
  * 11/19/04		1.0 moved to LGPL.
  *  
  * 29/01/00		Initial version. mdm@techie.com
@@ -210,6 +193,8 @@ public class jlc {
             System.out.println("  More info on http://www.javazoom.net");
             /* System.out.println("  -f ushort  use this scalefactor instead of the default value 32768");*/
             return false;
-	   }
-	};
+        }
+    }
+
+    ;
 };

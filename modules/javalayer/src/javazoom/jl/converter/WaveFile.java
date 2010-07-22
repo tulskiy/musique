@@ -1,21 +1,4 @@
 /*
- * Copyright (c) 2008, 2009 Denis Tulskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
  * 11/19/04 1.0 moved to LGPL.
  * 02/23/99 JavaConversion by E.B
  * Don Cross, April 1993.
@@ -85,14 +68,14 @@ public class WaveFile extends RiffFile {
         public int VerifyValidity() {
             boolean ret = header.ckID == FourCC("fmt ") &&
 
-                    (data.nChannels == 1 || data.nChannels == 2) &&
+                          (data.nChannels == 1 || data.nChannels == 2) &&
 
-                    data.nAvgBytesPerSec == (data.nChannels *
-                            data.nSamplesPerSec *
-                            data.nBitsPerSample) / 8 &&
+                          data.nAvgBytesPerSec == (data.nChannels *
+                                                   data.nSamplesPerSec *
+                                                   data.nBitsPerSample) / 8 &&
 
-                    data.nBlockAlign == (data.nChannels *
-                            data.nBitsPerSample) / 8;
+                          data.nBlockAlign == (data.nChannels *
+                                               data.nBitsPerSample) / 8;
             if (ret == true) return 1;
             else return 0;
         }
@@ -172,8 +155,8 @@ public class WaveFile extends RiffFile {
     public int OpenForWrite(String Filename, int SamplingRate, short BitsPerSample, short NumChannels) {
         // Verify parameters...
         if ((Filename == null) ||
-                (BitsPerSample != 8 && BitsPerSample != 16) ||
-                NumChannels < 1 || NumChannels > 2) {
+            (BitsPerSample != 8 && BitsPerSample != 16) ||
+            NumChannels < 1 || NumChannels > 2) {
             return DDC_INVALID_CALL;
         }
 
@@ -481,6 +464,7 @@ public class WaveFile extends RiffFile {
     }
 
     // [Hz]
+
     public int SamplingRate() {
         return wave_format.data.nSamplesPerSec;
     }

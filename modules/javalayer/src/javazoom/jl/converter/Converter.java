@@ -1,21 +1,4 @@
 /*
- * Copyright (c) 2008, 2009 Denis Tulskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
  * 11/19/04 1.0 moved to LGPL.
  * 12/12/99 Original verion. mdm@techie.com.
  *-----------------------------------------------------------------------
@@ -259,6 +242,8 @@ public class Converter {
          * Called when an exception is thrown during while converting
          * a frame.
          *
+         * @param t The <code>Throwable</code> instance that
+         *          was thrown.
          * @return <code>true</code> to continue processing, or false
          *         to abort conversion.
          *         <p/>
@@ -266,8 +251,6 @@ public class Converter {
          *         is propagated to the caller of the convert() method. If
          *         <code>true</code> is returned, the exception is silently
          *         ignored and the converter moves onto the next frame.
-         * @param    t    The <code>Throwable</code> instance that
-         * was thrown.
          */
         public boolean converterException(Throwable t);
 
@@ -329,7 +312,7 @@ public class Converter {
 
                         pw.println();
                         pw.println("Converted " + param2 + " frames in " + param1 + " ms (" +
-                                (param1 / param2) + " ms per frame.)");
+                                   (param1 / param2) + " ms per frame.)");
                 }
             }
         }
@@ -365,25 +348,22 @@ public class Converter {
                     pw.flush();
                 }
 
-                if ((frameNo % 10)==0)
-				{
-					pw.print('.');
-					pw.flush();
-				}
-			}
-		}
+                if ((frameNo % 10) == 0) {
+                    pw.print('.');
+                    pw.flush();
+                }
+            }
+        }
 
-		public boolean converterException(Throwable t)
-		{
-			if (this.detailLevel>NO_DETAIL)
-			{
-				t.printStackTrace(pw);
-				pw.flush();
-			}
-			return false;
-		}
+        public boolean converterException(Throwable t) {
+            if (this.detailLevel > NO_DETAIL) {
+                t.printStackTrace(pw);
+                pw.flush();
+            }
+            return false;
+        }
 
-	}
+    }
 
 
 }

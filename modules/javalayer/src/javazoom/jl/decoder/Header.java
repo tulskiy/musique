@@ -1,18 +1,33 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * 11/19/04 : 1.0 moved to LGPL.
+ *            VBRI header support added, E.B javalayer@javazoom.net
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * 12/04/03 : VBR (XING) header support added, E.B javalayer@javazoom.net
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * 02/13/99 : Java Conversion by JavaZOOM , E.B javalayer@javazoom.net
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Declarations for MPEG header class
+ * A few layer III, MPEG-2 LSF, and seeking modifications made by Jeff Tsay.
+ * Last modified : 04/19/97
+ *
+ *  @(#) header.h 1.7, last edit: 6/15/94 16:55:33
+ *  @(#) Copyright (C) 1993, 1994 Tobias Bading (bading@cs.tu-berlin.de)
+ *  @(#) Berlin University of Technology
+ *-----------------------------------------------------------------------
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU Library General Public License as published
+ *   by the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU Library General Public License for more details.
+ *
+ *   You should have received a copy of the GNU Library General Public
+ *   License along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *----------------------------------------------------------------------
  */
 package javazoom.jl.decoder;
 
@@ -416,6 +431,7 @@ public final class Header {
     }
 
     // Seeking and layer III stuff
+
     /**
      * Returns Layer III Padding bit.
      */
@@ -463,6 +479,7 @@ public final class Header {
     };
 
     // E.B -> private to public
+
     /**
      * Calculate Frame size.
      * Calculates framesize in bytes excluding header size.
@@ -471,7 +488,7 @@ public final class Header {
 
         if (h_layer == 1) {
             framesize = (12 * bitrates[h_version][0][h_bitrate_index]) /
-                    frequencies[h_version][h_sample_frequency];
+                        frequencies[h_version][h_sample_frequency];
             if (h_padding_bit != 0) {
                 framesize++;
             }
@@ -479,7 +496,7 @@ public final class Header {
             nSlots = 0;
         } else {
             framesize = (144 * bitrates[h_version][h_layer - 1][h_bitrate_index]) /
-                    frequencies[h_version][h_sample_frequency];
+                        frequencies[h_version][h_sample_frequency];
             if (h_version == MPEG2_LSF || h_version == MPEG25_LSF) {
                 framesize >>= 1;    // SZD
             }
@@ -490,12 +507,12 @@ public final class Header {
             if (h_layer == 3) {
                 if (h_version == MPEG1) {
                     nSlots = framesize - ((h_mode == SINGLE_CHANNEL) ? 17 : 32) // side info size
-                            - ((h_protection_bit != 0) ? 0 : 2)                // CRC size
-                            - 4;                                              // header size
+                             - ((h_protection_bit != 0) ? 0 : 2)                // CRC size
+                             - 4;                                              // header size
                 } else {  // MPEG-2 LSF, SZD: MPEG-2.5 LSF
                     nSlots = framesize - ((h_mode == SINGLE_CHANNEL) ? 9 : 17) // side info size
-                            - ((h_protection_bit != 0) ? 0 : 2)                // CRC size
-                            - 4;                                              // header size
+                             - ((h_protection_bit != 0) ? 0 : 2)                // CRC size
+                             - 4;                                              // header size
                 }
             } else {
                 nSlots = 0;
@@ -584,6 +601,7 @@ public final class Header {
     }
 
     // functions which return header informations as strings:
+
     /**
      * Return Layer version.
      */

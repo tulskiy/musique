@@ -1,18 +1,31 @@
-/*
- * Copyright (c) 2008, 2009 Denis Tulskiy
+/**
+ *  @author : Paul Taylor
+ *  @author : Eric Farng
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  Version @version:$Id: DataTypes.java,v 1.6 2008/01/01 15:14:15 paultaylor Exp $
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  MusicTag Copyright (C)2003,2004
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  This library is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser
+ *  General Public  License as published by the Free Software Foundation; either version 2.1 of the License,
+ *  or (at your option) any later version.
+ *
+ *  This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even
+ *  the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *  See the GNU Lesser General Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public License along with this library; if not,
+ *  you can get a copy from http://www.opensource.org/licenses/lgpl-license.php or write to the Free Software
+ *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ *
+ * Description:
+ * Object Types,all types used by the various frame bodies and associated objects are defined here
+ * this works better than putting them with their associated bodies because bodies dont all fall
+ * the neccessary hierachy, and values are also required in some Objects (which were previously
+ * defined seperately).
+ *
+ * Warning:Values should not be seperated by space as this will break XML display of tag.
+ *
  */
 package org.jaudiotagger.tag.datatype;
 
