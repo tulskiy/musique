@@ -32,7 +32,9 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
@@ -49,6 +51,8 @@ public class LyricsPanel extends JPanel {
     private static Configuration config = app.getConfiguration();
     private static final String searchURL = "http://www.lyricsplugin.com/winamp03/plugin/?";
     private static Logger logger = Logger.getLogger("musique");
+    private final File lyricsDir = new File(app.CONFIG_HOME, "lyrics");
+    private final Object lock = new Object();
 
     public LyricsPanel() {
         setLayout(new BorderLayout());
@@ -124,35 +128,55 @@ public class LyricsPanel extends JPanel {
 
         @Override
         public void run() {
-            String artist = track.getArtist();
-            String title = track.getTitle();
-            if (track != null && !Util.isEmpty(artist) && !Util.isEmpty(title)) {
-                textPane.setText("");
-                StyledDocument doc = textPane.getStyledDocument();
-                try {
-                    doc.insertString(doc.getLength(), artist + "\n", textPane.getStyle("artist"));
-                    doc.insertString(doc.getLength(), title + "\n\n", textPane.getStyle("title"));
+            synchronized (lock) {
+                String artist = track.getArtist();
+                String title = track.getTitle();
+                if (track != null && !Util.isEmpty(artist) && !Util.isEmpty(title)) {
+                    textPane.setText("");
+                    StyledDocument doc = textPane.getStyledDocument();
+                    try {
+                        doc.insertString(doc.getLength(), artist + "\n", textPane.getStyle("artist"));
+                        doc.insertString(doc.getLength(), title + "\n\n", textPane.getStyle("title"));
 
-                    URL search = new URL(searchURL +
-                                         "artist=" + URLEncoder.encode(artist, "utf8") +
-                                         "&title=" + URLEncoder.encode(title, "utf8"));
-                    logger.fine("Searching for lyrics, url: " + URLDecoder.decode(search.toString(), "utf8"));
-                    URLConnection conn = search.openConnection();
+                        Scanner fi;
+                        File file = new File(lyricsDir, artist + " - " + title + ".txt");
+                        StringBuilder sb = new StringBuilder();
+                        if (file.exists()) {
+                            logger.info("Loading lyrics from file: " + file.getName());
+                            fi = new Scanner(file);
+                            while (fi.hasNextLine())
+                                sb.append(fi.nextLine()).append("\n");
+                        } else {
+                            URL search = new URL(searchURL +
+                                                 "artist=" + URLEncoder.encode(artist, "utf8") +
+                                                 "&title=" + URLEncoder.encode(title, "utf8"));
+                            logger.info("Searching for lyrics at url: " + URLDecoder.decode(search.toString(), "utf8"));
+                            URLConnection conn = search.openConnection();
+                            fi = new Scanner(conn.getInputStream(), "utf-8");
+                            while (fi.hasNextLine()) {
+                                String s = fi.nextLine();
+                                if (s.startsWith("<div id=\"lyrics\">")) {
+                                    while (!(s = fi.nextLine()).equals("</div>")) {
+                                        sb.append(s.replaceAll("<.*?>", "")).append("\n");
+                                    }
+                                }
+                            }
 
-                    Scanner fi = new Scanner(conn.getInputStream(), "utf-8");
-                    while (fi.hasNextLine()) {
-                        String s = fi.nextLine();
-                        if (s.startsWith("<div id=\"lyrics\">")) {
-                            while (!(s = fi.nextLine()).equals("</div>")) {
-                                s = s.replaceAll("<.*?>", "") + "\n";
-                                doc.insertString(doc.getLength(), s, null);
+                            if (sb.length() > 0) {
+                                //noinspection ResultOfMethodCallIgnored
+                                lyricsDir.mkdirs();
+                                PrintWriter writer = new PrintWriter(file);
+                                writer.print(sb.toString());
+                                writer.close();
                             }
                         }
+
+                        doc.insertString(doc.getLength(), sb.toString(), null);
+                    } catch (BadLocationException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                } catch (BadLocationException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
             }
         }
