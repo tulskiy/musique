@@ -39,6 +39,7 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -190,16 +191,18 @@ public class PlaylistPanel extends JPanel {
     }
 
     public void addMenu(JMenuBar menuBar) {
+        ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+
         JMenu fileMenu = new JMenu("File ");
         menuBar.add(fileMenu);
-        JMenu editMenu = new JMenu("Edit ");
+        JMenu editMenu = new JMenu("Edit");
         menuBar.add(editMenu);
         final JMenu playbackMenu = new JMenu("Playback");
         menuBar.add(playbackMenu);
 
         ActionMap tMap = tabs.getActionMap();
         fileMenu.add(tMap.get("newPlaylist")).setAccelerator(KeyStroke.getKeyStroke("ctrl N"));
-        fileMenu.add(tMap.get("removePlaylist"));
+        fileMenu.add(tMap.get("removePlaylist")).setIcon(emptyIcon);
         fileMenu.add(tMap.get("loadPlaylist"));
         fileMenu.add(tMap.get("savePlaylist")).setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
 
@@ -270,6 +273,7 @@ public class PlaylistPanel extends JPanel {
             }
         }));
         JMenuItem propsItem = editMenu.add("Properties");
+        propsItem.setIcon(emptyIcon);
         propsItem.setAccelerator(KeyStroke.getKeyStroke("ctrl P"));
         final JComponent comp = this;
         propsItem.addActionListener(new ActionListener() {
