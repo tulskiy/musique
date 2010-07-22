@@ -23,7 +23,6 @@ import java.beans.PropertyChangeSupport;
 import java.io.*;
 import java.util.*;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -31,23 +30,14 @@ import java.util.logging.Logger;
  * Date: Jun 15, 2010
  */
 public class Configuration {
-    private static final String CONFIG_PATH = "resources/config";
-    private Logger logger = Logger.getLogger(getClass().getName());
+    private Logger logger = Logger.getLogger("musique");
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     private Map<String, Object> map = new TreeMap<String, Object>();
 
-    public void load() {
-        try {
-            load(new FileReader(CONFIG_PATH));
-        } catch (FileNotFoundException e) {
-            logger.info("Could not find default config file. Possibly fresh install");
-        }
-    }
-
     public void load(Reader reader) {
         try {
-            logger.info("Loading configuration");
+            logger.fine("Loading configuration");
             BufferedReader r = new BufferedReader(reader);
 
             ArrayList<String> array = null;
@@ -88,18 +78,9 @@ public class Configuration {
         }
     }
 
-    public void save() {
-        try {
-            save(new FileWriter(CONFIG_PATH));
-        } catch (IOException e) {
-            logger.severe("Failed to save configuration: " + e.getMessage());
-        }
-    }
-
     @SuppressWarnings({"unchecked"})
     public void save(Writer writer) {
-        logger.setLevel(Level.INFO);
-        logger.info("Saving configuration");
+        logger.fine("Saving configuration");
         PrintWriter w = new PrintWriter(writer);
 
         for (String key : map.keySet()) {
@@ -283,24 +264,6 @@ public class Configuration {
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(listener);
-    }
-
-    public static void main(String[] args) throws IOException {
-        System.setProperty("java.util.logging.config.file", "resources/logging.properties");
-        Configuration config = new Configuration();
-        config.load();
-        Rectangle r = new Rectangle();
-        r.setRect(0.1, 0.123, 0.234, 0.567);
-        config.setRectangle("floatRect", r);
-        config.setColor("color", new Color(0x00AA00));
-        config.save();
-
-        System.out.println(config.getInt("some.int", -1));
-        System.out.println(config.getFloat("some.float", -1));
-        System.out.println(config.getColor("playlist.color", null));
-        System.out.println(config.getString("just.for.fun", "empty"));
-        System.out.println(config.getRectangle("window.size", new Rectangle()));
-        System.out.println(config.getFont("playlist.font", null));
     }
 }
 

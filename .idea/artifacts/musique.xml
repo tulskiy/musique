@@ -6,6 +6,13 @@
         <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
       </element>
       <element id="module-output" name="musique" />
+      <element id="module-output" name="cuelib" />
+      <element id="module-output" name="jaudiotagger" />
+      <element id="module-output" name="javalayer" />
+      <element id="module-output" name="jflac" />
+      <element id="module-output" name="jmac" />
+      <element id="module-output" name="jorbis" />
+      <element id="module-output" name="wavpack" />
     </root>
   </artifact>
 </component>

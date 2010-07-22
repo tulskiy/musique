@@ -27,9 +27,9 @@ import javax.sound.sampled.AudioFormat;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 
 /**
  * @Author: Denis Tulskiy
@@ -45,16 +45,18 @@ public class VorbisDecoder implements Decoder {
     public boolean open(Track track) {
         try {
             this.track = track;
-            URI location = track.getLocation();
-            if (location.getScheme().equals("file")) {
-                //it's a file
+            if (track.isFile()) {
+                logger.fine("Opening file: " + track.getFile());
                 vorbisFile = new VorbisFile(track.getFile().getAbsolutePath());
                 streaming = false;
                 oldBitrate = track.getBitrate();
-            } else {
-                URL url = location.toURL();
+            } else if (track.isStream()) {
+                URL url = track.getLocation().toURL();
+                logger.fine("Opening stream: " + URLDecoder.decode(url.toString(), "utf8"));
                 URLConnection urlConnection = url.openConnection();
-                if (!urlConnection.getContentType().equals("application/ogg")) {
+                String contentType = urlConnection.getContentType();
+                if (!contentType.equals("application/ogg")) {
+                    logger.warning("Wrong content type: " + contentType);
                     return false;
                 }
                 InputStream is = urlConnection.getInputStream();

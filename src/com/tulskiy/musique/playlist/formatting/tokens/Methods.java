@@ -18,6 +18,7 @@
 package com.tulskiy.musique.playlist.formatting.tokens;
 
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.util.Util;
@@ -31,8 +32,8 @@ import java.util.ArrayList;
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class Methods {
-    private static ImageIcon playingIcon = new ImageIcon("resources/images/play.png");
-    private static ImageIcon pausedIcon = new ImageIcon("resources/images/pause.png");
+    private static ImageIcon playingIcon = Images.loadIcon("play.png");
+    private static ImageIcon pausedIcon = Images.loadIcon("pause.png");
     private Application app = Application.getInstance();
 
     public String if3(Track track, ArrayList<Expression> args) {

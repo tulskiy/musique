@@ -22,10 +22,14 @@ import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.tag.Tag;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.LineNumberReader;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @Author: Denis Tulskiy
@@ -34,8 +38,10 @@ import java.util.Map;
 public abstract class AudioFileReader {
     private static CUEParser cueParser;
     protected static Charset defaultCharset = Charset.forName("iso8859-1");
+    protected final Logger logger = Logger.getLogger("musique");
 
     public void read(File f, List<Track> list) {
+        logger.log(Level.FINE, "Reading file : {0}", f);
         Track track = readSingle(f);
         String cueSheet = track.getCueSheet();
         if (cueSheet != null && cueSheet.length() > 0) {

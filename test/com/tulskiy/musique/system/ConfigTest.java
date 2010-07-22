@@ -20,13 +20,13 @@ package com.tulskiy.musique.system;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 import java.awt.*;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static org.junit.Assert.*;
 
 /**
  * Author: Denis Tulskiy
@@ -37,8 +37,7 @@ public class ConfigTest {
 
     @Before
     public void setUp() {
-        Logger.getLogger(
-                "com.tulskiy.musique.system.Config").setLevel(Level.OFF);
+        Logger.getLogger("musique").setLevel(Level.OFF);
         config = new Configuration();
         config.load(new StringReader(
                 "font: Serif, 0, 14\n" +

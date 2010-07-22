@@ -26,6 +26,7 @@ import com.tulskiy.musique.util.AudioMath;
 
 import javax.sound.sampled.*;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import static com.tulskiy.musique.audio.player.PlayerEvent.PlayerEventCode.*;
 
@@ -37,6 +38,8 @@ public class Player {
     private static enum PlayerState {
         PLAYING, PAUSED, STOPPED
     }
+
+    private final Logger logger = Logger.getLogger("musique");
 
     private Configuration config = Application.getInstance().getConfiguration();
 
@@ -293,16 +296,16 @@ public class Player {
                     return;
                 }
             }
-            System.out.println("Audio format: " + fmt);
+            logger.fine("Audio format: " + fmt);
             DataLine.Info info = new DataLine.Info(SourceDataLine.class, fmt, BUFFER_SIZE);
-            System.out.println("Dataline Info: " + info);
+            logger.fine("Dataline info: " + info);
             if (mixer != null && mixer.isLineSupported(info)) {
                 line = (SourceDataLine) mixer.getLine(info);
                 System.out.println("Mixer: " + mixer.getMixerInfo().getDescription());
             } else {
                 line = AudioSystem.getSourceDataLine(fmt);
             }
-            System.out.println("Line: " + line);
+            logger.fine("Line: " + line);
             line.open(fmt, BUFFER_SIZE);
             line.start();
             if (line.isControlSupported(FloatControl.Type.VOLUME)) {
@@ -413,14 +416,15 @@ public class Player {
                 }
 
             } catch (LineUnavailableException e) {
-                System.out.println("Line is unavailable. Listing all mixers");
+                System.err.println("Line is unavailable. Listing all mixers");
+                System.err.println("See README for troubleshooting information");
                 Mixer.Info[] infos = AudioSystem.getMixerInfo();
                 for (Mixer.Info info : infos) {
-                    System.out.println(info.getName() + ": " + info.getDescription());
+                    System.err.println(info.getName() + ": " + info.getDescription());
                     Mixer mixer = AudioSystem.getMixer(info);
                     Line.Info[] lineInfo = mixer.getSourceLineInfo();
                     for (Line.Info info1 : lineInfo) {
-                        System.out.println("\t" + info1);
+                        System.err.println("\t" + info1);
                     }
                 }
                 for (Mixer.Info i : AudioSystem.getMixerInfo()) {
@@ -428,7 +432,6 @@ public class Player {
                         l.close();
                     }
                 }
-//                e.printStackTrace();
                 pause();
             }
         }

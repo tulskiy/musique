@@ -48,7 +48,7 @@ public class LyricsPanel extends JPanel {
     private static Application app = Application.getInstance();
     private static Configuration config = app.getConfiguration();
     private static final String searchURL = "http://www.lyricsplugin.com/winamp03/plugin/?";
-    private static Logger logger = Logger.getLogger(LyricsPanel.class.getName());
+    private static Logger logger = Logger.getLogger("musique");
 
     public LyricsPanel() {
         setLayout(new BorderLayout());
@@ -136,7 +136,7 @@ public class LyricsPanel extends JPanel {
                     URL search = new URL(searchURL +
                                          "artist=" + URLEncoder.encode(artist, "utf8") +
                                          "&title=" + URLEncoder.encode(title, "utf8"));
-                    logger.info("Searching for lyrics, url: " + URLDecoder.decode(search.toString(), "utf8"));
+                    logger.fine("Searching for lyrics, url: " + URLDecoder.decode(search.toString(), "utf8"));
                     URLConnection conn = search.openConnection();
 
                     Scanner fi = new Scanner(conn.getInputStream(), "utf-8");

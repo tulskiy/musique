@@ -27,34 +27,45 @@ import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
 
 import javax.swing.*;
+import java.io.*;
 import java.nio.charset.Charset;
+import java.util.logging.Logger;
 
 public class Application {
     private static Application ourInstance = new Application();
+    private final Logger logger = Logger.getLogger("musique");
 
     private Player player;
     private Configuration configuration;
     private PlaylistManager playlistManager;
     private MainWindow mainWindow;
-    private static final String VERSION = "Musique 0.2 pre";
+    public final String VERSION = "Musique 0.2 pre";
+    public final File CONFIG_HOME =
+            new File(System.getProperty("user.home"), ".config/musique").getAbsoluteFile();
+    private final File configFile = new File(CONFIG_HOME, "config");
 
     public static Application getInstance() {
         return ourInstance;
     }
 
     private Application() {
+        //noinspection ResultOfMethodCallIgnored
+        CONFIG_HOME.mkdirs();
 
+        logger.fine("Using '" + CONFIG_HOME + "' as a home directory");
     }
 
     public void load() {
         configuration = new Configuration();
-        configuration.load();
+        try {
+            configuration.load(new FileReader(configFile));
+        } catch (FileNotFoundException ignored) {
+        }
 
         player = new Player();
 
         playlistManager = new PlaylistManager();
         playlistManager.loadPlaylists();
-
 
         loadSettings();
     }
@@ -105,7 +116,11 @@ public class Application {
             mainWindow.shutdown();
         playlistManager.saveSettings();
         saveSettings();
-        configuration.save();
+        try {
+            configuration.save(new FileWriter(configFile));
+        } catch (IOException e) {
+            logger.severe("Could not save configuration to " + configFile);
+        }
         System.exit(0);
     }
 
@@ -119,13 +134,5 @@ public class Application {
 
     public PlaylistManager getPlaylistManager() {
         return playlistManager;
-    }
-
-    public MainWindow getMainWindow() {
-        return mainWindow;
-    }
-
-    public String getVersion() {
-        return VERSION;
     }
 }

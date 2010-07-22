@@ -18,6 +18,7 @@
 package com.tulskiy.musique.gui;
 
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
@@ -89,9 +90,9 @@ public class Tray {
     private JPopupTrayIcon createTrayIcon(Dimension size) {
         ImageIcon icon;
         if (size.height < 24)
-            icon = new ImageIcon("resources/images/tray16.png");
+            icon = Images.loadIcon("tray16.png");
         else
-            icon = new ImageIcon("resources/images/tray24.png");
+            icon = Images.loadIcon("tray24.png");
         BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D d = img.createGraphics();
 
@@ -143,22 +144,6 @@ public class Tray {
         public JPopupTrayIcon(Image image) {
             super(image);
             init();
-        }
-
-        public JPopupTrayIcon(Image image, String tooltip) {
-            super(image, tooltip);
-            init();
-        }
-
-        public JPopupTrayIcon(Image image, String tooltip, PopupMenu popup) {
-            super(image, tooltip, popup);
-            init();
-        }
-
-        public JPopupTrayIcon(Image image, String tooltip, JPopupMenu popup) {
-            super(image, tooltip);
-            init();
-            setJPopupMenu(popup);
         }
 
         private void init() {

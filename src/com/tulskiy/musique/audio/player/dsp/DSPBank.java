@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class DSPBank {
     private static final int DEFAULT_SAMPLES_SIZE = (int) (44100 * 4 * 0.2);
-    private static final Logger logger = Logger.getLogger("DSPBank");
+    private static final Logger logger = Logger.getLogger("musique");
 
     private ArrayList<Processor> processors = new ArrayList<Processor>();
     private int count;

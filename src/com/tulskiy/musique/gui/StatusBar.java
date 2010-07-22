@@ -20,13 +20,11 @@ package com.tulskiy.musique.gui;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.GlobalTimer;
-import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,7 +37,6 @@ import java.awt.event.ActionListener;
  */
 public class StatusBar extends JPanel {
     private JLabel info;
-    private JLabel time;
 
     private Application app = Application.getInstance();
     private Player player = app.getPlayer();

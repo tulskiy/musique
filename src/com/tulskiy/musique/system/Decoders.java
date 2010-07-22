@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class Decoders {
     private static HashMap<String, Decoder> decoders = new HashMap<String, Decoder>();
-    private static final Logger logger = Logger.getLogger(Decoders.class.getName());
+    private static final Logger logger = Logger.getLogger("musique");
 
     static {
         decoders.put("mp3", new MP3Decoder());

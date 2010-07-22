@@ -4,13 +4,13 @@
 
     <property file="musique.properties"/>
     <!-- Uncomment the following property if no tests compilation is needed -->
-    <!--
-   <property name="skip.tests" value="true"/>
-    -->
+
+    <property name="skip.tests" value="true"/>
+
 
     <!-- Compiler options -->
 
-    <property name="compiler.debug" value="on"/>
+    <property name="compiler.debug" value="off"/>
     <property name="compiler.generate.no.warnings" value="off"/>
     <property name="compiler.args" value=""/>
     <property name="compiler.max.memory" value="128m"/>
@@ -29,6 +29,8 @@
         <exclude name="**/*.hprof/**"/>
         <exclude name="**/_svn/**"/>
         <exclude name="**/.hg/**"/>
+        <exclude name="**/*.o/**"/>
+        <exclude name="**/*.obj/**"/>
     </patternset>
     <patternset id="library.patterns">
         <include name="*.zip"/>
@@ -52,9 +54,6 @@
         <include name="**/?*.ser"/>
         <include name="**/?*.sql"/>
     </patternset>
-
-
-    <!-- Project Libraries -->
 
     <!-- Modules -->
 
@@ -571,7 +570,6 @@
         <pathelement location="${jorbis.output.dir}"/>
         <pathelement location="${jorbis.testoutput.dir}"/>
         <pathelement location="${basedir}/lib/junit-4.7.jar"/>
-        <pathelement location="${basedir}/lib/hsqldb.jar"/>
     </path>
 
     <path id="musique.runtime.module.classpath">
@@ -585,7 +583,6 @@
         <path refid="jmac.runtime.module.classpath"/>
         <path refid="jorbis.runtime.module.classpath"/>
         <pathelement location="${basedir}/lib/junit-4.7.jar"/>
-        <pathelement location="${basedir}/lib/hsqldb.jar"/>
     </path>
 
 
@@ -676,190 +673,53 @@
 
     <target name="init.artifacts">
         <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
-        <property name="artifact.output.cuelib" value="${basedir}/lib"/>
-        <property name="artifact.output.jaudiotagger" value="${basedir}/lib"/>
-        <property name="artifact.output.javalayer" value="${basedir}/lib"/>
-        <property name="artifact.output.jflac" value="${basedir}/lib"/>
-        <property name="artifact.output.jmac" value="${basedir}/lib"/>
-        <property name="artifact.output.jorbis" value="${basedir}/lib"/>
         <property name="artifact.output.musique" value="${basedir}"/>
-        <property name="artifact.output.release" value="${basedir}/tags/current"/>
-        <property name="artifact.output.wavpack" value="${basedir}/lib"/>
+        <property name="artifact.output.release" value="${basedir}/tags/musique"/>
         <mkdir dir="${artifacts.temp.dir}"/>
-        <property name="temp.jar.path.cuelib.jar" value="${artifacts.temp.dir}/cuelib.jar"/>
-        <property name="temp.jar.path.jaudiotagger.jar" value="${artifacts.temp.dir}/jaudiotagger.jar"/>
-        <property name="temp.jar.path.javalayer.jar" value="${artifacts.temp.dir}/javalayer.jar"/>
-        <property name="temp.jar.path.jflac.jar" value="${artifacts.temp.dir}/jflac.jar"/>
-        <property name="temp.jar.path.jmac.jar" value="${artifacts.temp.dir}/jmac.jar"/>
-        <property name="temp.jar.path.jorbis.jar" value="${artifacts.temp.dir}/jorbis.jar"/>
         <property name="temp.jar.path.musique.jar" value="${artifacts.temp.dir}/musique.jar"/>
-        <property name="temp.jar.path.wavpack.jar" value="${artifacts.temp.dir}/wavpack.jar"/>
     </target>
 
     <target name="clean.artifact.release" description="clean release artifact output">
         <delete dir="${artifact.output.release}"/>
     </target>
 
-    <target name="artifact.cuelib" depends="init.artifacts, compile.module.cuelib"
-            description="Build &apos;cuelib&apos; artifact">
-        <property name="artifact.temp.output.cuelib" value="${artifacts.temp.dir}/cuelib"/>
-        <mkdir dir="${artifact.temp.output.cuelib}"/>
-        <jar destfile="${temp.jar.path.cuelib.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-            <zipfileset dir="${cuelib.output.dir}"/>
-        </jar>
-        <copy file="${temp.jar.path.cuelib.jar}" tofile="${artifact.temp.output.cuelib}/cuelib.jar"/>
-    </target>
-
-    <target name="artifact.jaudiotagger" depends="init.artifacts, compile.module.jaudiotagger"
-            description="Build &apos;jaudiotagger&apos; artifact">
-        <property name="artifact.temp.output.jaudiotagger" value="${artifacts.temp.dir}/jaudiotagger"/>
-        <mkdir dir="${artifact.temp.output.jaudiotagger}"/>
-        <jar destfile="${temp.jar.path.jaudiotagger.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-            <zipfileset dir="${jaudiotagger.output.dir}"/>
-        </jar>
-        <copy file="${temp.jar.path.jaudiotagger.jar}" tofile="${artifact.temp.output.jaudiotagger}/jaudiotagger.jar"/>
-    </target>
-
-    <target name="artifact.javalayer" depends="init.artifacts, compile.module.javalayer"
-            description="Build &apos;javalayer&apos; artifact">
-        <property name="artifact.temp.output.javalayer" value="${artifacts.temp.dir}/javalayer"/>
-        <mkdir dir="${artifact.temp.output.javalayer}"/>
-        <jar destfile="${temp.jar.path.javalayer.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-            <zipfileset dir="${javalayer.output.dir}"/>
-        </jar>
-        <copy file="${temp.jar.path.javalayer.jar}" tofile="${artifact.temp.output.javalayer}/javalayer.jar"/>
-    </target>
-
-    <target name="artifact.jflac" depends="init.artifacts, compile.module.jflac"
-            description="Build &apos;jflac&apos; artifact">
-        <property name="artifact.temp.output.jflac" value="${artifacts.temp.dir}/jflac"/>
-        <mkdir dir="${artifact.temp.output.jflac}"/>
-        <jar destfile="${temp.jar.path.jflac.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-            <zipfileset dir="${jflac.output.dir}"/>
-        </jar>
-        <copy file="${temp.jar.path.jflac.jar}" tofile="${artifact.temp.output.jflac}/jflac.jar"/>
-    </target>
-
-    <target name="artifact.jmac" depends="init.artifacts, compile.module.jmac"
-            description="Build &apos;jmac&apos; artifact">
-        <property name="artifact.temp.output.jmac" value="${artifacts.temp.dir}/jmac"/>
-        <mkdir dir="${artifact.temp.output.jmac}"/>
-        <jar destfile="${temp.jar.path.jmac.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-            <zipfileset dir="${jmac.output.dir}"/>
-        </jar>
-        <copy file="${temp.jar.path.jmac.jar}" tofile="${artifact.temp.output.jmac}/jmac.jar"/>
-    </target>
-
-    <target name="artifact.jorbis" depends="init.artifacts, compile.module.jorbis"
-            description="Build &apos;jorbis&apos; artifact">
-        <property name="artifact.temp.output.jorbis" value="${artifacts.temp.dir}/jorbis"/>
-        <mkdir dir="${artifact.temp.output.jorbis}"/>
-        <jar destfile="${temp.jar.path.jorbis.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-            <zipfileset dir="${jorbis.output.dir}"/>
-        </jar>
-        <copy file="${temp.jar.path.jorbis.jar}" tofile="${artifact.temp.output.jorbis}/jorbis.jar"/>
-    </target>
-
-    <target name="artifact.musique" depends="init.artifacts, compile.module.musique"
+    <target name="artifact.musique"
+            depends="init.artifacts, compile.module.musique, compile.module.cuelib, compile.module.jaudiotagger, compile.module.javalayer, compile.module.jflac, compile.module.jmac, compile.module.jorbis, compile.module.wavpack"
             description="Build &apos;musique&apos; artifact">
         <property name="artifact.temp.output.musique" value="${artifacts.temp.dir}/musique"/>
         <mkdir dir="${artifact.temp.output.musique}"/>
         <jar destfile="${temp.jar.path.musique.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
             <zipfileset file="${basedir}/META-INF/MANIFEST.MF" prefix="META-INF"/>
             <zipfileset dir="${musique.output.dir}"/>
+            <zipfileset dir="${cuelib.output.dir}"/>
+            <zipfileset dir="${jaudiotagger.output.dir}"/>
+            <zipfileset dir="${javalayer.output.dir}"/>
+            <zipfileset dir="${jflac.output.dir}"/>
+            <zipfileset dir="${jmac.output.dir}"/>
+            <zipfileset dir="${jorbis.output.dir}"/>
+            <zipfileset dir="${wavpack.output.dir}"/>
         </jar>
         <copy file="${temp.jar.path.musique.jar}" tofile="${artifact.temp.output.musique}/musique.jar"/>
     </target>
 
-    <target name="artifact.release"
-            depends="init.artifacts, artifact.cuelib, artifact.jaudiotagger, artifact.javalayer, artifact.jflac, artifact.jmac, artifact.jorbis, artifact.wavpack, artifact.musique"
+    <target name="artifact.release" depends="init.artifacts, artifact.musique"
             description="Build &apos;release&apos; artifact">
         <mkdir dir="${artifact.output.release}"/>
-        <mkdir dir="${artifact.output.release}/lib"/>
-        <copy todir="${artifact.output.release}/lib">
-            <fileset dir="${artifact.temp.output.cuelib}"/>
-        </copy>
-        <copy todir="${artifact.output.release}/lib">
-            <fileset dir="${artifact.temp.output.jaudiotagger}"/>
-        </copy>
-        <copy todir="${artifact.output.release}/lib">
-            <fileset dir="${artifact.temp.output.javalayer}"/>
-        </copy>
-        <copy todir="${artifact.output.release}/lib">
-            <fileset dir="${artifact.temp.output.jflac}"/>
-        </copy>
-        <copy todir="${artifact.output.release}/lib">
-            <fileset dir="${artifact.temp.output.jmac}"/>
-        </copy>
-        <copy todir="${artifact.output.release}/lib">
-            <fileset dir="${artifact.temp.output.jorbis}"/>
-        </copy>
-        <copy todir="${artifact.output.release}/lib">
-            <fileset dir="${artifact.temp.output.wavpack}"/>
-        </copy>
-        <copy file="${basedir}/lib/hsqldb.jar" tofile="${artifact.output.release}/lib/hsqldb.jar"/>
         <copy todir="${artifact.output.release}">
             <fileset dir="${artifact.temp.output.musique}"/>
         </copy>
-        <mkdir dir="${artifact.output.release}/resources"/>
-        <mkdir dir="${artifact.output.release}/resources/images"/>
-        <copy todir="${artifact.output.release}/resources/images">
-            <fileset dir="${basedir}/resources/images"/>
-        </copy>
         <copy file="${basedir}/Copying" tofile="${artifact.output.release}/Copying"/>
+        <copy file="${basedir}/musique.bat" tofile="${artifact.output.release}/musique.bat"/>
         <copy file="${basedir}/musique.sh" tofile="${artifact.output.release}/musique.sh"/>
         <copy file="${basedir}/README" tofile="${artifact.output.release}/README"/>
-        <copy file="${basedir}/musique.bat" tofile="${artifact.output.release}/musique.bat"/>
-        <mkdir dir="${artifact.output.release}/native"/>
-        <copy todir="${artifact.output.release}/native">
-            <fileset dir="${basedir}/native"/>
-        </copy>
+        <copy file="${basedir}/logging.properties" tofile="${artifact.output.release}/logging.properties"/>
+        <copy file="${basedir}/musique.vmoptions" tofile="${artifact.output.release}/musique.vmoptions"/>
     </target>
 
-    <target name="artifact.wavpack" depends="init.artifacts, compile.module.wavpack"
-            description="Build &apos;wavpack&apos; artifact">
-        <property name="artifact.temp.output.wavpack" value="${artifacts.temp.dir}/wavpack"/>
-        <mkdir dir="${artifact.temp.output.wavpack}"/>
-        <jar destfile="${temp.jar.path.wavpack.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
-            <zipfileset dir="${wavpack.output.dir}"/>
-        </jar>
-        <copy file="${temp.jar.path.wavpack.jar}" tofile="${artifact.temp.output.wavpack}/wavpack.jar"/>
-    </target>
-
-    <target name="build.all.artifacts"
-            depends="artifact.cuelib, artifact.jaudiotagger, artifact.javalayer, artifact.jflac, artifact.jmac, artifact.jorbis, artifact.musique, artifact.release, artifact.wavpack"
-            description="Build all artifacts">
-        <mkdir dir="${artifact.output.cuelib}"/>
-        <copy todir="${artifact.output.cuelib}">
-            <fileset dir="${artifact.temp.output.cuelib}"/>
-        </copy>
-        <mkdir dir="${artifact.output.jaudiotagger}"/>
-        <copy todir="${artifact.output.jaudiotagger}">
-            <fileset dir="${artifact.temp.output.jaudiotagger}"/>
-        </copy>
-        <mkdir dir="${artifact.output.javalayer}"/>
-        <copy todir="${artifact.output.javalayer}">
-            <fileset dir="${artifact.temp.output.javalayer}"/>
-        </copy>
-        <mkdir dir="${artifact.output.jflac}"/>
-        <copy todir="${artifact.output.jflac}">
-            <fileset dir="${artifact.temp.output.jflac}"/>
-        </copy>
-        <mkdir dir="${artifact.output.jmac}"/>
-        <copy todir="${artifact.output.jmac}">
-            <fileset dir="${artifact.temp.output.jmac}"/>
-        </copy>
-        <mkdir dir="${artifact.output.jorbis}"/>
-        <copy todir="${artifact.output.jorbis}">
-            <fileset dir="${artifact.temp.output.jorbis}"/>
-        </copy>
+    <target name="build.all.artifacts" depends="artifact.musique, artifact.release" description="Build all artifacts">
         <mkdir dir="${artifact.output.musique}"/>
         <copy todir="${artifact.output.musique}">
             <fileset dir="${artifact.temp.output.musique}"/>
-        </copy>
-        <mkdir dir="${artifact.output.wavpack}"/>
-        <copy todir="${artifact.output.wavpack}">
-            <fileset dir="${artifact.temp.output.wavpack}"/>
         </copy>
 
         <!-- Delete temporary files -->

@@ -29,12 +29,11 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class PlaylistManager {
-    public static final String PLAYLISTS_PATH = "playlists/";
-
-    private Logger logger = Logger.getLogger(getClass().getName());
-    private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
+    private File PLAYLIST_PATH = new File(app.CONFIG_HOME, "playlists");
+    private Logger logger = Logger.getLogger("musique");
+    private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private Playlist currentPlaylist;
     private PlaylistOrder order = new PlaylistOrder();
 
@@ -56,7 +55,7 @@ public class PlaylistManager {
         for (int i = 0; i < list.size(); i++) {
             String fmt = list.get(i);
             Playlist playlist = new Playlist(fmt);
-            playlist.load(new File(PLAYLISTS_PATH + i + ".mus"));
+            playlist.load(new File(PLAYLIST_PATH, i + ".mus"));
             playlists.add(playlist);
         }
 
@@ -83,10 +82,9 @@ public class PlaylistManager {
     }
 
     public void saveSettings() {
-        File dir = new File(PLAYLISTS_PATH);
         //noinspection ResultOfMethodCallIgnored
-        dir.mkdir();
-        File[] files = dir.listFiles();
+        PLAYLIST_PATH.mkdir();
+        File[] files = PLAYLIST_PATH.listFiles();
         for (File file : files) {
             if (file.getName().endsWith(".dat")) {
                 if (!file.delete()) {
@@ -97,7 +95,7 @@ public class PlaylistManager {
 
         for (int i = 0; i < playlists.size(); i++) {
             Playlist playlist = playlists.get(i);
-            playlist.save(new File(PLAYLISTS_PATH + i + ".mus"));
+            playlist.save(new File(PLAYLIST_PATH, i + ".mus"));
         }
 
         config.setList("playlists", playlists);
@@ -112,10 +110,6 @@ public class PlaylistManager {
 
     public int getTotalPlaylists() {
         return playlists.size();
-    }
-
-    public Playlist getPlaylist(int index) {
-        return playlists.get(index);
     }
 
     public Playlist addPlaylist(String name) {

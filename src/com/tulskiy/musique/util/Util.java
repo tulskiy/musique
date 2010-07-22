@@ -19,7 +19,8 @@ package com.tulskiy.musique.util;
 
 import java.awt.*;
 import java.io.File;
-import java.util.*;
+import java.util.Formatter;
+import java.util.Locale;
 
 /**
  * @Author: Denis Tulskiy

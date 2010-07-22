@@ -46,7 +46,7 @@ public class Playlist extends ArrayList<Track> {
             "year", "genre", "comment", "codec"
     };
 
-    private static final Logger logger = Logger.getLogger(Playlist.class.getName());
+    private static final Logger logger = Logger.getLogger("musique");
     private String name;
     private boolean sortAscending = true;
     private String sortBy;
@@ -75,7 +75,7 @@ public class Playlist extends ArrayList<Track> {
         try {
             //remove the garbage
             cleanUp();
-
+            logger.fine("Saving playlist: " + file.getName());
             DataOutputStream dos = new DataOutputStream(
                     new BufferedOutputStream(new FileOutputStream(file)));
             dos.write(MAGIC);
@@ -114,13 +114,13 @@ public class Playlist extends ArrayList<Track> {
 
             dos.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.warning("Failed to save playlist " + file.getName() + ": " + e.getMessage());
         }
     }
 
     public void load(File file) {
         try {
-            logger.info("Loading playlist: " + file.getName());
+            logger.fine("Loading musique playlist: " + file.getName());
             DataInputStream dis = new DataInputStream(
                     new BufferedInputStream(new FileInputStream(file)));
 
@@ -171,7 +171,7 @@ public class Playlist extends ArrayList<Track> {
 
             dis.close();
         } catch (Exception e) {
-            logger.warning("Failed to load playlist " + file.getName());
+            logger.warning("Failed to load playlist " + file.getName() + ": " + e.getMessage());
         }
     }
 
@@ -190,7 +190,7 @@ public class Playlist extends ArrayList<Track> {
     public List<String> loadM3U(String location) {
         Scanner fi;
         ArrayList<String> items = new ArrayList<String>();
-
+        logger.fine("Loading M3U from: " + location);
         try {
             File parent = null;
             if (location.toLowerCase().startsWith("http://")) {
@@ -231,6 +231,7 @@ public class Playlist extends ArrayList<Track> {
     public List<String> loadPLS(String location) {
         Scanner fi;
         ArrayList<String> items = new ArrayList<String>();
+        logger.fine("Loading PLS from: " + location);
 
         try {
             if (location.toLowerCase().startsWith("http://")) {
@@ -329,7 +330,7 @@ public class Playlist extends ArrayList<Track> {
 
     public void sort(String expression, boolean toggle) {
         cleanUp();
-
+        logger.fine("Sorting playlist with expression: " + expression);
         if (toggle && expression.equals(sortBy)) {
             sortAscending = !sortAscending;
         } else {
@@ -361,6 +362,7 @@ public class Playlist extends ArrayList<Track> {
 
     public void groupBy(String expression) {
         groupBy = expression;
+        logger.fine("Grouping playlist with expression: " + expression);
         groupExpression = Util.isEmpty(expression) ? null : Parser.parse(expression);
 
         regroup();

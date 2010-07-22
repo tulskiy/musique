@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -42,7 +41,7 @@ import java.util.logging.Logger;
  * Date: Jul 19, 2010
  */
 public class AlbumArtPanel extends JPanel {
-    private static Logger logger = Logger.getLogger(AlbumArtPanel.class.getName());
+    private static Logger logger = Logger.getLogger("musique");
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
@@ -127,11 +126,11 @@ public class AlbumArtPanel extends JPanel {
                                 continue;
                             image = cache.get(file);
                             if (image == null) {
-                                logger.info("Loading Album Art from file: " + file);
+                                logger.fine("Loading Album Art from file: " + file);
                                 image = new ImageIcon(file.getAbsolutePath());
                                 cache.put(file, image);
                             } else {
-                                logger.info("Loading Album Art from cache for file: " + file);
+                                logger.fine("Loading Album Art from cache for file: " + file);
                             }
                             break;
                         } catch (Exception ignored) {

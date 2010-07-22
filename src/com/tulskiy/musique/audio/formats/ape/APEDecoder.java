@@ -43,6 +43,7 @@ public class APEDecoder implements Decoder {
     public boolean open(Track track) {
         this.track = track;
         try {
+            logger.fine("Opening file: " + track.getFile());
             File apeInputFile = File.createFile(track.getFile().getAbsolutePath(), "r");
             decoder = IAPEDecompress.CreateIAPEDecompress(apeInputFile);
             blockAlign = decoder.getApeInfoBlockAlign();

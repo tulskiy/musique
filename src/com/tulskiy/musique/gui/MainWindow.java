@@ -20,6 +20,7 @@ package com.tulskiy.musique.gui;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.playlist.PlaylistPanel;
+import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
@@ -48,7 +49,7 @@ public class MainWindow extends JFrame {
     private Expression windowFormat;
 
     public MainWindow() {
-        setIconImage(new ImageIcon("resources/images/icon.png").getImage());
+        setIconImage(Images.loadImage("icon.png"));
         ControlPanel controlPanel = new ControlPanel();
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
@@ -111,9 +112,9 @@ public class MainWindow extends JFrame {
             value = (String) windowFormat.eval(track);
 
         if (Util.isEmpty(value) || app.getPlayer().isStopped()) {
-            setTitle(app.getVersion());
+            setTitle(app.VERSION);
         } else {
-            setTitle(value + " [" + app.getVersion() + "]");
+            setTitle(value + " [" + app.VERSION + "]");
         }
     }
 

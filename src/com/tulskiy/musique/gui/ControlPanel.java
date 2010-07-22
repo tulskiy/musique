@@ -19,6 +19,8 @@ package com.tulskiy.musique.gui;
 
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
+import com.tulskiy.musique.audio.player.PlayerListener;
+import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.util.GlobalTimer;
@@ -65,11 +67,11 @@ public class ControlPanel extends JPanel {
         for (MouseListener ml : progressSlider.getMouseListeners())
             progressSlider.removeMouseListener(ml);
 
-        stopButton = createButton("resources/images/stop.png");
-        prevButton = createButton("resources/images/prev.png");
-        playButton = createButton("resources/images/play.png");
-        pauseButton = createButton("resources/images/pause.png");
-        nextButton = createButton("resources/images/next.png");
+        stopButton = createButton("stop.png");
+        prevButton = createButton("prev.png");
+        playButton = createButton("play.png");
+        pauseButton = createButton("pause.png");
+        nextButton = createButton("next.png");
 
         volumeSlider = new JSlider(0, 100);
         volumeSlider.setMaximumSize(new Dimension(100, 30));
@@ -120,11 +122,10 @@ public class ControlPanel extends JPanel {
         }
     }
 
-    private JButton createButton(String path) {
+    private JButton createButton(String icon) {
         JButton b = new JButton();
         Dimension buttonSize = new Dimension(30, 30);
-        b.setIcon(new ImageIcon(path));
-        b.setName("nextButton");
+        b.setIcon(Images.loadIcon(icon));
         b.setFocusable(false);
         String laf = UIManager.getLookAndFeel().getName();
         if (laf.contains("GTK")) {
@@ -214,14 +215,12 @@ public class ControlPanel extends JPanel {
                 player.play();
             }
         });
-
         stopButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 player.stop();
             }
         });
-
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 player.pause();
@@ -233,7 +232,7 @@ public class ControlPanel extends JPanel {
             }
         });
 
-        player.addListener(new com.tulskiy.musique.audio.player.PlayerListener() {
+        player.addListener(new PlayerListener() {
             public void onEvent(PlayerEvent e) {
                 switch (e.getEventCode()) {
                     case STOPPED:

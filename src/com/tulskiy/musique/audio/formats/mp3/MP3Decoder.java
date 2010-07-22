@@ -26,9 +26,9 @@ import javax.sound.sampled.AudioFormat;
 import java.io.*;
 import java.net.URI;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * @Author: Denis Tulskiy
@@ -42,7 +42,6 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             return size() > 10;
         }
     };
-    private static final Logger logger = Logger.getLogger(MP3Decoder.class.getName());
 
     private Bitstream bitstream;
     private javazoom.jl.decoder.Decoder decoder;
@@ -165,13 +164,13 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             URI location = track.getLocation();
             InputStream fis;
             if (track.isFile()) {
-                logger.info("Opening file: " + location);
+                logger.fine("Opening file: " + track.getFile());
                 streaming = false;
-                fis = new FileInputStream(this.track.getFile());
-                streamSize = this.track.getFile().length();
+                fis = new FileInputStream(track.getFile());
+                streamSize = track.getFile().length();
             } else {
                 track.setCodec("MP3 Stream");
-                logger.info("Opening stream: " + location);
+                logger.fine("Opening stream: " + URLDecoder.decode(location.toString(), "utf8"));
                 streaming = true;
                 URLConnection urlConnection = location.toURL().openConnection();
                 urlConnection.setRequestProperty("Icy-MetaData", "1");

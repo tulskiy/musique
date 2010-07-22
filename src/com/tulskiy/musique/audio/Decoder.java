@@ -20,12 +20,15 @@ package com.tulskiy.musique.audio;
 import com.tulskiy.musique.playlist.Track;
 
 import javax.sound.sampled.AudioFormat;
+import java.util.logging.Logger;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: 12.06.2009
  */
 public interface Decoder {
+    final Logger logger = Logger.getLogger("musique");
+
     /**
      * Open the file and prepare for decoding.
      * This method sets the decoder to play the file from startIndex

@@ -17,16 +17,24 @@
 
 package com.tulskiy.musique.system;
 
+import java.io.IOException;
+import java.util.logging.LogManager;
+
 /**
  * @Author: Denis Tulskiy
  * @Date: Jan 10, 2010
  */
 public class Main {
     public static void main(String[] args) {
+        System.setProperty("java.util.logging.config.file", "logging.properties");
+        try {
+            LogManager.getLogManager().readConfiguration();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         Application app = Application.getInstance();
         app.load();
-//        app.installDB();
-//        app.defaultSettings();
         app.start();
     }
 }
