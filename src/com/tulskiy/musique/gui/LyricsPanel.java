@@ -157,7 +157,7 @@ public class LyricsPanel extends JPanel {
                         fi = new Scanner(file);
                         while (fi.hasNextLine())
                             sb.append(fi.nextLine()).append("\n");
-                    } else {
+                    } else if (config.getBoolean("lyrics.searchOnline", true)) {
                         URL search = new URL(searchURL +
                                              "artist=" + URLEncoder.encode(artist, "utf8") +
                                              "&title=" + URLEncoder.encode(title, "utf8"));

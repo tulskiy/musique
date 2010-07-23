@@ -26,7 +26,11 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Mixer;
 import javax.swing.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
@@ -72,14 +76,26 @@ public class Application {
 
     private void loadSettings() {
         player.setVolume(configuration.getFloat("player.volume", 1));
-        UIManager.put("Slider.paintValue", Boolean.FALSE);
-        try {
-            Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
-            AudioFileReader.setDefaultCharset(charset);
-        } catch (Exception e) {
-            e.printStackTrace();
+        String mixer = configuration.getString("player.mixer", null);
+        if (mixer != null) {
+            Mixer.Info[] infos = AudioSystem.getMixerInfo();
+            for (Mixer.Info info : infos) {
+                if (info.getName().equals(mixer)) {
+                    player.setMixer(info);
+                    break;
+                }
+            }
         }
+        configuration.addPropertyChangeListener("player.stopAfterCurrent", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                player.setStopAfterCurrent(configuration.getBoolean("player.stopAfterCurrent", false));
+            }
+        });
+        UIManager.put("Slider.paintValue", Boolean.FALSE);
 
+        Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
+        AudioFileReader.setDefaultCharset(charset);
         try {
             String laf = configuration.getString("gui.LAF", "");
             if (laf.isEmpty()) {
@@ -93,6 +109,16 @@ public class Application {
 
     private void saveSettings() {
         configuration.setFloat("player.volume", player.getVolume());
+        Mixer.Info mixer = player.getMixer();
+        if (mixer != null)
+            configuration.setString("player.mixer", mixer.getName());
+        else
+            configuration.remove("player.mixer");
+        Charset value = AudioFileReader.getDefaultCharset();
+        if (value != null)
+            configuration.setString("tag.defaultEncoding", value.name());
+        else
+            configuration.remove("tag.defaultEncoding");
         configuration.setString("gui.LAF", UIManager.getLookAndFeel().getClass().getCanonicalName());
     }
 

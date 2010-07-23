@@ -17,15 +17,22 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
+import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Mixer;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Vector;
 
 /**
@@ -36,7 +43,7 @@ public class SettingsDialog extends JDialog {
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
 
-    private JButton saveButton;
+    private JButton applyButton;
     private JComponent owner;
     private JButton defaults;
     private JTabbedPane tabs;
@@ -51,13 +58,9 @@ public class SettingsDialog extends JDialog {
         Box buttons = Box.createHorizontalBox();
         buttons.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         defaults = new JButton("Defaults");
-        buttons.add(defaults);
-        buttons.add(Box.createHorizontalGlue());
-        saveButton = new JButton(" Save ");
-        buttons.add(saveButton);
-        buttons.add(Box.createHorizontalStrut(5));
-        JButton cancelButton = new JButton("Close");
-        buttons.add(cancelButton);
+        applyButton = new JButton(" Apply ");
+
+        final JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -66,6 +69,23 @@ public class SettingsDialog extends JDialog {
             }
         });
 
+        JButton okButton = new JButton("   OK   ");
+        okButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                applyButton.doClick();
+                cancelButton.doClick();
+            }
+        });
+        buttons.add(defaults);
+        buttons.add(Box.createHorizontalGlue());
+        buttons.add(okButton);
+        buttons.add(Box.createHorizontalStrut(3));
+        buttons.add(cancelButton);
+        buttons.add(Box.createHorizontalStrut(3));
+        buttons.add(applyButton);
+
+        tabs.add(createSystemPanel());
         tabs.add(createGUIPanel());
         tabs.add(createColorsAndFontsPanel());
         add(tabs, BorderLayout.CENTER);
@@ -73,7 +93,7 @@ public class SettingsDialog extends JDialog {
 
         pack();
         setSize(600, getHeight());
-        setLocationRelativeTo(owner);
+        setLocationRelativeTo(SwingUtilities.windowForComponent(owner));
     }
 
     private boolean isSelected(JComponent component) {
@@ -110,19 +130,64 @@ public class SettingsDialog extends JDialog {
         Box format = Box.createVerticalBox();
         format.setBorder(BorderFactory.createTitledBorder("Display Formatting"));
         format.add(new JLabel("Window Title"));
+        format.add(Box.createVerticalStrut(2));
         final JTextField window = new JTextField(config.getString("format.window", ""));
+        window.setCaretPosition(0);
         format.add(window);
+        format.add(Box.createVerticalStrut(2));
         format.add(new JLabel("Status Bar"));
         final JTextField status = new JTextField(config.getString("format.statusBar", ""));
+        status.setCaretPosition(0);
         format.add(status);
 
         mainBox.add(Box.createVerticalStrut(20));
         mainBox.add(format);
 
+        Box side = Box.createVerticalBox();
+        JPanel sidePanel = new JPanel(new BorderLayout());
+        sidePanel.setBorder(BorderFactory.createTitledBorder("Side Bar"));
+        sidePanel.add(side, BorderLayout.CENTER);
+
+        final JCheckBox sidebar = new JCheckBox("Show Side Bar", config.getBoolean("sidebar.enabled", true));
+        side.add(sidebar);
+        side.add(Box.createVerticalStrut(10));
+        final JCheckBox lyrics = new JCheckBox("Search for lyrics at lyricsplugin.com",
+                config.getBoolean("lyrics.searchOnline", true));
+        side.add(lyrics);
+        side.add(Box.createVerticalStrut(5));
+        Box aaBox = Box.createHorizontalBox();
+        ButtonGroup bg = new ButtonGroup();
+        boolean nowPlaying = config.getBoolean("albumart.nowPlayingOnly", false);
+        final JRadioButton plTrack = new JRadioButton("Playing track", nowPlaying);
+        JRadioButton selTrack = new JRadioButton("Selected track", !nowPlaying);
+        bg.add(plTrack);
+        bg.add(selTrack);
+        aaBox.setAlignmentX(0);
+        aaBox.add(new JLabel("Show Album Art for: "));
+        aaBox.add(Box.createHorizontalStrut(10));
+        aaBox.add(plTrack);
+        aaBox.add(Box.createHorizontalStrut(10));
+        aaBox.add(selTrack);
+
+        side.add(aaBox);
+        side.add(Box.createVerticalStrut(5));
+
+        side.add(new JLabel("Album Art stubs: "));
+        ArrayList<String> stubList = config.getList("albumart.stubs", null);
+        StringBuilder sb = new StringBuilder();
+        for (String s : stubList) {
+            sb.append(s).append("\n");
+        }
+        final JTextArea stubs = new JTextArea(sb.toString(), 6, 1);
+        stubs.setAlignmentX(0);
+        side.add(stubs);
+
+        mainBox.add(sidePanel);
+
         panel.add(mainBox, BorderLayout.NORTH);
 
         final JDialog comp = this;
-        saveButton.addActionListener(new ActionListener() {
+        applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 int index = laf.getSelectedIndex();
@@ -140,6 +205,11 @@ public class SettingsDialog extends JDialog {
                 config.setBoolean("tray.minimizeOnClose", minimizeOnClose.isSelected());
                 config.setString("format.window", window.getText());
                 config.setString("format.statusBar", status.getText());
+                config.setBoolean("sidebar.enabled", sidebar.isSelected());
+                config.setBoolean("lyrics.searchOnline", lyrics.isSelected());
+                config.setBoolean("albumart.nowPlayingOnly", plTrack.isSelected());
+                List<String> stubList = Arrays.asList(stubs.getText().split("\n"));
+                config.setList("albumart.stubs", new ArrayList<String>(stubList));
             }
         });
 
@@ -197,7 +267,7 @@ public class SettingsDialog extends JDialog {
 
         mainBox.add(fonts);
 
-        saveButton.addActionListener(new ActionListener() {
+        applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 config.setColor("gui.color.text", text.getColor());
@@ -223,6 +293,58 @@ public class SettingsDialog extends JDialog {
                     trayBg1.setColor(null);
                     trayBg2.setColor(null);
                 }
+            }
+        });
+
+        return panel;
+    }
+
+    private JComponent createSystemPanel() {
+        final JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setName("System");
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 100));
+
+        Box mainBox = Box.createVerticalBox();
+        JPanel misc = new JPanel(new GridLayout(1, 2, 10, 10));
+
+        Box mix = Box.createHorizontalBox();
+        mix.add(new JLabel("Audio Mixer: "));
+        Vector<String> mixerVector = new Vector<String>();
+        mixerVector.add("Detect automatically");
+        final Mixer.Info[] mixerInfo = AudioSystem.getMixerInfo();
+        int selectedIndex = Arrays.asList(mixerInfo).indexOf(app.getPlayer().getMixer());
+        for (Mixer.Info info : mixerInfo) {
+            String s = info.getDescription() + ", " + info.getName();
+            mixerVector.add(s);
+        }
+        final JComboBox mixers = new JComboBox(mixerVector);
+        mixers.setSelectedIndex(selectedIndex + 1);
+        mixers.setPrototypeDisplayValue(mixerVector.get(0));
+        mix.add(mixers);
+        mainBox.add(mix);
+        mainBox.add(Box.createVerticalStrut(5));
+        mainBox.add(misc);
+
+        misc.add(new JLabel("Default Encoding for Tags"));
+        Charset charset = AudioFileReader.getDefaultCharset();
+        final JComboBox encoding = new JComboBox(Charset.availableCharsets().values().toArray());
+        encoding.setSelectedItem(charset);
+        misc.add(encoding);
+
+
+        panel.add(mainBox, BorderLayout.NORTH);
+
+        applyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int index = mixers.getSelectedIndex();
+                if (index > 0) {
+                    Mixer.Info info = mixerInfo[index - 1];
+                    app.getPlayer().setMixer(info);
+                } else {
+                    app.getPlayer().setMixer(null);
+                }
+                AudioFileReader.setDefaultCharset((Charset) encoding.getSelectedItem());
             }
         });
 

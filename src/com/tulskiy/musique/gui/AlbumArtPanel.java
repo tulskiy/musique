@@ -17,6 +17,9 @@
 
 package com.tulskiy.musique.gui;
 
+import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.audio.player.PlayerEvent;
+import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
@@ -62,11 +65,10 @@ public class AlbumArtPanel extends JPanel {
 
     private ArrayList<Expression> stubs = new ArrayList<Expression>();
     private Timer timer;
+    private boolean nowPlayingOnly;
 
     public AlbumArtPanel() {
         setLayout(new BorderLayout());
-        updateStubs();
-
         final JLabel canvas = new JLabel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -92,20 +94,43 @@ public class AlbumArtPanel extends JPanel {
         canvas.setHorizontalAlignment(JLabel.CENTER);
         canvas.setVerticalAlignment(JLabel.CENTER);
 
+        config.addPropertyChangeListener("albumart.nowPlayingOnly", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                nowPlayingOnly = config.getBoolean(evt.getPropertyName(), false);
+            }
+        });
+
         config.addPropertyChangeListener("playlist.selectedTrack", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                if (evt.getNewValue() instanceof Track) {
+                if (!nowPlayingOnly && evt.getNewValue() instanceof Track) {
                     track = (Track) evt.getNewValue();
                     timer.restart();
                 }
             }
         });
+        final Player player = app.getPlayer();
+        player.addListener(new PlayerListener() {
+            @Override
+            public void onEvent(PlayerEvent e) {
+                if (config.getBoolean("albumart.nowPlayingOnly", false)) {
+                    if (nowPlayingOnly) {
+                        track = player.getTrack();
+                        timer.restart();
+                    }
+                }
+            }
+        });
 
-        config.addPropertyChangeListener("albumart.stubs", new PropertyChangeListener() {
+        config.addPropertyChangeListener("albumart.stubs", true, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                updateStubs();
+                stubs.clear();
+                ArrayList<String> list = config.getList("albumart.stubs", stubDefaults);
+                for (String s : list) {
+                    stubs.add(Parser.parse(s));
+                }
             }
         });
         add(canvas, BorderLayout.CENTER);
@@ -143,11 +168,4 @@ public class AlbumArtPanel extends JPanel {
         });
     }
 
-    public void updateStubs() {
-        stubs.clear();
-        ArrayList<String> list = config.getList("albumart.stubs", stubDefaults);
-        for (String s : list) {
-            stubs.add(Parser.parse(s));
-        }
-    }
 }

@@ -47,17 +47,17 @@ public class MainWindow extends JFrame {
     private PlaylistPanel playlistPanel;
     private Tray tray;
     private Expression windowFormat;
+    private final String defaultWindowFormat = "%title% - [%artist%][ - '['%album%[ CD%discNumber%][ #%trackNumber%]']' ]";
 
     public MainWindow() {
         setIconImage(Images.loadImage("icon.png"));
         ControlPanel controlPanel = new ControlPanel();
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
-        JSplitPane side = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new LyricsPanel(), new AlbumArtPanel());
+        final JSplitPane side = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new LyricsPanel(), new AlbumArtPanel());
         side.setDividerLocation(400);
-        side.setDividerSize(5);
-        JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, side, playlistPanel);
-        center.setDividerSize(5);
+        side.setDividerSize(6);
+        final JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, side, playlistPanel);
         center.setDividerLocation(300);
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
@@ -72,27 +72,40 @@ public class MainWindow extends JFrame {
         setSize((int) r.getWidth(), (int) r.getHeight());
         setExtendedState(config.getInt("gui.mainWindowState", 0));
 
-        updateTray();
-
-        updateTitleFormat();
         app.getPlayer().addListener(new PlayerListener() {
             @Override
             public void onEvent(PlayerEvent e) {
                 formatTitle();
             }
         });
+        config.addPropertyChangeListener("sidebar.enabled", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                boolean enabled = config.getBoolean(evt.getPropertyName(), true);
+                side.setVisible(enabled);
+                center.setDividerSize(enabled ? 6 : 0);
+            }
+        });
 
+        updateTray();
         config.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 String prop = evt.getPropertyName();
                 if (prop.startsWith("tray.")) {
                     updateTray();
-                } else if (prop.equals("format.window")) {
-                    updateTitleFormat();
                 }
             }
         });
+
+        config.addPropertyChangeListener("format.window", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                windowFormat = Parser.parse(config.getString("format.window", defaultWindowFormat));
+                formatTitle();
+            }
+        });
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -116,11 +129,6 @@ public class MainWindow extends JFrame {
         } else {
             setTitle(value + " [" + app.VERSION + "]");
         }
-    }
-
-    private void updateTitleFormat() {
-        windowFormat = Parser.parse(config.getString("format.window", ""));
-        formatTitle();
     }
 
     private void updateTray() {
