@@ -110,6 +110,14 @@ public class Track implements Cloneable {
         }
     }
 
+    public void clearTags() {
+        String[] tags = {"artist", "album", "albumArtist", "title",
+                "year", "genre", "comment"};
+        for (String tag : tags) {
+            setMeta(tag, "");
+        }
+    }
+
     public int getSampleRate() {
         return sampleRate;
     }

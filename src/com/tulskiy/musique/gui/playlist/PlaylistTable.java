@@ -21,7 +21,10 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.dialogs.*;
+import com.tulskiy.musique.gui.dialogs.ColumnDialog;
+import com.tulskiy.musique.gui.dialogs.ProgressDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.gui.dialogs.TracksInfoDialog;
 import com.tulskiy.musique.gui.grouptable.GroupTable;
 import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
@@ -35,7 +38,10 @@ import com.tulskiy.musique.system.TrackIO;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.*;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -590,6 +596,7 @@ public class PlaylistTable extends GroupTable {
                                 currentTrack = track.getFile().getName();
                                 progress = (float) i / selectedSongs.size();
                                 AudioFileReader reader = TrackIO.getAudioFileReader(track.getFile().getName());
+                                track.clearTags();
                                 reader.readSingle(track);
                             }
                         }
