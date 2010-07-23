@@ -48,17 +48,23 @@ public class MainWindow extends JFrame {
     private Tray tray;
     private Expression windowFormat;
     private final String defaultWindowFormat = "%title% - [%artist%][ - '['%album%[ CD%discNumber%][ #%trackNumber%]']' ]";
+    private final JSplitPane side;
+    private final JSplitPane center;
 
     public MainWindow() {
         setIconImage(Images.loadImage("icon.png"));
         ControlPanel controlPanel = new ControlPanel();
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
-        final JSplitPane side = new JSplitPane(JSplitPane.VERTICAL_SPLIT, new LyricsPanel(), new AlbumArtPanel());
-        side.setDividerLocation(400);
+        LyricsPanel lyricsPanel = new LyricsPanel();
+        side = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lyricsPanel, new AlbumArtPanel());
         side.setDividerSize(6);
-        final JSplitPane center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, side, playlistPanel);
-        center.setDividerLocation(300);
+        center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, side, playlistPanel);
+
+        int sideBarWidth = config.getInt("sidebar.width", 300);
+        center.setDividerLocation(sideBarWidth);
+        int sideBarSeparator = config.getInt("sidebar.divider", 400);
+        side.setDividerLocation(sideBarSeparator);
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         playlistPanel.addMenu(menuBar);
@@ -67,7 +73,7 @@ public class MainWindow extends JFrame {
         add(center, BorderLayout.CENTER);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        Rectangle r = config.getRectangle("gui.mainWindowPosition", new Rectangle(0, 0, 790, 480));
+        Rectangle r = config.getRectangle("gui.mainWindowPosition", new Rectangle(50, 0, 1000, 730));
         setLocation((int) r.getX(), (int) r.getY());
         setSize((int) r.getWidth(), (int) r.getHeight());
         setExtendedState(config.getInt("gui.mainWindowState", 0));
@@ -167,6 +173,8 @@ public class MainWindow extends JFrame {
         setVisible(false);
         config.setRectangle("gui.mainWindowPosition", new Rectangle(getX(), getY(), getWidth(), getHeight()));
         config.setInt("gui.mainWindowState", getExtendedState());
+        config.setInt("sidebar.width", center.getDividerLocation());
+        config.setInt("sidebar.divider", side.getDividerLocation());
         playlistPanel.saveSettings();
     }
 }
