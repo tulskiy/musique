@@ -19,8 +19,6 @@ package com.tulskiy.musique.audio.player;
 
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.Decoders;
 import com.tulskiy.musique.util.AudioMath;
 
@@ -41,8 +39,6 @@ public class Player {
 
     private final Logger logger = Logger.getLogger("musique");
 
-    private Configuration config = Application.getInstance().getConfiguration();
-
     private PlayerState state = PlayerState.STOPPED;
     private static ArrayList<PlayerListener> listeners = new ArrayList<PlayerListener>();
 
@@ -50,6 +46,7 @@ public class Player {
     private PlaybackOrder order;
     private float volumeValue = 1f;
     private boolean linearVolume = false;
+    private boolean stopAfterCurrent = false;
 
     public void open(Track track) {
         playerThread.open(track, true);
@@ -132,6 +129,10 @@ public class Player {
         return state == PlayerState.STOPPED;
     }
 
+    public void setStopAfterCurrent(boolean stopAfterCurrent) {
+        this.stopAfterCurrent = stopAfterCurrent;
+    }
+
     public float getVolume() {
         FloatControl volume = playerThread.volume;
         if (volume != null) {
@@ -200,8 +201,18 @@ public class Player {
     }
 
     public void setMixer(Mixer.Info info) {
-        playerThread.mixer = AudioSystem.getMixer(info);
+        if (info == null)
+            playerThread.mixer = null;
+        else
+            playerThread.mixer = AudioSystem.getMixer(info);
         playerThread.mixerChanged = true;
+    }
+
+    public Mixer.Info getMixer() {
+        if (playerThread.mixer != null)
+            return playerThread.mixer.getMixerInfo();
+        else
+            return null;
     }
 
     class PlayerThread extends Thread {
@@ -243,7 +254,7 @@ public class Player {
                             if (nextTrack != null) {
                                 open(nextTrack, false);
                                 nextTrack = null;
-                                if (config != null && config.getBoolean("player.stopAfterCurrent", false)) {
+                                if (stopAfterCurrent) {
                                     stopPlaying();
                                     continue;
                                 }
@@ -301,9 +312,10 @@ public class Player {
             logger.fine("Dataline info: " + info);
             if (mixer != null && mixer.isLineSupported(info)) {
                 line = (SourceDataLine) mixer.getLine(info);
-                System.out.println("Mixer: " + mixer.getMixerInfo().getDescription());
+                logger.fine("Mixer: " + mixer.getMixerInfo().getDescription());
             } else {
                 line = AudioSystem.getSourceDataLine(fmt);
+                mixer = null;
             }
             logger.fine("Line: " + line);
             line.open(fmt, BUFFER_SIZE);
