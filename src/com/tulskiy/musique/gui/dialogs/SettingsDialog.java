@@ -274,7 +274,7 @@ public class SettingsDialog extends JDialog {
                 config.setColor("gui.color.background", background.getColor());
                 config.setColor("gui.color.selection", selection.getColor());
                 config.setColor("gui.color.highlight", highlight.getColor());
-                config.setFont("gui.font.default", defaultFont.getFont());
+                config.setFont("gui.font.default", defaultFont.getSelectedFont());
                 config.setColor("tray.bgColor1", trayBg1.getColor());
                 config.setColor("tray.bgColor2", trayBg2.getColor());
                 SwingUtilities.updateComponentTreeUI(SwingUtilities.getRoot(owner));
@@ -401,7 +401,7 @@ public class SettingsDialog extends JDialog {
     }
 
     class FontChooser extends JPanel {
-        Font font;
+        Font selectedFont;
         JLabel text = new JLabel();
 
         FontChooser(Font font) {
@@ -425,8 +425,8 @@ public class SettingsDialog extends JDialog {
                 }
             });
 
-            this.font = font;
-            setFont(font);
+            this.selectedFont = font;
+            setSelectedFont(font);
             setPreferredSize(new Dimension(10, 25));
             text.setHorizontalAlignment(JLabel.CENTER);
             text.setBorder(BorderFactory.createEtchedBorder());
@@ -441,13 +441,13 @@ public class SettingsDialog extends JDialog {
             });
         }
 
-        public Font getFont() {
-            return font;
+        public Font getSelectedFont() {
+            return selectedFont;
         }
 
-        public void setFont(Font font) {
-            super.setFont(font);
-            this.font = font;
+        public void setSelectedFont(Font font) {
+            setFont(font);
+            this.selectedFont = font;
             String s = "";
             if (font != null) {
                 s += font.getName() + ", " + font.getSize() + "pt";

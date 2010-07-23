@@ -171,7 +171,7 @@ public class Configuration {
 
     public void setColor(String key, Color value) {
         if (value == null)
-            put(key, value);
+            remove(key);
         else {
             String s = new Formatter().format(
                     "#%06X", value.getRGB() & 0xFFFFFF).toString();
@@ -199,12 +199,16 @@ public class Configuration {
     }
 
     public void setRectangle(String key, Rectangle value) {
-        String s = new Formatter().format("%d %d %d %d",
-                (int) value.getX(),
-                (int) value.getY(),
-                (int) value.getWidth(),
-                (int) value.getHeight()).toString();
-        put(key, s);
+        if (value == null)
+            remove(key);
+        else {
+            String s = new Formatter().format("%d %d %d %d",
+                    (int) value.getX(),
+                    (int) value.getY(),
+                    (int) value.getWidth(),
+                    (int) value.getHeight()).toString();
+            put(key, s);
+        }
     }
 
     public Font getFont(String key, Font def) {
@@ -223,7 +227,7 @@ public class Configuration {
 
     public void setFont(String key, Font value) {
         if (value == null)
-            put(key, value);
+            remove(key);
         else {
             String s = new Formatter().format(
                     "%s, %d, %d",
@@ -260,11 +264,15 @@ public class Configuration {
     }
 
     public void setList(String key, ArrayList<?> value) {
-        ArrayList<String> s = new ArrayList<String>(value.size());
-        for (Object o : value) {
-            s.add(o.toString());
+        if (value == null)
+            remove(key);
+        else {
+            ArrayList<String> s = new ArrayList<String>(value.size());
+            for (Object o : value) {
+                s.add(o.toString());
+            }
+            put(key, s);
         }
-        put(key, s);
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {
