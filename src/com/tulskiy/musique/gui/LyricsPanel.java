@@ -102,10 +102,14 @@ public class LyricsPanel extends JPanel {
 
         @Override
         public void updateUI() {
+            super.updateUI();
+            Color oldSelectionColor = getSelectionColor();
             setUI(new BasicTextPaneUI());
             Color background = config.getColor("gui.color.background", null);
             if (background != null) {
                 setBackground(background);
+            } else {
+                setBackground(Color.white);
             }
 
             Color text = config.getColor("gui.color.text", null);
@@ -115,8 +119,11 @@ public class LyricsPanel extends JPanel {
             Color selection = config.getColor("gui.color.selection", null);
             if (selection != null) {
                 setSelectionColor(selection);
-                setSelectedTextColor(Util.getContrastColor(selection));
+            } else {
+                setSelectionColor(oldSelectionColor);
             }
+
+            setSelectedTextColor(Util.getContrastColor(getSelectionColor()));
 
             Font font = config.getFont("gui.font.default", null);
             if (font != null) {
