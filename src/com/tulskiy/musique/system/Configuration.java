@@ -18,6 +18,7 @@
 package com.tulskiy.musique.system;
 
 import java.awt.*;
+import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.*;
@@ -260,6 +261,12 @@ public class Configuration {
 
     public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
         changeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void addPropertyChangeListener(String propertyName, boolean initialize, PropertyChangeListener listener) {
+        addPropertyChangeListener(propertyName, listener);
+        if (initialize)
+            listener.propertyChange(new PropertyChangeEvent(this, propertyName, null, get(propertyName)));
     }
 
     public void addPropertyChangeListener(PropertyChangeListener listener) {
