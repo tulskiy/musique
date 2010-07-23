@@ -62,7 +62,7 @@ public class LyricsPanel extends JPanel {
         final JTextPane textPane = new TextPane();
 
         final Player player = app.getPlayer();
-        timer = new Timer(100, new ActionListener() {
+        timer = new Timer(200, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 thread = new Thread(new Search(textPane, player.getTrack()));
@@ -168,16 +168,17 @@ public class LyricsPanel extends JPanel {
                             String s = fi.nextLine();
                             if (s.startsWith("<div id=\"lyrics\">")) {
                                 while (!(s = fi.nextLine()).equals("</div>")) {
-                                    sb.append(s.replaceAll("<.*?>", "")).append("\n");
+                                    sb.append(Util.htmlToString(s)).append("\n");
                                 }
                             }
                         }
 
-                        if (sb.length() > 0) {
+                        String text = sb.toString().trim();
+                        if (text.length() > 0) {
                             //noinspection ResultOfMethodCallIgnored
                             lyricsDir.mkdirs();
                             PrintWriter writer = new PrintWriter(file);
-                            writer.print(sb.toString());
+                            writer.print(text);
                             writer.close();
                         }
                     }

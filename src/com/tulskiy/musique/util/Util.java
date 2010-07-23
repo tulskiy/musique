@@ -27,6 +27,16 @@ import java.util.Locale;
  * @Date: 21.11.2008
  */
 public class Util {
+    public static String htmlToString(String string) {
+        String ans = string.replaceAll("&quot;", "\"");
+        ans = ans.replaceAll("&amp;", "&");
+        ans = ans.replaceAll("&lt;", "<");
+        ans = ans.replaceAll("&gt;", ">");
+        ans = ans.replaceAll("<.+?>", "");
+
+        return ans;
+    }
+
     public static String samplesToTime(long samples, int sampleRate, int precision) {
         if (samples == -1 || sampleRate == 0)
             return "-:--";
