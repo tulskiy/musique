@@ -30,6 +30,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * @Author: Denis Tulskiy
@@ -42,6 +44,7 @@ public class StatusBar extends JPanel {
     private Player player = app.getPlayer();
     private Configuration config = app.getConfiguration();
     private Expression statusFormat;
+    private final String defaultFormat = "%codec% | %bitrate% kbps | %sampleRate% Hz | %channelsAsString% | $playingTime()[ / %length%]";
 
     public StatusBar() {
         info = new JLabel("Stopped");
@@ -55,14 +58,9 @@ public class StatusBar extends JPanel {
         box.add(info);
         box.add(Box.createGlue());
         box.add(Box.createHorizontalStrut(20));
-        updateFormat();
         add(box);
 
         buildListeners();
-    }
-
-    public void updateFormat() {
-        statusFormat = Parser.parse(config.getString("format.statusBar", ""));
     }
 
     private void buildListeners() {
@@ -80,6 +78,13 @@ public class StatusBar extends JPanel {
                     case STOPPED:
                         info.setText("Stopped");
                 }
+            }
+        });
+
+        config.addPropertyChangeListener("format.statusBar", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                statusFormat = Parser.parse(config.getString(evt.getPropertyName(), defaultFormat));
             }
         });
     }
