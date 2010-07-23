@@ -112,6 +112,10 @@ public class Configuration {
         changeSupport.firePropertyChange(key, old, value);
     }
 
+    public void remove(String key) {
+        map.remove(key);
+    }
+
     public Object get(String key) {
         return map.get(key);
     }
@@ -120,6 +124,7 @@ public class Configuration {
         try {
             return Integer.valueOf(get(key).toString());
         } catch (Exception e) {
+            setInt(key, def);
             return def;
         }
     }
@@ -132,6 +137,7 @@ public class Configuration {
         try {
             return Float.valueOf(get(key).toString());
         } catch (Exception e) {
+            setFloat(key, def);
             return def;
         }
     }
@@ -144,6 +150,7 @@ public class Configuration {
         try {
             return get(key).toString();
         } catch (Exception e) {
+            setString(key, def);
             return def;
         }
     }
@@ -157,6 +164,7 @@ public class Configuration {
             String s = get(key).toString().substring(1);
             return new Color(Integer.parseInt(s, 16));
         } catch (Exception e) {
+            setColor(key, def);
             return def;
         }
     }
@@ -185,6 +193,7 @@ public class Configuration {
             }
             return new Rectangle(values[0], values[1], values[2], values[3]);
         } catch (Exception e) {
+            setRectangle(key, def);
             return def;
         }
     }
@@ -207,6 +216,7 @@ public class Configuration {
                     Integer.parseInt(tokens[1]),
                     Integer.parseInt(tokens[2]));
         } catch (Exception e) {
+            setFont(key, def);
             return def;
         }
     }
@@ -228,6 +238,7 @@ public class Configuration {
             String value = get(key).toString();
             return Boolean.parseBoolean(value);
         } catch (Exception e) {
+            setBoolean(key, def);
             return def;
         }
     }
@@ -244,6 +255,7 @@ public class Configuration {
                 return strings;
         } catch (Exception ignored) {
         }
+        setList(key, def);
         return def;
     }
 
