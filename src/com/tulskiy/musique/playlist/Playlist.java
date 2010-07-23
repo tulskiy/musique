@@ -113,6 +113,7 @@ public class Playlist extends ArrayList<Track> {
             }
 
             dos.close();
+            regroup();
         } catch (IOException e) {
             logger.warning("Failed to save playlist " + file.getName() + ": " + e.getMessage());
         }
