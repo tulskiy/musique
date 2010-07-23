@@ -421,7 +421,7 @@ public class SettingsDialog extends JDialog {
             clear.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    setFont(null);
+                    setSelectedFont(null);
                 }
             });
 
@@ -436,7 +436,7 @@ public class SettingsDialog extends JDialog {
                 public void mouseClicked(MouseEvent e) {
                     Font f = FontChooserDialog.show(comp, getFont());
                     if (f != null)
-                        setFont(f);
+                        setSelectedFont(f);
                 }
             });
         }
