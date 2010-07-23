@@ -18,9 +18,9 @@
 package com.tulskiy.musique.audio.formats.mp3;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
 import com.tulskiy.musique.playlist.Track;
+import davaguine.jmac.info.ID3Tag;
 import org.jaudiotagger.audio.mp3.LameFrame;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -42,6 +42,7 @@ public class MP3FileReader extends AudioFileReader {
 
     public Track readSingle(Track track) {
         TextEncoding.getInstanceOf().setDefaultNonUnicode(defaultCharset.name());
+        ID3Tag.setDefaultEncoding(defaultCharset.name());
         MP3File mp3File = null;
         try {
             mp3File = new MP3File(track.getFile(), MP3File.LOAD_IDV2TAG, true);

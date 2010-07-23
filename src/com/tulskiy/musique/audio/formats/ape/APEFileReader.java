@@ -21,6 +21,7 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.playlist.Track;
 import davaguine.jmac.info.APEFileInfo;
 import davaguine.jmac.info.APEHeader;
+import davaguine.jmac.info.ID3Tag;
 import davaguine.jmac.tools.RandomAccessFile;
 
 /**
@@ -32,6 +33,7 @@ public class APEFileReader extends AudioFileReader {
 
     public Track readSingle(Track track) {
         try {
+            ID3Tag.setDefaultEncoding(defaultCharset.name());
             RandomAccessFile ras = new RandomAccessFile(track.getFile(), "r");
             APEHeader header = new APEHeader(ras);
             APEFileInfo fileInfo = new APEFileInfo();
