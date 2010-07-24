@@ -121,6 +121,15 @@ public class PlaylistTabs extends JTabbedPane {
             public void mousePressed(MouseEvent e) {
                 dragFrom = indexAtLocation(e.getX(), e.getY());
             }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON1 &&
+                    e.getClickCount() == 2) {
+                    getActionMap().get("newPlaylist").actionPerformed(
+                            new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+                }
+            }
         });
     }
 

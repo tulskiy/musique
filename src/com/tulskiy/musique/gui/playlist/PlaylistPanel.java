@@ -204,7 +204,7 @@ public class PlaylistPanel extends JPanel {
         menuBar.add(playbackMenu);
 
         ActionMap tMap = tabs.getActionMap();
-        fileMenu.add(tMap.get("newPlaylist")).setAccelerator(KeyStroke.getKeyStroke("ctrl N"));
+        fileMenu.add(tMap.get("newPlaylist")).setAccelerator(KeyStroke.getKeyStroke("ctrl T"));
         fileMenu.add(tMap.get("removePlaylist")).setIcon(emptyIcon);
         fileMenu.add(tMap.get("loadPlaylist"));
         fileMenu.add(tMap.get("savePlaylist")).setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
