@@ -79,12 +79,12 @@ public class Tray {
             }
         };
 
-        popup.add("Play").addActionListener(al);
-        popup.add("Pause").addActionListener(al);
-        popup.add("Next").addActionListener(al);
-        popup.add("Stop").addActionListener(al);
-        popup.add("Previous    ").addActionListener(al);
-        popup.add("Quit").addActionListener(al);
+        popup.add("   Play").addActionListener(al);
+        popup.add("   Pause").addActionListener(al);
+        popup.add("   Next").addActionListener(al);
+        popup.add("   Stop").addActionListener(al);
+        popup.add("   Previous   ").addActionListener(al);
+        popup.add("   Quit").addActionListener(al);
     }
 
     private JPopupTrayIcon createTrayIcon(Dimension size) {

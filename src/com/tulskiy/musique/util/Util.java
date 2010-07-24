@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.util;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.util.Formatter;
@@ -109,5 +110,20 @@ public class Util {
         int threshold = 105;
         int delta = (int) (bg.getRed() * 0.299 + bg.getGreen() * 0.587 + bg.getBlue() * 0.114);
         return (255 - delta < threshold) ? Color.black : Color.white;
+    }
+
+    public static void fixIconTextGap(JComponent menu) {
+        if (UIManager.getLookAndFeel().getName().contains("Nimbus")) {
+            Component[] components = menu.getComponents();
+            for (Component component : components) {
+                if (component instanceof AbstractButton) {
+                    AbstractButton b = (AbstractButton) component;
+                    b.setIconTextGap(0);
+                }
+
+                if (component instanceof JMenu)
+                    fixIconTextGap(((JMenu) component).getPopupMenu());
+            }
+        }
     }
 }

@@ -39,7 +39,10 @@ import javax.swing.table.TableColumnModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -250,6 +253,33 @@ public class PlaylistPanel extends JPanel {
             }
         }));
 
+        TransferActionListener transferListener = new TransferActionListener();
+
+        JMenuItem menuItem = new JMenuItem("Cut");
+        menuItem.setActionCommand((String) TransferHandler.getCutAction().
+                getValue(Action.NAME));
+        menuItem.addActionListener(transferListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke("ctrl X"));
+        menuItem.setMnemonic(KeyEvent.VK_T);
+        editMenu.add(menuItem);
+
+        menuItem = new JMenuItem("Copy");
+        menuItem.setActionCommand((String) TransferHandler.getCopyAction().
+                getValue(Action.NAME));
+        menuItem.addActionListener(transferListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke("ctrl C"));
+        menuItem.setMnemonic(KeyEvent.VK_C);
+        editMenu.add(menuItem);
+
+        menuItem = new JMenuItem("Paste");
+        menuItem.setActionCommand((String) TransferHandler.getPasteAction().
+                getValue(Action.NAME));
+        menuItem.addActionListener(transferListener);
+        menuItem.setAccelerator(KeyStroke.getKeyStroke("ctrl V"));
+        menuItem.setMnemonic(KeyEvent.VK_P);
+        editMenu.add(menuItem);
+
+        editMenu.addSeparator();
         editMenu.add("Clear").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -260,7 +290,7 @@ public class PlaylistPanel extends JPanel {
                 table.update();
             }
         });
-        editMenu.add(tableAction("removeSelected", "Remove"));
+        editMenu.add(tableAction("removeSelected", "Remove Tracks"));
         editMenu.addSeparator();
         editMenu.add(tableAction("clearQueue", "Clear Playback Queue"));
         editMenu.add(newItem("Search", "ctrl F", new ActionListener() {
@@ -339,5 +369,37 @@ public class PlaylistPanel extends JPanel {
                 config.setBoolean("player.stopAfterCurrent", item.isSelected());
             }
         });
+    }
+
+    public class TransferActionListener implements ActionListener,
+            PropertyChangeListener {
+        private JComponent focusOwner = null;
+
+        public TransferActionListener() {
+            KeyboardFocusManager manager = KeyboardFocusManager.
+                    getCurrentKeyboardFocusManager();
+            manager.addPropertyChangeListener("permanentFocusOwner", this);
+        }
+
+        public void propertyChange(PropertyChangeEvent e) {
+            Object o = e.getNewValue();
+            if (o instanceof JComponent) {
+                focusOwner = (JComponent) o;
+            } else {
+                focusOwner = null;
+            }
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (focusOwner == null)
+                return;
+            String action = e.getActionCommand();
+            Action a = focusOwner.getActionMap().get(action);
+            if (a != null) {
+                a.actionPerformed(new ActionEvent(focusOwner,
+                        ActionEvent.ACTION_PERFORMED,
+                        null));
+            }
+        }
     }
 }

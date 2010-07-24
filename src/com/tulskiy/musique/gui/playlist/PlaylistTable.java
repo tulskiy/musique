@@ -34,6 +34,7 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -47,6 +48,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -64,6 +66,7 @@ public class PlaylistTable extends GroupTable {
     private PlaylistModel model;
 
     private JScrollPane scrollPane;
+    private final ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
 
     public PlaylistTable(Playlist playlist, ArrayList<PlaylistColumn> columns) {
         this.playlist = playlist;
@@ -153,7 +156,7 @@ public class PlaylistTable extends GroupTable {
                 update();
             }
         });
-        aMap.put("enqueue", new AbstractAction("Add to Queue") {
+        aMap.put("enqueue", new AbstractAction("Add to Queue  ") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (Track track : getSelectedSongs()) {
@@ -368,9 +371,53 @@ public class PlaylistTable extends GroupTable {
     }
 
     public void buildMenus() {
-        ActionMap aMap = getActionMap();
-        final JPopupMenu headerMenu = new JPopupMenu();
         final JTableHeader header = getTableHeader();
+        header.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                show(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                show(e);
+            }
+
+            public void show(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int index = header.getColumnModel().getColumnIndexAtX(e.getX());
+                    if (index != -1) {
+                        selectedColumn = header.getColumnModel().getColumn(index);
+                    }
+                    JPopupMenu headerMenu = buildHeaderMenu();
+                    headerMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                show(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                show(e);
+            }
+
+            public void show(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    selectSongsAt(e.getPoint());
+                    JPopupMenu popup = buildTableMenu();
+                    popup.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+        });
+    }
+
+    private JPopupMenu buildHeaderMenu() {
+        final JPopupMenu headerMenu = new JPopupMenu();
 
         headerMenu.add(new JMenuItem("Add Column")).addActionListener(new ActionListener() {
             @Override
@@ -474,6 +521,7 @@ public class PlaylistTable extends GroupTable {
             }
 
             AbstractButton item = groups.add(groupValue);
+            item.setIcon(emptyIcon);
             item.addActionListener(groupListener);
             item.putClientProperty("index", i);
         }
@@ -534,38 +582,31 @@ public class PlaylistTable extends GroupTable {
             }
 
             AbstractButton item = sort.add(sortValue);
+            item.setIcon(emptyIcon);
             item.addActionListener(sortListener);
             item.putClientProperty("index", i);
         }
 
         headerMenu.add(sort);
+        Util.fixIconTextGap(headerMenu);
+        return headerMenu;
+    }
 
-        header.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                show(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                show(e);
-            }
-
-            public void show(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    int index = header.getColumnModel().getColumnIndexAtX(e.getX());
-                    if (index != -1) {
-                        selectedColumn = header.getColumnModel().getColumn(index);
-                    }
-                    headerMenu.updateUI();
-                    headerMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
-
+    private JPopupMenu buildTableMenu() {
+        ActionMap aMap;
         final JPopupMenu tableMenu = new JPopupMenu();
+        aMap = getActionMap();
 
-        tableMenu.add(aMap.get("enqueue")).setAccelerator(KeyStroke.getKeyStroke("Q"));
+        tableMenu.add(aMap.get(TransferHandler.getCutAction().
+                getValue(Action.NAME))).setText("Cut");
+        tableMenu.add(aMap.get(TransferHandler.getCopyAction().
+                getValue(Action.NAME))).setText("Copy");
+        tableMenu.add(aMap.get(TransferHandler.getPasteAction().
+                getValue(Action.NAME))).setText("Paste");
+        tableMenu.addSeparator();
+        JMenuItem item = tableMenu.add(aMap.get("enqueue"));
+        item.setIcon(emptyIcon);
+        item.setAccelerator(KeyStroke.getKeyStroke("Q"));
         tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -617,26 +658,8 @@ public class PlaylistTable extends GroupTable {
         });
         tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));
         tableMenu.add(aMap.get("showProperties")).setAccelerator(KeyStroke.getKeyStroke("alt ENTER"));
-
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                show(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                show(e);
-            }
-
-            public void show(MouseEvent e) {
-                if (e.isPopupTrigger()) {
-                    selectSongsAt(e.getPoint());
-                    tableMenu.updateUI();
-                    tableMenu.show(e.getComponent(), e.getX(), e.getY());
-                }
-            }
-        });
+        Util.fixIconTextGap(tableMenu);
+        return tableMenu;
     }
 
     class PlaylistModel extends AbstractTableModel {

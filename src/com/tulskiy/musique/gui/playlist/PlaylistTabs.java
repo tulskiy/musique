@@ -33,6 +33,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
 
@@ -124,8 +125,8 @@ public class PlaylistTabs extends JTabbedPane {
     }
 
     private void createPopupMenu() {
-        final JPopupMenu tabMenu = new JPopupMenu();
         ActionMap aMap = getActionMap();
+
         aMap.put("newPlaylist", new AbstractAction("Add New Playlist") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -199,13 +200,6 @@ public class PlaylistTabs extends JTabbedPane {
             }
         });
 
-        tabMenu.add(aMap.get("newPlaylist"));
-        tabMenu.add(aMap.get("renamePlaylist"));
-        tabMenu.add(aMap.get("removePlaylist"));
-        tabMenu.addSeparator();
-        tabMenu.add(aMap.get("savePlaylist"));
-        tabMenu.add(aMap.get("loadPlaylist"));
-
         addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -222,10 +216,24 @@ public class PlaylistTabs extends JTabbedPane {
                     int index = indexAtLocation(e.getX(), e.getY());
                     if (index != -1)
                         setSelectedIndex(index);
-                    tabMenu.show(e.getComponent(), e.getX(), e.getY());
+                    buildPopupMenu().show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
+    }
+
+    private JPopupMenu buildPopupMenu() {
+        ActionMap aMap = getActionMap();
+        final JPopupMenu tabMenu = new JPopupMenu();
+        ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+        tabMenu.add(aMap.get("newPlaylist")).setIcon(emptyIcon);
+        tabMenu.add(aMap.get("renamePlaylist"));
+        tabMenu.add(aMap.get("removePlaylist"));
+        tabMenu.addSeparator();
+        tabMenu.add(aMap.get("savePlaylist"));
+        tabMenu.add(aMap.get("loadPlaylist"));
+        Util.fixIconTextGap(tabMenu);
+        return tabMenu;
     }
 
     public Playlist addPlaylist(String name) {
