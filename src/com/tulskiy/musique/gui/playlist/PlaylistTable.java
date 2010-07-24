@@ -593,18 +593,37 @@ public class PlaylistTable extends GroupTable {
     }
 
     private JPopupMenu buildTableMenu() {
-        ActionMap aMap;
+        final ActionMap aMap = getActionMap();
         final JPopupMenu tableMenu = new JPopupMenu();
-        aMap = getActionMap();
+        final JTable owner = this;
+        JMenuItem item;
 
-        tableMenu.add(aMap.get(TransferHandler.getCutAction().
-                getValue(Action.NAME))).setText("Cut");
-        tableMenu.add(aMap.get(TransferHandler.getCopyAction().
-                getValue(Action.NAME))).setText("Copy");
-        tableMenu.add(aMap.get(TransferHandler.getPasteAction().
-                getValue(Action.NAME))).setText("Paste");
+        ActionListener listener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String cmd = e.getActionCommand();
+                Action action = aMap.get(cmd);
+                if (action != null)
+                    action.actionPerformed(new ActionEvent(owner,
+                            ActionEvent.ACTION_PERFORMED,
+                            null));
+            }
+        };
+
+        item = tableMenu.add("Cut");
+        item.addActionListener(listener);
+        item.setActionCommand((String) TransferHandler.getCutAction().getValue(Action.NAME));
+
+        item = tableMenu.add("Copy");
+        item.addActionListener(listener);
+        item.setActionCommand((String) TransferHandler.getCopyAction().getValue(Action.NAME));
+
+        item = tableMenu.add("Paste");
+        item.addActionListener(listener);
+        item.setActionCommand((String) TransferHandler.getPasteAction().getValue(Action.NAME));
+
         tableMenu.addSeparator();
-        JMenuItem item = tableMenu.add(aMap.get("enqueue"));
+        item = tableMenu.add(aMap.get("enqueue"));
         item.setIcon(emptyIcon);
         item.setAccelerator(KeyStroke.getKeyStroke("Q"));
         tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
