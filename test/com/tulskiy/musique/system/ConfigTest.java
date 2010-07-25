@@ -84,22 +84,22 @@ public class ConfigTest {
 
     @Test
     public void testDefaults() {
-        Font font = config.getFont("doesNotExist", null);
+        Font font = config.getFont("doesNotExist1", null);
         assertNull(font);
 
-        Color color = config.getColor("doesNotExist", null);
+        Color color = config.getColor("doesNotExist2", null);
         assertNull(color);
 
-        Rectangle rectangle = config.getRectangle("doesNotExist", null);
+        Rectangle rectangle = config.getRectangle("doesNotExist3", null);
         assertNull(rectangle);
 
-        int anInt = config.getInt("doesNotExist", -1);
+        int anInt = config.getInt("doesNotExist4", -1);
         assertEquals(-1, anInt);
 
-        float aFloat = config.getFloat("doesNotExist", -1);
+        float aFloat = config.getFloat("doesNotExist5", -1);
         assertEquals(-1, aFloat, 0.00001);
 
-        String string = config.getString("doesNotExist", null);
+        String string = config.getString("doesNotExist6", null);
         assertNull(string);
     }
 
