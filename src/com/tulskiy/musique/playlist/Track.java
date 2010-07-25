@@ -175,6 +175,7 @@ public class Track implements Cloneable {
 
     public void setTotalSamples(long totalSamples) {
         this.totalSamples = totalSamples;
+        length = null;
     }
 
     public URI getLocation() {
