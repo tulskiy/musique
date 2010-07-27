@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.gui;
 
+import com.tulskiy.musique.audio.player.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -47,6 +48,7 @@ public class ControlPanel extends JPanel {
     private JButton pauseButton = new JButton();
     private JButton stopButton = new JButton();
     private Player player = app.getPlayer();
+    private AudioOutput output = player.getAudioOutput();
 
     private Popup popup;
     private JToolTip toolTip;
@@ -76,7 +78,7 @@ public class ControlPanel extends JPanel {
         volumeSlider = new JSlider(0, 100);
         volumeSlider.setMaximumSize(new Dimension(100, 30));
         volumeSlider.setPreferredSize(new Dimension(100, 30));
-        volumeSlider.setValue((int) (player.getVolume() * 100));
+        volumeSlider.setValue((int) (output.getVolume() * 100));
         volumeSlider.setFocusable(false);
 
         //hack to make volume and progress sliders be on same level
@@ -144,7 +146,7 @@ public class ControlPanel extends JPanel {
     private void buildListeners() {
         volumeSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                player.setVolume(volumeSlider.getValue() / 100f);
+                output.setVolume(volumeSlider.getValue() / 100f);
             }
         });
 

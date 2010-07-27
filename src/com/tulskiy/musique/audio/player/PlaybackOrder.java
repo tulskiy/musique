@@ -24,26 +24,6 @@ import com.tulskiy.musique.playlist.Track;
  * @Date: 01.07.2009
  */
 public interface PlaybackOrder {
-    public enum Order {
-        DEFAULT("Default"),
-        REPEAT("Repeat"),
-        REPEAT_TRACK("Repeat Track"),
-        SHUFFLE("Shuffle"),
-        RANDOM("Random");
-
-        private String text;
-
-        Order(String text) {
-            this.text = text;
-        }
-
-        public String getText() {
-            return text;
-        }
-    }
-
-    public void setOrder(Order order);
-
     public Track next(Track currentTrack);
 
     public Track prev(Track currentTrack);

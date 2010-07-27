@@ -18,6 +18,7 @@
 package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.audio.player.AudioOutput;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
@@ -307,12 +308,14 @@ public class SettingsDialog extends JDialog {
         Box mainBox = Box.createVerticalBox();
         JPanel misc = new JPanel(new GridLayout(1, 2, 10, 10));
 
+        final AudioOutput output = app.getPlayer().getAudioOutput();
+
         Box mix = Box.createHorizontalBox();
         mix.add(new JLabel("Audio Mixer: "));
         Vector<String> mixerVector = new Vector<String>();
         mixerVector.add("Detect automatically");
         final Mixer.Info[] mixerInfo = AudioSystem.getMixerInfo();
-        int selectedIndex = Arrays.asList(mixerInfo).indexOf(app.getPlayer().getMixer());
+        int selectedIndex = Arrays.asList(mixerInfo).indexOf(output.getMixer());
         for (Mixer.Info info : mixerInfo) {
             String s = info.getDescription() + ", " + info.getName();
             mixerVector.add(s);
@@ -340,9 +343,9 @@ public class SettingsDialog extends JDialog {
                 int index = mixers.getSelectedIndex();
                 if (index > 0) {
                     Mixer.Info info = mixerInfo[index - 1];
-                    app.getPlayer().setMixer(info);
+                    output.setMixer(info);
                 } else {
-                    app.getPlayer().setMixer(null);
+                    output.setMixer(null);
                 }
                 AudioFileReader.setDefaultCharset((Charset) encoding.getSelectedItem());
             }

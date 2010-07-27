@@ -22,9 +22,11 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Decoders;
 import com.tulskiy.musique.util.AudioMath;
 
-import javax.sound.sampled.*;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Line;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer;
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 import static com.tulskiy.musique.audio.player.PlayerEvent.PlayerEventCode.*;
 
@@ -37,16 +39,16 @@ public class Player {
         PLAYING, PAUSED, STOPPED
     }
 
-    private final Logger logger = Logger.getLogger("musique");
-
+    private ArrayList<PlayerListener> listeners = new ArrayList<PlayerListener>();
     private PlayerState state = PlayerState.STOPPED;
-    private static ArrayList<PlayerListener> listeners = new ArrayList<PlayerListener>();
-
     private PlayerThread playerThread = new PlayerThread();
     private PlaybackOrder order;
-    private float volumeValue = 1f;
-    private boolean linearVolume = false;
+    private AudioOutput output;
     private boolean stopAfterCurrent = false;
+
+    public Player() {
+        this.output = new AudioOutput();
+    }
 
     public void open(Track track) {
         playerThread.open(track, true);
@@ -94,15 +96,16 @@ public class Player {
         }
     }
 
-    public void setVolume(float volume) {
-        FloatControl v = playerThread.volume;
-        this.volumeValue = volume;
-        if (v != null) {
-            if (linearVolume)
-                v.setValue(v.getMaximum() * volume);
-            else
-                v.setValue(linearToDb(volume));
-        }
+    public void exit() {
+        playerThread.exit();
+    }
+
+    public void setAudioOutput(AudioOutput output) {
+        this.output = output;
+    }
+
+    public AudioOutput getAudioOutput() {
+        return output;
     }
 
     public void addListener(PlayerListener listener) {
@@ -131,25 +134,6 @@ public class Player {
 
     public void setStopAfterCurrent(boolean stopAfterCurrent) {
         this.stopAfterCurrent = stopAfterCurrent;
-    }
-
-    public float getVolume() {
-        FloatControl volume = playerThread.volume;
-        if (volume != null) {
-            if (linearVolume)
-                return volume.getValue() / volume.getMaximum();
-            else
-                return dbToLinear(volume.getValue());
-        } else
-            return this.volumeValue;
-    }
-
-    public float linearToDb(double volume) {
-        return (float) (20 * Math.log10(volume));
-    }
-
-    public float dbToLinear(double volume) {
-        return (float) Math.pow(10, volume / 20);
     }
 
     public void setPlaybackOrder(PlaybackOrder order) {
@@ -200,50 +184,30 @@ public class Player {
         }
     }
 
-    public void setMixer(Mixer.Info info) {
-        if (info == null)
-            playerThread.mixer = null;
-        else
-            playerThread.mixer = AudioSystem.getMixer(info);
-        playerThread.mixerChanged = true;
-    }
-
-    public Mixer.Info getMixer() {
-        if (playerThread.mixer != null)
-            return playerThread.mixer.getMixerInfo();
-        else
-            return null;
-    }
-
     class PlayerThread extends Thread {
-        private final int BUFFER_SIZE = (int) Math.pow(2, 16);
-
         private final Object lock = new Object();
-        private SourceDataLine line;
-        private FloatControl volume;
         private long currentByte = 0;
         private boolean paused = true;
         private Track currentTrack;
         private Track nextTrack;
         private Decoder decoder;
         private long cueTotalBytes;
-        private Mixer mixer;
-        private boolean mixerChanged;
+        private boolean exit = false;
 
-        @SuppressWarnings({"InfiniteLoopStatement", "ConstantConditions"})
+        @SuppressWarnings({"ConstantConditions"})
         @Override
         public void run() {
             byte[] buf = new byte[65536];
             int len;
-            while (true) {
+            while (!exit) {
                 synchronized (lock) {
                     try {
                         while (paused) {
-                            if (state == PlayerState.PLAYING)
+                            if (isPlaying())
                                 setState(PlayerState.PAUSED);
                             lock.wait();
                         }
-                        if (order == null || decoder == null) {
+                        if (decoder == null) {
                             stopPlaying();
                             continue;
                         }
@@ -263,29 +227,33 @@ public class Player {
                             len = decoder.decode(buf);
 
                             if (len == -1) {
-                                nextTrack = order.next(currentTrack);
-                                if (nextTrack == null)
+                                nextTrack = null;
+                                if (order != null)
+                                    nextTrack = order.next(currentTrack);
+                                if (nextTrack == null) {
                                     stopPlaying();
+                                }
                                 continue;
                             }
 
-                            if (currentTrack.getSubsongIndex() != 0) {
+                            if (currentTrack.isCue()) {
                                 if (cueTotalBytes <= currentByte + len) {
-                                    Track s = order.next(currentTrack);
+                                    Track s = null;
+                                    if (order != null)
+                                        s = order.next(currentTrack);
 
+                                    len = (int) (cueTotalBytes - currentByte);
                                     if (s != null) {
-                                        len = (int) (cueTotalBytes - currentByte);
                                         nextTrack = s;
                                     } else {
                                         stopPlaying();
-                                        continue;
                                     }
                                 }
                             }
 
                             currentByte += len;
 
-                            line.write(buf, 0, len);
+                            output.write(buf, 0, len);
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -294,49 +262,11 @@ public class Player {
             }
         }
 
-        private void initLine() throws LineUnavailableException {
-            AudioFormat fmt = decoder.getAudioFormat();
-            //if it is same format and the line is opened, do nothing
-            if (line != null && line.isOpen()) {
-                if (mixerChanged || !line.getFormat().matches(fmt)) {
-                    mixerChanged = false;
-                    line.drain();
-                    line.close();
-                    line = null;
-                } else {
-                    return;
-                }
-            }
-            logger.fine("Audio format: " + fmt);
-            DataLine.Info info = new DataLine.Info(SourceDataLine.class, fmt, BUFFER_SIZE);
-            logger.fine("Dataline info: " + info);
-            if (mixer != null && mixer.isLineSupported(info)) {
-                line = (SourceDataLine) mixer.getLine(info);
-                logger.fine("Mixer: " + mixer.getMixerInfo().getDescription());
-            } else {
-                line = AudioSystem.getSourceDataLine(fmt);
-                mixer = null;
-            }
-            logger.fine("Line: " + line);
-            line.open(fmt, BUFFER_SIZE);
-            line.start();
-            if (line.isControlSupported(FloatControl.Type.VOLUME)) {
-                volume = (FloatControl) line.getControl(FloatControl.Type.VOLUME);
-                volume.setValue(volumeValue * volume.getMaximum());
-                linearVolume = true;
-            } else if (line.isControlSupported(FloatControl.Type.MASTER_GAIN)) {
-                volume = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-                volume.setValue(linearToDb(volumeValue));
-                linearVolume = false;
-            }
-        }
-
         public void pause() {
             paused = true;
 
             synchronized (lock) {
-                if (line != null && line.isOpen())
-                    line.stop();
+                output.stop();
             }
         }
 
@@ -357,8 +287,7 @@ public class Player {
                 paused = false;
 
                 synchronized (lock) {
-                    if (line != null)
-                        line.start();
+                    output.start();
                     lock.notifyAll();
                 }
             }
@@ -366,11 +295,8 @@ public class Player {
 
         public void seek(long sample) {
             PlayerState oldState = state;
-
             pause();
-
-            if (line != null)
-                line.flush();
+            output.flush();
 
             if (decoder != null) {
                 decoder.seekSample(currentTrack.getStartPosition() + sample);
@@ -384,13 +310,10 @@ public class Player {
 
         public synchronized void open(Track track, boolean force) {
             if (force) {
-                if (line != null && line.isOpen())
-                    line.flush();
-
+                //I shit a lot, need to flush twice :)
+                output.flush();
                 pause();
-
-                if (line != null && line.isOpen())
-                    line.flush();
+                output.flush();
             }
 
             try {
@@ -409,6 +332,7 @@ public class Player {
 
                     if (decoder == null || !decoder.open(track)) {
                         currentTrack = null;
+                        stopPlaying();
                         return;
                     }
 
@@ -420,10 +344,8 @@ public class Player {
                         cueTotalBytes = 0;
                     }
 
-                    initLine();
-
+                    output.init(decoder.getAudioFormat());
                     track.setPlayed(true);
-
                     fireEvent(FILE_OPENED);
                 }
 
@@ -450,12 +372,17 @@ public class Player {
 
         public void stopPlaying() {
             pause();
-//            if (line != null)
-//                line.close();
             if (decoder != null)
                 decoder.close();
             decoder = null;
             setState(PlayerState.STOPPED);
+        }
+
+        private void exit() {
+            stopPlaying();
+            synchronized (lock) {
+                lock.notifyAll();
+            }
         }
 
         public synchronized long getCurrentSample() {

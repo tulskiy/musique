@@ -31,6 +31,24 @@ import java.util.LinkedList;
  * Date: Jul 1, 2010
  */
 public class PlaylistOrder implements PlaybackOrder {
+    public enum Order {
+        DEFAULT("Default"),
+        REPEAT("Repeat"),
+        REPEAT_TRACK("Repeat Track"),
+        SHUFFLE("Shuffle"),
+        RANDOM("Random");
+
+        private String text;
+
+        Order(String text) {
+            this.text = text;
+        }
+
+        public String getText() {
+            return text;
+        }
+    }
+
     class QueueTuple {
         Track track;
         Playlist playlist;

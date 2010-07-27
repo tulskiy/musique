@@ -22,6 +22,7 @@
 package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.audio.player.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -65,7 +66,6 @@ public class Application {
             configuration.load(new FileReader(configFile));
         } catch (FileNotFoundException ignored) {
         }
-
         player = new Player();
 
         playlistManager = new PlaylistManager();
@@ -75,13 +75,14 @@ public class Application {
     }
 
     private void loadSettings() {
-        player.setVolume(configuration.getFloat("player.volume", 1));
+        AudioOutput audioOutput = player.getAudioOutput();
+        audioOutput.setVolume(configuration.getFloat("player.volume", 1));
         String mixer = configuration.getString("player.mixer", null);
         if (mixer != null) {
             Mixer.Info[] infos = AudioSystem.getMixerInfo();
             for (Mixer.Info info : infos) {
                 if (info.getName().equals(mixer)) {
-                    player.setMixer(info);
+                    audioOutput.setMixer(info);
                     break;
                 }
             }
@@ -108,8 +109,9 @@ public class Application {
     }
 
     private void saveSettings() {
-        configuration.setFloat("player.volume", player.getVolume());
-        Mixer.Info mixer = player.getMixer();
+        AudioOutput audioOutput = player.getAudioOutput();
+        configuration.setFloat("player.volume", audioOutput.getVolume());
+        Mixer.Info mixer = audioOutput.getMixer();
         if (mixer != null)
             configuration.setString("player.mixer", mixer.getName());
         else

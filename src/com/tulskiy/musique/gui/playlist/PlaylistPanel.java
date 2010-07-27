@@ -17,7 +17,6 @@
 
 package com.tulskiy.musique.gui.playlist;
 
-import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -315,24 +314,25 @@ public class PlaylistPanel extends JPanel {
 
         JMenu orderMenu = new JMenu("Order");
         playbackMenu.add(orderMenu);
+        final PlaylistOrder order = (PlaylistOrder) app.getPlayer().getPlaybackOrder();
         ActionListener orderListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JMenuItem item = (JMenuItem) e.getSource();
-                PlaybackOrder.Order o = PlaybackOrder.Order.valueOf(item.getName());
-                app.getPlayer().getPlaybackOrder().setOrder(o);
+                PlaylistOrder.Order o = PlaylistOrder.Order.valueOf(item.getName());
+                order.setOrder(o);
                 config.setInt("player.playbackOrder", o.ordinal());
             }
         };
 
         int index = config.getInt("player.playbackOrder", 0);
-        PlaybackOrder.Order[] orders = PlaybackOrder.Order.values();
+        PlaylistOrder.Order[] orders = PlaylistOrder.Order.values();
         ButtonGroup gr = new ButtonGroup();
-        for (PlaybackOrder.Order o : orders) {
+        for (PlaylistOrder.Order o : orders) {
             JCheckBoxMenuItem item = new JCheckBoxMenuItem(o.getText());
             if (o.ordinal() == index) {
                 item.setSelected(true);
-                app.getPlayer().getPlaybackOrder().setOrder(o);
+                order.setOrder(o);
             }
             item.addActionListener(orderListener);
             item.setName(o.toString());

@@ -21,10 +21,7 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.dialogs.ColumnDialog;
-import com.tulskiy.musique.gui.dialogs.ProgressDialog;
-import com.tulskiy.musique.gui.dialogs.Task;
-import com.tulskiy.musique.gui.dialogs.TracksInfoDialog;
+import com.tulskiy.musique.gui.dialogs.*;
 import com.tulskiy.musique.gui.grouptable.GroupTable;
 import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
@@ -673,6 +670,12 @@ public class PlaylistTable extends GroupTable {
                         return progress;
                     }
                 });
+            }
+        });
+        tableMenu.add("Convert").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ConverterDialog(owner, getSelectedSongs()).setVisible(true);
             }
         });
         tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));
