@@ -38,10 +38,7 @@ public class Util {
         return ans;
     }
 
-    public static String samplesToTime(long samples, int sampleRate, int precision) {
-        if (samples == -1 || sampleRate == 0)
-            return "-:--";
-        double seconds = AudioMath.samplesToMillis(samples, sampleRate) / 1000d;
+    public static String formatMillis(double seconds, int precision) {
         int min = (int) (seconds / 60);
         int hrs = min / 60;
         if (min > 0) seconds -= min * 60;
@@ -61,6 +58,13 @@ public class Util {
         String fmt = "%0" + n + "." + precision + "f";
         builder.append(new Formatter().format(Locale.US, fmt, seconds));
         return builder.toString();
+    }
+
+    public static String samplesToTime(long samples, int sampleRate, int precision) {
+        if (samples <= 0)
+            return "-:--";
+        double seconds = AudioMath.samplesToMillis(samples, sampleRate) / 1000d;
+        return formatMillis(seconds, precision);
     }
 
     public static String getFileExt(File file) {

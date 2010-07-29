@@ -72,6 +72,10 @@ public abstract class Task {
         return 0;
     }
 
+    public String getTitle() {
+        return null;
+    }
+
     public abstract String getStatus();
 
     public abstract void abort();

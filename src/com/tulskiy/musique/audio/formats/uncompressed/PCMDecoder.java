@@ -70,7 +70,7 @@ public class PCMDecoder implements Decoder {
 
     public int decode(byte[] buf) {
         try {
-            return audioInputStream.read(buf, 0, buf.length - 1);
+            return audioInputStream.read(buf, 0, buf.length);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -96,6 +96,10 @@ public class ProgressDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 progress.setValue((int) (progress.getMaximum() * task.getProgress()));
                 status.setText(task.getStatus());
+                String title = task.getTitle();
+                if (title != null)
+                    setTitle(title);
+                progress.setIndeterminate(task.isIndeterminate());
             }
         });
         timer.start();

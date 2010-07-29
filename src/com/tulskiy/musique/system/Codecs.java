@@ -18,12 +18,17 @@
 package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.Decoder;
+import com.tulskiy.musique.audio.Encoder;
 import com.tulskiy.musique.audio.formats.ape.APEDecoder;
+import com.tulskiy.musique.audio.formats.ape.APEEncoder;
 import com.tulskiy.musique.audio.formats.flac.FLACDecoder;
 import com.tulskiy.musique.audio.formats.mp3.MP3Decoder;
 import com.tulskiy.musique.audio.formats.ogg.VorbisDecoder;
+import com.tulskiy.musique.audio.formats.ogg.VorbisEncoder;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMDecoder;
+import com.tulskiy.musique.audio.formats.uncompressed.PCMEncoder;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackDecoder;
+import com.tulskiy.musique.audio.formats.wavpack.WavPackEncoder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
@@ -37,8 +42,9 @@ import java.util.logging.Logger;
  * @Author: Denis Tulskiy
  * @Date: 24.06.2009
  */
-public class Decoders {
+public class Codecs {
     private static HashMap<String, Decoder> decoders = new HashMap<String, Decoder>();
+    private static HashMap<String, Encoder> encoders = new HashMap<String, Encoder>();
     private static final Logger logger = Logger.getLogger("musique");
 
     static {
@@ -51,6 +57,11 @@ public class Decoders {
         decoders.put("flac", new FLACDecoder());
         decoders.put("ape", new APEDecoder());
         decoders.put("wv", new WavPackDecoder());
+
+        encoders.put("wav", new PCMEncoder());
+        encoders.put("ape", new APEEncoder());
+        encoders.put("ogg", new VorbisEncoder());
+        encoders.put("wv", new WavPackEncoder());
     }
 
     public static Decoder getDecoder(Track track) {
@@ -77,5 +88,21 @@ public class Decoders {
         }
         String ext = Util.getFileExt(location.toString()).toLowerCase();
         return decoders.get(ext);
+    }
+
+    public static Decoder getNewDecoder(Track track) {
+        try {
+            return getDecoder(track).getClass().newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static Encoder getEncoder(String format) {
+        return encoders.get(format);
     }
 }

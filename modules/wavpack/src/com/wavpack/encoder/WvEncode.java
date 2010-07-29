@@ -10,6 +10,9 @@
 */
 package com.wavpack.encoder;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
+
 public class WvEncode {
     public static void main(String[] args) {
         // This is the main module for the demonstration WavPack command-line
@@ -29,7 +32,7 @@ public class WvEncode {
 
         String sign_on1 = "Java WavPack Encoder (c) 2008 Peter McQuillan";
         String sign_on2 = "based on TINYPACK - Tiny Audio Compressor  Version " + VERSION_STR +
-                " " + DATE_STR + " Copyright (c) 1998 - 2007 Conifer Software.  All Rights Reserved.";
+                          " " + DATE_STR + " Copyright (c) 1998 - 2007 Conifer Software.  All Rights Reserved.";
 
         String usage0 = "";
         String usage1 = " Usage:   java WvEncode [-options] infile.wav outfile.wv [outfile.wvc]";
@@ -151,7 +154,7 @@ public class WvEncode {
                         config.flags &= ~Defines.CONFIG_JOINT_STEREO;
                     } else if (passedInt == 1) {
                         config.flags |= (Defines.CONFIG_JOINT_OVERRIDE |
-                                Defines.CONFIG_JOINT_STEREO);
+                                         Defines.CONFIG_JOINT_STEREO);
                     } else {
                         System.err.println("-j0 or -j1 only!");
                         ++error_count;
@@ -185,7 +188,7 @@ public class WvEncode {
                         config.flags &= ~Defines.CONFIG_HYBRID_SHAPE;
                     } else if ((config.shaping_weight >= -1024) && (config.shaping_weight <= 1024)) {
                         config.flags |= (Defines.CONFIG_HYBRID_SHAPE |
-                                Defines.CONFIG_SHAPE_OVERRIDE);
+                                         Defines.CONFIG_SHAPE_OVERRIDE);
                     } else {
                         System.err.println("-s-1.00 to -s1.00 only!");
                         ++error_count;
@@ -239,7 +242,7 @@ public class WvEncode {
         }
 
         if ((infilename.length() == 0) || (outfilename.length() == 0) ||
-                ((out2filename.length() == 0) && ((config.flags & Defines.CONFIG_CREATE_WVC) != 0))) {
+            ((out2filename.length() == 0) && ((config.flags & Defines.CONFIG_CREATE_WVC) != 0))) {
             System.out.println(usage0);
             System.out.println(usage1);
             System.out.println(usage2);
@@ -274,8 +277,8 @@ public class WvEncode {
         long bcount;
         WavpackConfig loc_config = config;
         byte[] riff_chunk_header = new byte[12];
-        java.io.FileOutputStream wv_file;
-        java.io.FileOutputStream wvc_file;
+        RandomAccessFile wv_file;
+        RandomAccessFile wvc_file;
         byte[] chunk_header = new byte[8];
         byte[] WaveHeader = new byte[40];
         int whBlockAlign = 1;
@@ -304,9 +307,10 @@ public class WvEncode {
 
         // open output file for writing
         try {
-            wv_file = new java.io.FileOutputStream(outfilename);
+            wv_file = new RandomAccessFile(outfilename, "rw");
+            wv_file.setLength(0);
         }
-        catch (java.io.FileNotFoundException fe) {
+        catch (IOException fe) {
             System.err.println("can't create file " + outfilename);
 
             return Defines.SOFT_ERROR;
@@ -320,9 +324,9 @@ public class WvEncode {
         bcount = DoReadFile(in, riff_chunk_header, 12);
 
         if ((bcount != 12) || (riff_chunk_header[0] != 'R') || (riff_chunk_header[1] != 'I') ||
-                (riff_chunk_header[2] != 'F') || (riff_chunk_header[3] != 'F') ||
-                (riff_chunk_header[8] != 'W') || (riff_chunk_header[9] != 'A') ||
-                (riff_chunk_header[10] != 'V') || (riff_chunk_header[11] != 'E')) {
+            (riff_chunk_header[2] != 'F') || (riff_chunk_header[3] != 'F') ||
+            (riff_chunk_header[8] != 'W') || (riff_chunk_header[9] != 'A') ||
+            (riff_chunk_header[10] != 'V') || (riff_chunk_header[11] != 'E')) {
             System.err.println(infilename + " is not a valid .WAV file!");
 
             try {
@@ -356,12 +360,12 @@ public class WvEncode {
             }
 
             chunkSize = (chunk_header[4] & 0xFF) + ((chunk_header[5] & 0xFF) << 8) +
-                    ((chunk_header[6] & 0xFF) << 16) + ((chunk_header[7] & 0xFF) << 24);
+                        ((chunk_header[6] & 0xFF) << 16) + ((chunk_header[7] & 0xFF) << 24);
 
             // if it's the format chunk, we want to get some info out of there and
             // make sure it's a .wav file we can handle
             if ((chunk_header[0] == 'f') && (chunk_header[1] == 'm') && (chunk_header[2] == 't') &&
-                    (chunk_header[3] == ' ')) {
+                (chunk_header[3] == ' ')) {
                 int supported = Defines.TRUE;
                 int format;
                 int check = 0;
@@ -404,7 +408,7 @@ public class WvEncode {
 
                 if (chunkSize == 40) {
                     whValidBitsPerSample = (WaveHeader[18] & 0xFF) +
-                            ((WaveHeader[19] & 0xFF) << 8);
+                                           ((WaveHeader[19] & 0xFF) << 8);
                     loc_config.bits_per_sample = whValidBitsPerSample;
                 } else {
                     loc_config.bits_per_sample = whBitsPerSample;
@@ -418,9 +422,9 @@ public class WvEncode {
                 whNumChannels = (WaveHeader[2] & 0xFF) + ((WaveHeader[3] & 0xFF) << 8);
 
                 if ((whNumChannels == 0) || (whNumChannels > 2) ||
-                        ((whBlockAlign / whNumChannels) < ((loc_config.bits_per_sample + 7) / 8)) ||
-                        ((whBlockAlign / whNumChannels) > 3) ||
-                        ((whBlockAlign % whNumChannels) > 0)) {
+                    ((whBlockAlign / whNumChannels) < ((loc_config.bits_per_sample + 7) / 8)) ||
+                    ((whBlockAlign / whNumChannels) > 3) ||
+                    ((whBlockAlign % whNumChannels) > 0)) {
                     supported = Defines.FALSE;
                 }
 
@@ -429,7 +433,7 @@ public class WvEncode {
                 }
 
                 whSampleRate = (WaveHeader[4] & 0xFF) + ((WaveHeader[5] & 0xFF) << 8) +
-                        ((WaveHeader[6] & 0xFF) << 16) + ((WaveHeader[7] & 0xFF) << 24);
+                               ((WaveHeader[6] & 0xFF) << 16) + ((WaveHeader[7] & 0xFF) << 24);
 
                 if (supported != Defines.TRUE) {
                     System.err.println(infilename + " is an unsupported .WAV format!");
@@ -444,7 +448,7 @@ public class WvEncode {
                     return Defines.SOFT_ERROR;
                 }
             } else if ((chunk_header[0] == 'd') && (chunk_header[1] == 'a') &&
-                    (chunk_header[2] == 't') && (chunk_header[3] == 'a')) {
+                       (chunk_header[2] == 't') && (chunk_header[3] == 'a')) {
                 // on the data chunk, get size and exit loop
                 total_samples = chunkSize / whBlockAlign;
 
@@ -481,10 +485,11 @@ public class WvEncode {
         // if we are creating a "correction" file, open it now for writing
         if (out2filename.length() > 0) {
             try {
-                wvc_file = new java.io.FileOutputStream(out2filename);
+                wvc_file = new RandomAccessFile(out2filename, "rw");
+                wvc_file.setLength(0);
                 wpc.correction_outfile = wvc_file;
             }
-            catch (java.io.FileNotFoundException fe) {
+            catch (IOException fe) {
                 System.err.println("can't create file " + outfilename);
 
                 return Defines.SOFT_ERROR;
@@ -510,7 +515,7 @@ public class WvEncode {
         // situations we might have to back up and re-write the initial blocks.
         // Currently the only case is if we're ignoring length.
         if ((result == Defines.NO_ERROR) &&
-                (WavPackUtils.WavpackGetNumSamples(wpc) != WavPackUtils.WavpackGetSampleIndex(wpc))) {
+            (WavPackUtils.WavpackGetNumSamples(wpc) != WavPackUtils.WavpackGetSampleIndex(wpc))) {
             System.err.println("couldn't read all samples, file may be corrupt!!");
             result = Defines.SOFT_ERROR;
         }
@@ -610,7 +615,7 @@ public class WvEncode {
 
                     while (cnt > 0) {
                         dptr[dcounter] = (sptr[scounter] & 0xff) |
-                                ((sptr[scounter + 1] & 0xff) << 8) | (sptr[scounter + 2] << 16);
+                                         ((sptr[scounter + 1] & 0xff) << 8) | (sptr[scounter + 2] << 16);
                         scounter = scounter + 3;
                         dcounter++;
                         cnt--;

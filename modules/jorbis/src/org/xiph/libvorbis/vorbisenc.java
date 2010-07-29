@@ -10,7 +10,7 @@
 
 package org.xiph.libvorbis;
 
-import org.xiph.libvorbis.modes.*;
+import org.xiph.libvorbis.modes.setup_44;
 
 import static org.xiph.libvorbis.vorbis_constants.integer_constants.*;
 
@@ -313,14 +313,13 @@ public class vorbisenc {
 
     private boolean get_setup_template(int ch, int srate, float req, int q_or_bitrate) {
 
-        int i = 0, j;
+        int j;
         highlevel_encode_setup hi = vi.codec_setup.hi;
 
         if (q_or_bitrate > 0)
             req /= ch;
 
-        while (setup_list[i] != null) {
-
+        for (int i = 0; i < setup_list.length; i++) {
             if (setup_list[i].coupling_restriction == -1 || setup_list[i].coupling_restriction == ch) {
 
                 if (srate >= setup_list[i].samplerate_min_restriction && srate <= setup_list[i].samplerate_max_restriction) {
@@ -334,12 +333,10 @@ public class vorbisenc {
 
                     // the template matches.  Does the requested quality mode fall within this templates modes?
                     if (req < map[0]) {
-                        ++i;
                         continue;
                     }
 
                     if (req > map[setup_list[i].mappings]) {
-                        ++i;
                         continue;
                     }
 
@@ -362,7 +359,6 @@ public class vorbisenc {
                     return true;
                 }
             }
-            i++;
         }
         hi.setup = null;
         return false;

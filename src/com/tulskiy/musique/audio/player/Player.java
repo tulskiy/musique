@@ -19,7 +19,7 @@ package com.tulskiy.musique.audio.player;
 
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.Decoders;
+import com.tulskiy.musique.system.Codecs;
 import com.tulskiy.musique.util.AudioMath;
 
 import javax.sound.sampled.AudioSystem;
@@ -326,7 +326,7 @@ public class Player {
                         decoder = null;
                         return;
                     }
-                    decoder = Decoders.getDecoder(track);
+                    decoder = Codecs.getDecoder(track);
                     currentTrack = track;
                     currentByte = 0;
 

@@ -24,7 +24,7 @@ import com.tulskiy.musique.audio.formats.ogg.OGGFileReader;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMFileReader;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackFileReader;
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.Decoders;
+import com.tulskiy.musique.system.Codecs;
 import org.junit.Test;
 
 import java.io.File;
@@ -93,7 +93,7 @@ public class DecoderTest {
 
     private void test(AudioFileReader reader, String fileName) {
         Track file = reader.readSingle(new File(fileName));
-        DecoderSeekTest test = new DecoderSeekTest(file, Decoders.getDecoder(file));
+        DecoderSeekTest test = new DecoderSeekTest(file, Codecs.getDecoder(file));
         test.start();
     }
 }

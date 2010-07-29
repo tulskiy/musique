@@ -48,6 +48,7 @@ public class APECompress extends IAPECompress {
     }
 
     // start encoding
+
     public void Start(String pOutputFilename, WaveFormat pwfeInput, int nMaxAudioBytes, int nCompressionLevel, byte[] pHeaderData, int nHeaderBytes) throws IOException {
         m_pioOutput = File.createFile(pOutputFilename, "rw");
         m_bOwnsOutputIO = true;
@@ -75,6 +76,7 @@ public class APECompress extends IAPECompress {
     // add data / compress data
 
     // allows linear, immediate access to the buffer (fast)
+
     public int GetBufferBytesAvailable() {
         return m_nBufferSize - m_nBufferTail;
     }
@@ -152,6 +154,7 @@ public class APECompress extends IAPECompress {
 
         // calculate the 'ideal' number of bytes
         int nIdealBytes = m_spAPECompressCreate.GetFullFrameBytes() - (m_nBufferTail - m_nBufferHead);
+        System.out.println(nIdealBytes);
         if (nIdealBytes > 0) {
             // get the data
             int nBytesToAdd = m_nAddDataFromInputSourceBytesAvailavle.value;
@@ -183,6 +186,7 @@ public class APECompress extends IAPECompress {
     }
 
     // finish / kill
+
     public void Finish(byte[] pTerminatingData, int nTerminatingBytes, int nWAVTerminatingBytes) throws IOException {
         ProcessBuffer(true);
         m_spAPECompressCreate.Finish(pTerminatingData, nTerminatingBytes, nWAVTerminatingBytes);

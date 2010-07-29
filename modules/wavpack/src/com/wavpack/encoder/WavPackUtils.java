@@ -10,7 +10,7 @@
 */
 package com.wavpack.encoder;
 
-class WavPackUtils {
+public class WavPackUtils {
     ///////////////////////////// local table storage ////////////////////////////
     static long[] sample_rates =
             {
@@ -59,7 +59,7 @@ class WavPackUtils {
     // be created, but when applications want to access that file they will have
     // to seek all the way to the end to determine the actual duration. A return of
     // FALSE indicates an error.
-    static int WavpackSetConfiguration(WavpackContext wpc, WavpackConfig config, long total_samples) {
+    public static int WavpackSetConfiguration(WavpackContext wpc, WavpackConfig config, long total_samples) {
         long flags = (config.bytes_per_sample - 1);
         WavpackStream wps = wpc.stream;
         int bps = 0;
@@ -99,8 +99,8 @@ class WavPackUtils {
             flags |= (Defines.HYBRID_FLAG | Defines.HYBRID_BITRATE | Defines.HYBRID_BALANCE);
 
             if (((wpc.config.flags & Defines.CONFIG_SHAPE_OVERRIDE) != 0) &&
-                    ((wpc.config.flags & Defines.CONFIG_HYBRID_SHAPE) != 0) &&
-                    (config.shaping_weight != 0)) {
+                ((wpc.config.flags & Defines.CONFIG_HYBRID_SHAPE) != 0) &&
+                (config.shaping_weight != 0)) {
                 wpc.config.shaping_weight = config.shaping_weight;
                 flags |= (Defines.HYBRID_SHAPE | Defines.NEW_SHAPING);
             }
@@ -115,7 +115,7 @@ class WavPackUtils {
         }
 
         if (((config.flags & Defines.CONFIG_JOINT_OVERRIDE) == 0) ||
-                ((config.flags & Defines.CONFIG_JOINT_STEREO) != 0)) {
+            ((config.flags & Defines.CONFIG_JOINT_STEREO) != 0)) {
             flags |= Defines.JOINT_STEREO;
         }
 
@@ -139,7 +139,7 @@ class WavPackUtils {
 
         if (config.num_channels == 1) {
             wps.wphdr.flags &= ~(Defines.JOINT_STEREO | Defines.CROSS_DECORR |
-                    Defines.HYBRID_BALANCE);
+                                 Defines.HYBRID_BALANCE);
             wps.wphdr.flags |= Defines.MONO_FLAG;
         }
 
@@ -149,7 +149,7 @@ class WavPackUtils {
     // Prepare to actually pack samples by determining the size of the WavPack
     // blocks and initializing the stream. Call after WavpackSetConfiguration()
     // and before WavpackPackSamples(). A return of FALSE indicates an error.
-    static int WavpackPackInit(WavpackContext wpc) {
+    public static int WavpackPackInit(WavpackContext wpc) {
         if (wpc.config.block_samples > 0) {
             wpc.block_samples = wpc.config.block_samples;
         } else {
@@ -187,27 +187,26 @@ class WavPackUtils {
     // to force an early termination. Completed WavPack blocks are send to the
     // function provided in the initial call to WavpackOpenFileOutput(). A
     // return of FALSE indicates an error.
-    static int WavpackPackSamples(WavpackContext wpc, long[] sample_buffer, long sample_count) {
+    public static int WavpackPackSamples(WavpackContext wpc, long[] sample_buffer, long sample_count) {
         WavpackStream wps = wpc.stream;
         long flags = wps.wphdr.flags;
 
         if ((flags & Defines.SHIFT_MASK) != 0) {
             int shift = (int) ((flags & Defines.SHIFT_MASK) >> Defines.SHIFT_LSB);
-            long[] ptr = sample_buffer;
             long cnt = sample_count;
             int ptrIndex = 0;
 
             if ((flags & (Defines.MONO_FLAG | Defines.FALSE_STEREO)) != 0) {
                 while (cnt > 0) {
-                    ptr[ptrIndex] = ptr[ptrIndex] >>> shift; // was >>
+                    sample_buffer[ptrIndex] = sample_buffer[ptrIndex] >>> shift; // was >>
                     ptrIndex++;
                     cnt--;
                 }
             } else {
                 while (cnt > 0) {
-                    ptr[ptrIndex] = ptr[ptrIndex] >>> shift; // was >>
+                    sample_buffer[ptrIndex] = sample_buffer[ptrIndex] >>> shift; // was >>
                     ptrIndex++;
-                    ptr[ptrIndex] = ptr[ptrIndex] >>> shift; // was >>
+                    sample_buffer[ptrIndex] = sample_buffer[ptrIndex] >>> shift; // was >>
                     ptrIndex++;
                     cnt--;
                 }
@@ -237,7 +236,7 @@ class WavPackUtils {
             sample_count -= samples_packed;
 
             if (((wpc.acc_samples += samples_packed) == wpc.block_samples) ||
-                    (samples_packed != samples_to_pack)) {
+                (samples_packed != samples_to_pack)) {
                 if (finish_block(wpc) == 0) {
                     return Defines.FALSE;
                 }
@@ -252,7 +251,7 @@ class WavPackUtils {
     // called to terminate a WavPack block at a specific sample (in other words it
     // is possible to continue after this operation). A return of FALSE indicates
     // an error.
-    static int WavpackFlushSamples(WavpackContext wpc) {
+    public static int WavpackFlushSamples(WavpackContext wpc) {
         if ((wpc.acc_samples != 0) && (finish_block(wpc) == 0)) {
             return Defines.FALSE;
         }
@@ -276,10 +275,12 @@ class WavPackUtils {
         }
 
         bcount = (wps.blockbuff[4] & 0xff) + ((wps.blockbuff[5] & 0xff) << 8) +
-                ((wps.blockbuff[6] & 0xff) << 16) + ((wps.blockbuff[7] & 0xff) << 24) + 8;
+                 ((wps.blockbuff[6] & 0xff) << 16) + ((wps.blockbuff[7] & 0xff) << 24) + 8;
 
         try {
             wpc.outfile.write(wps.blockbuff, 0, (int) bcount);
+            if (wpc.first_block_size == -1)
+                wpc.first_block_size = (int) bcount;
         }
         catch (Exception e) {
             result = Defines.FALSE;
@@ -296,7 +297,7 @@ class WavPackUtils {
         if (wps.block2buff[0] == 'w') // if starts with w then has a WavPack header i.e. it is defined 
         {
             bcount = (wps.block2buff[4] & 0xff) + ((wps.block2buff[5] & 0xff) << 8) +
-                    ((wps.block2buff[6] & 0xff) << 16) + ((wps.block2buff[7] & 0xff) << 24) + 8;
+                     ((wps.block2buff[6] & 0xff) << 16) + ((wps.block2buff[7] & 0xff) << 24) + 8;
 
             try {
                 wpc.correction_outfile.write(wps.block2buff, 0, (int) bcount);
@@ -345,7 +346,7 @@ class WavPackUtils {
     }
 
     // Returns the number of channels of the specified WavPack file.
-    static int WavpackGetNumChannels(WavpackContext wpc) {
+    public static int WavpackGetNumChannels(WavpackContext wpc) {
         if (null != wpc) {
             return (wpc.config.num_channels);
         } else {
@@ -371,7 +372,7 @@ class WavPackUtils {
     // file. This is required information for the user of this module because the
     // audio data is returned in the LOWER bytes of the long buffer and must be
     // left-shifted 8, 16, or 24 bits if normalized longs are required.
-    static int WavpackGetBytesPerSample(WavpackContext wpc) {
+    public static int WavpackGetBytesPerSample(WavpackContext wpc) {
         if (null != wpc) {
             return (wpc.config.bytes_per_sample);
         } else {
