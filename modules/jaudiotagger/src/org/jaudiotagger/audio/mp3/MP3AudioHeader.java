@@ -435,6 +435,21 @@ public class MP3AudioHeader extends GenericAudioHeader {
         return trackLength;
     }
 
+    @Override
+    public Long getTotalSamples() {
+        long totalSamples = numberOfFrames * mp3FrameHeader.getNoOfSamples();
+        //Because when calculating framelength we may have altered the calculation slightly for MPEGVersion2
+        //to account for mono/stero we seem to have to make a corresponding modification to get the correct time
+        if ((mp3FrameHeader.getVersion() == MPEGFrameHeader.VERSION_2) || (mp3FrameHeader.getVersion() == MPEGFrameHeader.VERSION_2_5)) {
+            if ((mp3FrameHeader.getLayer() == MPEGFrameHeader.LAYER_II) || (mp3FrameHeader.getLayer() == MPEGFrameHeader.LAYER_III)) {
+                if (mp3FrameHeader.getNumberOfChannels() == 1) {
+                    totalSamples /= 2;
+                }
+            }
+        }
+        return totalSamples;
+    }
+
     public int getTrackLength() {
         return (int) getPreciseLength();
     }

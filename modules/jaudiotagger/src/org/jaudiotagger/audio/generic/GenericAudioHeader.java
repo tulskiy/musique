@@ -316,6 +316,14 @@ public class GenericAudioHeader implements AudioHeader {
         content.put(key, value);
     }
 
+    public void setTotalSamples(long samples) {
+        content.put("totalSamples", samples);
+    }
+
+    public Long getTotalSamples() {
+        return (Long) content.get("totalSamples");
+    }
+
     /**
      * Pretty prints this encoding info
      *

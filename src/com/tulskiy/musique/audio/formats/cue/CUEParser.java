@@ -95,7 +95,7 @@ public class CUEParser {
     }
 
     private long indexToSample(Index index, int sampleRate) {
-//        System.out.println(index.getPosition().getTotalFrames());
-        return (long) (index.getPosition().getTotalFrames() / 75f * sampleRate);
+//        System.out.println(index.getPosition().getTotalFrames() / 75d * sampleRate);
+        return (long) (index.getPosition().getTotalFrames() / 75d * sampleRate);
     }
 }

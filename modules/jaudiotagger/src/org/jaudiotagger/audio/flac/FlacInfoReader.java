@@ -74,7 +74,8 @@ public class FlacInfoReader {
         info.setSamplingRate(mbdsi.getSamplingRate());
         info.setEncodingType(mbdsi.getEncodingType());
         info.setExtraEncodingInfos("");
-        info.setBitrate(computeBitrate(mbdsi.getPreciseLength(), raf.length() - raf.getFilePointer()));
+        info.setBitrate(computeBitrate((float) mbdsi.getPreciseLength(), raf.length() - raf.getFilePointer()));
+        info.setTotalSamples(mbdsi.getTotalNumberOfSamples());
         return info;
     }
 

@@ -52,8 +52,16 @@ public class MetadataBlockDataStreamInfo {
     // Logger Object
     //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.flac.MetadataBlockDataStreamInfo");
 
-    private int minBlockSize, maxBlockSize, minFrameSize, maxFrameSize, samplingRate, samplingRatePerChannel, bitsPerSample, channelNumber, totalNumberOfSamples;
-    private float length;
+    private int minBlockSize;
+    private int maxBlockSize;
+    private int minFrameSize;
+    private int maxFrameSize;
+    private int samplingRate;
+    private int samplingRatePerChannel;
+    private int bitsPerSample;
+    private int channelNumber;
+    private long totalNumberOfSamples;
+    private double length;
     private boolean isValid = true;
 
     public MetadataBlockDataStreamInfo(MetadataBlockHeader header, RandomAccessFile raf) throws IOException {
@@ -75,9 +83,12 @@ public class MetadataBlockDataStreamInfo {
         bitsPerSample = ((u(rawdata.get(12)) & 0x01) << 4) + ((u(rawdata.get(13)) & 0xF0) >>> 4) + 1;
 
         totalNumberOfSamples = readTotalNumberOfSamples(rawdata.get(13), rawdata.get(14), rawdata.get(15), rawdata.get(16), rawdata.get(17));
-
-        length = (float) ((double) totalNumberOfSamples / samplingRate);
+        length = ((double) totalNumberOfSamples / samplingRate);
 //        //logger.info(this.toString());
+    }
+
+    public long getTotalNumberOfSamples() {
+        return totalNumberOfSamples;
     }
 
     public String toString() {
@@ -90,7 +101,7 @@ public class MetadataBlockDataStreamInfo {
         return (int) length;
     }
 
-    public float getPreciseLength() {
+    public double getPreciseLength() {
         return length;
     }
 
@@ -121,14 +132,15 @@ public class MetadataBlockDataStreamInfo {
 
     //TODO this code seems to be give a sampling rate over 21 bytes instead of 20 bytes but attempt to change
     //to 21 bytes give wrong value
+
     private int readSamplingRate(byte b1, byte b2, byte b3) {
         int rate = (u(b1) << 12) + (u(b2) << 4) + ((u(b3) & 0xF0) >>> 4);
         return rate;
 
     }
 
-    private int readTotalNumberOfSamples(byte b1, byte b2, byte b3, byte b4, byte b5) {
-        int nb = u(b5);
+    private long readTotalNumberOfSamples(byte b1, byte b2, byte b3, byte b4, byte b5) {
+        long nb = u(b5);
         nb += u(b4) << 8;
         nb += u(b3) << 16;
         nb += u(b2) << 24;

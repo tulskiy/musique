@@ -89,6 +89,7 @@ public class OggInfoReader {
         VorbisIdentificationHeader vorbisIdentificationHeader = new VorbisIdentificationHeader(vorbisData);
 
         //Map to generic encodingInfo
+        info.setTotalSamples((long) pcmSamplesNumber);
         info.setPreciseLength((double) (pcmSamplesNumber / vorbisIdentificationHeader.getSamplingRate()));
         info.setChannelNumber(vorbisIdentificationHeader.getChannelNumber());
         info.setSamplingRate(vorbisIdentificationHeader.getSamplingRate());

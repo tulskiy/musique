@@ -81,7 +81,9 @@ public abstract class AudioFileReader {
     protected void copyHeaderFields(GenericAudioHeader header, Track track) {
         if (header != null && track != null) {
             track.setChannels(header.getChannelNumber());
-            track.setTotalSamples((long) (header.getPreciseLength() * header.getSampleRateAsNumber()));
+            track.setTotalSamples(header.getTotalSamples());
+
+//            track.setTotalSamples((long) (header.getPreciseLength() * header.getSampleRateAsNumber()));
             track.setSampleRate(header.getSampleRateAsNumber());
             track.setStartPosition(0);
             track.setCodec(header.getFormat());
