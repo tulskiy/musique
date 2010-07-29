@@ -104,13 +104,15 @@ public class Methods {
     }
 
     public Object isPlaying(Track track, ArrayList<Expression> args) {
-        if (app.getPlayer().getTrack() == track) {
-            if (app.getPlayer().isPaused())
-                return pausedIcon;
-            if (app.getPlayer().isPlaying())
-                return playingIcon;
-        } else if (track.getQueuePosition() != -1) {
-            return track.getQueuePosition();
+        if (track != null) {
+            if (app.getPlayer().getTrack() == track) {
+                if (app.getPlayer().isPaused())
+                    return pausedIcon;
+                if (app.getPlayer().isPlaying())
+                    return playingIcon;
+            } else if (track.getQueuePosition() != -1) {
+                return track.getQueuePosition();
+            }
         }
 
         return null;

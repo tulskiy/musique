@@ -321,6 +321,13 @@ public class Playlist extends ArrayList<Track> {
             }
         }
 
+        Collections.sort(temp, new Comparator<Track>() {
+            @Override
+            public int compare(Track o1, Track o2) {
+                return o1.getLocation().compareTo(o2.getLocation());
+            }
+        });
+
         addAll(location, temp);
         firePlaylistChanged();
         int size = temp.size();
