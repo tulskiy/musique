@@ -24,8 +24,6 @@ public class WavPackUtils {
             {
                     6000, 8000, 9600, 11025, 12000, 16000, 22050, 24000, 32000, 44100, 48000, 64000, 88200, 96000, 192000
             };
-    private static int[] temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
-
     ///////////////////////////// executable code ////////////////////////////////
 
 
@@ -85,7 +83,7 @@ public class WavPackUtils {
         wpc.config.float_norm_exp = wps.float_norm_exp;
 
         wpc.config.bits_per_sample = (int) ((wpc.config.bytes_per_sample * 8)
-                - ((wps.wphdr.flags & Defines.SHIFT_MASK) >> Defines.SHIFT_LSB));
+                                            - ((wps.wphdr.flags & Defines.SHIFT_MASK) >> Defines.SHIFT_LSB));
 
         if ((wpc.config.flags & Defines.FLOAT_DATA) > 0) {
             wpc.config.bytes_per_sample = 3;
@@ -97,7 +95,7 @@ public class WavPackUtils {
                 wpc.config.sample_rate = 44100;
             else
                 wpc.config.sample_rate = sample_rates[(int) ((wps.wphdr.flags & Defines.SRATE_MASK)
-                        >> Defines.SRATE_LSB)];
+                                                             >> Defines.SRATE_LSB)];
         }
 
         if (wpc.config.num_channels == 0) {
@@ -169,6 +167,7 @@ public class WavPackUtils {
     // encountered or an error occurs.
 
     public static long WavpackUnpackSamples(WavpackContext wpc, int[] buffer, long samples) {
+        int[] temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
         WavpackStream wps = wpc.stream;
         long samples_unpacked = 0, samples_to_unpack;
         int num_channels = wpc.config.num_channels;
@@ -180,7 +179,7 @@ public class WavPackUtils {
 
         while (samples > 0) {
             if (wps.wphdr.block_samples == 0 || (wps.wphdr.flags & Defines.INITIAL_BLOCK) == 0
-                    || wps.sample_index >= wps.wphdr.block_index + wps.wphdr.block_samples) {
+                || wps.sample_index >= wps.wphdr.block_index + wps.wphdr.block_samples) {
 
                 wps.wphdr = read_next_header(wpc.infile, wps.wphdr);
 
@@ -194,7 +193,7 @@ public class WavPackUtils {
             }
 
             if (wps.wphdr.block_samples == 0 || (wps.wphdr.flags & Defines.INITIAL_BLOCK) == 0
-                    || wps.sample_index >= wps.wphdr.block_index + wps.wphdr.block_samples)
+                || wps.sample_index >= wps.wphdr.block_index + wps.wphdr.block_samples)
                 continue;
 
             if (wps.sample_index < wps.wphdr.block_index) {
@@ -500,8 +499,8 @@ public class WavPackUtils {
             bleft = 32;
 
             if (buffer[0] == 'w' && buffer[1] == 'v' && buffer[2] == 'p' && buffer[3] == 'k'
-                    && (buffer[4] & 1) == 0 && buffer[6] < 16 && buffer[7] == 0 && buffer[9] == 4
-                    && buffer[8] >= (Defines.MIN_STREAM_VERS & 0xff) && buffer[8] <= (Defines.MAX_STREAM_VERS & 0xff)) {
+                && (buffer[4] & 1) == 0 && buffer[6] < 16 && buffer[7] == 0 && buffer[9] == 4
+                && buffer[8] >= (Defines.MIN_STREAM_VERS & 0xff) && buffer[8] <= (Defines.MAX_STREAM_VERS & 0xff)) {
 
                 wphdr.ckID[0] = 'w';
                 wphdr.ckID[1] = 'v';

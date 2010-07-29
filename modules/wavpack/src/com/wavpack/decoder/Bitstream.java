@@ -19,5 +19,6 @@ class Bitstream {
     RandomAccessFile file;
     int bitval = 0;
     byte[] buf;
+    byte[] temp_buf = new byte[65536];
     int buf_index = 0;
 }

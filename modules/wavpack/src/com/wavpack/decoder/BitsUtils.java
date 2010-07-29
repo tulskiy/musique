@@ -95,8 +95,9 @@ class BitsUtils {
 
         return bs;
     }
-    private static byte[] buf = new byte[65536];
+
     static Bitstream bs_read(Bitstream bs) {
+        byte[] buf = bs.temp_buf;
         if (bs.file_bytes > 0) {
             long bytes_read, bytes_to_read;
 
