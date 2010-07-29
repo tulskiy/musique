@@ -104,8 +104,7 @@ public class ConverterDialog extends JDialog {
         g1.add(pathSource);
         g1.add(pathSpecify);
         folder.add(new JLabel());
-        final JTextField path = new JTextField();
-        path.setText(config.getString("converter.path", ""));
+        final DirectoryChooser path = new DirectoryChooser(config.getString("converter.path", ""));
         folder.add(path);
 
         JPanel output = new JPanel(new GridLayout(3, 2));
@@ -137,7 +136,7 @@ public class ConverterDialog extends JDialog {
                 String codec = (String) encoder.getSelectedItem();
                 config.setString("converter.encoder", formatToCoder.get(codec));
                 config.setBoolean("converter.saveToSourceFolder", pathSource.isSelected());
-                config.setString("converter.path", path.getText());
+                config.setString("converter.path", path.getPath());
                 config.setString("converter.actionWhenExists", (String) whenExists.getSelectedItem());
                 config.setString("converter.fileNameFormat", fileNameFormat.getText());
                 config.setBoolean("converter.merge", merge.isSelected());
@@ -227,11 +226,11 @@ public class ConverterDialog extends JDialog {
         misc.add(new JLabel("Bitrate, bits/sample"));
         final JSpinner bitrate = new JSpinner(
                 new SpinnerNumberModel(4.0, 2.0, 16.0, 0.1));
-        bitrate.setValue(config.getFloat("wavpack.encoder.hybrid.bitrate", 4f));
+        bitrate.setValue((double) config.getFloat("wavpack.encoder.hybrid.bitrate", 4f));
         misc.add(bitrate);
         misc.add(new JLabel("Noize shape override"));
         final JSpinner noise = new JSpinner(new SpinnerNumberModel(0, -1.0, 1.0, 0.1));
-        noise.setValue(config.getFloat("wavpack.encoder.hybrid.noiseShape", 0));
+        noise.setValue((double) config.getFloat("wavpack.encoder.hybrid.noiseShape", 0));
         misc.add(noise);
 
         ItemListener hybridListener = new ItemListener() {
@@ -371,6 +370,41 @@ public class ConverterDialog extends JDialog {
             formatter.format("Converting. Elapsed: %s Estimated: %s Speed: %.2fx",
                     elapsed, estimated, converter.getSpeed());
             return sb.toString();
+        }
+    }
+
+    class DirectoryChooser extends JPanel {
+        String path;
+        JTextField text = new JTextField();
+
+        DirectoryChooser(String path) {
+            setPath(path);
+            setLayout(new BorderLayout());
+            add(text, BorderLayout.CENTER);
+            JButton button = new JButton("...");
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    JFileChooser fc = new JFileChooser(config.getString("playlist.lastDir", ""));
+                    fc.setSize(500, 500);
+                    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+                    int ret = fc.showDialog(getParent(), "Choose Folder");
+                    if (ret == JFileChooser.APPROVE_OPTION) {
+                        setPath(fc.getSelectedFile().getAbsolutePath());
+                    }
+                }
+            });
+            add(button, BorderLayout.LINE_END);
+        }
+
+        public String getPath() {
+            return text.getText();
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+            text.setText(path);
         }
     }
 
