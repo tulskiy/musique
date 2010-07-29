@@ -311,6 +311,26 @@ public class PlaylistPanel extends JPanel {
                 new SettingsDialog(comp).setVisible(true);
             }
         });
+        editMenu.add("Remove Dead Items").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table != null) {
+                    table.getPlaylist().removeDeadItems();
+                    table.update();
+                }
+            }
+        });
+        editMenu.add("Remove Duplicates").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table != null) {
+                    table.getPlaylist().removeDuplicates();
+                    table.update();
+                }
+            }
+        });
 
         JMenu orderMenu = new JMenu("Order");
         playbackMenu.add(orderMenu);
