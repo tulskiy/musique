@@ -76,7 +76,6 @@ public class Track implements Cloneable {
 
     private static Random random;
     private int shuffleRating = nextRandom();
-    private boolean played = false;
 
     public static int nextRandom() {
         if (random == null)
@@ -90,14 +89,6 @@ public class Track implements Cloneable {
 
     public void setShuffleRating(int shuffleRating) {
         this.shuffleRating = shuffleRating;
-    }
-
-    public boolean isPlayed() {
-        return played;
-    }
-
-    public void setPlayed(boolean played) {
-        this.played = played;
     }
 
     public Track copy() {

@@ -20,13 +20,14 @@ package com.tulskiy.musique.playlist;
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
+import com.tulskiy.musique.util.Util;
 
 import java.util.LinkedList;
 
 /**
  * Manages playback.
  * <p/>
- * Shuffle algorithm taken from streamer.c from DeadBeef project
+ * Idea fot the shuffle algorithm taken from streamer.c from DeadBeef project
  * <p/>
  * Author: Denis Tulskiy
  * Date: Jul 1, 2010
@@ -66,8 +67,7 @@ public class PlaybackOrder {
     private Order order = Order.DEFAULT;
     private LinkedList<QueueTuple> queue = new LinkedList<QueueTuple>();
     private Track lastPlayed;
-    private Track plMin, plMax;
-    private Expression albumFormat = Parser.parse("%albumArtist% | %date% | %album%");
+    private Expression albumFormat = Parser.parse("[%albumArtist%|]%album%[|%date%]");
 
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
@@ -104,6 +104,45 @@ public class PlaybackOrder {
         updateQueuePositions();
     }
 
+    private Track getTrack(int index) {
+        if (index != -1) {
+            Track track = playlist.get(index);
+            // technically, separator can not be the last track
+            // so we just get the next track
+            if (track instanceof SeparatorTrack)
+                return playlist.get(index + 1);
+            return track;
+        } else {
+            return null;
+        }
+    }
+
+    private Track next(int index) {
+        index = index < playlist.size() - 1 ? index + 1 : -1;
+        if (index != -1) {
+            Track track = playlist.get(index);
+            // technically, separator can not be the last track
+            // so we just get the next track
+            if (track.getLocation() == null)
+                return next(index);
+            return track;
+        } else {
+            return null;
+        }
+    }
+
+    private Track prev(int index) {
+        index--;
+        if (index >= 0) {
+            Track track = playlist.get(index);
+            if (track.getLocation() == null)
+                return prev(index);
+            return track;
+        } else {
+            return null;
+        }
+    }
+
     public Track next(Track currentTrack) {
         int index;
 
@@ -135,19 +174,23 @@ public class PlaybackOrder {
                 return null;
 
             int size = playlist.size();
+            Track track;
 
             switch (order) {
                 case DEFAULT:
                     return next(index);
                 case REPEAT:
-                    index = (index + 1) % size;
-                    break;
+                    track = next(index);
+                    return track != null ? track : getTrack(0);
                 case REPEAT_TRACK:
                     return currentTrack;
                 case REPEAT_ALBUM:
                     String album = (String) albumFormat.eval(currentTrack);
 
-                    Track track = next(index);
+                    if (Util.isEmpty(album))
+                        return next(index);
+
+                    track = next(index);
                     if (track != null) {
                         if (album.equals(albumFormat.eval(track))) {
                             return track;
@@ -158,70 +201,19 @@ public class PlaybackOrder {
                         track = playlist.get(i);
                         Object value = albumFormat.eval(track);
                         if (!album.equals(value)) {
-                            return playlist.get(++i);
+                            return next(i);
                         }
                     }
 
                     return track;
                 case RANDOM:
-                    index = (int) (Math.random() * size);
-                    break;
+                    return getTrack((int) (Math.random() * size));
                 case SHUFFLE:
-                    return nextShuffle();
-
+                    return nextShuffle(currentTrack);
             }
         }
 
         return getTrack(index);
-    }
-
-    private Track next(int index) {
-        return getTrack(index < playlist.size() - 1 ? index + 1 : -1);
-    }
-
-    private Track nextShuffle() {
-        //find non played minimum
-        Track min = null;
-        for (Track track : playlist) {
-            if (track instanceof SeparatorTrack || track.isPlayed())
-                continue;
-
-            if (min == null || track.getShuffleRating() < min.getShuffleRating()) {
-                min = track;
-            }
-        }
-        if (min == null) {
-            reshuffle();
-            min = plMin;
-        }
-
-        return min;
-    }
-
-    private void reshuffle() {
-        for (Track track : playlist) {
-            track.setPlayed(false);
-            track.setShuffleRating(Track.nextRandom());
-
-            if (plMin == null || track.getShuffleRating() < plMin.getShuffleRating())
-                plMin = track;
-
-            if (plMax == null || track.getShuffleRating() > plMax.getShuffleRating())
-                plMax = track;
-        }
-    }
-
-    private Track getTrack(int index) {
-        if (index != -1) {
-            Track track = playlist.get(index);
-            // technically, separator can not be the last track
-            // so we just get the next track
-            if (track instanceof SeparatorTrack)
-                return playlist.get(index + 1);
-            return track;
-        } else {
-            return null;
-        }
     }
 
     public Track prev(Track currentTrack) {
@@ -234,21 +226,19 @@ public class PlaybackOrder {
 
         int size = playlist.size();
 
+        Track track;
         switch (order) {
             case DEFAULT:
-                index--;
-                break;
+                return prev(index);
             case REPEAT:
-                index--;
-                if (index < 0)
-                    index += size;
-                break;
+                track = prev(index);
+                return track != null ? track : getTrack(size - 1);
             case REPEAT_TRACK:
-                break;
+                return currentTrack;
             case REPEAT_ALBUM:
                 String album = (String) albumFormat.eval(currentTrack);
 
-                Track track = getTrack(index - 1);
+                track = prev(index);
                 if (track != null) {
                     if (album.equals(albumFormat.eval(track))) {
                         return track;
@@ -259,14 +249,13 @@ public class PlaybackOrder {
                     track = playlist.get(i);
                     Object value = albumFormat.eval(track);
                     if (!album.equals(value)) {
-                        return playlist.get(--i);
+                        return prev(i);
                     }
                 }
 
                 return track;
             case RANDOM:
-                index = (int) (Math.random() * size);
-                break;
+                return getTrack((int) (Math.random() * size));
             case SHUFFLE:
                 return prevShuffle(currentTrack);
         }
@@ -274,37 +263,46 @@ public class PlaybackOrder {
         return getTrack(index);
     }
 
-    private Track prevShuffle(Track currentTrack) {
-        // find already played song with maximum shuffle rating below prev song
-        Track max = null;
-        Track amax = null;
-        currentTrack.setPlayed(false);
-        int rating = currentTrack.getShuffleRating();
+    private Track nextShuffle(Track currentTrack) {
+        Track minRating = null;
+        Track minGreater = null;
         for (Track track : playlist) {
-            if (track instanceof SeparatorTrack)
+            if (track == currentTrack || track.getLocation() == null)
                 continue;
-            if (track != currentTrack && track.isPlayed() &&
-                (amax == null || track.getShuffleRating() > amax.getShuffleRating())) {
-                amax = track;
+
+            if (minRating == null || track.getShuffleRating() < minRating.getShuffleRating()) {
+                minRating = track;
             }
 
-            if (track == currentTrack || track.getShuffleRating() > rating || !track.isPlayed()) {
-                continue;
-            }
-
-            if (max == null || track.getShuffleRating() > max.getShuffleRating()) {
-                max = track;
+            if (track.getShuffleRating() >= currentTrack.getShuffleRating()) {
+                if (minGreater == null || track.getShuffleRating() < minGreater.getShuffleRating()) {
+                    minGreater = track;
+                }
             }
         }
 
-        if (max == null) {
-            if (amax == null) {
-                reshuffle();
-                amax = plMax;
+        return minGreater != null ? minGreater : minRating;
+    }
+
+    private Track prevShuffle(Track currentTrack) {
+        Track maxSmaller = null;
+        Track maxRating = null;
+
+        for (Track track : playlist) {
+            if (track == currentTrack || track.getLocation() == null)
+                continue;
+
+            if (maxRating == null || track.getShuffleRating() > maxRating.getShuffleRating()) {
+                maxRating = track;
             }
 
-            max = amax;
+            if (track.getShuffleRating() <= currentTrack.getShuffleRating()) {
+                if (maxSmaller == null || track.getShuffleRating() > maxSmaller.getShuffleRating()) {
+                    maxSmaller = track;
+                }
+            }
         }
-        return max;
+
+        return maxSmaller != null ? maxSmaller : maxRating;
     }
 }

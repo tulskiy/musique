@@ -338,7 +338,6 @@ public class Player {
                     }
 
                     output.init(decoder.getAudioFormat());
-                    track.setPlayed(true);
                     fireEvent(FILE_OPENED);
                 }
 
