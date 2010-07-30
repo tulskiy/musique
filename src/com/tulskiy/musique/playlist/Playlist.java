@@ -448,5 +448,38 @@ public class Playlist extends ArrayList<Track> {
     public boolean equals(Object o) {
         return o instanceof Playlist && this == o;
     }
+
+    public void removeDeadItems() {
+        for (Iterator it = this.iterator(); it.hasNext();) {
+            Track track = (Track) it.next();
+            if (track.getLocation() == null)
+                continue;
+            if (track.isFile() && !track.getFile().exists()) {
+                it.remove();
+            }
+        }
+        firePlaylistChanged();
+    }
+
+    public void removeDuplicates() {
+        ArrayList<Track> dup = new ArrayList<Track>();
+        for (int i = 0; i < size() - 1; i++) {
+            Track t1 = get(i);
+            URI l1 = t1.getLocation();
+            if (l1 == null)
+                continue;
+            for (int j = i + 1; j < size(); j++) {
+                Track t2 = get(j);
+
+                if (l1.equals(t2.getLocation()) &&
+                    t1.getSubsongIndex() == t2.getSubsongIndex()) {
+                    dup.add(t2);
+                }
+            }
+        }
+
+        removeAll(dup);
+        firePlaylistChanged();
+    }
 }
 

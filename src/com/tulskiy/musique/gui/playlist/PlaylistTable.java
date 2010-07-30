@@ -25,8 +25,8 @@ import com.tulskiy.musique.gui.dialogs.*;
 import com.tulskiy.musique.gui.grouptable.GroupTable;
 import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
+import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
-import com.tulskiy.musique.playlist.PlaylistOrder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -118,7 +118,7 @@ public class PlaylistTable extends GroupTable {
                 if (!tracks.isEmpty()) {
                     player.open(tracks.get(0));
                     player.play();
-                    PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                    PlaybackOrder order = player.getPlaybackOrder();
                     order.setLastPlayed(null);
                     app.getPlaylistManager().selectPlaylist(playlist);
                 }
@@ -157,7 +157,7 @@ public class PlaylistTable extends GroupTable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (Track track : getSelectedSongs()) {
-                    PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                    PlaybackOrder order = player.getPlaybackOrder();
                     order.enqueue(track, playlist);
                     update();
                 }
@@ -166,7 +166,7 @@ public class PlaylistTable extends GroupTable {
         aMap.put("clearQueue", new AbstractAction("Clear Playback Queue") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                PlaybackOrder order = player.getPlaybackOrder();
                 order.flushQueue();
                 update();
             }
@@ -203,7 +203,7 @@ public class PlaylistTable extends GroupTable {
                         }
 
                         if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
-                            PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                            PlaybackOrder order = player.getPlaybackOrder();
                             order.setLastPlayed(null);
                         }
                         break;
@@ -240,7 +240,7 @@ public class PlaylistTable extends GroupTable {
                 Track track = tracks.get(0);
                 config.put("playlist.selectedTrack", track);
                 if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
-                    PlaylistOrder order = (PlaylistOrder) player.getPlaybackOrder();
+                    PlaybackOrder order = player.getPlaybackOrder();
                     order.setLastPlayed(track);
                 }
             }

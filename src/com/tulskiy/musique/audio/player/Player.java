@@ -18,6 +18,7 @@
 package com.tulskiy.musique.audio.player;
 
 import com.tulskiy.musique.audio.Decoder;
+import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Codecs;
 import com.tulskiy.musique.util.AudioMath;
@@ -94,14 +95,6 @@ public class Player {
         } else {
             stop();
         }
-    }
-
-    public void exit() {
-        playerThread.exit();
-    }
-
-    public void setAudioOutput(AudioOutput output) {
-        this.output = output;
     }
 
     public AudioOutput getAudioOutput() {
@@ -376,13 +369,6 @@ public class Player {
                 decoder.close();
             decoder = null;
             setState(PlayerState.STOPPED);
-        }
-
-        private void exit() {
-            stopPlaying();
-            synchronized (lock) {
-                lock.notifyAll();
-            }
         }
 
         public synchronized long getCurrentSample() {

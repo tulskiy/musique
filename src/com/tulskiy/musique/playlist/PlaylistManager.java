@@ -35,7 +35,7 @@ public class PlaylistManager {
     private Logger logger = Logger.getLogger("musique");
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private Playlist currentPlaylist;
-    private PlaylistOrder order = new PlaylistOrder();
+    private PlaybackOrder order = new PlaybackOrder();
 
     public ArrayList<Playlist> getPlaylists() {
         return playlists;

@@ -25,6 +25,7 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.MainWindow;
+import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.PlaylistManager;
 
 import javax.sound.sampled.AudioSystem;
@@ -91,6 +92,13 @@ public class Application {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 player.setStopAfterCurrent(configuration.getBoolean("player.stopAfterCurrent", false));
+            }
+        });
+        configuration.addPropertyChangeListener("player.playbackOrder", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                int index = configuration.getInt(evt.getPropertyName(), 0);
+                player.getPlaybackOrder().setOrder(PlaybackOrder.Order.values()[index]);
             }
         });
         UIManager.put("Slider.paintValue", Boolean.FALSE);

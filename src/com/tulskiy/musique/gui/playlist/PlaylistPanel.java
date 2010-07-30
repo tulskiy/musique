@@ -24,9 +24,9 @@ import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
 import com.tulskiy.musique.gui.dialogs.SettingsDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
-import com.tulskiy.musique.playlist.PlaylistOrder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -46,6 +46,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Enumeration;
 
 /**
  * @Author: Denis Tulskiy
@@ -105,7 +106,7 @@ public class PlaylistPanel extends JPanel {
         tabs.setSelectedIndex(-1);
         tabs.setSelectedIndex(playlists.indexOf(playlist));
 
-        PlaylistOrder order = (PlaylistOrder) app.getPlayer().getPlaybackOrder();
+        PlaybackOrder order = app.getPlayer().getPlaybackOrder();
         Track lastPlayed = order.getLastPlayed();
 
         if (lastPlayed != null) {
@@ -311,34 +312,60 @@ public class PlaylistPanel extends JPanel {
                 new SettingsDialog(comp).setVisible(true);
             }
         });
+        editMenu.add("Remove Dead Items").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table != null) {
+                    table.getPlaylist().removeDeadItems();
+                    table.update();
+                }
+            }
+        });
+        editMenu.add("Remove Duplicates").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table != null) {
+                    table.getPlaylist().removeDuplicates();
+                    table.update();
+                }
+            }
+        });
 
         JMenu orderMenu = new JMenu("Order");
         playbackMenu.add(orderMenu);
-        final PlaylistOrder order = (PlaylistOrder) app.getPlayer().getPlaybackOrder();
         ActionListener orderListener = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JMenuItem item = (JMenuItem) e.getSource();
-                PlaylistOrder.Order o = PlaylistOrder.Order.valueOf(item.getName());
-                order.setOrder(o);
-                config.setInt("player.playbackOrder", o.ordinal());
+                int index = (Integer) item.getClientProperty("order");
+                config.setInt("player.playbackOrder", index);
             }
         };
 
-        int index = config.getInt("player.playbackOrder", 0);
-        PlaylistOrder.Order[] orders = PlaylistOrder.Order.values();
-        ButtonGroup gr = new ButtonGroup();
-        for (PlaylistOrder.Order o : orders) {
-            JCheckBoxMenuItem item = new JCheckBoxMenuItem(o.getText());
-            if (o.ordinal() == index) {
-                item.setSelected(true);
-                order.setOrder(o);
-            }
+        final ButtonGroup gr = new ButtonGroup();
+        for (PlaybackOrder.Order o : PlaybackOrder.Order.values()) {
+            JCheckBoxMenuItem item = new JCheckBoxMenuItem(o.toString());
             item.addActionListener(orderListener);
-            item.setName(o.toString());
+            item.putClientProperty("order", o.ordinal());
             gr.add(item);
             orderMenu.add(item);
         }
+
+        config.addPropertyChangeListener("player.playbackOrder", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                int value = config.getInt(evt.getPropertyName(), 0);
+                Enumeration<AbstractButton> items = gr.getElements();
+                while (items.hasMoreElements()) {
+                    AbstractButton item = items.nextElement();
+                    if (item.getClientProperty("order").equals(value)) {
+                        item.setSelected(true);
+                    }
+                }
+            }
+        });
 
         playbackMenu.addSeparator();
 

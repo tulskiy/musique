@@ -22,8 +22,10 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.images.Images;
+import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.GlobalTimer;
 import com.tulskiy.musique.util.Util;
 
@@ -33,6 +35,8 @@ import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 
 /**
  * @Author: Denis Tulskiy
@@ -40,6 +44,7 @@ import java.awt.event.*;
  */
 public class ControlPanel extends JPanel {
     private Application app = Application.getInstance();
+    private Configuration config = app.getConfiguration();
     private JSlider progressSlider;
     private JSlider volumeSlider;
     private JButton prevButton = new JButton();
@@ -85,6 +90,27 @@ public class ControlPanel extends JPanel {
         progressSlider.setMaximumSize(new Dimension(10000, 30));
         progressSlider.setPreferredSize(new Dimension(100, 30));
 
+        final JComboBox order = new JComboBox(PlaybackOrder.Order.values());
+        Dimension orderSize = order.getMinimumSize();
+        orderSize.width += 10;
+        order.setMaximumSize(orderSize);
+        order.setPreferredSize(orderSize);
+
+        config.addPropertyChangeListener("player.playbackOrder", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                int value = config.getInt(evt.getPropertyName(), 0);
+                order.setSelectedIndex(value);
+            }
+        });
+
+        order.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("here");
+                config.setInt("player.playbackOrder", order.getSelectedIndex());
+            }
+        });
 
         Box box = new Box(BoxLayout.X_AXIS);
         box.add(Box.createHorizontalStrut(5));
@@ -97,6 +123,8 @@ public class ControlPanel extends JPanel {
         box.add(volumeSlider);
         box.add(Box.createHorizontalStrut(10));
         box.add(progressSlider);
+        box.add(Box.createHorizontalStrut(5));
+        box.add(order);
         box.add(Box.createHorizontalStrut(5));
 
         add(box);

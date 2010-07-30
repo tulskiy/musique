@@ -17,8 +17,9 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.audio.player.PlaybackOrder;
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
+import com.tulskiy.musique.playlist.formatting.Parser;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 
 import java.util.LinkedList;
 
@@ -30,11 +31,12 @@ import java.util.LinkedList;
  * Author: Denis Tulskiy
  * Date: Jul 1, 2010
  */
-public class PlaylistOrder implements PlaybackOrder {
+public class PlaybackOrder {
     public enum Order {
         DEFAULT("Default"),
         REPEAT("Repeat"),
         REPEAT_TRACK("Repeat Track"),
+        REPEAT_ALBUM("Repeat Album"),
         SHUFFLE("Shuffle"),
         RANDOM("Random");
 
@@ -44,7 +46,8 @@ public class PlaylistOrder implements PlaybackOrder {
             this.text = text;
         }
 
-        public String getText() {
+        @Override
+        public String toString() {
             return text;
         }
     }
@@ -64,6 +67,7 @@ public class PlaylistOrder implements PlaybackOrder {
     private LinkedList<QueueTuple> queue = new LinkedList<QueueTuple>();
     private Track lastPlayed;
     private Track plMin, plMax;
+    private Expression albumFormat = Parser.parse("%albumArtist% | %date% | %album%");
 
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
@@ -100,7 +104,6 @@ public class PlaylistOrder implements PlaybackOrder {
         updateQueuePositions();
     }
 
-    @Override
     public Track next(Track currentTrack) {
         int index;
 
@@ -135,13 +138,31 @@ public class PlaylistOrder implements PlaybackOrder {
 
             switch (order) {
                 case DEFAULT:
-                    index = index < size - 1 ? index + 1 : -1;
-                    break;
+                    return next(index);
                 case REPEAT:
                     index = (index + 1) % size;
                     break;
                 case REPEAT_TRACK:
-                    break;
+                    return currentTrack;
+                case REPEAT_ALBUM:
+                    String album = (String) albumFormat.eval(currentTrack);
+
+                    Track track = next(index);
+                    if (track != null) {
+                        if (album.equals(albumFormat.eval(track))) {
+                            return track;
+                        }
+                    }
+
+                    for (int i = index; i >= 0; i--) {
+                        track = playlist.get(i);
+                        Object value = albumFormat.eval(track);
+                        if (!album.equals(value)) {
+                            return playlist.get(++i);
+                        }
+                    }
+
+                    return track;
                 case RANDOM:
                     index = (int) (Math.random() * size);
                     break;
@@ -152,6 +173,10 @@ public class PlaylistOrder implements PlaybackOrder {
         }
 
         return getTrack(index);
+    }
+
+    private Track next(int index) {
+        return getTrack(index < playlist.size() - 1 ? index + 1 : -1);
     }
 
     private Track nextShuffle() {
@@ -199,7 +224,6 @@ public class PlaylistOrder implements PlaybackOrder {
         }
     }
 
-    @Override
     public Track prev(Track currentTrack) {
         if (playlist == null || playlist.size() <= 0)
             return null;
@@ -221,6 +245,25 @@ public class PlaylistOrder implements PlaybackOrder {
                 break;
             case REPEAT_TRACK:
                 break;
+            case REPEAT_ALBUM:
+                String album = (String) albumFormat.eval(currentTrack);
+
+                Track track = getTrack(index - 1);
+                if (track != null) {
+                    if (album.equals(albumFormat.eval(track))) {
+                        return track;
+                    }
+                }
+
+                for (int i = index; i < size; i++) {
+                    track = playlist.get(i);
+                    Object value = albumFormat.eval(track);
+                    if (!album.equals(value)) {
+                        return playlist.get(--i);
+                    }
+                }
+
+                return track;
             case RANDOM:
                 index = (int) (Math.random() * size);
                 break;
