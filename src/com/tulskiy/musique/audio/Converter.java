@@ -23,6 +23,7 @@ import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Codecs;
 import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.AudioMath;
 
 import javax.swing.*;
@@ -50,6 +51,7 @@ public class Converter {
     private long elapsed;
     private double speed;
     private double estimated;
+    private File output;
 
     public Converter() {
         String fileName = config.getString("converter.fileNameFormat", "%fileName%");
@@ -103,8 +105,12 @@ public class Converter {
             }
 
             if (!merge) {
+                Track newTrack = track.copy();
+                newTrack.setLocation(output.toURI());
                 encoder.close();
                 encoder = null;
+
+                TrackIO.write(newTrack);
             }
             decoder.close();
             decoder = null;
@@ -200,7 +206,7 @@ public class Converter {
         String format = config.getString("converter.encoder", "wav");
         String fileName = String.valueOf(fileNameFormat.eval(track)) +
                           "." + format;
-        File output = new File(parent, fileName);
+        output = new File(parent, fileName);
 
         if (output.exists()) {
             String action = config.getString("converter.actionWhenExists", "Ask");
@@ -233,5 +239,9 @@ public class Converter {
             return false;
         }
         return true;
+    }
+
+    public File getOutput() {
+        return output;
     }
 }

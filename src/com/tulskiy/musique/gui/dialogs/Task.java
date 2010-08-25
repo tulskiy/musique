@@ -43,7 +43,7 @@ public abstract class Task {
 
         @Override
         public String getStatus() {
-            return String.valueOf(map.get("processing.file"));
+            return "Reading File: " + String.valueOf(map.get("processing.file"));
         }
 
         @Override

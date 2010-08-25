@@ -52,7 +52,7 @@ public class ConverterDialog extends JDialog {
 
     public ConverterDialog(final JComponent owner, final List<Track> tracks) {
         super(SwingUtilities.windowForComponent(owner), "Convert Files", ModalityType.MODELESS);
-
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         coders.put("WAV", null);
         coders.put("OGG Vorbis", createVorbisSettings());
         coders.put("WavPack", createWavpackSettings());
@@ -104,7 +104,7 @@ public class ConverterDialog extends JDialog {
         g1.add(pathSource);
         g1.add(pathSpecify);
         folder.add(new JLabel());
-        final DirectoryChooser path = new DirectoryChooser(config.getString("converter.path", ""));
+        final PathChooser path = new PathChooser(config.getString("converter.path", ""));
         folder.add(path);
 
         JPanel output = new JPanel(new GridLayout(3, 2));
@@ -332,11 +332,20 @@ public class ConverterDialog extends JDialog {
 
         @Override
         public String getStatus() {
-            Track track = converter.getTrack();
-            if (track.isFile())
-                return track.getFile().getName();
-            else
-                return track.getLocation().toString();
+            try {
+                Track track = converter.getTrack();
+                String status = "Input: ";
+                if (track.isFile())
+                    status += track.getFile().getAbsolutePath();
+                else
+                    status += track.getLocation().toString();
+
+                status += "\nOutput: ";
+                status += converter.getOutput().getAbsolutePath();
+                return status;
+            } catch (Exception ignored) {
+            }
+            return null;
         }
 
         @Override
@@ -372,40 +381,4 @@ public class ConverterDialog extends JDialog {
             return sb.toString();
         }
     }
-
-    class DirectoryChooser extends JPanel {
-        String path;
-        JTextField text = new JTextField();
-
-        DirectoryChooser(String path) {
-            setPath(path);
-            setLayout(new BorderLayout());
-            add(text, BorderLayout.CENTER);
-            JButton button = new JButton("...");
-            button.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JFileChooser fc = new JFileChooser(config.getString("playlist.lastDir", ""));
-                    fc.setSize(500, 500);
-                    fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-                    int ret = fc.showDialog(getParent(), "Choose Folder");
-                    if (ret == JFileChooser.APPROVE_OPTION) {
-                        setPath(fc.getSelectedFile().getAbsolutePath());
-                    }
-                }
-            });
-            add(button, BorderLayout.LINE_END);
-        }
-
-        public String getPath() {
-            return text.getText();
-        }
-
-        public void setPath(String path) {
-            this.path = path;
-            text.setText(path);
-        }
-    }
-
 }

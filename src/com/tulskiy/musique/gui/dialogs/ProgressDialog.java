@@ -28,7 +28,7 @@ import java.awt.event.ActionListener;
  */
 public class ProgressDialog extends JDialog {
     private JProgressBar progress;
-    private JLabel status;
+    private JTextArea status;
     private Task task;
     private Thread thread;
     private boolean aborted;
@@ -39,8 +39,12 @@ public class ProgressDialog extends JDialog {
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         progress = new JProgressBar(0, 100);
-        status = new JLabel();
+        status = new JTextArea(2, 10);
+        status.setEditable(false);
+        status.setBorder(BorderFactory.createEmptyBorder());
         status.setFont(status.getFont().deriveFont(11f));
+        status.setEnabled(false);
+        status.setDisabledTextColor(Color.black);
         JButton cancel = new JButton("Abort");
         cancel.addActionListener(new ActionListener() {
             @Override
@@ -61,17 +65,15 @@ public class ProgressDialog extends JDialog {
         });
 
         Box box = Box.createVerticalBox();
-        Box statusBox = Box.createHorizontalBox();
-        statusBox.add(new JLabel("Processing: "));
-        statusBox.add(status);
-        statusBox.add(Box.createHorizontalGlue());
-        box.add(statusBox);
-        box.add(Box.createVerticalStrut(10));
+        box.add(status);
+        box.add(Box.createVerticalStrut(20));
         box.add(progress);
         Box buttonBox = Box.createHorizontalBox();
         buttonBox.add(Box.createHorizontalGlue());
         buttonBox.add(cancel);
+        box.add(Box.createVerticalStrut(10));
         box.add(buttonBox);
+        box.add(Box.createVerticalStrut(5));
         progress.setVisible(false);
 
         box.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
@@ -86,7 +88,7 @@ public class ProgressDialog extends JDialog {
         else
             progress.setVisible(true);
         pack();
-        setSize(500, getHeight());
+        setSize(600, getHeight());
         setLocationRelativeTo(getParent());
         aborted = false;
         setVisible(true);

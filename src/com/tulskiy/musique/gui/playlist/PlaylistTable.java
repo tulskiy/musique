@@ -634,7 +634,7 @@ public class PlaylistTable extends GroupTable {
 
                     @Override
                     public String getStatus() {
-                        return currentTrack;
+                        return "Reading tags: " + currentTrack;
                     }
 
                     @Override

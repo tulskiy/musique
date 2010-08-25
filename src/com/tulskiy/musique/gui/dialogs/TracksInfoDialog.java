@@ -164,7 +164,7 @@ public class TracksInfoDialog extends JDialog {
 
             @Override
             public String getStatus() {
-                return status;
+                return "Writing Tags to: " + status;
             }
 
             @Override
