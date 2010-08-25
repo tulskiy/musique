@@ -130,11 +130,15 @@ public class MainWindow extends JFrame {
         if (track != null)
             value = (String) windowFormat.eval(track);
 
+        String title;
         if (Util.isEmpty(value) || app.getPlayer().isStopped()) {
-            setTitle(app.VERSION);
+            title = app.VERSION;
         } else {
-            setTitle(value + " [" + app.VERSION + "]");
+            title = value + " [" + app.VERSION + "]";
         }
+        setTitle(title);
+        if (tray != null)
+            tray.setToolTip(title);
     }
 
     private void updateTray() {

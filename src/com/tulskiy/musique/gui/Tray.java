@@ -49,7 +49,6 @@ public class Tray {
 
                 JPopupMenu popup = new JPopupMenu();
                 trayIcon.setJPopupMenu(popup);
-
                 createPopup(popup);
             }
         } catch (AWTException e) {
@@ -85,6 +84,11 @@ public class Tray {
         popup.add("   Stop").addActionListener(al);
         popup.add("   Previous   ").addActionListener(al);
         popup.add("   Quit").addActionListener(al);
+    }
+
+    public void setToolTip(String toolTip) {
+        if (trayIcon != null)
+            trayIcon.setToolTip(toolTip);
     }
 
     private JPopupTrayIcon createTrayIcon(Dimension size) {
