@@ -230,14 +230,29 @@ public class LyricsPanel extends JPanel {
 //        }
 
         private void searchLyrics(String artist, String title, StringBuilder sb) throws IOException {
-            String search = "http://lyrics.wikia.com/";
-            artist = Util.capitalize(artist);
-            title = Util.capitalize(title);
-            search += URLEncoder.encode(artist, "utf-8");
-            search += ":";
-            search += URLEncoder.encode(title, "utf-8");
-
             try {
+//                String search = "http://lyrics.wikia.com/Special:Search?search=";
+//                search += URLEncoder.encode(artist, "utf-8");
+//                search += "+";
+//                search += URLEncoder.encode(title, "utf-8");
+//
+//                URL searchURL = new URL(search);
+//                Scanner scan = new Scanner(searchURL.openStream());
+//                StringBuilder content = new StringBuilder();
+//                while (scan.hasNextLine())
+//                    content.append(scan.nextLine());
+//
+//                Matcher matcher = Pattern.compile("http://lyrics.wikia.com/wiki/[^\"]*").matcher(content);
+//                if (!matcher.find()) {
+//                    return;
+//                }
+                String search = "http://lyrics.wikia.com/";
+                artist = Util.capitalize(artist);
+                title = Util.capitalize(title);
+                search += URLEncoder.encode(artist, "utf-8");
+                search += ":";
+                search += URLEncoder.encode(title, "utf-8");
+
                 URL url = new URL(search);
                 InputStream is = url.openStream();
                 Scanner fi = new Scanner(is);

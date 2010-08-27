@@ -76,6 +76,8 @@ public class Application {
     }
 
     private void loadSettings() {
+        System.setProperty("http.agent", "Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101");
+
         AudioOutput audioOutput = player.getAudioOutput();
         audioOutput.setVolume(configuration.getFloat("player.volume", 1));
         String mixer = configuration.getString("player.mixer", null);
