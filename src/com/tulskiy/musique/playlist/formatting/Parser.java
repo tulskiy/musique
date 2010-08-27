@@ -17,9 +17,10 @@
 
 package com.tulskiy.musique.playlist.formatting;
 
-import com.tulskiy.musique.playlist.formatting.tokens.*;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.playlist.formatting.tokens.MethodExpression;
 import com.tulskiy.musique.playlist.formatting.tokens.ParameterExpression;
+import com.tulskiy.musique.playlist.formatting.tokens.TextExpression;
 
 import java.util.ArrayList;
 import java.util.Stack;
@@ -36,44 +37,51 @@ public class Parser {
         MethodExpression root = new MethodExpression("eval");
         Stack<MethodExpression> stack = new Stack<MethodExpression>();
         stack.push(root);
-        while (st.hasMoreTokens()) {
-            String token = st.nextToken();
+        try {
+            while (st.hasMoreTokens()) {
+                String token = st.nextToken();
 
-            if (token.equals("%")) {
-                String s = st.nextToken();
-                s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
-                stack.peek().addExpression(new ParameterExpression(s));
-                if (!st.nextToken().equals("%")) {
-                    System.err.println("Unknown token!");
-                    break;
-                }
-            } else if (token.equals("$")) {
-                String s = st.nextToken();
-                s = s.substring(0, s.length() - 1);
-                MethodExpression m = new MethodExpression(s);
-                stack.peek().addExpression(m);
-                stack.push(m);
-            } else if (token.equals(")") || token.equals("]")) {
-                stack.pop();
-            } else if (token.equals(",")) {
-                //ignore
-            } else if (token.equals("\'")) {
-                StringBuilder sb = new StringBuilder();
-                while (st.hasMoreTokens()) {
-                    String str = st.nextToken();
-                    if (str.equals("\'"))
-                        break;
-                    sb.append(str);
-                }
+                if (token.equals("%")) {
+                    if (st.hasMoreTokens()) {
+                        String s = st.nextToken();
+                        s = Character.toUpperCase(s.charAt(0)) + s.substring(1);
+                        stack.peek().addExpression(new ParameterExpression(s));
+                        if (st.hasMoreTokens() && !st.nextToken().equals("%")) {
+                            break;
+                        }
+                    }
+                } else if (token.equals("$")) {
+                    if (st.hasMoreTokens()) {
+                        String s = st.nextToken();
+                        s = s.substring(0, s.length() - 1);
+                        MethodExpression m = new MethodExpression(s);
+                        stack.peek().addExpression(m);
+                        stack.push(m);
+                    }
+                } else if (token.equals(")") || token.equals("]")) {
+                    stack.pop();
+                } else if (token.equals(",")) {
+                    //ignore
+                } else if (token.equals("\'")) {
+                    StringBuilder sb = new StringBuilder();
+                    while (st.hasMoreTokens()) {
+                        String str = st.nextToken();
+                        if (str.equals("\'"))
+                            break;
+                        sb.append(str);
+                    }
 
-                stack.peek().addExpression(new TextExpression(sb.toString()));
-            } else if (token.equals("[")) {
-                MethodExpression m = new MethodExpression("notNull");
-                stack.peek().addExpression(m);
-                stack.push(m);
-            } else {
-                stack.peek().addExpression(new TextExpression(token));
+                    stack.peek().addExpression(new TextExpression(sb.toString()));
+                } else if (token.equals("[")) {
+                    MethodExpression m = new MethodExpression("notNull");
+                    stack.peek().addExpression(m);
+                    stack.push(m);
+                } else {
+                    stack.peek().addExpression(new TextExpression(token));
+                }
             }
+        } catch (Exception e) {
+//            e.printStackTrace();
         }
 
         ArrayList<Expression> e = root.getExpressions();
