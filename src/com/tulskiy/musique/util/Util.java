@@ -20,6 +20,9 @@ package com.tulskiy.musique.util;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.channels.ClosedChannelException;
 import java.util.Formatter;
 import java.util.Locale;
 
@@ -110,6 +113,21 @@ public class Util {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
+    public static String capitalize(String str) {
+        str = str.replaceAll("&", "and");
+        String[] strings = str.split(" ");
+        final StringBuilder sb = new StringBuilder();
+
+        for (String s : strings) {
+            s = s.toLowerCase();
+            sb.append(s.substring(0, 1).toUpperCase());
+            sb.append(s.substring(1)).append("_");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+
+        return sb.toString();
+    }
+
     public static Color getContrastColor(Color bg) {
         int threshold = 105;
         int delta = (int) (bg.getRed() * 0.299 + bg.getGreen() * 0.587 + bg.getBlue() * 0.114);
@@ -129,5 +147,25 @@ public class Util {
                     fixIconTextGap(((JMenu) component).getPopupMenu());
             }
         }
+    }
+
+    public static boolean copy(FileInputStream from, FileInputStream to) {
+        try {
+            long transferred = 0;
+            long length = from.getChannel().size();
+            int chunkSize = 10000000;
+            while (transferred < length) {
+                transferred += from.getChannel().transferTo(
+                        transferred, chunkSize, to.getChannel());
+            }
+            from.close();
+            to.close();
+            return true;
+        } catch (ClosedChannelException ignore) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 }
