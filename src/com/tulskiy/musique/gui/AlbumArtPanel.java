@@ -114,11 +114,9 @@ public class AlbumArtPanel extends JPanel {
         player.addListener(new PlayerListener() {
             @Override
             public void onEvent(PlayerEvent e) {
-                if (config.getBoolean("albumart.nowPlayingOnly", false)) {
-                    if (nowPlayingOnly) {
-                        track = player.getTrack();
-                        timer.restart();
-                    }
+                if (nowPlayingOnly && e.getEventCode() == PlayerEvent.PlayerEventCode.FILE_OPENED) {
+                    track = player.getTrack();
+                    timer.restart();
                 }
             }
         });

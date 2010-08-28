@@ -78,10 +78,16 @@ public class MainWindow extends JFrame {
         setSize((int) r.getWidth(), (int) r.getHeight());
         setExtendedState(config.getInt("gui.mainWindowState", 0));
 
+        final Runnable formatTitle = new Runnable() {
+            @Override
+            public void run() {
+                formatTitle();
+            }
+        };
         app.getPlayer().addListener(new PlayerListener() {
             @Override
             public void onEvent(PlayerEvent e) {
-                formatTitle();
+                SwingUtilities.invokeLater(formatTitle);
             }
         });
         config.addPropertyChangeListener("sidebar.enabled", true, new PropertyChangeListener() {
@@ -137,8 +143,10 @@ public class MainWindow extends JFrame {
             title = value + " [" + app.VERSION + "]";
         }
         setTitle(title);
-        if (tray != null)
-            tray.setToolTip(title);
+
+        // deadlocks the jvm :( pity...
+//        if (tray != null)
+//            tray.setToolTip(title);
     }
 
     private void updateTray() {

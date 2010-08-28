@@ -158,8 +158,9 @@ public class Player {
 
     void fireEvent(PlayerEvent.PlayerEventCode event) {
         PlayerEvent e = new PlayerEvent(event);
-        EventLauncher eventLauncher = new EventLauncher(e);
-        eventLauncher.run();
+        for (PlayerListener listener : listeners) {
+            listener.onEvent(e);
+        }
     }
 
     private class EventLauncher extends Thread {
