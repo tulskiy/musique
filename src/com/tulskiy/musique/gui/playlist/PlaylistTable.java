@@ -49,6 +49,8 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static com.tulskiy.musique.gui.dialogs.FileOperations.Operation;
+
 /**
  * Author: Denis Tulskiy
  * Date: May 13, 2010
@@ -672,12 +674,52 @@ public class PlaylistTable extends GroupTable {
                 });
             }
         });
+
+        ActionListener fileOpsListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String cmd = e.getActionCommand();
+                Operation op = Operation.valueOf(cmd);
+                new FileOperations(owner, op, getSelectedSongs()).setVisible(true);
+            }
+        };
+        JMenu fileOps = new JMenu("File Operations");
+        for (Operation op : Operation.values()) {
+            fileOps.add(op.name()).addActionListener(fileOpsListener);
+        }
+        fileOps.addSeparator();
+        JMenuItem deleteItem = fileOps.add("Delete       ");
+        deleteItem.setIcon(emptyIcon);
+        deleteItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Track> tracks = getSelectedSongs();
+                int ret = JOptionPane.showConfirmDialog(null, "This will delete file(s) permanently. Are you sure?", "Delete File(s)?", JOptionPane.YES_NO_OPTION);
+                if (ret == JOptionPane.YES_OPTION) {
+                    for (Track track : tracks) {
+                        if (track.isFile() && !track.isCue()) {
+                            if (player.getTrack() == track)
+                                player.stop();
+
+                            if (track.getFile().delete()) {
+                                playlist.remove(track);
+                            }
+                        }
+
+                        playlist.firePlaylistChanged();
+                        update();
+                    }
+                }
+            }
+        });
+
         tableMenu.add("Convert").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new ConverterDialog(owner, getSelectedSongs()).setVisible(true);
             }
         });
+        tableMenu.add(fileOps);
         tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));
         tableMenu.add(aMap.get("showProperties")).setAccelerator(KeyStroke.getKeyStroke("alt ENTER"));
         Util.fixIconTextGap(tableMenu);

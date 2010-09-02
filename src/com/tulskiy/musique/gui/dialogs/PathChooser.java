@@ -21,6 +21,8 @@ import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,6 +56,28 @@ public class PathChooser extends JPanel {
                 }
             }
         });
+
+        text.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                fire();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                fire();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                fire();
+            }
+
+            private void fire() {
+                firePropertyChange("path", null, null);
+            }
+        });
+
         add(button, BorderLayout.LINE_END);
     }
 
@@ -64,6 +88,7 @@ public class PathChooser extends JPanel {
     public void setPath(String path) {
         this.path = path;
         text.setText(path);
+        firePropertyChange("path", null, path);
     }
 
     @Override
