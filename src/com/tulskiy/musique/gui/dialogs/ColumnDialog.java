@@ -30,7 +30,7 @@ import java.awt.event.ActionListener;
  */
 public class ColumnDialog extends JDialog {
     private static Object[] formats = new Object[]{
-            "[%artist% -]%title%", "%title%", "%artist%", "%album%", "%year%",
+            "[%artist% - ]%title%", "%title%", "%artist%", "%album%", "%year%",
             "%length%", "$isPlaying", "%fileName%", "%albumArtist% - %year% - %album% - %discNumber% - %trackNumber% - %title% - %fileName%"
     };
 
