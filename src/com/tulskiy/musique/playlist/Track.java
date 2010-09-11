@@ -239,7 +239,10 @@ public class Track implements Cloneable {
             if (s.length > 0) {
                 try {
                     int i = Integer.parseInt(s[0]);
-                    track = new Formatter().format("%02d", i).toString();
+                    if (i != 0)
+                        track = new Formatter().format("%02d", i).toString();
+                    else
+                        track = null;
                 } catch (NumberFormatException ignored) {
                     track = s[0];
                 }
