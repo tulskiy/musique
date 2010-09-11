@@ -22,6 +22,7 @@
 package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.audio.Scrobbler;
 import com.tulskiy.musique.audio.player.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.MainWindow;
@@ -49,6 +50,7 @@ public class Application {
     public final File CONFIG_HOME =
             new File(System.getProperty("user.home"), ".musique").getAbsoluteFile();
     private final File configFile = new File(CONFIG_HOME, "config");
+    private Scrobbler scrobbler;
 
     public static Application getInstance() {
         return ourInstance;
@@ -68,6 +70,8 @@ public class Application {
         } catch (FileNotFoundException ignored) {
         }
         player = new Player();
+        scrobbler = new Scrobbler();
+        scrobbler.start();
 
         playlistManager = new PlaylistManager();
         playlistManager.loadPlaylists();

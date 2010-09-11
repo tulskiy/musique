@@ -2,7 +2,7 @@ testfiles
 out
 temp
 musique.jar
-lib
+lib/junit*
 tags
 resources/db
 .idea/workspace.xml

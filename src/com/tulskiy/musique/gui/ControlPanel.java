@@ -107,7 +107,6 @@ public class ControlPanel extends JPanel {
         order.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                System.out.println("here");
                 config.setInt("player.playbackOrder", order.getSelectedIndex());
             }
         });

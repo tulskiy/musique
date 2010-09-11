@@ -4,13 +4,13 @@
 
     <property file="musique.properties"/>
     <!-- Uncomment the following property if no tests compilation is needed -->
-
-    <property name="skip.tests" value="true"/>
-
+    <!--
+   <property name="skip.tests" value="true"/>
+    -->
 
     <!-- Compiler options -->
 
-    <property name="compiler.debug" value="off"/>
+    <property name="compiler.debug" value="on"/>
     <property name="compiler.generate.no.warnings" value="off"/>
     <property name="compiler.args" value=""/>
     <property name="compiler.max.memory" value="128m"/>
@@ -570,6 +570,7 @@
         <pathelement location="${jorbis.output.dir}"/>
         <pathelement location="${jorbis.testoutput.dir}"/>
         <pathelement location="${basedir}/lib/junit-4.7.jar"/>
+        <pathelement location="${basedir}/lib/last.fm-bindings.jar"/>
     </path>
 
     <path id="musique.runtime.module.classpath">
@@ -583,6 +584,7 @@
         <path refid="jmac.runtime.module.classpath"/>
         <path refid="jorbis.runtime.module.classpath"/>
         <pathelement location="${basedir}/lib/junit-4.7.jar"/>
+        <pathelement location="${basedir}/lib/last.fm-bindings.jar"/>
     </path>
 
 

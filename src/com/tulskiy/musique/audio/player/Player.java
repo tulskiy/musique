@@ -113,6 +113,10 @@ public class Player {
         return playerThread.currentTrack;
     }
 
+    public double getPlaybackTime() {
+        return playerThread.playbackTime;
+    }
+
     public boolean isPlaying() {
         return state == PlayerState.PLAYING;
     }
@@ -163,21 +167,6 @@ public class Player {
         }
     }
 
-    private class EventLauncher extends Thread {
-        private PlayerEvent e;
-
-        private EventLauncher(PlayerEvent e) {
-            this.e = e;
-        }
-
-        @Override
-        public void run() {
-            for (PlayerListener l : listeners) {
-                l.onEvent(e);
-            }
-        }
-    }
-
     class PlayerThread extends Thread {
         private final Object lock = new Object();
         private long currentByte = 0;
@@ -187,6 +176,8 @@ public class Player {
         private Decoder decoder;
         private long cueTotalBytes;
         private boolean exit = false;
+        private long playbackBytes;
+        private double playbackTime;
 
         @SuppressWarnings({"ConstantConditions"})
         @Override
@@ -246,6 +237,7 @@ public class Player {
                             }
 
                             currentByte += len;
+                            playbackBytes += len;
 
                             output.write(buf, 0, len);
                         }
@@ -312,6 +304,9 @@ public class Player {
 
             try {
                 if (decoder != null) {
+                    playbackTime = AudioMath.bytesToMillis(
+                            playbackBytes, decoder.getAudioFormat());
+
                     decoder.close();
                 }
 
@@ -323,6 +318,7 @@ public class Player {
                     decoder = Codecs.getDecoder(track);
                     currentTrack = track;
                     currentByte = 0;
+                    playbackBytes = 0;
 
                     if (decoder == null || !decoder.open(track)) {
                         currentTrack = null;
@@ -365,8 +361,11 @@ public class Player {
 
         public void stopPlaying() {
             pause();
-            if (decoder != null)
+            if (decoder != null) {
+                playbackTime = AudioMath.bytesToMillis(
+                        playbackBytes, decoder.getAudioFormat());
                 decoder.close();
+            }
             decoder = null;
             setState(PlayerState.STOPPED);
         }

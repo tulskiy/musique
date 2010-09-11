@@ -17,6 +17,8 @@
 
 package com.tulskiy.musique.util;
 
+import javax.sound.sampled.AudioFormat;
+
 /**
  * @Author: Denis Tulskiy
  * @Date: 13.07.2009
@@ -32,5 +34,10 @@ public class AudioMath {
 
     public static double samplesToMillis(long samples, int sampleRate) {
         return (double) samples / sampleRate * 1000;
+    }
+
+    public static double bytesToMillis(long bytes, AudioFormat fmt) {
+        long l = AudioMath.bytesToSamples(bytes, fmt.getFrameSize());
+        return samplesToMillis(l, (int) fmt.getSampleRate());
     }
 }
