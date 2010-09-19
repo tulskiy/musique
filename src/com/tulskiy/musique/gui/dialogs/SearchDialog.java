@@ -17,10 +17,13 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
+import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
+import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
@@ -41,7 +44,7 @@ import java.util.ArrayList;
  */
 public class SearchDialog extends JDialog {
     private final String[] fields = {
-            "artist", "title", "album", "albumArtist", "year", "genre", "fileName"
+            "artist", "title", "album", "albumArtist", "fileName"
     };
 
     private JTextField searchField;
@@ -103,6 +106,18 @@ public class SearchDialog extends JDialog {
             }
         });
 
+        final Player player = Application.getInstance().getPlayer();
+        table.getActionMap().put("enqueue", new AbstractAction("Add to Queue  ") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (Track track : table.getSelectedSongs()) {
+                    PlaybackOrder order = player.getPlaybackOrder();
+                    order.enqueue(track, playlist);
+                    table.update();
+                }
+            }
+        });
+
         timer = new Timer(300, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -119,10 +134,13 @@ public class SearchDialog extends JDialog {
                             String value = track.getMeta(field);
                             if (!Util.isEmpty(value)) {
                                 value = value.toLowerCase();
-                                for (int j = 0, textLength = text.length; j < textLength; j++) {
-                                    String s = text[j];
-                                    if (value.contains(s)) {
-                                        hasText[j] = true;
+                                String[] vals = value.split("\\s+");
+                                for (String val : vals) {
+                                    for (int j = 0, textLength = text.length; j < textLength; j++) {
+                                        String s = text[j];
+                                        if (val.startsWith(s)) {
+                                            hasText[j] = true;
+                                        }
                                     }
                                 }
                             }
