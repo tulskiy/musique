@@ -245,7 +245,7 @@ public class TracksInfoDialog extends JDialog {
         table.setIntercellSpacing(new Dimension(1, 1));
         table.setGridColor(Color.lightGray);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        table.putClientProperty("terminateEditOnFocusLost", Boolean.FALSE);
+        table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         final JTextField editor = new JTextField();
         table.setDefaultEditor(Object.class, new DefaultCellEditor(editor) {
             @Override
