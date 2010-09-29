@@ -19,6 +19,7 @@ package com.tulskiy.musique.gui;
 
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
+import com.tulskiy.musique.gui.dialogs.TextDialog;
 import com.tulskiy.musique.gui.playlist.PlaylistPanel;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Track;
@@ -30,12 +31,11 @@ import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 
 /**
  * @Author: Denis Tulskiy
@@ -68,6 +68,7 @@ public class MainWindow extends JFrame {
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
         playlistPanel.addMenu(menuBar);
+        addHelpMenu(menuBar);
         add(controlPanel, BorderLayout.NORTH);
         add(statusBar, BorderLayout.SOUTH);
         add(center, BorderLayout.CENTER);
@@ -126,6 +127,30 @@ public class MainWindow extends JFrame {
                 } else {
                     setVisible(false);
                 }
+            }
+        });
+    }
+
+    private void addHelpMenu(JMenuBar menuBar) {
+        ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+
+        JMenu helpMenu = new JMenu("Help");
+        menuBar.add(helpMenu);
+
+        final JFrame comp = this;
+        JMenuItem helpMenuItem = helpMenu.add("Help     ");
+        helpMenuItem.setIcon(emptyIcon);
+        helpMenuItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new TextDialog(comp, "Readme", new File("README")).setVisible(true);
+            }
+        });
+
+        helpMenu.add("About").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new TextDialog(comp, "About", new File("ABOUT")).setVisible(true);
             }
         });
     }
