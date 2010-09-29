@@ -46,8 +46,8 @@ public class FontChooserDialog extends JDialog {
 
         final JList fontsList = new JList(fonts);
         final JList styleList = new JList(new Object[]{"Regular", "Italic", "Bold", "Bold Italic"});
-        final JList sizesList = new JList(new Integer[]{7, 8, 9, 10, 11, 12, 14, 16, 18,
-                20, 24, 30, 36, 40, 48, 60, 72});
+        final JList sizesList = new JList(new Integer[]{7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+                19, 20, 22, 24, 30, 36});
 
         if (font != null) {
             fontsList.setSelectedValue(font.getName(), true);
