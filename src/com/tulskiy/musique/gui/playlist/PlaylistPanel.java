@@ -98,7 +98,7 @@ public class PlaylistPanel extends JPanel {
             } catch (Exception ignored) {
             }
 
-            tabs.add(pl.getName(), newTable.getScrollPane());
+            tabs.addTab(pl.getName(), newTable.getScrollPane());
         }
 
         final Playlist playlist = playlistManager.getCurrentPlaylist();
@@ -113,7 +113,8 @@ public class PlaylistPanel extends JPanel {
             PlaylistTable table = tabs.getSelectedTable();
             if (table != null) {
                 int index = table.getPlaylist().indexOf(lastPlayed);
-                table.setRowSelectionInterval(index, index);
+                if (index != -1)
+                    table.setRowSelectionInterval(index, index);
             }
         }
 
@@ -203,7 +204,7 @@ public class PlaylistPanel extends JPanel {
         final JMenu playbackMenu = new JMenu("Playback");
         menuBar.add(playbackMenu);
 
-        ActionMap tMap = tabs.getActionMap();
+        ActionMap tMap = tabs.getActions();
         fileMenu.add(tMap.get("newPlaylist")).setAccelerator(KeyStroke.getKeyStroke("ctrl T"));
         fileMenu.add(tMap.get("removePlaylist")).setIcon(emptyIcon);
         fileMenu.add(tMap.get("loadPlaylist"));

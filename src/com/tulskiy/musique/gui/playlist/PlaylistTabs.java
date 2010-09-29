@@ -41,36 +41,93 @@ import java.util.ArrayList;
  * Author: Denis Tulskiy
  * Date: Jun 21, 2010
  */
-public class PlaylistTabs extends JTabbedPane {
+public class PlaylistTabs extends JPanel {
     private TableColumnModel columnModel;
     private ArrayList<PlaylistColumn> columns;
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private PlaylistManager playlistManager = app.getPlaylistManager();
+    private JTabbedPane tabbedPane;
+    private Component singleTab;
+    private boolean tabsVisible;
 
     private PlaylistTable selectedTable;
 
     private int dragTo = -1;
     private int dragFrom;
+    private String singleTitle;
 
     public PlaylistTabs(ArrayList<PlaylistColumn> columns) {
         this.columns = columns;
+        setLayout(new BorderLayout());
+        tabbedPane = new JTabbedPane();
+        tabsVisible = true;
 
-        setFocusable(false);
+        tabbedPane.setFocusable(false);
         if (UIManager.getLookAndFeel().getName().contains("GTK")) {
-            setPreferredSize(new Dimension(10000, 30));
+            tabbedPane.setPreferredSize(new Dimension(10000, 30));
         } else {
-            setPreferredSize(new Dimension(10000, 25));
+            tabbedPane.setPreferredSize(new Dimension(10000, 25));
         }
 
         buildListeners();
         createPopupMenu();
     }
 
+    private void checkTabCount() {
+        if (!config.getBoolean("playlist.tabs.hideSingle", true)) {
+            return;
+        }
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                int count = tabbedPane.getTabCount();
+                if (tabsVisible && count <= 1) {
+                    tabsVisible = false;
+                    remove(tabbedPane);
+
+                    if (count == 1) {
+                        singleTab = tabbedPane.getComponentAt(0);
+                        singleTitle = tabbedPane.getTitleAt(0);
+                        tabbedPane.removeAll();
+                        add(singleTab, BorderLayout.CENTER);
+                    }
+                    revalidate();
+                    repaint();
+                } else if (!tabsVisible && count > 0) {
+                    tabsVisible = true;
+
+                    removeAll();
+                    tabbedPane.add(singleTab, 0);
+                    tabbedPane.setTitleAt(0, singleTitle);
+                    singleTab = null;
+                    add(tabbedPane, BorderLayout.CENTER);
+                    revalidate();
+                    repaint();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void updateUI() {
+        super.updateUI();
+
+        if (tabbedPane != null)
+            tabbedPane.updateUI();
+    }
+
     public PlaylistTable getTableAt(int index) {
         try {
-            return (PlaylistTable) ((JScrollPane) getComponentAt(index)).getViewport().getView();
+            Component comp;
+            if (!tabsVisible) {
+                comp = singleTab;
+            } else {
+                comp = tabbedPane.getComponentAt(index);
+            }
+
+            return (PlaylistTable) ((JScrollPane) comp).getViewport().getView();
         } catch (Exception e) {
             return null;
         }
@@ -81,20 +138,20 @@ public class PlaylistTabs extends JTabbedPane {
     }
 
     private void buildListeners() {
-        addChangeListener(new ChangeListener() {
+        tabbedPane.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
-                int index = getSelectedIndex();
+                int index = tabbedPane.getSelectedIndex();
                 if (index == -1)
                     return;
                 selectedTable = getTableAt(index);
             }
         });
 
-        addMouseMotionListener(new MouseMotionListener() {
+        tabbedPane.addMouseMotionListener(new MouseMotionListener() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                dragTo = indexAtLocation(e.getX(), e.getY());
+                dragTo = tabbedPane.indexAtLocation(e.getX(), e.getY());
                 repaint();
             }
 
@@ -103,30 +160,30 @@ public class PlaylistTabs extends JTabbedPane {
             }
         });
 
-        addMouseListener(new MouseAdapter() {
+        tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
                 if (dragFrom != -1 && dragTo != -1 && dragFrom != dragTo) {
                     playlistManager.movePlaylist(dragFrom, dragTo);
-                    Component comp = getComponentAt(dragFrom);
-                    String title = getTitleAt(dragFrom);
-                    removeTabAt(dragFrom);
-                    insertTab(title, null, comp, null, dragTo);
-                    setSelectedIndex(dragTo);
+                    Component comp = tabbedPane.getComponentAt(dragFrom);
+                    String title = tabbedPane.getTitleAt(dragFrom);
+                    tabbedPane.removeTabAt(dragFrom);
+                    tabbedPane.insertTab(title, null, comp, null, dragTo);
+                    tabbedPane.setSelectedIndex(dragTo);
                 }
                 dragTo = -1;
             }
 
             @Override
             public void mousePressed(MouseEvent e) {
-                dragFrom = indexAtLocation(e.getX(), e.getY());
+                dragFrom = tabbedPane.indexAtLocation(e.getX(), e.getY());
             }
 
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 &&
                     e.getClickCount() == 2) {
-                    getActionMap().get("newPlaylist").actionPerformed(
+                    tabbedPane.getActionMap().get("newPlaylist").actionPerformed(
                             new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                 }
             }
@@ -134,7 +191,7 @@ public class PlaylistTabs extends JTabbedPane {
     }
 
     private void createPopupMenu() {
-        ActionMap aMap = getActionMap();
+        ActionMap aMap = tabbedPane.getActionMap();
 
         aMap.put("newPlaylist", new AbstractAction("Add New Playlist") {
             @Override
@@ -151,7 +208,7 @@ public class PlaylistTabs extends JTabbedPane {
                     String name = JOptionPane.showInputDialog("Rename", playlist.getName());
                     if (!Util.isEmpty(name)) {
                         playlist.setName(name);
-                        setTitleAt(getSelectedIndex(), name);
+                        tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), name);
                     }
                 }
             }
@@ -159,14 +216,15 @@ public class PlaylistTabs extends JTabbedPane {
         aMap.put("removePlaylist", new AbstractAction("Remove Playlist") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int index = getSelectedIndex();
+                int index = tabbedPane.getSelectedIndex();
                 if (index != -1) {
                     Playlist playlist = selectedTable.getPlaylist();
-                    removeTabAt(index);
+                    tabbedPane.removeTabAt(index);
                     playlistManager.removePlaylist(playlist);
                     if (playlistManager.getTotalPlaylists() == 0) {
                         addPlaylist("Default");
                     }
+                    checkTabCount();
                 }
             }
         });
@@ -209,7 +267,7 @@ public class PlaylistTabs extends JTabbedPane {
             }
         });
 
-        addMouseListener(new MouseAdapter() {
+        tabbedPane.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 show(e);
@@ -222,9 +280,9 @@ public class PlaylistTabs extends JTabbedPane {
 
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    int index = indexAtLocation(e.getX(), e.getY());
+                    int index = tabbedPane.indexAtLocation(e.getX(), e.getY());
                     if (index != -1)
-                        setSelectedIndex(index);
+                        tabbedPane.setSelectedIndex(index);
                     buildPopupMenu().show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -232,7 +290,7 @@ public class PlaylistTabs extends JTabbedPane {
     }
 
     private JPopupMenu buildPopupMenu() {
-        ActionMap aMap = getActionMap();
+        ActionMap aMap = tabbedPane.getActionMap();
         final JPopupMenu tabMenu = new JPopupMenu();
         ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
         tabMenu.add(aMap.get("newPlaylist")).setIcon(emptyIcon);
@@ -249,7 +307,7 @@ public class PlaylistTabs extends JTabbedPane {
         if (!Util.isEmpty(name)) {
             Playlist playlist = playlistManager.addPlaylist(name);
             addPlaylist(playlist);
-            setSelectedIndex(getTabCount() - 1);
+            tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
             return playlist;
         }
         return null;
@@ -263,14 +321,15 @@ public class PlaylistTabs extends JTabbedPane {
         } else {
             newTable.setColumnModel(columnModel);
         }
-        add(playlist.getName(), newTable.getScrollPane());
+        tabbedPane.add(playlist.getName(), newTable.getScrollPane());
+        checkTabCount();
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (dragTo != -1 && dragFrom != -1 && dragTo != dragFrom) {
-            Rectangle b = getBoundsAt(dragTo);
+            Rectangle b = tabbedPane.getBoundsAt(dragTo);
             g.setColor(Color.GRAY);
             int x = (int) (b.getX());
             if (dragTo > dragFrom)
@@ -282,5 +341,27 @@ public class PlaylistTabs extends JTabbedPane {
             int[] yP = {y + 2, y - 5, y - 5, y + 2};
             g.fillPolygon(xP, yP, xP.length);
         }
+    }
+
+    public void setSelectedIndex(int i) {
+        if (tabbedPane.getTabCount() < i)
+            tabbedPane.setSelectedIndex(i);
+    }
+
+    public int getTabCount() {
+        if (!tabsVisible) {
+            return singleTab != null ? 1 : 0;
+        } else {
+            return tabbedPane.getTabCount();
+        }
+    }
+
+    public void addTab(String name, JScrollPane comp) {
+        tabbedPane.addTab(name, comp);
+        checkTabCount();
+    }
+
+    public ActionMap getActions() {
+        return tabbedPane.getActionMap();
     }
 }
