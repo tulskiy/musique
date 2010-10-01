@@ -47,7 +47,7 @@ public class MainWindow extends JFrame {
     private PlaylistPanel playlistPanel;
     private Tray tray;
     private Expression windowFormat;
-    private final String defaultWindowFormat = "%title% - [%artist%][ - '['%album%[ CD%discNumber%][ #%trackNumber%]']' ]";
+    private final String defaultWindowFormat = "%title% - [%artist%][ - '['[%album% ][CD%discNumber% ][#%trackNumber%]']' ]";
     private final JSplitPane side;
     private final JSplitPane center;
 

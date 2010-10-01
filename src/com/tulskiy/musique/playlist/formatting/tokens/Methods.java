@@ -94,7 +94,8 @@ public class Methods {
             String str = (String) expression.eval(track);
             if (!(expression instanceof TextExpression))
                 notEmpty |= notEmpty(str);
-            sb.append(str);
+            if (str != null)
+                sb.append(str);
         }
 
         if (notEmpty)
