@@ -50,8 +50,6 @@ public class Scrobbler {
     private net.roarsoftware.lastfm.scrobble.Scrobbler scrobbler;
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
-    private ResponseStatus status;
-    private boolean enabled;
     private boolean authorized;
     private Player player;
 
@@ -59,11 +57,9 @@ public class Scrobbler {
     private int nowPlayingLength;
 
     private final Queue<SubmissionData> submitQueue = new LinkedList<SubmissionData>();
-    private Thread submitThread;
-
 
     public void start() {
-        submitThread = new Thread(new SubmitSender());
+        Thread submitThread = new Thread(new SubmitSender());
         submitThread.start();
 
         authorized = false;
@@ -141,7 +137,7 @@ public class Scrobbler {
             try {
                 logger.fine("Authorizing user: " + user);
                 scrobbler = newScrobbler(CLIENT_ID, CLIENT_VERSION, user);
-                status = scrobbler.handshake(password);
+                ResponseStatus status = scrobbler.handshake(password);
                 authorized = status.ok();
                 if (!authorized) {
                     switch (status.getStatus()) {
@@ -159,6 +155,10 @@ public class Scrobbler {
     }
 
     class SubmitSender implements Runnable {
+        private int MAX_WAIT_TIME = 7200000;
+        private int MIN_WAIT_TIME = 60000;
+        private int waitTime = MIN_WAIT_TIME;
+
         @Override
         public void run() {
             while (true) {
@@ -175,20 +175,23 @@ public class Scrobbler {
                     if (!authorized) {
                         auth();
                         if (!authorized) {
-                            Thread.sleep(300000);
+                            Thread.sleep(waitTime);
+                            waitTime = Math.min(waitTime * 2, MAX_WAIT_TIME);
                             continue;
                         }
                     }
                     logger.fine("Submitting data: " + data.toString());
                     ResponseStatus status = scrobbler.submit(data);
                     if (status.ok()) {
+                        waitTime = MIN_WAIT_TIME;
                         synchronized (submitQueue) {
                             submitQueue.poll();
                         }
                     } else {
                         switch (status.getStatus()) {
                             case ResponseStatus.BADSESSION:
-                                auth();
+                            case ResponseStatus.FAILED:
+                                authorized = false;
                                 continue;
                             case ResponseStatus.BANNED:
                                 logger.warning("Last.fm says that we're banned :(");
@@ -201,8 +204,9 @@ public class Scrobbler {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    authorized = false;
                     try {
-                        Thread.sleep(300000);
+                        Thread.sleep(waitTime);
                     } catch (InterruptedException e1) {
                         e1.printStackTrace();
                     }
