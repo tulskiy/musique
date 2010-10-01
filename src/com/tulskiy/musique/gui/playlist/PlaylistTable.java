@@ -347,10 +347,15 @@ public class PlaylistTable extends GroupTable {
         return tracks;
     }
 
-    private void selectSongsAt(Point p) {
+    private boolean selectSongsAt(Point p) {
         int index = rowAtPoint(p);
-        if (index != -1 && !isRowSelected(index)) {
-            setRowSelectionInterval(index, index);
+        if (index != -1) {
+            if (!isRowSelected(index)) {
+                setRowSelectionInterval(index, index);
+            }
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -407,9 +412,10 @@ public class PlaylistTable extends GroupTable {
 
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    selectSongsAt(e.getPoint());
-                    JPopupMenu popup = buildTableMenu();
-                    popup.show(e.getComponent(), e.getX(), e.getY());
+                    if (selectSongsAt(e.getPoint())) {
+                        JPopupMenu popup = buildTableMenu();
+                        popup.show(e.getComponent(), e.getX(), e.getY());
+                    }
                 }
             }
         });
