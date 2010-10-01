@@ -25,17 +25,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module-library">
-      <library>
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/last.fm-bindings.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="file://$MODULE_DIR$/../../Downloads/last.fm-bindings-7.3/src" />
-        </SOURCES>
-      </library>
-    </orderEntry>
+    <orderEntry type="library" name="lastfm" level="project" />
   </component>
 </module>
 

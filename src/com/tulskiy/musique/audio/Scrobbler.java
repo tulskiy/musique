@@ -43,12 +43,16 @@ import static net.roarsoftware.lastfm.scrobble.Scrobbler.newScrobbler;
  * Date: Sep 3, 2010
  */
 public class Scrobbler {
+    private static final String CLIENT_ID = "mqe";
+    private static final String CLIENT_VERSION = "1.0";
+
     private Logger logger = Logger.getLogger("musique");
     private net.roarsoftware.lastfm.scrobble.Scrobbler scrobbler;
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private ResponseStatus status;
-    private boolean active;
+    private boolean enabled;
+    private boolean authorized;
     private Player player;
 
     private SubmissionData nowPlaying;
@@ -62,24 +66,25 @@ public class Scrobbler {
         submitThread = new Thread(new SubmitSender());
         submitThread.start();
 
-        config.addPropertyChangeListener("lastfm.enabled", true, new PropertyChangeListener() {
+        authorized = false;
+        config.addPropertyChangeListener("lastfm.user", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                if (submitThread.isAlive() && config.getBoolean(evt.getPropertyName(), false)) {
-                    if (!active)
-                        authentificate();
-                } else {
-                    active = false;
-                }
+                authorized = false;
             }
         });
-        authentificate();
+        config.addPropertyChangeListener("lastfm.password", new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                authorized = false;
+            }
+        });
 
         player = app.getPlayer();
         player.addListener(new PlayerListener() {
             @Override
             public void onEvent(PlayerEvent e) {
-                if (active) {
+                if (config.getBoolean("lastfm.enabled", false)) {
                     SubmissionData data = nowPlaying;
                     switch (e.getEventCode()) {
                         case FILE_OPENED:
@@ -126,23 +131,29 @@ public class Scrobbler {
         }
     }
 
-    private void authentificate() {
+    private void auth() {
         String user = config.getString("lastfm.user", null);
         String password = config.getString("lastfm.password", null);
         if (Util.isEmpty(user) || Util.isEmpty(password)) {
-            active = false;
+            authorized = false;
             scrobbler = null;
         } else {
             try {
-                scrobbler = newScrobbler("tst", "1.0", user);
+                logger.fine("Authorizing user: " + user);
+                scrobbler = newScrobbler(CLIENT_ID, CLIENT_VERSION, user);
                 status = scrobbler.handshake(password);
-                active = status.ok();
-                if (!active) {
+                authorized = status.ok();
+                if (!authorized) {
+                    switch (status.getStatus()) {
+                        case ResponseStatus.BADAUTH:
+                        case ResponseStatus.BANNED:
+                            config.setBoolean("lastfm.enabled", false);
+                    }
                     logger.warning("Scrobbler handshake returned error: " + status.getMessage());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
-                active = false;
+                authorized = false;
             }
         }
     }
@@ -154,11 +165,21 @@ public class Scrobbler {
                 try {
                     SubmissionData data;
                     synchronized (submitQueue) {
-                        while (!active || submitQueue.isEmpty()) {
+                        while (!config.getBoolean("lastfm.enabled", false) ||
+                               submitQueue.isEmpty()) {
                             submitQueue.wait();
                         }
                         data = submitQueue.peek();
                     }
+
+                    if (!authorized) {
+                        auth();
+                        if (!authorized) {
+                            Thread.sleep(300000);
+                            continue;
+                        }
+                    }
+                    logger.fine("Submitting data: " + data.toString());
                     ResponseStatus status = scrobbler.submit(data);
                     if (status.ok()) {
                         synchronized (submitQueue) {
@@ -167,7 +188,7 @@ public class Scrobbler {
                     } else {
                         switch (status.getStatus()) {
                             case ResponseStatus.BADSESSION:
-                                authentificate();
+                                auth();
                                 continue;
                             case ResponseStatus.BANNED:
                                 logger.warning("Last.fm says that we're banned :(");

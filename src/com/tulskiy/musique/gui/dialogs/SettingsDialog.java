@@ -87,6 +87,7 @@ public class SettingsDialog extends JDialog {
         buttons.add(applyButton);
 
         tabs.add(createSystemPanel());
+        tabs.add(createNetworkPanel());
         tabs.add(createGUIPanel());
         tabs.add(createColorsAndFontsPanel());
         add(tabs, BorderLayout.CENTER);
@@ -348,6 +349,74 @@ public class SettingsDialog extends JDialog {
                     output.setMixer(null);
                 }
                 AudioFileReader.setDefaultCharset((Charset) encoding.getSelectedItem());
+            }
+        });
+
+        return panel;
+    }
+
+    private JComponent createNetworkPanel() {
+        final JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setName("Network");
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 100));
+        Box mainBox = Box.createVerticalBox();
+        panel.add(mainBox, BorderLayout.NORTH);
+
+        JPanel proxy = new JPanel(new GridLayout(5, 2, 0, 5));
+        mainBox.add(proxy);
+        proxy.setBorder(BorderFactory.createTitledBorder("HTTP Proxy"));
+
+        JCheckBox proxyEnabled = new JCheckBox("Use HTTP Proxy");
+        proxyEnabled.setSelected(config.getBoolean("proxy.enabled", false));
+        proxy.add(proxyEnabled);
+        proxy.add(new JLabel());
+
+        proxy.add(new JLabel("Host"));
+        JTextField host = new JTextField();
+        host.setText(config.getString("proxy.host", null));
+        proxy.add(host);
+
+        proxy.add(new JLabel("Port"));
+        JTextField port = new JTextField();
+        port.setText(config.getString("proxy.port", null));
+        proxy.add(port);
+
+        proxy.add(new JLabel("Username"));
+        JTextField username = new JTextField();
+        username.setText(config.getString("proxy.username", null));
+        proxy.add(username);
+
+        proxy.add(new JLabel("Password"));
+        JPasswordField password = new JPasswordField();
+        password.setText(config.getString("proxy.password", null));
+        proxy.add(password);
+
+        final JPanel lastfm = new JPanel(new GridLayout(3, 2));
+        lastfm.setBorder(BorderFactory.createTitledBorder("Last.fm Scrobbling"));
+
+        final JCheckBox lfmEnabled = new JCheckBox("Enable Last.fm Scrobbling");
+        lastfm.add(lfmEnabled);
+        lfmEnabled.setSelected(config.getBoolean("lastfm.enabled", false));
+        lastfm.add(new JLabel());
+
+        lastfm.add(new JLabel("Username"));
+        final JTextField lfmUsername = new JTextField();
+        lfmUsername.setText(config.getString("lastfm.user", null));
+        lastfm.add(lfmUsername);
+
+        lastfm.add(new JLabel("Password"));
+        final JPasswordField lfmPassword = new JPasswordField();
+        lfmPassword.setText(config.getString("lastfm.password", null));
+        lastfm.add(lfmPassword);
+
+        mainBox.add(lastfm);
+
+        applyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                config.setBoolean("lastfm.enabled", lfmEnabled.isSelected());
+                config.setString("lastfm.user", lfmUsername.getText());
+                config.setString("lastfm.password", String.valueOf(lfmPassword.getPassword()));
             }
         });
 

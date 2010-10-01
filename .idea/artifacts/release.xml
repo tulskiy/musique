@@ -9,6 +9,9 @@
       <element id="file-copy" path="$PROJECT_DIR$/README" />
       <element id="file-copy" path="$PROJECT_DIR$/logging.properties" />
       <element id="file-copy" path="$PROJECT_DIR$/musique.vmoptions" />
+      <element id="directory" name="lib">
+        <element id="library" level="project" name="lastfm" />
+      </element>
     </root>
   </artifact>
 </component>
