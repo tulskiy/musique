@@ -12,6 +12,7 @@
       <element id="directory" name="lib">
         <element id="library" level="project" name="lastfm" />
       </element>
+      <element id="file-copy" path="$PROJECT_DIR$/ABOUT" />
     </root>
   </artifact>
 </component>

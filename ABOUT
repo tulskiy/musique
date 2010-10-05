@@ -13,3 +13,38 @@ GNU Lesser General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License
 version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+
+Libraries:
+
+JLayer - MP3 decoder/player/converter library for Java™ platform.
+http://www.javazoom.net/javalayer/javalayer.html
+Copyright (C) JavaZOOM 1999-2008
+
+jflac - Free Lossless Audio Codec library
+http://jflac.sourceforge.net/
+Copyright (C) 2000,2001,2002,2003  Josh Coalson
+
+jmac - Java implementation of the Monkey's Audio decoder
+http://jmac.sourceforge.net/
+Copyright (C) Dmitry Vaguine
+
+jorbis - OGG Vorbis decoder
+http://www.jcraft.com/jorbis/
+Copyright (C) 2000 ymnk, JCraft,Inc.
+
+vorbis-java - java port of Vorbis encoder
+http://www.xiph.org/downloads/
+Copyright (c) 2002-2004 Xiph.org Foundation
+
+wavpack - Java Implementation of WavPack Encoder/Decoder
+http://www.wavpack.com/
+Copyright (c) 2008 Peter McQuillan
+Portions Copyright (c) 1998 - 2007 Conifer Software
+
+cuelib - library for manipulating cue sheets.
+http://code.google.com/p/cuelib/
+Copyright (C) 2007-2008 Jan-Willem van den Broek
+
+jaudiotagger - Audio Tagging library
+http://www.jthink.net/jaudiotagger/
+
