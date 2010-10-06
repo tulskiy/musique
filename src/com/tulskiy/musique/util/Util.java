@@ -41,10 +41,11 @@ public class Util {
         return ans;
     }
 
-    public static String formatMillis(double seconds, int precision) {
-        int min = (int) (seconds / 60);
+    public static String formatSeconds(double seconds, int precision) {
+        int min = (int) ((Math.round(seconds)) / 60);
         int hrs = min / 60;
         if (min > 0) seconds -= min * 60;
+        if (seconds < 0) seconds = 0;
         if (hrs > 0) min -= hrs * 60;
         int days = hrs / 24;
         if (days > 0) hrs -= days * 24;
@@ -66,8 +67,8 @@ public class Util {
     public static String samplesToTime(long samples, int sampleRate, int precision) {
         if (samples <= 0)
             return "-:--";
-        double seconds = AudioMath.samplesToMillis(samples, sampleRate) / 1000d;
-        return formatMillis(seconds, precision);
+        double seconds = AudioMath.samplesToMillis(samples, sampleRate) / 1000f;
+        return formatSeconds(seconds, precision);
     }
 
     public static String getFileExt(File file) {

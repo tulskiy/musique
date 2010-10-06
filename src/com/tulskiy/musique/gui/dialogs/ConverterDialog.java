@@ -370,7 +370,7 @@ public class ConverterDialog extends JDialog {
 
         @Override
         public String getTitle() {
-            String elapsed = Util.formatMillis(
+            String elapsed = Util.formatSeconds(
                     converter.getElapsed() / 1000f, 0);
             String estimated = Util.samplesToTime(
                     (long) converter.getEstimated(),

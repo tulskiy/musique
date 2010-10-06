@@ -289,7 +289,6 @@ public class ControlPanel extends JPanel {
                                 progressSlider.setMaximum(max);
                             }
                         }
-                        updateStatus();
                         progressSlider.setValue((int) player.getCurrentSample());
                         break;
                 }
