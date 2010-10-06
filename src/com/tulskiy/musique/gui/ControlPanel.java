@@ -24,6 +24,8 @@ import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.formatting.Parser;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.GlobalTimer;
@@ -61,6 +63,8 @@ public class ControlPanel extends JPanel {
 
     private boolean isSeeking = false;
     private boolean progressEnabled = false;
+    private JLabel statusLabel;
+    private Expression statusExpression;
 
     public ControlPanel() {
         setLayout(new BorderLayout());
@@ -122,6 +126,11 @@ public class ControlPanel extends JPanel {
         box.add(volumeSlider);
         box.add(Box.createHorizontalStrut(10));
         box.add(progressSlider);
+        box.add(Box.createHorizontalStrut(5));
+        statusLabel = new JLabel();
+        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
+        statusExpression = Parser.parse("$if3($playingTime(), '0:00')[/%length%]");
+        box.add(statusLabel);
         box.add(Box.createHorizontalStrut(5));
         box.add(order);
         box.add(Box.createHorizontalStrut(5));
@@ -267,6 +276,7 @@ public class ControlPanel extends JPanel {
                     case STOPPED:
                         progressEnabled = false;
                         progressSlider.setValue(progressSlider.getMinimum());
+                        statusLabel.setText(null);
                         break;
                     case FILE_OPENED:
                         Track track = player.getTrack();
@@ -279,6 +289,7 @@ public class ControlPanel extends JPanel {
                                 progressSlider.setMaximum(max);
                             }
                         }
+                        updateStatus();
                         progressSlider.setValue((int) player.getCurrentSample());
                         break;
                 }
@@ -290,8 +301,14 @@ public class ControlPanel extends JPanel {
                 if (progressEnabled && player.isPlaying() && !isSeeking) {
                     progressSlider.setValue((int) player.getCurrentSample());
                 }
+                if (player.isPlaying())
+                    updateStatus();
             }
         });
+    }
+
+    private void updateStatus() {
+        statusLabel.setText((String) statusExpression.eval(player.getTrack()));
     }
 
     private void showToolTip(MouseEvent e) {
