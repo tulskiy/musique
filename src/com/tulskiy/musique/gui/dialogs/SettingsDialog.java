@@ -366,28 +366,28 @@ public class SettingsDialog extends JDialog {
         mainBox.add(proxy);
         proxy.setBorder(BorderFactory.createTitledBorder("HTTP Proxy"));
 
-        JCheckBox proxyEnabled = new JCheckBox("Use HTTP Proxy");
+        final JCheckBox proxyEnabled = new JCheckBox("Use HTTP Proxy");
         proxyEnabled.setSelected(config.getBoolean("proxy.enabled", false));
         proxy.add(proxyEnabled);
         proxy.add(new JLabel());
 
         proxy.add(new JLabel("Host"));
-        JTextField host = new JTextField();
+        final JTextField host = new JTextField();
         host.setText(config.getString("proxy.host", null));
         proxy.add(host);
 
         proxy.add(new JLabel("Port"));
-        JTextField port = new JTextField();
+        final JTextField port = new JTextField();
         port.setText(config.getString("proxy.port", null));
         proxy.add(port);
 
         proxy.add(new JLabel("Username"));
-        JTextField username = new JTextField();
-        username.setText(config.getString("proxy.username", null));
-        proxy.add(username);
+        final JTextField user = new JTextField();
+        user.setText(config.getString("proxy.user", null));
+        proxy.add(user);
 
         proxy.add(new JLabel("Password"));
-        JPasswordField password = new JPasswordField();
+        final JPasswordField password = new JPasswordField();
         password.setText(config.getString("proxy.password", null));
         proxy.add(password);
 
@@ -417,6 +417,20 @@ public class SettingsDialog extends JDialog {
                 config.setBoolean("lastfm.enabled", lfmEnabled.isSelected());
                 config.setString("lastfm.user", lfmUsername.getText());
                 config.setString("lastfm.password", String.valueOf(lfmPassword.getPassword()));
+
+                config.setBoolean("proxy.enabled", proxyEnabled.isSelected());
+                config.setString("proxy.host", host.getText());
+                config.setString("proxy.port", port.getText());
+                config.setString("proxy.user", user.getText());
+                config.setString("proxy.password", String.valueOf(password.getPassword()));
+
+                if (proxyEnabled.isSelected()) {
+                    System.setProperty("http.proxyHost", host.getText());
+                    System.setProperty("http.proxyPort", port.getText());
+                } else {
+                    System.setProperty("http.proxyHost", "");
+                    System.setProperty("http.proxyPort", "");
+                }
             }
         });
 

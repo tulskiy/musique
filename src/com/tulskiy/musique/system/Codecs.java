@@ -66,7 +66,10 @@ public class Codecs {
 
     public static Decoder getDecoder(Track track) {
         URI location = track.getLocation();
-        if ("http".equals(location.getScheme())) {
+        if (location == null) {
+            return null;
+        }
+        if (track.isStream()) {
             try {
                 URLConnection con = location.toURL().openConnection();
                 String contentType = con.getContentType();

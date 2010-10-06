@@ -187,11 +187,11 @@ public class Track implements Cloneable {
     }
 
     public boolean isFile() {
-        return !isStream();
+        return location != null && !isStream();
     }
 
     public boolean isStream() {
-        return "http".equals(location.getScheme());
+        return location != null && "http".equals(location.getScheme());
     }
 
     public String getArtist() {

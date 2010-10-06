@@ -35,6 +35,8 @@ import javax.swing.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
@@ -50,7 +52,6 @@ public class Application {
     public final File CONFIG_HOME =
             new File(System.getProperty("user.home"), ".musique").getAbsoluteFile();
     private final File configFile = new File(CONFIG_HOME, "config");
-    private Scrobbler scrobbler;
 
     public static Application getInstance() {
         return ourInstance;
@@ -70,7 +71,7 @@ public class Application {
         } catch (FileNotFoundException ignored) {
         }
         player = new Player();
-        scrobbler = new Scrobbler();
+        Scrobbler scrobbler = new Scrobbler();
         scrobbler.start();
 
         playlistManager = new PlaylistManager();
@@ -94,6 +95,22 @@ public class Application {
                 }
             }
         }
+        if (configuration.getBoolean("proxy.enabled", false)) {
+            System.setProperty("http.proxyHost", configuration.getString("proxy.host", null));
+            System.setProperty("http.proxyPort", configuration.getString("proxy.port", null));
+        }
+        Authenticator.setDefault(new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                String user = configuration.getString("proxy.user", null);
+                String password = configuration.getString("proxy.password", null);
+
+                if (user != null && password != null)
+                    return new PasswordAuthentication(user, password.toCharArray());
+                else
+                    return null;
+            }
+        });
         configuration.addPropertyChangeListener("player.stopAfterCurrent", true, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
