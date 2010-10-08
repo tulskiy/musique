@@ -26,46 +26,6 @@ Compiling
 
     Then run either musique.sh or musique.bat
 
-Title formatting help:
-
-    Everything is pretty much winamp/foobar2000 style:
-    Currently the following tags are supported:
-
-    %artist%, %title%, %album%, %year%, %genre%, %comment%, %length% - Don't need to explain these
-    %albumArtist% - Album Artist, for MP3 I use album artist from TXXX
-    %fileName% - filename without extension
-    %file% - full file path
-    %trackNumber%, %totalTracks% - track number formatted as a two-digit number and total tracks
-    %track% - convenience method that returns trackNumber/totalTrack, eg. 1/12
-    %discNumber%, %totalDiscs% - disc number and total discs
-    %codec% - returns codec (MPEG-1 Layer 3, FLAC, WavPack, Ogg Vorbis, Monkey's Audio, PCM)
-
-    some technical info fields like
-    %bitrate%, %totalSamples%, %bps%, %channels%, %songIndex%, %sampleRate%
-
-    You can also use some functions, but not many of them are implemented yet:
-    $if1(arg1, arg2, arg3) - returns arg2 if arg1 is not empty, and arg3 otherwise
-    $if3(arg1, arg2, ...) - returns first non-empty argument
-    $strcmp(arg1, arg2) - returns 1 if arg1=arg2, empty string otherwise
-    $isPlaying() - used to idicate that the song is currently playing, paused or in playback queue
-
-    '' - Regular strings are enclosed in single quotation marks
-    [arg1 arg2] - will return contents only if at least on of the args is not empty
-
-    Some sample usages:
-
-    $if1($strcmp('mp3', %codec%),'this is mp3','hurray to free formats')
-        will compare field 'codec' with string 'mp3', and return 'this is mp3' if they are equal
-
-    [%artist% - ]%title% - returns 'Artist - Title' if artist field is not empty,
-        otherwise returns just 'Title'
-
-    $if3(%title%, %fileName%) - returns file name without extension if title is empty
-
-    $if3(%albumArtist%, %artist%)\%year%\%album%%discNumber%%tracknumber%%title%%fileName%
-        I use this expression to sort my collection
-
-
 Performance Notes
 
     The program should be run in client mode, not server, otherwise memory and CPU
@@ -81,6 +41,25 @@ Performance Notes
 
     If you are running a 64-bit system and 64-bit JDK, it can not be run in client mode,
     so it is better to install a 32-bit JRE. Then just change path to jre in musique.sh
+
+Tray Icons
+
+    On Gnome, tray icon is not transparent, so I have to draw background and gradient
+    myself to blend in. Here are some colors for standard Gnome/Ubuntu themes that will make the
+    tray icon seem transparent (written as Red, Green, Blue, can be set in
+    Properties->Color and Fonts):
+
+    Theme       | Background 1   | Background 2
+    ---------------------------------------------
+    Ambiance:     92, 91, 86     | 60, 59, 54
+    New Wave      58, 58, 58     | 42, 42, 42
+    Radiance      247, 244, 236  | 225, 215, 188
+    // other themes don't require gradient, so only one color
+    Clearlooks    237, 236, 235
+    Dust          52, 51, 48
+    Dust Sand     193, 189, 191
+    High contrast 0, 0, 51
+
 
 Troubleshooting
 
@@ -105,3 +84,43 @@ Troubleshooting
 
     uncomment last line. Change it to aoss if you use alsa (you might need to install
     the package first).
+
+Title formatting help:
+
+    Everything is pretty much winamp/foobar2000 style:
+    Currently the following tags are supported:
+
+    %artist%, %title%, %album%, %year%, %genre%, %comment%, %length% - Don't need to explain these
+    %albumArtist% - Album Artist (returns %artist% if album artist is not set)
+                    for MP3 I use album artist from TXXX
+    %fileName% - filename without extension
+    %file% - full file path
+    %trackNumber%, %totalTracks% - track number formatted as a two-digit number and total tracks
+    %track% - convenience method that returns trackNumber/totalTrack, eg. 1/12
+    %discNumber%, %totalDiscs% - disc number and total discs
+    %codec% - returns codec (MPEG-1 Layer 3, FLAC, WavPack, Ogg Vorbis, Monkey's Audio, PCM)
+
+    some technical info fields like
+    %bitrate%, %totalSamples%, %bps%, %channels%, %songIndex%, %sampleRate%,
+    %channelsAsString% (Mono or Stereo)
+    $playingTime() - playing time of current song, if any
+
+    You can also use some functions, but not many of them are implemented yet:
+    $if1(arg1, arg2, arg3) - returns arg2 if arg1 is not empty, and arg3 otherwise
+    $if3(arg1, arg2, ...) - returns first non-empty argument
+    $strcmp(arg1, arg2) - returns 1 if arg1=arg2, empty string otherwise
+    $isPlaying() - used to idicate that the song is currently playing, paused or in playback queue
+    
+
+    '' - Regular strings are enclosed in single quotation marks
+    [arg1 arg2] - will return contents only if at least on of the args is not empty
+
+    Some sample usages:
+
+    $if1($strcmp('MPEG-1 Layer 3', %codec%),'this is mp3','hurray to free formats')
+        will compare field 'codec' with string 'mp3', and return 'this is mp3' if they are equal
+
+    [%artist% - ]%title% - returns 'Artist - Title' if artist field is not empty,
+        otherwise returns just 'Title'
+
+    $if3(%title%, %fileName%) - returns file name without extension if title is empty
