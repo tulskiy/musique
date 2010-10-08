@@ -422,9 +422,13 @@ public class PlaylistTable extends GroupTable {
     }
 
     private JPopupMenu buildHeaderMenu() {
+        ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+
         final JPopupMenu headerMenu = new JPopupMenu();
 
-        headerMenu.add(new JMenuItem("Add Column")).addActionListener(new ActionListener() {
+        JMenuItem menuItem = new JMenuItem("Add Column");
+        menuItem.setIcon(emptyIcon);
+        headerMenu.add(menuItem).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 PlaylistColumn column = new PlaylistColumn();
@@ -460,139 +464,7 @@ public class PlaylistTable extends GroupTable {
                 createDefaultColumnsFromModel();
             }
         });
-        JCheckBoxMenuItem hideScrollbar = new JCheckBoxMenuItem("Hide Scrollbar");
-        headerMenu.add(hideScrollbar).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
-                if (item.isSelected()) {
-                    config.setBoolean("playlist.hideScrollBar", true);
-                    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-                } else {
-                    config.setBoolean("playlist.hideScrollBar", false);
-                    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-                }
-            }
-        });
-        hideScrollbar.setSelected(!config.getBoolean("playlist.hideScrollBar", false));
-        hideScrollbar.doClick();
 
-        final String[] groupItems = {"None", "Artist", "Album Artist", "Artist/Album",
-                "Artist/Album/Date", null, "Custom"};
-        final String[] groupValues = {null, "%artist%", "%albumArtist%", "%albumArtist%[ - %album%",
-                "%albumArtist%[ - %album%][ '['%year%']']"
-        };
-        JMenu groups = new JMenu("Groups");
-        ActionListener groupListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int row = rowAtPoint(getVisibleRect().getLocation());
-                Track firstVisibleTrack;
-                do {
-                    firstVisibleTrack = playlist.get(row++);
-                } while (firstVisibleTrack instanceof Separator);
-
-                JMenuItem src = (JMenuItem) e.getSource();
-                Integer index = (Integer) src.getClientProperty("index");
-                if (index < groupItems.length - 1) {
-                    playlist.groupBy(groupValues[index]);
-                } else {
-                    Object ret = JOptionPane.showInputDialog(getParentFrame(),
-                            "Select formatting",
-                            config.getString("playlist.groupBy", playlist.getGroupBy()));
-                    if (ret != null) {
-                        playlist.groupBy(ret.toString());
-                        config.setString("playlist.groupBy", ret.toString());
-                    }
-                }
-
-                int firstVisibleIndex = playlist.indexOf(firstVisibleTrack);
-                if (firstVisibleIndex != -1) {
-                    Rectangle cellRect = getCellRect(firstVisibleIndex, 0, true);
-                    Rectangle visibleRect = getVisibleRect();
-                    cellRect.setSize(visibleRect.width, visibleRect.height);
-                    scrollRectToVisible(cellRect);
-                }
-
-                update();
-            }
-        };
-
-        for (int i = 0; i < groupItems.length; i++) {
-            String groupValue = groupItems[i];
-            if (groupValue == null) {
-                groups.addSeparator();
-                continue;
-            }
-
-            AbstractButton item = groups.add(groupValue);
-            item.setIcon(emptyIcon);
-            item.addActionListener(groupListener);
-            item.putClientProperty("index", i);
-        }
-
-        headerMenu.add(groups);
-
-        JMenu sort = new JMenu("Sort");
-        String[] sortItems = {
-                "Sort by...", "Randomize", "Reverse",
-                "Sort by Artist", "Sort by Album",
-                "Sort by File Path", "Sort by Title",
-                "Sort by Track Number", "Sort by Album Artist/Year/Album/Disc/Track/File Name"
-        };
-
-        final String[] sortValues = {
-                null, null, null, "%artist%", "%album%",
-                "%file%", "%title%", "%trackNumber%",
-                "%albumArtist% - %year% - %album% - %discNumber% - %trackNumber% - %fileName%"
-        };
-
-        ActionListener sortListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JMenuItem src = (JMenuItem) e.getSource();
-                Integer index = (Integer) src.getClientProperty("index");
-                switch (index) {
-                    case 0:
-                        Object ret = JOptionPane.showInputDialog(getParentFrame(),
-                                "Sort By...",
-                                config.getString("playlist.sortString", ""));
-                        if (ret != null) {
-                            playlist.sort(ret.toString(), false);
-                            config.setString("playlist.sortString", ret.toString());
-                        }
-
-                        break;
-                    case 1:
-                        Collections.shuffle(playlist);
-                        playlist.firePlaylistChanged();
-                        break;
-                    case 2:
-                        Collections.reverse(playlist);
-                        playlist.firePlaylistChanged();
-                        break;
-                    default:
-                        playlist.sort(sortValues[index], false);
-                }
-
-                update();
-            }
-        };
-
-        for (int i = 0; i < sortItems.length; i++) {
-            String sortValue = sortItems[i];
-            if (sortValue == null) {
-                sort.addSeparator();
-                continue;
-            }
-
-            AbstractButton item = sort.add(sortValue);
-            item.setIcon(emptyIcon);
-            item.addActionListener(sortListener);
-            item.putClientProperty("index", i);
-        }
-
-        headerMenu.add(sort);
         Util.fixIconTextGap(headerMenu);
         return headerMenu;
     }

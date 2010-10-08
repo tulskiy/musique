@@ -24,6 +24,7 @@ import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SearchDialog;
 import com.tulskiy.musique.gui.dialogs.SettingsDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -196,6 +197,7 @@ public class PlaylistPanel extends JPanel {
 
     public void addMenu(JMenuBar menuBar) {
         ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+        final JComponent comp = this;
 
         JMenu fileMenu = new JMenu("File ");
         menuBar.add(fileMenu);
@@ -279,7 +281,6 @@ public class PlaylistPanel extends JPanel {
         menuItem.setAccelerator(KeyStroke.getKeyStroke("ctrl V"));
         menuItem.setMnemonic(KeyEvent.VK_P);
         editMenu.add(menuItem);
-
         editMenu.addSeparator();
         editMenu.add("Clear").addActionListener(new ActionListener() {
             @Override
@@ -292,6 +293,132 @@ public class PlaylistPanel extends JPanel {
             }
         });
         editMenu.add(tableAction("removeSelected", "Remove Tracks"));
+        final String[] groupItems = {"None", "Artist", "Album Artist", "Artist/Album",
+                "Artist/Album/Date", null, "Custom"};
+        final String[] groupValues = {null, "%artist%", "%albumArtist%", "%albumArtist%[ - %album%",
+                "%albumArtist%[ - %album%][ '['%year%']']"
+        };
+        JMenu groups = new JMenu("Group playlist");
+        ActionListener groupListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table == null)
+                    return;
+
+                Playlist playlist = table.getPlaylist();
+                int row = table.rowAtPoint(getVisibleRect().getLocation());
+                Track firstVisibleTrack;
+                do {
+                    firstVisibleTrack = playlist.get(row++);
+                } while (firstVisibleTrack instanceof Separator);
+
+                JMenuItem src = (JMenuItem) e.getSource();
+                Integer index = (Integer) src.getClientProperty("index");
+                if (index < groupItems.length - 1) {
+                    playlist.groupBy(groupValues[index]);
+                } else {
+                    Object ret = JOptionPane.showInputDialog(comp,
+                            "Select formatting",
+                            config.getString("playlist.groupBy", playlist.getGroupBy()));
+                    if (ret != null) {
+                        playlist.groupBy(ret.toString());
+                        config.setString("playlist.groupBy", ret.toString());
+                    }
+                }
+
+                int firstVisibleIndex = playlist.indexOf(firstVisibleTrack);
+                if (firstVisibleIndex != -1) {
+                    Rectangle cellRect = table.getCellRect(firstVisibleIndex, 0, true);
+                    Rectangle visibleRect = getVisibleRect();
+                    cellRect.setSize(visibleRect.width, visibleRect.height);
+                    table.scrollRectToVisible(cellRect);
+                }
+
+                table.update();
+            }
+        };
+
+        for (int i = 0; i < groupItems.length; i++) {
+            String groupValue = groupItems[i];
+            if (groupValue == null) {
+                groups.addSeparator();
+                continue;
+            }
+
+            AbstractButton item = groups.add(groupValue);
+            item.setIcon(emptyIcon);
+            item.addActionListener(groupListener);
+            item.putClientProperty("index", i);
+        }
+
+        editMenu.add(groups);
+
+        JMenu sort = new JMenu("Sort");
+        String[] sortItems = {
+                "Sort by...", "Randomize", "Reverse",
+                "Sort by Artist", "Sort by Album",
+                "Sort by File Path", "Sort by Title",
+                "Sort by Track Number", "Sort by Album Artist/Year/Album/Disc/Track/File Name"
+        };
+
+        final String[] sortValues = {
+                null, null, null, "%artist%", "%album%",
+                "%file%", "%title%", "%trackNumber%",
+                "%albumArtist% - %year% - %album% - %discNumber% - %trackNumber% - %fileName%"
+        };
+
+        ActionListener sortListener = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem src = (JMenuItem) e.getSource();
+                Integer index = (Integer) src.getClientProperty("index");
+                PlaylistTable table = tabs.getSelectedTable();
+                if (table == null)
+                    return;
+
+                Playlist playlist = table.getPlaylist();
+                switch (index) {
+                    case 0:
+                        Object ret = JOptionPane.showInputDialog(comp,
+                                "Sort By...",
+                                config.getString("playlist.sortString", ""));
+                        if (ret != null) {
+                            playlist.sort(ret.toString(), false);
+                            config.setString("playlist.sortString", ret.toString());
+                        }
+
+                        break;
+                    case 1:
+                        Collections.shuffle(playlist);
+                        playlist.firePlaylistChanged();
+                        break;
+                    case 2:
+                        Collections.reverse(playlist);
+                        playlist.firePlaylistChanged();
+                        break;
+                    default:
+                        playlist.sort(sortValues[index], false);
+                }
+
+                table.update();
+            }
+        };
+
+        for (int i = 0; i < sortItems.length; i++) {
+            String sortValue = sortItems[i];
+            if (sortValue == null) {
+                sort.addSeparator();
+                continue;
+            }
+
+            AbstractButton item = sort.add(sortValue);
+            item.setIcon(emptyIcon);
+            item.addActionListener(sortListener);
+            item.putClientProperty("index", i);
+        }
+
+        editMenu.add(sort);
         editMenu.addSeparator();
         editMenu.add(tableAction("clearQueue", "Clear Playback Queue"));
         editMenu.add(newItem("Search", "ctrl F", new ActionListener() {
@@ -303,16 +430,6 @@ public class PlaylistPanel extends JPanel {
                 new SearchDialog(table).setVisible(true);
             }
         }));
-        JMenuItem propsItem = editMenu.add("Properties");
-        propsItem.setIcon(emptyIcon);
-        propsItem.setAccelerator(KeyStroke.getKeyStroke("ctrl P"));
-        final JComponent comp = this;
-        propsItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new SettingsDialog(comp).setVisible(true);
-            }
-        });
         editMenu.add("Remove Dead Items").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -331,6 +448,16 @@ public class PlaylistPanel extends JPanel {
                     table.getPlaylist().removeDuplicates();
                     table.update();
                 }
+            }
+        });
+        editMenu.addSeparator();
+        JMenuItem propsItem = editMenu.add("Properties");
+        propsItem.setIcon(emptyIcon);
+        propsItem.setAccelerator(KeyStroke.getKeyStroke("ctrl P"));
+        propsItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new SettingsDialog(comp).setVisible(true);
             }
         });
 
