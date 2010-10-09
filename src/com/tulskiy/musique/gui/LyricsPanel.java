@@ -129,6 +129,8 @@ public class LyricsPanel extends JPanel {
             Color text = config.getColor("gui.color.text", null);
             if (text != null)
                 setForeground(text);
+            else
+                setForeground(null);
 
             Color selection = config.getColor("gui.color.selection", null);
             if (selection != null) {
@@ -146,6 +148,8 @@ public class LyricsPanel extends JPanel {
                     StyleConstants.setFontSize(artistStyle, font.getSize() + 4);
                 if (titleStyle != null)
                     StyleConstants.setFontSize(titleStyle, font.getSize() + 2);
+            } else {
+                setFont(null);
             }
         }
     }
