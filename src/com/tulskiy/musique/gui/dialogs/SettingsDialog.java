@@ -153,7 +153,7 @@ public class SettingsDialog extends JDialog {
         final JCheckBox sidebar = new JCheckBox("Show Side Bar", config.getBoolean("sidebar.enabled", true));
         side.add(sidebar);
         side.add(Box.createVerticalStrut(10));
-        final JCheckBox lyrics = new JCheckBox("Search for lyrics at lyricsplugin.com",
+        final JCheckBox lyrics = new JCheckBox("Search lyrics online",
                 config.getBoolean("lyrics.searchOnline", true));
         side.add(lyrics);
         side.add(Box.createVerticalStrut(5));
