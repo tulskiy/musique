@@ -46,6 +46,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -562,6 +564,24 @@ public class PlaylistTable extends GroupTable {
             }
         };
         JMenu fileOps = new JMenu("File Operations");
+        fileOps.add("Open containing folder").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ArrayList<Track> tracks = getSelectedSongs();
+                for (Track track : tracks) {
+                    if (track.isFile()) {
+                        File file = track.getFile().getParentFile();
+                        try {
+                            Desktop.getDesktop().open(file);
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+                        break;
+                    }
+                }
+            }
+        });
+        fileOps.addSeparator();
         for (Operation op : Operation.values()) {
             fileOps.add(op.name()).addActionListener(fileOpsListener);
         }
