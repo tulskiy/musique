@@ -238,7 +238,7 @@ public class PlaylistPanel extends JPanel {
         fileMenu.add("Add Location").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String ret = JOptionPane.showInputDialog("Add Location");
+                String ret = JOptionPane.showInputDialog(comp, "Enter URL", "Add Location", JOptionPane.QUESTION_MESSAGE);
                 if (!Util.isEmpty(ret)) {
                     PlaylistTable table = tabs.getSelectedTable();
                     if (table == null)
