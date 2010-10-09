@@ -25,6 +25,7 @@ import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import java.awt.*;
@@ -33,9 +34,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.List;
 
 /**
@@ -45,6 +44,7 @@ import java.util.List;
 public class TracksInfoDialog extends JDialog {
     private JButton cancel;
     private PlaylistTable parent;
+    private int DEFAULT_COLUMN_WIDTH = 430;
 
     public TracksInfoDialog(final PlaylistTable parent, final List<Track> tracks) {
         this.parent = parent;
@@ -53,60 +53,7 @@ public class TracksInfoDialog extends JDialog {
 
         final MetadataModel metaModel = new MetadataModel(tracks);
         JComponent tagsTable = createTable(metaModel);
-        JComponent propsTable = createTable(new MetadataModel(tracks) {
-            class Entry {
-                String key;
-                Object value;
-
-                Entry(String key, Object value) {
-                    this.key = key;
-                    this.value = value;
-                }
-            }
-
-            private ArrayList<Entry> list;
-
-            @Override
-            protected void loadTracks(List<Track> tracks) {
-                list = new ArrayList<Entry>();
-                Track track = tracks.get(0);
-                list.add(new Entry("Location", track.getLocation().toString().replaceAll("%\\d\\d", " ")));
-                if (track.isFile())
-                    list.add(new Entry("File Size (bytes)", track.getFile().length()));
-                if (track.getTotalSamples() >= 0)
-                    list.add(new Entry("Length", Util.samplesToTime(track.getTotalSamples(), track.getSampleRate(), 3) +
-                                                 " (" + track.getTotalSamples() + " samples)"));
-                list.add(new Entry("Subsong Index", track.getSubsongIndex()));
-                if (track.isCue()) {
-                    list.add(new Entry("Cue Embedded", track.isCueEmbedded()));
-                    if (!track.isCueEmbedded()) {
-                        list.add(new Entry("Cue Path", track.getCueLocation()));
-                    }
-                }
-                if (track.getSampleRate() > 0)
-                    list.add(new Entry("Sample Rate", track.getSampleRate() + " Hz"));
-                list.add(new Entry("Channels", track.getChannels()));
-            }
-
-            @Override
-            public int getRowCount() {
-                return list.size();
-            }
-
-            @Override
-            public Object getValueAt(int rowIndex, int columnIndex) {
-                Entry entry = list.get(rowIndex);
-                if (columnIndex == 0)
-                    return entry.key;
-                else
-                    return String.valueOf(entry.value);
-            }
-
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
-            }
-        });
+        JComponent propsTable = createTable(new FileInfoModel(tracks));
 
         JTabbedPane tp = new JTabbedPane();
         tp.setFocusable(false);
@@ -159,7 +106,7 @@ public class TracksInfoDialog extends JDialog {
 
             @Override
             public float getProgress() {
-                return processed / tracks.size();
+                return (float) processed / tracks.size();
             }
 
             @Override
@@ -231,15 +178,29 @@ public class TracksInfoDialog extends JDialog {
     }
 
     private JComponent createTable(TableModel model) {
-        final GroupTable table = new GroupTable();
+        final GroupTable table = new GroupTable() {
+            public Component prepareRenderer(final TableCellRenderer renderer,
+                                             final int row, final int column) {
+                final Component prepareRenderer = super
+                        .prepareRenderer(renderer, row, column);
+                final TableColumn tableColumn = getColumnModel().getColumn(column);
+
+                tableColumn.setPreferredWidth(Math.max(
+                        prepareRenderer.getPreferredSize().width + 20,
+                        tableColumn.getPreferredWidth()));
+
+                tableColumn.setPreferredWidth(Math.max(
+                        DEFAULT_COLUMN_WIDTH,
+                        tableColumn.getPreferredWidth()));
+
+                return prepareRenderer;
+            }
+        };
         table.setModel(model);
         table.setFont(table.getFont().deriveFont(11f));
 
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_LAST_COLUMN);
-        TableColumn column = table.getColumn("Key");
-        column.setPreferredWidth(100);
-        column.setMaxWidth(100);
-        column.setMinWidth(100);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.getColumn("Key").setMaxWidth(120);
 
         table.setShowVerticalLines(true);
         table.setIntercellSpacing(new Dimension(1, 1));
@@ -323,10 +284,138 @@ public class TracksInfoDialog extends JDialog {
         return scrollPane;
     }
 
+    private class FileInfoModel extends MetadataModel {
+        class Entry {
+            String key;
+            Object value;
+
+            Entry(String key, Object value) {
+                this.key = key;
+                this.value = value;
+            }
+        }
+
+        private ArrayList<Entry> list;
+
+        private FileInfoModel(List<Track> tracks) {
+            super(tracks);
+        }
+
+        @Override
+        protected void loadTracks(List<Track> tracks) {
+            list = new ArrayList<Entry>();
+            if (tracks.size() == 1) {
+                fillSingleTrack(tracks.get(0));
+            } else {
+                fillMultipleTracks(tracks);
+            }
+        }
+
+        private void fillMultipleTracks(List<Track> tracks) {
+            list.add(new Entry("Tracks selected", tracks.size()));
+            long fileSize = 0;
+            double length = 0;
+            HashMap<String, Integer> formats = new HashMap<String, Integer>();
+            HashMap<String, Integer> channels = new HashMap<String, Integer>();
+            HashMap<String, Integer> sampleRate = new HashMap<String, Integer>();
+            HashSet<String> files = new HashSet<String>();
+            for (Track track : tracks) {
+                if (track.isFile()) {
+                    fileSize += track.getFile().length();
+                    length += track.getTotalSamples() / (double) track.getSampleRate();
+                    files.add(track.getFile().getAbsolutePath());
+                    increment(formats, track.getCodec());
+                    increment(channels, track.getChannelsAsString());
+                    increment(sampleRate, track.getSampleRate() + " Hz");
+                }
+            }
+
+            list.add(new Entry("Files", files.toString()));
+            list.add(new Entry("Total size", fileSize + " bytes"));
+            list.add(new Entry("Total Length", Util.formatSeconds(length, 3)));
+            list.add(new Entry("Format", calcPercentage(formats)));
+            list.add(new Entry("Channels", calcPercentage(channels)));
+            list.add(new Entry("Sample Rate", calcPercentage(sampleRate)));
+        }
+
+        private Object calcPercentage(Map<String, Integer> map) {
+            double total = 0;
+            for (Integer val : map.values()) {
+                total += val;
+            }
+            ArrayList<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(map.entrySet());
+            Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+                @Override
+                public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+                    return o2.getValue().compareTo(o1.getValue());
+                }
+            });
+
+            boolean single = map.size() == 1;
+            StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, Integer> entry : list) {
+                sb.append(entry.getKey());
+                if (!single) {
+                    sb.append(" (").append(String.format("%.2f", entry.getValue() / total * 100))
+                            .append("%), ");
+                }
+            }
+
+            return sb.toString().replaceAll(", $", "");
+        }
+
+        private void increment(Map<String, Integer> map, String key) {
+            Integer val = map.get(key);
+            if (val == null) {
+                map.put(key, 1);
+            } else {
+                map.put(key, val + 1);
+            }
+        }
+
+        private void fillSingleTrack(Track track) {
+            list.add(new Entry("Location", track.getLocation().toString().replaceAll("%\\d\\d", " ")));
+            if (track.isFile())
+                list.add(new Entry("File Size (bytes)", track.getFile().length()));
+            if (track.getTotalSamples() >= 0)
+                list.add(new Entry("Length", Util.samplesToTime(track.getTotalSamples(), track.getSampleRate(), 3) +
+                                             " (" + track.getTotalSamples() + " samples)"));
+            list.add(new Entry("Subsong Index", track.getSubsongIndex()));
+            if (track.isCue()) {
+                list.add(new Entry("Cue Embedded", track.isCueEmbedded()));
+                if (!track.isCueEmbedded()) {
+                    list.add(new Entry("Cue Path", track.getCueLocation()));
+                }
+            }
+            if (track.getSampleRate() > 0)
+                list.add(new Entry("Sample Rate", track.getSampleRate() + " Hz"));
+            list.add(new Entry("Channels", track.getChannels()));
+        }
+
+        @Override
+        public int getRowCount() {
+            return list.size();
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            Entry entry = list.get(rowIndex);
+            if (columnIndex == 0)
+                return entry.key;
+            else
+                return String.valueOf(entry.value);
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return false;
+        }
+    }
+
     private class MetadataModel extends AbstractTableModel {
         private final String[] tagsMeta = {
                 "artist", "title", "album", "year", "genre",
-                "albumArtist", "trackNumber", "totalTracks",
+                "albumArtist", "track", "totalTracks",
                 "discNumber", "totalDiscs"
         };
 
