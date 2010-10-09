@@ -20,9 +20,6 @@ package com.tulskiy.musique.util;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.nio.channels.ClosedChannelException;
 import java.util.Formatter;
 import java.util.Locale;
 
@@ -148,25 +145,5 @@ public class Util {
                     fixIconTextGap(((JMenu) component).getPopupMenu());
             }
         }
-    }
-
-    public static boolean copy(FileInputStream from, FileInputStream to) {
-        try {
-            long transferred = 0;
-            long length = from.getChannel().size();
-            int chunkSize = 10000000;
-            while (transferred < length) {
-                transferred += from.getChannel().transferTo(
-                        transferred, chunkSize, to.getChannel());
-            }
-            from.close();
-            to.close();
-            return true;
-        } catch (ClosedChannelException ignore) {
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return false;
     }
 }
