@@ -48,7 +48,7 @@ public class Application {
     private Configuration configuration;
     private PlaylistManager playlistManager;
     private MainWindow mainWindow;
-    public final String VERSION = "Musique 0.2 pre";
+    public final String VERSION = "Musique 0.2";
     public final File CONFIG_HOME =
             new File(System.getProperty("user.home"), ".musique").getAbsoluteFile();
     private final File configFile = new File(CONFIG_HOME, "config");
