@@ -171,7 +171,7 @@ public class PlaybackOrder {
         } else {
             index = playlist.indexOf(currentTrack);
             if (index == -1)
-                return null;
+                return playlist.get(0);
 
             int size = playlist.size();
             Track track;

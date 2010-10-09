@@ -312,8 +312,14 @@ public class Player {
 
                 if (track != null) {
                     if (track.isFile() && !track.getFile().exists()) {
-                        decoder = null;
-                        return;
+                        //try to get the next one
+                        track = order.next(track);
+                        if (track != null &&
+                            track.isFile() &&
+                            !track.getFile().exists()) {
+                            decoder = null;
+                            return;
+                        }
                     }
                     decoder = Codecs.getDecoder(track);
                     currentTrack = track;

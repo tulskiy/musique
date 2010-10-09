@@ -148,11 +148,12 @@ public class PlaylistTable extends GroupTable {
         aMap.put("removeSelected", new AbstractAction("Remove") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                playlist.removeAll(getSelectedSongs());
+                ArrayList<Track> songs = getSelectedSongs();
+                playlist.removeAll(songs);
 
+                adjustLastSongAfterDelete(songs);
                 clearSelection();
                 playlist.firePlaylistChanged();
-
                 model.fireTableDataChanged();
                 update();
             }
@@ -249,6 +250,15 @@ public class PlaylistTable extends GroupTable {
                 }
             }
         });
+    }
+
+    private void adjustLastSongAfterDelete(ArrayList<Track> songs) {
+        if (songs.contains(player.getTrack())) {
+            int index = getSelectionModel().getMinSelectionIndex();
+            if (index < playlist.size()) {
+                player.getPlaybackOrder().setLastPlayed(playlist.get(index));
+            }
+        }
     }
 
     public JScrollPane getScrollPane() {
@@ -596,8 +606,9 @@ public class PlaylistTable extends GroupTable {
                 if (ret == JOptionPane.YES_OPTION) {
                     for (Track track : tracks) {
                         if (track.isFile() && !track.isCue()) {
-                            if (player.getTrack() == track)
+                            if (player.getTrack() == track) {
                                 player.stop();
+                            }
 
                             if (track.getFile().delete()) {
                                 playlist.remove(track);
@@ -608,6 +619,7 @@ public class PlaylistTable extends GroupTable {
                         update();
                     }
                 }
+                adjustLastSongAfterDelete(tracks);
             }
         });
 
