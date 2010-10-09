@@ -219,7 +219,29 @@ public class PlaylistPanel extends JPanel {
                 String path = config.getString("playlist.lastDir", "");
                 if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
                 fc.setMultiSelectionEnabled(true);
-                fc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                int retVal = fc.showOpenDialog(null);
+                final PlaylistTable table = tabs.getSelectedTable();
+                if (table == null)
+                    return;
+
+                if (retVal == JFileChooser.APPROVE_OPTION) {
+                    ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
+                    dialog.show(new Task.FileAddingTask(table, fc.getSelectedFiles(), -1));
+                }
+
+                config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
+                table.dataChanged();
+                table.update();
+            }
+        });
+        fileMenu.add("Add Folder").addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                final JFileChooser fc = new JFileChooser();
+                String path = config.getString("playlist.lastDir", "");
+                if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
+                fc.setMultiSelectionEnabled(true);
+                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 int retVal = fc.showOpenDialog(null);
                 final PlaylistTable table = tabs.getSelectedTable();
                 if (table == null)
