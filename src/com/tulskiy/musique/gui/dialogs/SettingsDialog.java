@@ -46,19 +46,16 @@ public class SettingsDialog extends JDialog {
 
     private JButton applyButton;
     private JComponent owner;
-    private JButton defaults;
-    private JTabbedPane tabs;
 
     public SettingsDialog(JComponent owner) {
         super(SwingUtilities.windowForComponent(owner), "Settings", ModalityType.MODELESS);
         this.owner = owner;
 
-        tabs = new JTabbedPane();
+        JTabbedPane tabs = new JTabbedPane();
         tabs.setFocusable(false);
 
         Box buttons = Box.createHorizontalBox();
         buttons.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        defaults = new JButton("Defaults");
         applyButton = new JButton(" Apply ");
 
         final JButton cancelButton = new JButton("Cancel");
@@ -78,7 +75,6 @@ public class SettingsDialog extends JDialog {
                 cancelButton.doClick();
             }
         });
-        buttons.add(defaults);
         buttons.add(Box.createHorizontalGlue());
         buttons.add(okButton);
         buttons.add(Box.createHorizontalStrut(3));
@@ -96,10 +92,6 @@ public class SettingsDialog extends JDialog {
         pack();
         setSize(600, getHeight());
         setLocationRelativeTo(SwingUtilities.windowForComponent(owner));
-    }
-
-    private boolean isSelected(JComponent component) {
-        return tabs.getSelectedComponent() == component;
     }
 
     private JComponent createGUIPanel() {
@@ -280,21 +272,6 @@ public class SettingsDialog extends JDialog {
                 config.setColor("tray.bgColor1", trayBg1.getColor());
                 config.setColor("tray.bgColor2", trayBg2.getColor());
                 SwingUtilities.updateComponentTreeUI(SwingUtilities.getRoot(owner));
-            }
-        });
-
-        defaults.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (isSelected(panel)) {
-                    text.setColor(null);
-                    background.setColor(null);
-                    selection.setColor(null);
-                    highlight.setColor(null);
-                    defaultFont.setFont(null);
-                    trayBg1.setColor(null);
-                    trayBg2.setColor(null);
-                }
             }
         });
 
