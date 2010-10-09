@@ -329,7 +329,7 @@ public class PlaylistPanel extends JPanel {
                     return;
 
                 Playlist playlist = table.getPlaylist();
-                int row = table.rowAtPoint(getVisibleRect().getLocation());
+                int row = table.rowAtPoint(table.getVisibleRect().getLocation());
                 Track firstVisibleTrack;
                 do {
                     firstVisibleTrack = playlist.get(row++);
@@ -352,7 +352,7 @@ public class PlaylistPanel extends JPanel {
                 int firstVisibleIndex = playlist.indexOf(firstVisibleTrack);
                 if (firstVisibleIndex != -1) {
                     Rectangle cellRect = table.getCellRect(firstVisibleIndex, 0, true);
-                    Rectangle visibleRect = getVisibleRect();
+                    Rectangle visibleRect = table.getVisibleRect();
                     cellRect.setSize(visibleRect.width, visibleRect.height);
                     table.scrollRectToVisible(cellRect);
                 }
