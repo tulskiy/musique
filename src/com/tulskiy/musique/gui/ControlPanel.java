@@ -329,7 +329,9 @@ public class ControlPanel extends JPanel {
     }
 
     private void hideToolTip() {
-        if (popup != null)
+        if (popup != null) {
             popup.hide();
+            popup = null;
+        }
     }
 }
