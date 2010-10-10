@@ -26,21 +26,18 @@ Compiling
 
     Then run either musique.sh or musique.bat
 
-Performance Notes
-
-    The program should be run in client mode, not server, otherwise memory and CPU
-    usage will be too high.
-
-    I've tested the program in Windows 7 on Core 2 Duo 2.13 GHz, JRE 1.6u20 32-bit
-    and average CPU load was less than 1. Memory consumption was around 30-40 Mb
-
-    When I run the program in Ubuntu 10.04 32-bit and OpenJDK 1.6, memory consumption
-    is also around 30-40Mb, but the CPU load is ~4%.
-    However, deadbeef and rhytmbox use same amount of CPU so I guess it's because of
-    PulseAudio.
-
-    If you are running a 64-bit system and 64-bit JDK, it can not be run in client mode,
-    so it is better to install a 32-bit JRE. Then just change path to jre in musique.sh
+Shortcuts
+    Z, X, C, V, B - prev, play, pause, stop, next
+    Space - scroll to now playing
+    Q - add selected tracks to queue
+    Alt-Enter - tracks info / edit tags
+    Del - remove selected tracks from playlist
+    Ctrl T - new playlist
+    Ctrl S - save playlist
+    Ctrl F - Search
+    Ctrl P - properties
+    Ctrl W - closes window if tray is enabled, else quit program
+    Ctrl Q - quit program
 
 Tray Icons
 
@@ -60,6 +57,21 @@ Tray Icons
     Dust Sand     193, 189, 191
     High contrast 0, 0, 51
 
+Performance Notes
+
+    The program should be run in client mode, not server, otherwise memory and CPU
+    usage will be too high.
+
+    I've tested the program in Windows 7 on Core 2 Duo 2.13 GHz, JRE 1.6u20 32-bit
+    and average CPU load was less than 1. Memory consumption was around 30-40 Mb
+
+    When I run the program in Ubuntu 10.04 32-bit and OpenJDK 1.6, memory consumption
+    is also around 30-40Mb, but the CPU load is ~4%.
+    However, deadbeef and rhytmbox use same amount of CPU so I guess it's because of
+    PulseAudio.
+
+    If you are running a 64-bit system and 64-bit JDK, it can not be run in client mode,
+    so it is better to install a 32-bit JRE. Then just change path to jre in musique.sh
 
 Troubleshooting
 
