@@ -49,11 +49,11 @@ public class ControlPanel extends JPanel {
     private Configuration config = app.getConfiguration();
     private JSlider progressSlider;
     private JSlider volumeSlider;
-    private JButton prevButton = new JButton();
-    private JButton nextButton = new JButton();
-    private JButton playButton = new JButton();
-    private JButton pauseButton = new JButton();
-    private JButton stopButton = new JButton();
+    private AbstractButton prevButton = new JButton();
+    private AbstractButton nextButton = new JButton();
+    private AbstractButton playButton = new JButton();
+    private AbstractButton pauseButton = new JButton();
+    private AbstractButton stopButton = new JButton();
     private Player player = app.getPlayer();
     private AudioOutput output = player.getAudioOutput();
 
@@ -78,11 +78,11 @@ public class ControlPanel extends JPanel {
         for (MouseListener ml : progressSlider.getMouseListeners())
             progressSlider.removeMouseListener(ml);
 
-        stopButton = createButton("stop.png");
-        prevButton = createButton("prev.png");
-        playButton = createButton("play.png");
-        pauseButton = createButton("pause.png");
-        nextButton = createButton("next.png");
+        stopButton = createButton("stop.png", false);
+        prevButton = createButton("prev.png", false);
+        playButton = createButton("play.png", false);
+        pauseButton = createButton("pause.png", true);
+        nextButton = createButton("next.png", false);
 
         volumeSlider = new JSlider(0, 100);
         volumeSlider.setMaximumSize(new Dimension(100, 30));
@@ -144,24 +144,29 @@ public class ControlPanel extends JPanel {
     public void updateUI() {
         super.updateUI();
 
-        JButton buttons[] = new JButton[]{
+        AbstractButton[] buttons = new AbstractButton[]{
                 stopButton, prevButton, playButton, pauseButton, nextButton
         };
         if (UIManager.getLookAndFeel().getName().contains("GTK")) {
-            for (JButton b : buttons) {
+            for (AbstractButton b : buttons) {
                 if (b != null)
                     b.setBorderPainted(false);
             }
         } else {
-            for (JButton b : buttons) {
+            for (AbstractButton b : buttons) {
                 if (b != null)
                     b.setBorderPainted(true);
             }
         }
     }
 
-    private JButton createButton(String icon) {
-        JButton b = new JButton();
+    private AbstractButton createButton(String icon, boolean toggle) {
+        AbstractButton b;
+        if (toggle) {
+            b = new JToggleButton();
+        } else {
+            b = new JButton();
+        }
         Dimension buttonSize = new Dimension(30, 30);
         b.setIcon(Images.loadIcon(icon));
         b.setFocusable(false);
@@ -262,6 +267,7 @@ public class ControlPanel extends JPanel {
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 player.pause();
+                pauseButton.setSelected(player.isPaused());
             }
         });
         nextButton.addActionListener(new ActionListener() {
@@ -269,9 +275,9 @@ public class ControlPanel extends JPanel {
                 player.next();
             }
         });
-
         player.addListener(new PlayerListener() {
             public void onEvent(PlayerEvent e) {
+                pauseButton.setSelected(player.isPaused());
                 switch (e.getEventCode()) {
                     case STOPPED:
                         progressEnabled = false;
