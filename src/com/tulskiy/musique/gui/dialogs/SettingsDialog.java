@@ -284,7 +284,7 @@ public class SettingsDialog extends JDialog {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 100));
 
         Box mainBox = Box.createVerticalBox();
-        JPanel misc = new JPanel(new GridLayout(1, 2, 10, 10));
+        JPanel misc = new JPanel(new GridLayout(2, 2, 10, 10));
 
         final AudioOutput output = app.getPlayer().getAudioOutput();
 
@@ -311,7 +311,9 @@ public class SettingsDialog extends JDialog {
         final JComboBox encoding = new JComboBox(Charset.availableCharsets().values().toArray());
         encoding.setSelectedItem(charset);
         misc.add(encoding);
-
+        final JCheckBox oneInstance = new JCheckBox("Allow only one instance (needs restart)");
+        oneInstance.setSelected(config.getBoolean("system.oneInstance", false));
+        misc.add(oneInstance);
 
         panel.add(mainBox, BorderLayout.NORTH);
 
@@ -326,6 +328,7 @@ public class SettingsDialog extends JDialog {
                     output.setMixer(null);
                 }
                 AudioFileReader.setDefaultCharset((Charset) encoding.getSelectedItem());
+                config.setBoolean("system.oneInstance", oneInstance.isSelected());
             }
         });
 

@@ -37,6 +37,7 @@ import java.beans.PropertyChangeListener;
 import java.io.*;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
+import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.logging.Logger;
 
@@ -70,6 +71,12 @@ public class Application {
             configuration.load(new FileReader(configFile));
         } catch (FileNotFoundException ignored) {
         }
+
+        if (configuration.getBoolean("system.oneInstance", false)
+            && !tryLock()) {
+            JOptionPane.showMessageDialog(null, "Only one instance of Musique can be run at a time", VERSION, JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
         player = new Player();
         Scrobbler scrobbler = new Scrobbler();
         scrobbler.start();
@@ -78,6 +85,19 @@ public class Application {
         playlistManager.loadPlaylists();
 
         loadSettings();
+    }
+
+    private boolean tryLock() {
+        try {
+            RandomAccessFile randomFile = new RandomAccessFile(new File(CONFIG_HOME, "lock"), "rw");
+            FileChannel channel = randomFile.getChannel();
+            //we couldn't acquire lock as it is already locked by another program instance)
+            if (channel.tryLock() == null)
+                return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     private void loadSettings() {
