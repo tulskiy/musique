@@ -148,8 +148,8 @@ public class LyricsPanel extends JPanel {
                     StyleConstants.setFontSize(artistStyle, font.getSize() + 4);
                 if (titleStyle != null)
                     StyleConstants.setFontSize(titleStyle, font.getSize() + 2);
-            } else {
-                setFont(null);
+            } else if (getParent() != null) {
+                setFont(getParent().getFont());
             }
         }
     }
