@@ -215,46 +215,12 @@ public class PlaylistPanel extends JPanel {
         fileMenu.addSeparator();
         fileMenu.add("Add Files").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                final JFileChooser fc = new JFileChooser();
-                String path = config.getString("playlist.lastDir", "");
-                if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
-                fc.setMultiSelectionEnabled(true);
-                fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                int retVal = fc.showOpenDialog(null);
-                final PlaylistTable table = tabs.getSelectedTable();
-                if (table == null)
-                    return;
-
-                if (retVal == JFileChooser.APPROVE_OPTION) {
-                    ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
-                    dialog.show(new Task.FileAddingTask(table, fc.getSelectedFiles(), -1));
-                }
-
-                config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
-                table.dataChanged();
-                table.update();
+                addItems(JFileChooser.FILES_ONLY);
             }
         });
         fileMenu.add("Add Folder").addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                final JFileChooser fc = new JFileChooser();
-                String path = config.getString("playlist.lastDir", "");
-                if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
-                fc.setMultiSelectionEnabled(true);
-                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int retVal = fc.showOpenDialog(null);
-                final PlaylistTable table = tabs.getSelectedTable();
-                if (table == null)
-                    return;
-
-                if (retVal == JFileChooser.APPROVE_OPTION) {
-                    ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
-                    dialog.show(new Task.FileAddingTask(table, fc.getSelectedFiles(), -1));
-                }
-
-                config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
-                table.dataChanged();
-                table.update();
+                addItems(JFileChooser.DIRECTORIES_ONLY);
             }
         });
         fileMenu.add("Add Location").addActionListener(new ActionListener() {
@@ -546,6 +512,26 @@ public class PlaylistPanel extends JPanel {
                 config.setBoolean("player.stopAfterCurrent", item.isSelected());
             }
         });
+    }
+
+    private void addItems(int selectionMode) {
+        final JFileChooser fc = new JFileChooser();
+        String path = config.getString("playlist.lastDir", "");
+        if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
+        fc.setMultiSelectionEnabled(true);
+        fc.setFileSelectionMode(selectionMode);
+        int retVal = fc.showOpenDialog(null);
+        final PlaylistTable table = tabs.getSelectedTable();
+        if (table == null)
+            return;
+
+        if (retVal == JFileChooser.APPROVE_OPTION) {
+            ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
+            dialog.show(new Task.FileAddingTask(table, fc.getSelectedFiles(), -1));
+        }
+
+        config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
+        table.update();
     }
 
     public class TransferActionListener implements ActionListener,

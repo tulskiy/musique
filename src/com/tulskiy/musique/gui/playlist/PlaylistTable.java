@@ -295,10 +295,6 @@ public class PlaylistTable extends GroupTable {
         return playlist;
     }
 
-    public void dataChanged() {
-        model.fireTableDataChanged();
-    }
-
     public void update() {
         getTableHeader().revalidate();
         getTableHeader().repaint();

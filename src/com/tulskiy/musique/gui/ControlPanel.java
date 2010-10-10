@@ -95,6 +95,7 @@ public class ControlPanel extends JPanel {
         progressSlider.setPreferredSize(new Dimension(100, 30));
 
         final JComboBox order = new JComboBox(PlaybackOrder.Order.values());
+        order.setFocusable(false);
         Dimension orderSize = order.getMinimumSize();
         orderSize.width += 10;
         order.setMaximumSize(orderSize);
