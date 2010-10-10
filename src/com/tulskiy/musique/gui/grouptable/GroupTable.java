@@ -133,7 +133,7 @@ public class GroupTable extends JTable {
         setFocusTraversalKeysEnabled(false);
         setFillsViewportHeight(true);
         setRowSelectionAllowed(true);
-        setOpaque(true);
+        setOpaque(false);
         setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         setFont(getFont());
         setForeground(getForeground());
