@@ -68,6 +68,7 @@ public class PlaylistTable extends GroupTable {
 
     private JScrollPane scrollPane;
     private final ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+    private JPopupMenu tablePopupMenu;
 
     public PlaylistTable(Playlist playlist, ArrayList<PlaylistColumn> columns) {
         this.playlist = playlist;
@@ -425,8 +426,9 @@ public class PlaylistTable extends GroupTable {
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
                     if (selectSongsAt(e.getPoint())) {
-                        JPopupMenu popup = buildTableMenu();
-                        popup.show(e.getComponent(), e.getX(), e.getY());
+                        // trying to fix issue 6
+                        tablePopupMenu = buildTableMenu();
+                        tablePopupMenu.show(e.getComponent(), e.getX(), e.getY());
                     }
                 }
             }
