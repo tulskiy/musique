@@ -237,6 +237,17 @@ public class PlaylistPanel extends JPanel {
             }
         });
         fileMenu.addSeparator();
+        fileMenu.add(newItem("Close", "ctrl W", new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (config.getBoolean("tray.enabled", false) &&
+                    config.getBoolean("tray.minimizeOnClose", true)) {
+                    SwingUtilities.windowForComponent(comp).setVisible(false);
+                } else {
+                    app.exit();
+                }
+            }
+        }));
         fileMenu.add(newItem("Quit", "ctrl Q", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
