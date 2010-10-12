@@ -39,7 +39,9 @@ Shortcuts
     Ctrl W - closes window if tray is enabled, else quit program
     Ctrl Q - quit program
 
-Tray Icons
+GUI Tweaks
+
+    Tray Icons
 
     On Gnome, tray icon is not transparent, so I have to draw background and gradient
     myself to blend in. Here are some colors for standard Gnome/Ubuntu themes that will make the
@@ -56,6 +58,18 @@ Tray Icons
     Dust          52, 51, 48
     Dust Sand     193, 189, 191
     High contrast 0, 0, 51
+
+    GTK LaF:
+
+    On Ubuntu Maverick with GTK LaF and Ambiance theme, slider is too wide,
+    you can fix it by adding 'gui.thumbWidth: 15' to
+    $HOME/.musique/config
+    Tabs are too tall, this is JRE bug, it's been around for 5+ years, and is,
+    as many GUI bugs are, low priority
+
+    Double-click speed on Linux is faster than system's settings, it might be
+    related to http://forums.sun.com/thread.jspa?threadID=585358
+
 
 Performance Notes
 

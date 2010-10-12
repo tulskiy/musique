@@ -39,6 +39,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 public class Application {
@@ -145,6 +146,13 @@ public class Application {
             }
         });
         UIManager.put("Slider.paintValue", Boolean.FALSE);
+        Object thumbWidth = configuration.get("gui.thumbWidth");
+        if (thumbWidth != null) {
+            try {
+                UIManager.put("Slider.thumbWidth", Integer.valueOf(thumbWidth.toString()));
+            } catch (NumberFormatException ignored) {
+            }
+        }
 
         Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
         AudioFileReader.setDefaultCharset(charset);
