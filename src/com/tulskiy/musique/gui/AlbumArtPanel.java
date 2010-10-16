@@ -30,6 +30,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -56,7 +57,7 @@ public class AlbumArtPanel extends JPanel {
             "folder.jpg"));
     private ImageIcon image;
     private Track track;
-    private LinkedHashMap<File, ImageIcon> cache = new LinkedHashMap<File, ImageIcon>(10, 0.7f, true) {
+    private LinkedHashMap<File, ImageIcon> cache = new LinkedHashMap<File, ImageIcon>(5, 0.7f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<File, ImageIcon> eldest) {
             return size() > 10;
@@ -66,6 +67,7 @@ public class AlbumArtPanel extends JPanel {
     private ArrayList<Expression> stubs = new ArrayList<Expression>();
     private Timer timer;
     private boolean nowPlayingOnly;
+    private final int MAX_SIZE = 300;
 
     public AlbumArtPanel() {
         setLayout(new BorderLayout());
@@ -150,7 +152,20 @@ public class AlbumArtPanel extends JPanel {
                             image = cache.get(file);
                             if (image == null) {
                                 logger.fine("Loading Album Art from file: " + file);
-                                image = new ImageIcon(file.getAbsolutePath());
+                                final ImageIcon newImage = new ImageIcon(file.getAbsolutePath());
+                                double iconHeight = newImage.getIconHeight();
+                                double iconWidth = newImage.getIconWidth();
+                                if (iconHeight > MAX_SIZE) {
+                                    double dt = MAX_SIZE / iconHeight;
+                                    Image instance = newImage.getImage().getScaledInstance(
+                                            (int) (iconWidth * dt), (int) (iconHeight * dt),
+                                            Image.SCALE_SMOOTH
+                                    );
+                                    image = new ImageIcon(instance);
+                                    System.gc();
+                                } else {
+                                    image = newImage;
+                                }
                                 cache.put(file, image);
                             } else {
                                 logger.fine("Loading Album Art from cache for file: " + file);
