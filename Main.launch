@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/musique/src/com/tulskiy/musique/system/Main.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.debug.core.capture_output" value="false"/>
+<booleanAttribute key="org.eclipse.debug.ui.ATTR_CONSOLE_OUTPUT_ON" value="false"/>
+<listAttribute key="org.eclipse.debug.ui.favoriteGroups">
+<listEntry value="org.eclipse.debug.ui.launchGroup.run"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.tulskiy.musique.system.Main"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="musique"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-client&#10;-Xms15m&#10;-Xmx40m&#10;-XX:+UnlockExperimentalVMOptions&#10;-XX:+CMSClassUnloadingEnabled&#10;-XX:+TieredCompilation&#10;-XX:+AggressiveOpts&#10;-XX:+UseAdaptiveSizePolicy&#10;-Dsun.java2d.noddraw=false&#10;-Dswing.aatext=true&#10;-XX:MaxHeapFreeRatio=10&#10;-XX:MinHeapFreeRatio=10"/>
+</launchConfiguration>

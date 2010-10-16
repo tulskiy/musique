@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact name="release">
-    <output-path>$PROJECT_DIR$/tags/musique</output-path>
+    <output-path>$PROJECT_DIR$/dist</output-path>
     <root id="root">
       <element id="artifact" artifact-name="musique" />
       <element id="file-copy" path="$PROJECT_DIR$/Copying" />
@@ -11,6 +11,7 @@
       <element id="file-copy" path="$PROJECT_DIR$/musique.vmoptions" />
       <element id="directory" name="lib">
         <element id="library" level="project" name="lastfm" />
+        <element id="library" level="project" name="gtkjfilechooser" />
       </element>
       <element id="file-copy" path="$PROJECT_DIR$/ABOUT" />
     </root>

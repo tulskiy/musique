@@ -1,12 +1,9 @@
 testfiles
-out
+build
 temp
 musique.jar
 lib/junit*
 tags
-resources/db
+dist
 .idea/workspace.xml
 src/com/tulskiy/musique/Test.java
-*.a
-playlists
-resources/config

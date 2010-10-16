@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.java.j2seproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
+            <name>musique</name>
+            <source-roots>
+                <root id="musique2.dir" name="musique"/>
+                <root id="src.dir" name="wavpack"/>
+                <root id="musique3.dir" name="jflac"/>
+                <root id="musique4.dir" name="jaudiotagger"/>
+                <root id="musique5.dir" name="cuelib"/>
+                <root id="musique6.dir" name="jmac"/>
+                <root id="musique7.dir" name="javalayer"/>
+                <root id="musique8.dir" name="jorbis"/>
+            </source-roots>
+            <test-roots>
+                <root id="test.src.dir"/>
+            </test-roots>
+        </data>
+    </configuration>
+</project>

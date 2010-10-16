@@ -17,14 +17,16 @@ Also, musique can recode these formats into:
 There is a built in support for CUE files, gapless playback,
 SHOUTCast/IceCast radio, Last.fm Scrobbling
 
-Compiling
+Building
 
-    To compile, run ant -f musique.xml or open the project in IntelliJ IDEA
-    Community Edition
+    To compile, run "ant", then run either musique.sh or musique.bat
+    to start the player
+    You also can open the project in IDE - there are configurations
+    for IntelliJ IDEA, NetBeans or Eclipse.
+    Main class is com.tulskiy.musque.system.Main
 
     Requirements: Sun JDK 1.6, or OpenJDK 1.6
 
-    Then run either musique.sh or musique.bat
 
 Shortcuts
     Z, X, C, V, B - prev, play, pause, stop, next
@@ -89,20 +91,20 @@ Performance Notes
 
 Troubleshooting
 
-    On Linux, Sun JRE is using alsa for sound output and the implementation is known to be
-    very buggy. Issues include conflicts with PulseAudio - player throws LineUnavailableException
+    On Linux, Sun JRE is using oss for sound output and the implementation is known to be
+    very buggy. Issues include conflicts with PulseAudio and Alsa - player throws LineUnavailableException
     when some other program is playing audio, or, when the player is running, other programs can not
     play sound.
 
     So if you use PulseAudio, it is best to install OpenJDK, which has good
-    PulseAudio support (at least on Ubuntu). If you don't want to use OpenJDK,
-    you can copy PulseAudio support from OpenJDK to Sun JDK using these instructions:
+    PulseAudio support (at least on Ubuntu). If you want to use Sun JDK instead of OpenJDK,
+    you can copy PulseAudio support from OpenJDK to Sun JDK using these instruction:
 
     copy the following files from openjdk folder to java-sun folder
     ./jre/lib/(i386, amd64)/libpulse-java.so
     ./jre/ext/pulse-java.jar
 
-    another solution is to use padsp or aoss to redirect sound to pulseaudio or alsa,
+    Another solution is to use padsp or aoss to redirect sound to pulseaudio or alsa,
     in this case, edit musique.sh. Find this line:
 
     # uncomment to use OSS emulation, fixes sound problems with Sun JRE's
