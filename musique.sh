@@ -11,7 +11,10 @@ cd "$MUSIQUE_HOME"
 if [ -z "$JAVA_PATH" ]; then
     JAVA_PATH="java"
 fi
-ARGS=$(tr '\n' ' ' < musique.vmoptions)
-JVM_ARGS="$ARGS $JVM_ARGS"
+JVM_ARGS=$(tr '\n' ' ' < musique.vmoptions)
+CLASSPATH=musique.jar
+CLASSPATH=$CLASSPATH:lib/last.fm-bindings.jar
+CLASSPATH=$CLASSPATH:lib/gtkjfilechooser.jar
 
-exec $DSP $JAVA_PATH $JVM_ARGS -jar musique.jar
+export CLASSPATH
+exec $DSP $JAVA_PATH $JVM_ARGS com.tulskiy.musique.system.Main
