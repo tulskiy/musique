@@ -5,6 +5,8 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/nbproject" />
+      <excludeFolder url="file://$MODULE_DIR$/tag" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
     </content>
     <orderEntry type="inheritedJdk" />
@@ -26,6 +28,7 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="lastfm" level="project" />
+    <orderEntry type="library" name="gtkjfilechooser" level="project" />
   </component>
 </module>
 

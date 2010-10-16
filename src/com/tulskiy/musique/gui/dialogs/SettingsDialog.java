@@ -187,9 +187,11 @@ public class SettingsDialog extends JDialog {
                 int index = laf.getSelectedIndex();
                 if (index != -1) {
                     try {
-                        UIManager.setLookAndFeel(lafs[index].getClassName());
+                        String laf = lafs[index].getClassName();
+                        UIManager.setLookAndFeel(laf);
                         SwingUtilities.updateComponentTreeUI(SwingUtilities.getRoot(owner));
                         SwingUtilities.updateComponentTreeUI(comp);
+                        config.setString("gui.LAF", laf);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
@@ -311,6 +313,7 @@ public class SettingsDialog extends JDialog {
         final JComboBox encoding = new JComboBox(Charset.availableCharsets().values().toArray());
         encoding.setSelectedItem(charset);
         misc.add(encoding);
+
         final JCheckBox oneInstance = new JCheckBox("Allow only one instance (needs restart)");
         oneInstance.setSelected(config.getBoolean("system.oneInstance", false));
         misc.add(oneInstance);

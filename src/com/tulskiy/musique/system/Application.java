@@ -39,6 +39,7 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
@@ -165,6 +166,18 @@ public class Application {
         } catch (Exception e) {
             System.err.println("Could not load LaF: " + e.getCause());
         }
+
+        configuration.addPropertyChangeListener("gui.LAF", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                String laf = configuration.getString(evt.getPropertyName(), "");
+                if (laf.endsWith("GTKLookAndFeel")) {
+                    UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
+                } else {
+                    UIManager.put("FileChooserUI", null);
+                }
+            }
+        });
     }
 
     private void saveSettings() {
@@ -180,7 +193,6 @@ public class Application {
             configuration.setString("tag.defaultEncoding", value.name());
         else
             configuration.remove("tag.defaultEncoding");
-        configuration.setString("gui.LAF", UIManager.getLookAndFeel().getClass().getCanonicalName());
     }
 
     public void start() {
