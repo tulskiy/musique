@@ -90,14 +90,14 @@ public class SettingsDialog extends JDialog {
         add(buttons, BorderLayout.SOUTH);
 
         pack();
-        setSize(600, getHeight());
+        setSize(670, getHeight());
         setLocationRelativeTo(SwingUtilities.windowForComponent(owner));
     }
 
     private JComponent createGUIPanel() {
         JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setName("GUI");
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 100));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 30));
 
         Box mainBox = Box.createVerticalBox();
         JPanel misc = new JPanel(new GridLayout(2, 2, 10, 10));
@@ -214,7 +214,7 @@ public class SettingsDialog extends JDialog {
 
     private JComponent createColorsAndFontsPanel() {
         final JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 100));
+        panel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 30));
         panel.setName("Colors and Fonts");
         panel.setLayout(new BorderLayout());
         Box mainBox = Box.createVerticalBox();
@@ -283,7 +283,7 @@ public class SettingsDialog extends JDialog {
     private JComponent createSystemPanel() {
         final JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setName("System");
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 100));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 30));
 
         Box mainBox = Box.createVerticalBox();
         JPanel misc = new JPanel(new GridLayout(2, 2, 10, 10));
@@ -341,7 +341,7 @@ public class SettingsDialog extends JDialog {
     private JComponent createNetworkPanel() {
         final JPanel panel = new JPanel(new BorderLayout(5, 5));
         panel.setName("Network");
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 100));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 30));
         Box mainBox = Box.createVerticalBox();
         panel.add(mainBox, BorderLayout.NORTH);
 
