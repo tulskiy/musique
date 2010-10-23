@@ -94,7 +94,7 @@ public class Tray {
     private JPopupTrayIcon createTrayIcon(Dimension size) {
         ImageIcon icon;
         if (size.height < 24)
-            icon = Images.loadIcon("tray16.png");
+            icon = Images.loadIcon("tray16_invert.png");
         else
             icon = Images.loadIcon("tray24.png");
         BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
