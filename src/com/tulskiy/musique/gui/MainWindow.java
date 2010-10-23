@@ -147,6 +147,13 @@ public class MainWindow extends JFrame {
             }
         });
 
+        helpMenu.add("License").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new TextDialog(comp, "License", new File("Copying")).setVisible(true);
+            }
+        });
+
         helpMenu.add("About").addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
