@@ -30,7 +30,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -96,44 +95,6 @@ public class AlbumArtPanel extends JPanel {
         canvas.setHorizontalAlignment(JLabel.CENTER);
         canvas.setVerticalAlignment(JLabel.CENTER);
 
-        config.addPropertyChangeListener("albumart.nowPlayingOnly", true, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                nowPlayingOnly = config.getBoolean(evt.getPropertyName(), false);
-            }
-        });
-
-        config.addPropertyChangeListener("playlist.selectedTrack", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if (!nowPlayingOnly && evt.getNewValue() instanceof Track) {
-                    track = (Track) evt.getNewValue();
-                    timer.restart();
-                }
-            }
-        });
-        final Player player = app.getPlayer();
-        player.addListener(new PlayerListener() {
-            @Override
-            public void onEvent(PlayerEvent e) {
-                if (nowPlayingOnly && e.getEventCode() == PlayerEvent.PlayerEventCode.FILE_OPENED) {
-                    track = player.getTrack();
-                    timer.restart();
-                }
-            }
-        });
-
-        config.addPropertyChangeListener("albumart.stubs", true, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                stubs.clear();
-                ArrayList<String> list = config.getList("albumart.stubs", stubDefaults);
-                for (String s : list) {
-                    stubs.add(Parser.parse(s));
-                }
-            }
-        });
-        add(canvas, BorderLayout.CENTER);
         timer = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -179,6 +140,45 @@ public class AlbumArtPanel extends JPanel {
                 timer.stop();
             }
         });
+
+        config.addPropertyChangeListener("albumart.nowPlayingOnly", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                nowPlayingOnly = config.getBoolean(evt.getPropertyName(), false);
+            }
+        });
+
+        config.addPropertyChangeListener("playlist.selectedTrack", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if (!nowPlayingOnly && evt.getNewValue() instanceof Track) {
+                    track = (Track) evt.getNewValue();
+                    timer.restart();
+                }
+            }
+        });
+        final Player player = app.getPlayer();
+        player.addListener(new PlayerListener() {
+            @Override
+            public void onEvent(PlayerEvent e) {
+                if (nowPlayingOnly && e.getEventCode() == PlayerEvent.PlayerEventCode.FILE_OPENED) {
+                    track = player.getTrack();
+                    timer.restart();
+                }
+            }
+        });
+
+        config.addPropertyChangeListener("albumart.stubs", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                stubs.clear();
+                ArrayList<String> list = config.getList("albumart.stubs", stubDefaults);
+                for (String s : list) {
+                    stubs.add(Parser.parse(s));
+                }
+            }
+        });
+        add(canvas, BorderLayout.CENTER);
     }
 
 }
