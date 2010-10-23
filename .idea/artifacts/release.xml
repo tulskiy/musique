@@ -1,6 +1,6 @@
 <component name="ArtifactManager">
   <artifact name="release">
-    <output-path>$PROJECT_DIR$/dist</output-path>
+    <output-path>$PROJECT_DIR$/dist/musique</output-path>
     <root id="root">
       <element id="artifact" artifact-name="musique" />
       <element id="file-copy" path="$PROJECT_DIR$/Copying" />
@@ -14,6 +14,7 @@
         <element id="library" level="project" name="gtkjfilechooser" />
       </element>
       <element id="file-copy" path="$PROJECT_DIR$/ABOUT" />
+      <element id="file-copy" path="$PROJECT_DIR$/musique.png" />
     </root>
   </artifact>
 </component>
