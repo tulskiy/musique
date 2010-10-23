@@ -1,4 +1,5 @@
 musique - Java Audio Player
+http://github.com/tulskiy/musique
 Copyright (c) 2008, 2009, 2010 Denis Tulskiy
 
 This program is free software: you can redistribute it and/or modify
@@ -18,19 +19,19 @@ Libraries:
 
 JLayer - MP3 decoder/player/converter library for Java™ platform.
 http://www.javazoom.net/javalayer/javalayer.html
-Copyright (C) JavaZOOM 1999-2008
+Copyright (c) JavaZOOM 1999-2008
 
 jflac - Free Lossless Audio Codec library
 http://jflac.sourceforge.net/
-Copyright (C) 2000,2001,2002,2003  Josh Coalson
+Copyright (c) 2000,2001,2002,2003  Josh Coalson
 
 jmac - Java implementation of the Monkey's Audio decoder
 http://jmac.sourceforge.net/
-Copyright (C) Dmitry Vaguine
+Copyright (c) Dmitry Vaguine
 
 jorbis - OGG Vorbis decoder
 http://www.jcraft.com/jorbis/
-Copyright (C) 2000 ymnk, JCraft,Inc.
+Copyright (c) 2000 ymnk, JCraft,Inc.
 
 vorbis-java - java port of Vorbis encoder
 http://www.xiph.org/downloads/
@@ -43,8 +44,11 @@ Portions Copyright (c) 1998 - 2007 Conifer Software
 
 cuelib - library for manipulating cue sheets.
 http://code.google.com/p/cuelib/
-Copyright (C) 2007-2008 Jan-Willem van den Broek
+Copyright (c) 2007-2008 Jan-Willem van den Broek
 
 jaudiotagger - Audio Tagging library
 http://www.jthink.net/jaudiotagger/
 
+gtkjfilechooser - GTK UI for JFileChooser
+http://code.google.com/p/gtkjfilechooser/
+Copyright (c) 2010 Costantino Cerbo.
