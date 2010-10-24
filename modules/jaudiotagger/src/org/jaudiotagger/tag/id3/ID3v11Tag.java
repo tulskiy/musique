@@ -29,6 +29,7 @@ import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.logging.ErrorMessage;
 import org.jaudiotagger.tag.*;
 import org.jaudiotagger.tag.id3.framebody.*;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -458,27 +459,27 @@ public class ID3v11Tag extends ID3v1Tag {
         System.arraycopy(TAG_ID, FIELD_TAGID_POS, buffer, FIELD_TAGID_POS, TAG_ID.length);
         int offset = FIELD_TITLE_POS;
         if (TagOptionSingleton.getInstance().isId3v1SaveTitle()) {
-            bytes = title.getBytes();
+            bytes = title.getBytes(TextEncoding.CHARSET_ISO_8859_1);
             System.arraycopy(bytes, 0, buffer, offset, Math.min(bytes.length, FIELD_TITLE_LENGTH));
         }
         offset = FIELD_ARTIST_POS;
         if (TagOptionSingleton.getInstance().isId3v1SaveArtist()) {
-            bytes = artist.getBytes();
+            bytes = artist.getBytes(TextEncoding.CHARSET_ISO_8859_1);
             System.arraycopy(bytes, 0, buffer, offset, Math.min(bytes.length, FIELD_ARTIST_LENGTH));
         }
         offset = FIELD_ALBUM_POS;
         if (TagOptionSingleton.getInstance().isId3v1SaveAlbum()) {
-            bytes = album.getBytes();
+            bytes = album.getBytes(TextEncoding.CHARSET_ISO_8859_1);
             System.arraycopy(bytes, 0, buffer, offset, Math.min(bytes.length, FIELD_ALBUM_LENGTH));
         }
         offset = FIELD_YEAR_POS;
         if (TagOptionSingleton.getInstance().isId3v1SaveYear()) {
-            bytes = year.getBytes();
+            bytes = year.getBytes(TextEncoding.CHARSET_ISO_8859_1);
             System.arraycopy(bytes, 0, buffer, offset, Math.min(bytes.length, FIELD_YEAR_LENGTH));
         }
         offset = FIELD_COMMENT_POS;
         if (TagOptionSingleton.getInstance().isId3v1SaveComment()) {
-            bytes = comment.getBytes();
+            bytes = comment.getBytes(TextEncoding.CHARSET_ISO_8859_1);
             System.arraycopy(bytes, 0, buffer, offset, Math.min(bytes.length, FIELD_COMMENT_LENGTH));
         }
         offset = FIELD_TRACK_POS;
