@@ -116,7 +116,7 @@ public class SettingsDialog extends JDialog {
         laf.setSelectedItem(name);
         misc.add(laf);
 
-        final JCheckBox trayEnabled = new JCheckBox("Enable System Tray", config.getBoolean("tray.enabled", false));
+        final JCheckBox trayEnabled = new JCheckBox("Enable Notification area icon", config.getBoolean("tray.enabled", false));
         misc.add(trayEnabled);
         final JCheckBox minimizeOnClose = new JCheckBox("Minimize to Tray on close", config.getBoolean("tray.minimizeOnClose", true));
         misc.add(minimizeOnClose);
