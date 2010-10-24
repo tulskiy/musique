@@ -96,7 +96,7 @@ public class Tray {
         if (size.height < 24)
             icon = Images.loadIcon("tray16_invert.png");
         else
-            icon = Images.loadIcon("tray24.png");
+            icon = Images.loadIcon("tray24_invert.png");
         BufferedImage img = new BufferedImage(size.width, size.height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D d = img.createGraphics();
 
