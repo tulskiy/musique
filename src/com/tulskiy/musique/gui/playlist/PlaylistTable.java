@@ -46,6 +46,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,6 +80,7 @@ public class PlaylistTable extends GroupTable {
         setModel(model);
         getTableHeader().setPreferredSize(new Dimension(10000, 20));
         scrollPane = new JScrollPane(this);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         buildActions();
         buildMenus();
     }
@@ -249,6 +252,14 @@ public class PlaylistTable extends GroupTable {
                     PlaybackOrder order = player.getPlaybackOrder();
                     order.setLastPlayed(track);
                 }
+            }
+        });
+
+        config.addPropertyChangeListener("gui.playlist.autoResizeMode", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                int mode = config.getInt(evt.getPropertyName(), AUTO_RESIZE_OFF);
+                setAutoResizeMode(mode);
             }
         });
     }
@@ -474,6 +485,18 @@ public class PlaylistTable extends GroupTable {
                 createDefaultColumnsFromModel();
             }
         });
+        headerMenu.addSeparator();
+        final JCheckBoxMenuItem fitColumns = new JCheckBoxMenuItem("Auto-scale Columns");
+        headerMenu.add(fitColumns).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                config.setInt("gui.playlist.autoResizeMode",
+                        fitColumns.isSelected() ? AUTO_RESIZE_SUBSEQUENT_COLUMNS : AUTO_RESIZE_OFF);
+            }
+        });
+
+        fitColumns.setSelected(
+                AUTO_RESIZE_OFF != config.getInt("gui.playlist.autoResizeMode", AUTO_RESIZE_OFF));
 
         Util.fixIconTextGap(headerMenu);
         return headerMenu;

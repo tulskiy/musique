@@ -107,6 +107,9 @@ public class GroupTable extends JTable {
                 changeSelection(selectedRow, 0, false, false);
             }
         });
+
+        imap.put(KeyStroke.getKeyStroke("HOME"), "selectFirstRow");
+        imap.put(KeyStroke.getKeyStroke("END"), "selectLastRow");
     }
 
     public void runAction(Object actionKey) {
@@ -133,7 +136,8 @@ public class GroupTable extends JTable {
         setFocusTraversalKeysEnabled(false);
         setFillsViewportHeight(true);
         setRowSelectionAllowed(true);
-        setOpaque(false);
+        setShowGrid(false);
+        setOpaque(true);
         setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         setFont(getFont());
         setForeground(getForeground());

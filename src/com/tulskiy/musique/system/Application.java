@@ -147,6 +147,7 @@ public class Application {
             }
         });
         UIManager.put("Slider.paintValue", Boolean.FALSE);
+        UIManager.put("FileChooser.readOnly", Boolean.TRUE);
         Object thumbWidth = configuration.get("gui.thumbWidth");
         if (thumbWidth != null) {
             try {
