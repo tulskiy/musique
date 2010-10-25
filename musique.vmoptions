@@ -10,7 +10,6 @@
 -Dswing.aatext=true
 -XX:MaxHeapFreeRatio=10
 -XX:MinHeapFreeRatio=10
--Xdock:name="Musique"
 -Dcom.apple.macos.useScreenMenuBar=true
 -Dcom.apple.mrj.application.apple.menu.about.name=Musique
 -Dcom.apple.macos.smallTabs=true

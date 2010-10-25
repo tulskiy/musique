@@ -72,6 +72,11 @@ GUI Tweaks
     Double-click speed on Linux is faster than system's settings, it might be
     related to http://forums.sun.com/thread.jspa?threadID=585358
 
+    Mac OSX:
+
+    add -Xdock:name="Musique"
+    to musique.vmoptions to change program name in global menu
+
 
 Performance Notes
 
