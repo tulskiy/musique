@@ -1,0 +1,16 @@
+* investigate sound delays/clicks
+* visual representation of sorting column
+* allow regulating buffer size
+    - probably add software buffer
+    - if so, add equalizer and replay gain
+* investigate jnlp start
+    - http://www.oracle.com/technetwork/java/javase/download-spec-142476.html
+* loop through other album art pictures on click
+* media library
+    - smart playlists
+* find better place for config folder on windows
+* find ways of showing embedded albumart
+* some kind of plug-ins, also for using native libs, global hotkeys (?)
+* support m3u and pls playlists in Load/Save Playlist actions
+* "Love" button for last.fm
+* support command line encoders
