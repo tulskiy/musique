@@ -124,7 +124,8 @@ public class Tray {
     }
 
     public void addMouseListener(MouseListener listener) {
-        trayIcon.addMouseListener(listener);
+        if (trayIcon != null)
+            trayIcon.addMouseListener(listener);
     }
 
     /**
