@@ -24,6 +24,8 @@ import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.CompoundBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -92,6 +94,7 @@ public class PlaylistTabs extends JPanel {
                         singleTitle = tabbedPane.getTitleAt(0);
                         tabbedPane.removeAll();
                         add(singleTab, BorderLayout.CENTER);
+                        setBorder(BorderFactory.createEtchedBorder());
                     }
                     revalidate();
                     repaint();
@@ -103,6 +106,7 @@ public class PlaylistTabs extends JPanel {
                     tabbedPane.setTitleAt(0, singleTitle);
                     singleTab = null;
                     add(tabbedPane, BorderLayout.CENTER);
+                    setBorder(BorderFactory.createEmptyBorder());
                     revalidate();
                     repaint();
                 }
