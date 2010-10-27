@@ -251,8 +251,8 @@ public class LyricsPanel extends JPanel {
 //                    return;
 //                }
                 String search = "http://lyrics.wikia.com/";
-                artist = Util.capitalize(artist);
-                title = Util.capitalize(title);
+                artist = Util.capitalize(artist, "_");
+                title = Util.capitalize(title, "_");
                 search += URLEncoder.encode(artist, "utf-8");
                 search += ":";
                 search += URLEncoder.encode(title, "utf-8");

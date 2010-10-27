@@ -17,6 +17,8 @@
 
 package com.tulskiy.musique.gui.playlist;
 
+import com.tulskiy.musique.gui.dialogs.ProgressDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
@@ -24,10 +26,9 @@ import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.border.CompoundBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -186,7 +187,7 @@ public class PlaylistTabs extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 &&
-                    e.getClickCount() == 2) {
+                        e.getClickCount() == 2) {
                     tabbedPane.getActionMap().get("newPlaylist").actionPerformed(
                             new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                 }
@@ -239,14 +240,33 @@ public class PlaylistTabs extends JPanel {
                 String path = config.getString("playlist.lastDir", "");
                 if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
                 fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fc.setFileFilter(new FileNameExtensionFilter("Musique Playlist", "mus"));
+                fc.setAcceptAllFileFilterUsed(false);
+                FileNameExtensionFilter musFiler = new FileNameExtensionFilter("Musique Playlist", "mus");
+                FileNameExtensionFilter m3uFilter = new FileNameExtensionFilter("M3U Playlist", "m3u", "m3u8");
+                FileNameExtensionFilter plsFiler = new FileNameExtensionFilter("PLS Playlist", "pls");
+                fc.addChoosableFileFilter(musFiler);
+                fc.addChoosableFileFilter(m3uFilter);
+                fc.addChoosableFileFilter(plsFiler);
                 Playlist playlist = selectedTable.getPlaylist();
-                String fileName = playlist.getName().toLowerCase().replaceAll("\\s+", "_") + ".mus";
+                String fileName = playlist.getName().toLowerCase().replaceAll("\\s+", "_");
                 fc.setSelectedFile(new File(fileName));
 
                 int ret = fc.showSaveDialog(getParent());
                 if (ret == JFileChooser.APPROVE_OPTION) {
-                    playlist.save(fc.getSelectedFile());
+                    FileNameExtensionFilter filter = (FileNameExtensionFilter) fc.getFileFilter();
+                    File file = fc.getSelectedFile();
+                    String suffix = filter.getExtensions()[0];
+                    if (!file.getName().endsWith(suffix)) {
+                        file = new File(file.getParent(),
+                                Util.removeExt(file.getName()) + "." + suffix);
+                    }
+                    if (filter == musFiler) {
+                        playlist.save(file);
+                    } else if (filter == m3uFilter) {
+                        playlist.saveM3U(file);
+                    } else if (filter == plsFiler) {
+                        playlist.savePLS(file);
+                    }
                     config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
                 }
             }
@@ -258,14 +278,20 @@ public class PlaylistTabs extends JPanel {
                 String path = config.getString("playlist.lastDir", "");
                 if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
                 fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                fc.setFileFilter(new FileNameExtensionFilter("Musique Playlist", "mus"));
+                fc.setMultiSelectionEnabled(false);
+                fc.setAcceptAllFileFilterUsed(false);
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("All supported formats", "mus", "m3u", "m3u8", "pls"));
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("Musique Playlist", "mus"));
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("M3U Playlist", "m3u", "m3u8"));
+                fc.addChoosableFileFilter(new FileNameExtensionFilter("PLS Playlist", "pls"));
 
                 int ret = fc.showOpenDialog(getParent());
                 if (ret == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    Playlist playlist = addPlaylist(Util.removeExt(file.getName()));
-                    playlist.load(file);
-                    selectedTable.update();
+                    PlaylistTable table = addPlaylist(
+                            Util.capitalize(Util.removeExt(file.getName()), " "));
+                    ProgressDialog dialog = new ProgressDialog(table, "Adding Files");
+                    dialog.show(new Task.FileAddingTask(table, new File[]{fc.getSelectedFile()}, -1));
                     config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
                 }
             }
@@ -307,17 +333,17 @@ public class PlaylistTabs extends JPanel {
         return tabMenu;
     }
 
-    public Playlist addPlaylist(String name) {
+    public PlaylistTable addPlaylist(String name) {
         if (!Util.isEmpty(name)) {
             Playlist playlist = playlistManager.addPlaylist(name);
-            addPlaylist(playlist);
+            PlaylistTable table = addPlaylist(playlist);
             tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
-            return playlist;
+            return table;
         }
         return null;
     }
 
-    public void addPlaylist(Playlist playlist) {
+    public PlaylistTable addPlaylist(Playlist playlist) {
         PlaylistTable newTable = new PlaylistTable(playlist, columns);
         newTable.setUpDndCCP();
         if (columnModel == null) {
@@ -327,6 +353,7 @@ public class PlaylistTabs extends JPanel {
         }
         tabbedPane.add(playlist.getName(), newTable.getScrollPane());
         checkTabCount();
+        return newTable;
     }
 
     @Override

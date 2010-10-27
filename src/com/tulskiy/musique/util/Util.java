@@ -111,15 +111,15 @@ public class Util {
         return s.substring(0, 1).toUpperCase() + s.substring(1);
     }
 
-    public static String capitalize(String str) {
+    public static String capitalize(String str, String delim) {
         str = str.replaceAll("&", "and");
-        String[] strings = str.split(" ");
+        String[] strings = str.split("[ _]+");
         final StringBuilder sb = new StringBuilder();
 
         for (String s : strings) {
             s = s.toLowerCase();
             sb.append(s.substring(0, 1).toUpperCase());
-            sb.append(s.substring(1)).append("_");
+            sb.append(s.substring(1)).append(delim);
         }
         sb.deleteCharAt(sb.length() - 1);
 

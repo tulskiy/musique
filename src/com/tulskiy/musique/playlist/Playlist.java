@@ -22,11 +22,13 @@ import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.util.AudioMath;
 import com.tulskiy.musique.util.Util;
 
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -229,6 +231,30 @@ public class Playlist extends ArrayList<Track> {
         return items;
     }
 
+    public void saveM3U(File file) {
+        try {
+            PrintWriter pw = new PrintWriter(file);
+            pw.println("#EXTM3U");
+            Expression expression = Parser.parse("[%artist% - ]%title%");
+            for (Track track : this) {
+                if (track.isStream()) {
+                    pw.println(track.getLocation());
+                } else if (track.isFile()) {
+                    int seconds = (int) AudioMath.samplesToMillis(
+                            track.getTotalSamples(),
+                            track.getSampleRate()) / 1000;
+                    String title = String.valueOf(expression.eval(track));
+                    pw.printf("#EXTINF:%d,%s\n%s\n",
+                            seconds, title,
+                            track.getFile().getAbsolutePath());
+                }
+            }
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     public List<String> loadPLS(String location) {
         Scanner fi;
         ArrayList<String> items = new ArrayList<String>();
@@ -259,6 +285,33 @@ public class Playlist extends ArrayList<Track> {
         }
 
         return items;
+    }
+
+    public void savePLS(File file) {
+        try {
+            PrintWriter pw = new PrintWriter(file);
+            Expression expression = Parser.parse("[%artist% - ]%title%");
+            pw.println("[playlist]");
+            pw.println("NumberOfEntries=" + size());
+            for (int i = 0; i < size(); i++) {
+                Track track = get(i);
+                int index = i + 1;
+                if (track.isFile()) {
+                    pw.printf("File%d=%s\n", index, track.getFile().getAbsolutePath());
+                    pw.printf("Title%d=%s\n", index, expression.eval(track));
+                    pw.printf("Length%d=%s\n", index, (int) AudioMath.samplesToMillis(
+                            track.getTotalSamples(),
+                            track.getSampleRate()) / 1000);
+                } else if (track.isStream()) {
+                    pw.printf("File%d=%s\n", index, track.getLocation().normalize());
+                }
+                pw.println();
+            }
+            pw.println("Version=2");
+            pw.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public int insertItem(String address, int location, boolean recurse, Map<String, Object> progress) {
@@ -472,7 +525,7 @@ public class Playlist extends ArrayList<Track> {
                 Track t2 = get(j);
 
                 if (l1.equals(t2.getLocation()) &&
-                    t1.getSubsongIndex() == t2.getSubsongIndex()) {
+                        t1.getSubsongIndex() == t2.getSubsongIndex()) {
                     dup.add(t2);
                 }
             }
