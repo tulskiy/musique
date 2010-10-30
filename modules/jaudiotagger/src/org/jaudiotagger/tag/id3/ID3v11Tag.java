@@ -169,8 +169,11 @@ public class ID3v11Tag extends ID3v1Tag {
                     Iterator iterator = id3tag.getFrameOfType(ID3v24Frames.FRAME_ID_COMMENT);
                     text = "";
                     while (iterator.hasNext()) {
-                        frame = (ID3v24Frame) iterator.next();
-                        text += (((FrameBodyCOMM) frame.getBody()).getText() + " ");
+                        Object o = iterator.next();
+                        if (o instanceof ID3v24Frame) {
+                            frame = (ID3v24Frame) o;
+                            text += (((FrameBodyCOMM) frame.getBody()).getText() + " ");
+                        }
                     }
                     this.comment = ID3Tags.truncate(text, FIELD_COMMENT_LENGTH);
                 }
@@ -178,9 +181,9 @@ public class ID3v11Tag extends ID3v1Tag {
                     frame = (ID3v24Frame) id3tag.getFrame(ID3v24Frames.FRAME_ID_GENRE);
                     text = ((FrameBodyTCON) frame.getBody()).getText();
                     try {
-                        this.genre = (byte) ID3Tags.findNumber(text);
-                    }
-                    catch (TagException ex) {
+                        if (text != null && text.length() > 0)
+                            this.genre = (byte) ID3Tags.findNumber(text);
+                    } catch (Exception ex) {
                         //logger.log(Level.WARNING, getLoggingFilename() + ":" + "Unable to convert TCON frame to format suitable for v11 tag", ex);
                         this.genre = (byte) ID3v1Tag.GENRE_UNDEFINED;
                     }
@@ -189,9 +192,9 @@ public class ID3v11Tag extends ID3v1Tag {
                     frame = (ID3v24Frame) id3tag.getFrame(ID3v24Frames.FRAME_ID_TRACK);
                     text = ((FrameBodyTRCK) frame.getBody()).getText();
                     try {
-                        this.track = (byte) ID3Tags.findNumber(text);
-                    }
-                    catch (TagException ex) {
+                        if (text != null && text.length() > 0)
+                            this.track = (byte) ID3Tags.findNumber(text);
+                    } catch (Exception ex) {
                         //logger.log(Level.WARNING, getLoggingFilename() + ":" + "Unable to convert TRCK frame to format suitable for v11 tag", ex);
                         this.track = (byte) TRACK_UNDEFINED;
                     }
@@ -228,7 +231,7 @@ public class ID3v11Tag extends ID3v1Tag {
      * @param file
      * @throws TagNotFoundException
      * @throws IOException
-     * @deprecated use {@link #ID3v11Tag(RandomAccessFile,String)} instead
+     * @deprecated use {@link #ID3v11Tag(RandomAccessFile, String)} instead
      */
     public ID3v11Tag(RandomAccessFile file) throws TagNotFoundException, IOException {
         this(file, "");
@@ -268,8 +271,7 @@ public class ID3v11Tag extends ID3v1Tag {
         //Try and convert String representation of track into an integer
         try {
             trackAsInt = Integer.parseInt(trackValue);
-        }
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             trackAsInt = 0;
         }
 

@@ -25,6 +25,8 @@ import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.TagFieldKey;
 import org.jaudiotagger.tag.id3.AbstractTag;
 import org.jaudiotagger.tag.id3.ID3v11Tag;
+import org.jaudiotagger.tag.id3.ID3v23Tag;
+import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import java.io.File;
@@ -51,17 +53,21 @@ public class MP3TagWriter extends AudioTagWriter {
         } else {
             MP3File mp3File;
             try {
-                mp3File = new MP3File(file, MP3File.LOAD_IDV2TAG, false);
+                mp3File = new MP3File(file, MP3File.LOAD_ALL, false);
 
-                org.jaudiotagger.tag.Tag id3v2tag = mp3File.getTagOrCreateAndSetDefault();
+                ID3v24Tag id3v2tag = mp3File.getID3v2TagAsv24();
+                if (id3v2tag == null) {
+                    id3v2tag = new ID3v24Tag();
+                }
                 copyCommonFields(id3v2tag, track);
 
                 id3v2tag.setTrack(track.getTrack());
                 id3v2tag.set(id3v2tag.createTagField(TagFieldKey.DISC_NO, track.getDisc()));
                 id3v2tag.set(id3v2tag.createTagField(TagFieldKey.ALBUM_ARTIST, track.getMeta("albumArtist")));
 
-                ID3v11Tag id3v1Tag = new ID3v11Tag((AbstractTag) id3v2tag);
+                ID3v11Tag id3v1Tag = new ID3v11Tag(id3v2tag);
                 mp3File.setID3v1Tag(id3v1Tag);
+                mp3File.setID3v2Tag(id3v2tag);
 
                 mp3File.commit();
             } catch (Exception e) {
