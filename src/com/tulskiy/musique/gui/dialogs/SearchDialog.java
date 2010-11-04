@@ -117,7 +117,14 @@ public class SearchDialog extends JDialog {
                 }
             }
         });
-
+        table.addKeyboardAction(KeyStroke.getKeyStroke("shift ENTER"), "playAndClose", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                playlistTable.runAction("playSelected");
+                setVisible(false);
+                dispose();
+            }
+        });
         timer = new Timer(300, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
