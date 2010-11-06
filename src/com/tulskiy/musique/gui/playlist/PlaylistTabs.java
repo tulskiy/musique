@@ -375,7 +375,7 @@ public class PlaylistTabs extends JPanel {
     }
 
     public void setSelectedIndex(int i) {
-        if (tabbedPane.getTabCount() < i)
+        if (tabbedPane.getTabCount() > i)
             tabbedPane.setSelectedIndex(i);
     }
 
