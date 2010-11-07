@@ -314,9 +314,8 @@ public class Player {
                     if (track.isFile() && !track.getFile().exists()) {
                         //try to get the next one
                         track = order.next(track);
-                        if (track != null &&
-                            track.isFile() &&
-                            !track.getFile().exists()) {
+                        if (track == null || (
+                            track.isFile() && !track.getFile().exists())) {
                             decoder = null;
                             return;
                         }
