@@ -69,13 +69,19 @@ GUI Tweaks
     Tabs are too tall, this is JRE bug, it's been around for 5+ years, and is,
     as many GUI bugs are, low priority
 
-    Double-click speed on Linux is faster than system's settings, it might be
-    related to http://forums.sun.com/thread.jspa?threadID=585358
+    Double-click speed on Linux is faster than system settings, it might be
+    related to http://ubuntuforums.org/showthread.php?t=221642
+
+        create ~/.Xresources, and add
+        *multiClickTime: 400
+        Log Out and then Log back on
+
+        Substitute 400 with your prefered time (in milliseconds).
 
     Mac OSX:
 
-    add -Xdock:name="Musique"
-    to musique.vmoptions to change program name in global menu
+        add -Xdock:name="Musique"
+        to musique.vmoptions to change program name in global menu
 
 
 Performance Notes
