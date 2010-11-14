@@ -18,6 +18,7 @@
 package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.gui.SearchWorker;
 import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.PlaybackOrder;
@@ -53,6 +54,7 @@ public class SearchDialog extends JDialog {
     private ArrayList<Integer> viewToModel = new ArrayList<Integer>();
     private Playlist playlist;
     private Timer timer;
+    private SearchWorker searchWorker;
 
     public SearchDialog(final PlaylistTable playlistTable) {
         super(playlistTable.getParentFrame(), "Search", false);
@@ -65,6 +67,7 @@ public class SearchDialog extends JDialog {
         searchField = new JTextField();
 
         ArrayList<PlaylistColumn> columns = new ArrayList<PlaylistColumn>();
+        columns.add(new PlaylistColumn("  ", 20, "$isPlaying()"));
         columns.add(new PlaylistColumn("Name", 400, "[%artist% - ]$if3(%title%,%fileName%)"));
         columns.add(new PlaylistColumn("Length", 60, "%length%"));
         columns.add(new PlaylistColumn("Album", 100, "%album%"));
@@ -113,8 +116,9 @@ public class SearchDialog extends JDialog {
                 for (Track track : table.getSelectedSongs()) {
                     PlaybackOrder order = player.getPlaybackOrder();
                     order.enqueue(track, playlist);
-                    table.update();
                 }
+                table.update();
+                playlistTable.update();
             }
         });
         table.addKeyboardAction(KeyStroke.getKeyStroke("shift ENTER"), "playAndClose", new AbstractAction() {
@@ -125,47 +129,35 @@ public class SearchDialog extends JDialog {
                 dispose();
             }
         });
-        timer = new Timer(300, new ActionListener() {
+        timer = new Timer(100, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String str = searchField.getText().toLowerCase().trim();
-                String[] text = str.split("\\s+");
-                view.clear();
-                viewToModel.clear();
-                if (!str.isEmpty() && text.length > 0) {
-                    for (int i = 0; i < playlist.size(); i++) {
-                        Track track = playlist.get(i);
-
-                        boolean hasText[] = new boolean[text.length];
-                        for (String field : fields) {
-                            String value = track.getMeta(field);
-                            if (!Util.isEmpty(value)) {
-                                value = value.toLowerCase();
-                                String[] vals = value.split("\\s+");
-                                for (String val : vals) {
-                                    for (int j = 0, textLength = text.length; j < textLength; j++) {
-                                        String s = text[j];
-                                        if (val.startsWith(s)) {
-                                            hasText[j] = true;
-                                        }
-                                    }
-                                }
+                if (searchWorker != null && !searchWorker.isDone()) {
+                    searchWorker.cancel(true);
+                }
+                searchWorker = new SearchWorker(playlist, searchField.getText(), false) {
+                    @Override
+                    protected void done() {
+                        try {
+                            Playlist result = get();
+                            if (result != null) {
+                                viewToModel.clear();
+                                viewToModel.addAll(viewToModelList);
+                                view.clear();
+                                view.addAll(result);
+                                table.update();
+                                if (result.size() > 0)
+                                    table.getSelectionModel().setSelectionInterval(0, 0);
+                                result.clear();
+                                result.trimToSize();
+                                viewToModelList.clear();
+                                viewToModelList.trimToSize();
                             }
-                        }
-
-                        boolean toAdd = true;
-                        for (boolean b : hasText) {
-                            toAdd &= b;
-                        }
-
-                        if (toAdd) {
-                            view.add(track);
-                            viewToModel.add(i);
+                        } catch (Exception ignored) {
                         }
                     }
-                }
-                table.update();
-                table.selectAll();
+                };
+                searchWorker.execute();
                 timer.stop();
             }
         });
