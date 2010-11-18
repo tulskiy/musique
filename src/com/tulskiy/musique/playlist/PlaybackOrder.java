@@ -17,12 +17,12 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.util.Util;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Manages playback.
@@ -53,19 +53,26 @@ public class PlaybackOrder {
         }
     }
 
-    class QueueTuple {
-        Track track;
-        Playlist playlist;
+    private static Expression queueTupleTitle = Parser.parse("[%artist% - ]%title%");
+
+    public class QueueTuple {
+        public Track track;
+        public Playlist playlist;
 
         QueueTuple(Track track, Playlist playlist) {
             this.track = track;
             this.playlist = playlist;
         }
+
+        @Override
+        public String toString() {
+            return (String) queueTupleTitle.eval(track);
+        }
     }
 
     private Playlist playlist;
     private Order order = Order.DEFAULT;
-    private LinkedList<QueueTuple> queue = new LinkedList<QueueTuple>();
+    private List<QueueTuple> queue = new ArrayList<QueueTuple>();
     private Track lastPlayed;
     private Expression albumFormat = Parser.parse("[%albumArtist%|]%album%[|%date%]");
 
@@ -85,12 +92,16 @@ public class PlaybackOrder {
         return lastPlayed;
     }
 
+    public List<QueueTuple> getQueue() {
+        return queue;
+    }
+
     public void enqueue(Track track, Playlist playlist) {
         queue.add(new QueueTuple(track, playlist));
         updateQueuePositions();
     }
 
-    private void updateQueuePositions() {
+    public void updateQueuePositions() {
         for (int i = 0; i < queue.size(); i++) {
             queue.get(i).track.setQueuePosition(i + 1);
         }
@@ -109,7 +120,7 @@ public class PlaybackOrder {
             Track track = playlist.get(index);
             // technically, separator can not be the last track
             // so we just get the next track
-            if (track instanceof SeparatorTrack)
+            if (track.getLocation() == null)
                 return playlist.get(index + 1);
             return track;
         } else {
@@ -147,7 +158,7 @@ public class PlaybackOrder {
         int index;
 
         if (!queue.isEmpty()) {
-            QueueTuple tuple = queue.poll();
+            QueueTuple tuple = queue.remove(0);
             Track track = tuple.track;
             setPlaylist(tuple.playlist);
             track.setQueuePosition(-1);

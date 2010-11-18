@@ -20,11 +20,7 @@ package com.tulskiy.musique.gui.playlist;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.dialogs.ProgressDialog;
-import com.tulskiy.musique.gui.dialogs.SearchDialog;
-import com.tulskiy.musique.gui.dialogs.SettingsDialog;
-import com.tulskiy.musique.gui.dialogs.Task;
-import com.tulskiy.musique.gui.grouptable.Separator;
+import com.tulskiy.musique.gui.dialogs.*;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -72,7 +68,6 @@ public class PlaylistPanel extends JPanel {
         columns = loadColumns();
 
         setLayout(new BorderLayout());
-        setBorder(BorderFactory.createEmptyBorder(4, 0, 0, 0));
 
         tabs = new PlaylistTabs(columns);
         add(tabs, BorderLayout.CENTER);
@@ -232,7 +227,6 @@ public class PlaylistPanel extends JPanel {
                     if (table == null)
                         return;
                     table.getPlaylist().insertItem(ret, -1, false, null);
-                    table.update();
                 }
             }
         });
@@ -241,7 +235,7 @@ public class PlaylistPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (config.getBoolean("tray.enabled", false) &&
-                    config.getBoolean("tray.minimizeOnClose", true)) {
+                        config.getBoolean("tray.minimizeOnClose", true)) {
                     SwingUtilities.windowForComponent(comp).setVisible(false);
                 } else {
                     app.exit();
@@ -310,18 +304,18 @@ public class PlaylistPanel extends JPanel {
                 Track firstVisibleTrack;
                 do {
                     firstVisibleTrack = playlist.get(row++);
-                } while (firstVisibleTrack instanceof Separator);
+                } while (firstVisibleTrack.getLocation() == null);
 
                 JMenuItem src = (JMenuItem) e.getSource();
                 Integer index = (Integer) src.getClientProperty("index");
                 if (index < groupItems.length - 1) {
-                    playlist.groupBy(groupValues[index]);
+                    playlist.setGroupBy(groupValues[index]);
                 } else {
                     Object ret = JOptionPane.showInputDialog(comp,
                             "Select formatting",
                             config.getString("playlist.groupBy", playlist.getGroupBy()));
                     if (ret != null) {
-                        playlist.groupBy(ret.toString());
+                        playlist.setGroupBy(ret.toString());
                         config.setString("playlist.groupBy", ret.toString());
                     }
                 }
@@ -399,8 +393,6 @@ public class PlaylistPanel extends JPanel {
                     default:
                         playlist.sort(sortValues[index], false);
                 }
-
-                table.update();
             }
         };
 
@@ -420,6 +412,12 @@ public class PlaylistPanel extends JPanel {
         editMenu.add(sort);
         editMenu.addSeparator();
         editMenu.add(tableAction("clearQueue", "Clear Playback Queue"));
+        editMenu.add(new JMenuItem("View Playback Queue")).addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new PlaybackQueueDialog(comp).setVisible(true);
+            }
+        });
         editMenu.add(newItem("Search", "ctrl F", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -435,7 +433,6 @@ public class PlaylistPanel extends JPanel {
                 PlaylistTable table = tabs.getSelectedTable();
                 if (table != null) {
                     table.getPlaylist().removeDeadItems();
-                    table.update();
                 }
             }
         });
@@ -445,7 +442,6 @@ public class PlaylistPanel extends JPanel {
                 PlaylistTable table = tabs.getSelectedTable();
                 if (table != null) {
                     table.getPlaylist().removeDuplicates();
-                    table.update();
                 }
             }
         });
@@ -538,11 +534,10 @@ public class PlaylistPanel extends JPanel {
 
         if (retVal == JFileChooser.APPROVE_OPTION) {
             ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
-            dialog.show(new Task.FileAddingTask(table, fc.getSelectedFiles(), -1));
+            dialog.show(new Task.FileAddingTask(table.getPlaylist(), fc.getSelectedFiles(), -1));
         }
 
         config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
-        table.update();
     }
 
     public class TransferActionListener implements ActionListener,
