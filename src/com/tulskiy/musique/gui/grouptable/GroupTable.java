@@ -50,7 +50,7 @@ public class GroupTable extends JTable {
 
     public GroupTable() {
         setDefaultRenderer(Object.class, new DefaultCellRenderer());
-
+        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         buildListeners();
     }
 
@@ -138,7 +138,6 @@ public class GroupTable extends JTable {
         setRowSelectionAllowed(true);
         setShowGrid(false);
         setOpaque(true);
-        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         setFont(getFont());
         setForeground(getForeground());
         setSelectionBackground(getSelectionBackground());
