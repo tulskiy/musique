@@ -27,6 +27,7 @@ import com.tulskiy.musique.gui.grouptable.Separator;
 import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.PlaylistListener;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -159,7 +160,6 @@ public class PlaylistTable extends GroupTable {
                 clearSelection();
                 playlist.firePlaylistChanged();
                 model.fireTableDataChanged();
-                update();
             }
         });
         aMap.put("enqueue", new AbstractAction("Add to Queue  ") {
@@ -260,6 +260,13 @@ public class PlaylistTable extends GroupTable {
             public void propertyChange(PropertyChangeEvent evt) {
                 int mode = config.getInt(evt.getPropertyName(), AUTO_RESIZE_OFF);
                 setAutoResizeMode(mode);
+            }
+        });
+
+        playlist.addChangeListener(new PlaylistListener() {
+            @Override
+            public void playlistUpdated(Playlist playlist) {
+                update();
             }
         });
     }
@@ -570,7 +577,7 @@ public class PlaylistTable extends GroupTable {
                                 reader.readSingle(track);
                             }
                         }
-                        update();
+                        playlist.firePlaylistChanged();
                     }
 
                     @Override
@@ -637,7 +644,6 @@ public class PlaylistTable extends GroupTable {
                         }
 
                         playlist.firePlaylistChanged();
-                        update();
                     }
                 }
                 adjustLastSongAfterDelete(tracks);

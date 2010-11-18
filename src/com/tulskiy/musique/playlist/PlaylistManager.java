@@ -26,7 +26,10 @@ import com.tulskiy.musique.system.Configuration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+
+import static com.tulskiy.musique.playlist.PlaylistListener.Event;
 
 public class PlaylistManager {
     private Application app = Application.getInstance();
@@ -36,13 +39,17 @@ public class PlaylistManager {
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private Playlist currentPlaylist;
     private PlaybackOrder order = new PlaybackOrder();
+    private List<PlaylistListener> listeners = new ArrayList<PlaylistListener>();
 
     public ArrayList<Playlist> getPlaylists() {
         return playlists;
     }
 
     public void selectPlaylist(Playlist playlist) {
-        currentPlaylist = playlist;
+        if (currentPlaylist != playlist) {
+            currentPlaylist = playlist;
+            notifyListeners(playlist, Event.SELECTED);
+        }
         order.setPlaylist(playlist);
     }
 
@@ -117,11 +124,18 @@ public class PlaylistManager {
         Playlist playlist = new Playlist();
         playlist.setName(name);
         playlists.add(playlist);
+        notifyListeners(playlist, Event.ADDED);
         return playlist;
     }
 
-    public void removePlaylist(Playlist pl) {
-        playlists.remove(pl);
+    public void addPlaylist(Playlist playlist) {
+        playlists.add(playlist);
+        notifyListeners(playlist, Event.ADDED);
+    }
+
+    public void removePlaylist(Playlist playlist) {
+        playlists.remove(playlist);
+        notifyListeners(playlist, Event.REMOVED);
     }
 
     public void movePlaylist(int from, int to) {
@@ -132,5 +146,29 @@ public class PlaylistManager {
             to++;
         playlists.add(to, p);
         playlists.remove(from);
+    }
+
+    public void addPlaylistListener(PlaylistListener listener) {
+        listeners.add(listener);
+    }
+
+    private void notifyListeners(Playlist playlist, Event event) {
+        for (PlaylistListener listener : listeners) {
+            switch (event) {
+                case ADDED:
+                    listener.playlistAdded(playlist);
+                    break;
+                case REMOVED:
+                    listener.playlistRemoved(playlist);
+                    break;
+                case SELECTED:
+                    listener.playlistSelected(playlist);
+                    break;
+                case UPDATED:
+                    listener.playlistUpdated(playlist);
+                    break;
+            }
+
+        }
     }
 }

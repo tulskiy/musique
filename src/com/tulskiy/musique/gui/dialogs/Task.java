@@ -17,7 +17,6 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Playlist;
 
 import java.io.File;
@@ -29,12 +28,12 @@ import java.util.HashMap;
  */
 public abstract class Task {
     public static class FileAddingTask extends Task {
-        private PlaylistTable table;
+        private Playlist playlist;
         private File[] files;
         private int location;
 
-        public FileAddingTask(PlaylistTable table, File[] files, int location) {
-            this.table = table;
+        public FileAddingTask(Playlist playlist, File[] files, int location) {
+            this.playlist = playlist;
             this.files = files;
             this.location = location;
         }
@@ -53,14 +52,11 @@ public abstract class Task {
 
         @Override
         public void start() {
-            Playlist playlist = table.getPlaylist();
             for (File file : files) {
                 int ret = playlist.insertItem(file.toString(), location, true, map);
                 if (location != -1)
                     location += ret;
             }
-
-            table.update();
         }
     }
 

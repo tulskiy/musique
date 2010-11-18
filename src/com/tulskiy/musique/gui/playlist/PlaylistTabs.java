@@ -20,6 +20,7 @@ package com.tulskiy.musique.gui.playlist;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.PlaylistListener;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -28,7 +29,6 @@ import com.tulskiy.musique.util.Util;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -75,7 +75,7 @@ public class PlaylistTabs extends JPanel {
         }
 
         buildListeners();
-        createPopupMenu();
+        createActions();
     }
 
     private void checkTabCount() {
@@ -193,9 +193,38 @@ public class PlaylistTabs extends JPanel {
                 }
             }
         });
+
+        playlistManager.addPlaylistListener(new PlaylistListener() {
+            @Override
+            public void playlistRemoved(Playlist playlist) {
+                for (int i = 0; i < getTabCount(); i++) {
+                    if (getTableAt(i).getPlaylist() == playlist) {
+                        tabbedPane.remove(i);
+                        break;
+                    }
+                }
+            }
+
+            @Override
+            public void playlistAdded(Playlist playlist) {
+                addPlaylist(playlist);
+                tabbedPane.setSelectedIndex(getTabCount() - 1);
+            }
+
+            @Override
+            public void playlistSelected(Playlist playlist) {
+                if (getTabCount() > 1)
+                for (int i = 0; i < getTabCount(); i++) {
+                    if (getTableAt(i).getPlaylist() == playlist) {
+                        tabbedPane.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+        });
     }
 
-    private void createPopupMenu() {
+    private void createActions() {
         ActionMap aMap = tabbedPane.getActionMap();
 
         aMap.put("newPlaylist", new AbstractAction("Add New Playlist") {
@@ -223,9 +252,7 @@ public class PlaylistTabs extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 int index = tabbedPane.getSelectedIndex();
                 if (index != -1) {
-                    Playlist playlist = selectedTable.getPlaylist();
-                    tabbedPane.removeTabAt(index);
-                    playlistManager.removePlaylist(playlist);
+                    playlistManager.removePlaylist(selectedTable.getPlaylist());
                     if (playlistManager.getTotalPlaylists() == 0) {
                         addPlaylist("Default");
                     }
@@ -288,10 +315,9 @@ public class PlaylistTabs extends JPanel {
                 int ret = fc.showOpenDialog(getParent());
                 if (ret == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
-                    PlaylistTable table = addPlaylist(
-                            Util.capitalize(Util.removeExt(file.getName()), " "));
-                    ProgressDialog dialog = new ProgressDialog(table, "Adding Files");
-                    dialog.show(new Task.FileAddingTask(table, new File[]{fc.getSelectedFile()}, -1));
+                    Playlist playlist = addPlaylist(Util.capitalize(Util.removeExt(file.getName()), " "));
+                    ProgressDialog dialog = new ProgressDialog(tabbedPane, "Adding Files");
+                    dialog.show(new Task.FileAddingTask(playlist, new File[]{fc.getSelectedFile()}, -1));
                     config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
                 }
             }
@@ -333,14 +359,8 @@ public class PlaylistTabs extends JPanel {
         return tabMenu;
     }
 
-    public PlaylistTable addPlaylist(String name) {
-        if (!Util.isEmpty(name)) {
-            Playlist playlist = playlistManager.addPlaylist(name);
-            PlaylistTable table = addPlaylist(playlist);
-            tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
-            return table;
-        }
-        return null;
+    public Playlist addPlaylist(String name) {
+        return playlistManager.addPlaylist(name);
     }
 
     public PlaylistTable addPlaylist(Playlist playlist) {

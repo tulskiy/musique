@@ -169,7 +169,6 @@ public class TracksInfoDialog extends JDialog {
 //                }
 
                 parent.getPlaylist().firePlaylistChanged();
-                parent.update();
                 setVisible(false);
                 dispose();
                 parent.requestFocus();

@@ -28,7 +28,6 @@ import com.tulskiy.musique.util.Util;
 import java.io.*;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -38,7 +37,7 @@ import java.util.logging.Logger;
  * @Date: Dec 30, 2009
  */
 public class Playlist extends ArrayList<Track> {
-    private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\"");
+    private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\" {2}");
 
     private static final int VERSION = 1;
     private static final byte[] MAGIC = "BARABASHKA".getBytes();
@@ -49,6 +48,7 @@ public class Playlist extends ArrayList<Track> {
     };
 
     private static final Logger logger = Logger.getLogger("musique");
+    private ArrayList<PlaylistListener> listeners = new ArrayList<PlaylistListener>();
     private String name;
     private boolean sortAscending = true;
     private String sortBy;
@@ -59,7 +59,8 @@ public class Playlist extends ArrayList<Track> {
         try {
             Object[] objects = format.parse(fmt);
             setName((String) objects[0]);
-            groupBy((String) objects[1]);
+            setGroupBy((String) objects[1]);
+            setLibraryView(Boolean.valueOf((String) objects[2]));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -139,6 +140,7 @@ public class Playlist extends ArrayList<Track> {
                 throw new RuntimeException();
             }
             int size = dis.readInt();
+            ensureCapacity(size);
             for (int i = 0; i < size; i++) {
                 Track track = new Track();
                 track.setLocation(new URI(dis.readUTF()));
@@ -421,16 +423,19 @@ public class Playlist extends ArrayList<Track> {
         firePlaylistChanged();
     }
 
-    public void groupBy(String expression) {
+    public void setGroupBy(String expression) {
         groupBy = expression;
         logger.fine("Grouping playlist with expression: " + expression);
         groupExpression = Util.isEmpty(expression) ? null : Parser.parse(expression);
 
-        regroup();
+        firePlaylistChanged();
     }
 
     public void firePlaylistChanged() {
         regroup();
+        for (PlaylistListener listener : listeners) {
+            listener.playlistUpdated(this);
+        }
     }
 
     public void regroup() {
@@ -494,7 +499,7 @@ public class Playlist extends ArrayList<Track> {
     public String toString() {
         if (groupBy == null)
             groupBy = "";
-        return format.format(new Object[]{name, groupBy});
+        return format.format(new Object[]{name, groupBy, libraryView});
     }
 
     @Override
@@ -533,6 +538,10 @@ public class Playlist extends ArrayList<Track> {
 
         removeAll(dup);
         firePlaylistChanged();
+    }
+
+    public void addChangeListener(PlaylistListener listener) {
+        listeners.add(listener);
     }
 }
 

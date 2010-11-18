@@ -72,7 +72,7 @@ public class PlaylistTransferHandler extends TransferHandler {
 
     private void addFiles(PlaylistTable table, List<File> files, int insertRow) {
         ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
-        dialog.show(new Task.FileAddingTask(table, files.toArray(new File[files.size()]), insertRow));
+        dialog.show(new Task.FileAddingTask(table.getPlaylist(), files.toArray(new File[files.size()]), insertRow));
     }
 
     @Override
@@ -139,7 +139,6 @@ public class PlaylistTransferHandler extends TransferHandler {
 
                 playlist.addAll(insertRow, tracks);
                 playlist.firePlaylistChanged();
-                table.update();
                 table.setRowSelectionInterval(insertRow, insertRow + tracks.size() - 1);
                 tracks.clear();
                 return true;
