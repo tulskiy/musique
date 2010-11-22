@@ -71,7 +71,12 @@ public class Playlist extends ArrayList<Track> {
     }
 
     public void cleanUp() {
-        removeAll(Collections.singleton(new SeparatorTrack(null, 0)));
+        Iterator<Track> it = iterator();
+        while (it.hasNext()) {
+            Track next = it.next();
+            if (next instanceof SeparatorTrack)
+                it.remove();
+        }
     }
 
     public void save(File file) {

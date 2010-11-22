@@ -43,10 +43,10 @@ public class SeparatorTrack extends Track implements Separator {
         return size;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof Separator;
-    }
+//    @Override
+//    public boolean equals(Object obj) {
+//        return obj instanceof Separator;
+//    }
 
     @Override
     public String toString() {

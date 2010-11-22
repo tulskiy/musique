@@ -19,8 +19,11 @@ package com.tulskiy.musique.playlist;
 
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
-import com.tulskiy.musique.util.Util;
+import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,9 +39,12 @@ public class PlaybackOrder {
     public enum Order {
         DEFAULT("Default"),
         REPEAT("Repeat"),
-        REPEAT_TRACK("Repeat Track"),
-        REPEAT_ALBUM("Repeat Album"),
+        REPEAT_TRACK("Repeat track"),
+        REPEAT_ALBUM("Repeat album"),
+        REPEAT_GROUP("Repeat group"),
         SHUFFLE("Shuffle"),
+        SHUFFLE_ALBUMS("Shuffle albums"),
+        SHUFFLE_GROUPS("Shuffle groups"),
         RANDOM("Random");
 
         private String text;
@@ -74,7 +80,18 @@ public class PlaybackOrder {
     private Order order = Order.DEFAULT;
     private List<QueueTuple> queue = new ArrayList<QueueTuple>();
     private Track lastPlayed;
-    private Expression albumFormat = Parser.parse("[%albumArtist%|]%album%[|%date%]");
+    private Expression albumFormat;
+
+    public PlaybackOrder() {
+        final Configuration config = Application.getInstance().getConfiguration();
+        config.addPropertyChangeListener("playbackOrder.albumFormat", true, new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                String format = config.getString(evt.getPropertyName(), "%album%");
+                albumFormat = Parser.parse(format);
+            }
+        });
+    }
 
     public void setPlaylist(Playlist playlist) {
         this.playlist = playlist;
@@ -196,35 +213,75 @@ public class PlaybackOrder {
                 case REPEAT_TRACK:
                     return currentTrack;
                 case REPEAT_ALBUM:
-                    String album = (String) albumFormat.eval(currentTrack);
-
-                    if (Util.isEmpty(album))
-                        return next(index);
-
-                    track = next(index);
-                    if (track != null) {
-                        if (album.equals(albumFormat.eval(track))) {
-                            return track;
+                    return nextPatternMatch(currentTrack, index, albumFormat, false);
+                case REPEAT_GROUP:
+                    if (index + 1 < playlist.size()) {
+                        Track tr = playlist.get(index + 1);
+                        if (tr.getLocation() != null) {
+                            return tr;
                         }
                     }
 
                     for (int i = index; i >= 0; i--) {
-                        track = playlist.get(i);
-                        Object value = albumFormat.eval(track);
-                        if (!album.equals(value)) {
-                            return next(i);
+                        if (playlist.get(i).getLocation() == null) {
+                            return playlist.get(i + 1);
+                        }
+                    }
+                    return playlist.get(0);
+                case SHUFFLE_ALBUMS:
+                    return nextPatternMatch(currentTrack, index, albumFormat, true);
+                case SHUFFLE_GROUPS:
+                    if (index + 1 < playlist.size()) {
+                        Track tr = playlist.get(index + 1);
+                        if (tr.getLocation() != null) {
+                            return tr;
                         }
                     }
 
-                    return track;
+                    for (int i = index; i >= 0; i--) {
+                        Track separator = playlist.get(i);
+                        if (separator.getLocation() == null) {
+                            separator = nextShuffle(separator, true, null);
+
+                            return next(playlist.indexOf(separator));
+                        }
+                    }
+                    return playlist.get(0);
                 case RANDOM:
                     return getTrack((int) (Math.random() * size));
                 case SHUFFLE:
-                    return nextShuffle(currentTrack);
+                    return nextShuffle(currentTrack, false, null);
             }
         }
 
         return getTrack(index);
+    }
+
+    private Track nextPatternMatch(Track currentTrack, int index, Expression pattern, boolean shuffle) {
+        Track track;
+        Object result = pattern.eval(currentTrack);
+
+        track = next(index);
+
+        if (track != null) {
+            if (equals(result, pattern.eval(track))) {
+                return track;
+            }
+        }
+
+        for (int i = index; i >= 0; i--) {
+            track = playlist.get(i);
+            if (!equals(result, pattern.eval(track))) {
+                Track next = next(i);
+                if (shuffle) {
+                    return nextShuffle(next, false, pattern);
+                } else {
+                    return next;
+                }
+            }
+        }
+
+        return track;
     }
 
     public Track prev(Track currentTrack) {
@@ -247,39 +304,97 @@ public class PlaybackOrder {
             case REPEAT_TRACK:
                 return currentTrack;
             case REPEAT_ALBUM:
-                String album = (String) albumFormat.eval(currentTrack);
-
-                track = prev(index);
-                if (track != null) {
-                    if (album.equals(albumFormat.eval(track))) {
-                        return track;
+                return prevPatternMatch(currentTrack, index, albumFormat, false);
+            case REPEAT_GROUP:
+                if (index > 0) {
+                    Track tr = playlist.get(index - 1);
+                    if (tr.getLocation() != null) {
+                        return tr;
                     }
                 }
 
-                for (int i = index; i < size; i++) {
-                    track = playlist.get(i);
-                    Object value = albumFormat.eval(track);
-                    if (!album.equals(value)) {
-                        return prev(i);
+                for (int i = index + 1; i < size; i++) {
+                    if (playlist.get(i).getLocation() == null) {
+                        return playlist.get(i - 1);
                     }
                 }
 
-                return track;
+                return playlist.get(size - 1);
+            case SHUFFLE_ALBUMS:
+                return prevPatternMatch(currentTrack, index, albumFormat, true);
+            case SHUFFLE_GROUPS:
+                if (index > 0) {
+                    Track tr = playlist.get(index - 1);
+                    if (tr.getLocation() != null) {
+                        return tr;
+                    }
+                }
+
+                for (int i = index; i >= 0; i--) {
+                    Track separator = playlist.get(i);
+                    if (separator.getLocation() == null) {
+                        separator = prevShuffle(separator, true, null);
+
+                        return next(playlist.indexOf(separator));
+                    }
+                }
+                return playlist.get(0);
             case RANDOM:
                 return getTrack((int) (Math.random() * size));
             case SHUFFLE:
-                return prevShuffle(currentTrack);
+                return prevShuffle(currentTrack, false, null);
         }
 
         return getTrack(index);
     }
 
-    private Track nextShuffle(Track currentTrack) {
+    private boolean equals(Object o1, Object o2) {
+        return (o1 != null && o1.equals(o2))
+                || (o1 == null && o2 == null);
+    }
+
+    private Track prevPatternMatch(Track currentTrack, int index, Expression pattern, boolean shuffle) {
+        Track track;
+        Object result = pattern.eval(currentTrack);
+
+        track = prev(index);
+        if (track != null) {
+            if (equals(result, pattern.eval(track))) {
+                return track;
+            }
+        }
+
+        if (shuffle) {
+            return prevShuffle(currentTrack, false, pattern);
+        }
+
+        for (int i = index; i < playlist.size(); i++) {
+            track = playlist.get(i);
+            if (!equals(result, pattern.eval(track))) {
+                return prev(i);
+            }
+        }
+
+        return track;
+    }
+
+    private Track nextShuffle(Track currentTrack, boolean searchSeparators, Expression pattern) {
         Track minRating = null;
         Track minGreater = null;
+        Object patternValue = null;
         for (Track track : playlist) {
-            if (track == currentTrack || track.getLocation() == null)
+            if (track == currentTrack
+                    || (searchSeparators && track.getLocation() != null)
+                    || (!searchSeparators && track.getLocation() == null))
                 continue;
+
+            if (pattern != null) {
+                Object value = pattern.eval(track);
+                if (equals(patternValue, value)) {
+                    continue;
+                }
+                patternValue = value;
+            }
 
             if (minRating == null || track.getShuffleRating() < minRating.getShuffleRating()) {
                 minRating = track;
@@ -295,13 +410,24 @@ public class PlaybackOrder {
         return minGreater != null ? minGreater : minRating;
     }
 
-    private Track prevShuffle(Track currentTrack) {
+    private Track prevShuffle(Track currentTrack, boolean searchSeparators, Expression pattern) {
         Track maxSmaller = null;
         Track maxRating = null;
+        Object patternValue = null;
 
-        for (Track track : playlist) {
-            if (track == currentTrack || track.getLocation() == null)
+        for (Track track: playlist) {
+            if (track == currentTrack
+                    || (searchSeparators && track.getLocation() != null)
+                    || (!searchSeparators && track.getLocation() == null))
                 continue;
+
+            if (pattern != null) {
+                Object value = pattern.eval(track);
+                if (equals(patternValue, value)) {
+                    continue;
+                }
+                patternValue = value;
+            }
 
             if (maxRating == null || track.getShuffleRating() > maxRating.getShuffleRating()) {
                 maxRating = track;
