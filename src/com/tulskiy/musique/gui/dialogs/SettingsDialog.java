@@ -100,7 +100,7 @@ public class SettingsDialog extends JDialog {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 30));
 
         Box mainBox = Box.createVerticalBox();
-        JPanel misc = new JPanel(new GridLayout(2, 2, 10, 10));
+        JPanel misc = new JPanel(new GridLayout(3, 2, 10, 10));
         mainBox.add(misc);
 
         misc.add(new JLabel("Look and Feel"));
@@ -120,7 +120,9 @@ public class SettingsDialog extends JDialog {
         misc.add(trayEnabled);
         final JCheckBox minimizeOnClose = new JCheckBox("Minimize to Tray on close", config.getBoolean("tray.minimizeOnClose", true));
         misc.add(minimizeOnClose);
-
+        misc.add(new JLabel("Pattern for Shuffle Albums mode"));
+        final JTextField patternField = new JTextField(config.getString("playbackOrder.albumFormat", "%album%"));
+        misc.add(patternField);
         Box format = Box.createVerticalBox();
         format.setBorder(BorderFactory.createTitledBorder("Display Formatting"));
         format.add(new JLabel("Window Title"));
@@ -204,6 +206,7 @@ public class SettingsDialog extends JDialog {
                 config.setBoolean("sidebar.enabled", sidebar.isSelected());
                 config.setBoolean("lyrics.searchOnline", lyrics.isSelected());
                 config.setBoolean("albumart.nowPlayingOnly", plTrack.isSelected());
+                config.setString("playbackOrder.albumFormat", patternField.getText());
                 List<String> stubList = Arrays.asList(stubs.getText().split("\n"));
                 config.setList("albumart.stubs", new ArrayList<String>(stubList));
             }

@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * @Date: Dec 30, 2009
  */
 public class Playlist extends ArrayList<Track> {
-    private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\" {2}");
+    private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\"");
 
     private static final int VERSION = 1;
     private static final byte[] MAGIC = "BARABASHKA".getBytes();
@@ -60,7 +60,7 @@ public class Playlist extends ArrayList<Track> {
             Object[] objects = format.parse(fmt);
             setName((String) objects[0]);
             setGroupBy((String) objects[1]);
-            setLibraryView(Boolean.valueOf((String) objects[2]));
+            //setLibraryView(Boolean.valueOf((String) objects[2]));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -71,7 +71,12 @@ public class Playlist extends ArrayList<Track> {
     }
 
     public void cleanUp() {
-        removeAll(Collections.singleton(new SeparatorTrack(null, 0)));
+        Iterator<Track> it = iterator();
+        while (it.hasNext()) {
+            Track next = it.next();
+            if (next instanceof SeparatorTrack)
+                it.remove();
+        }
     }
 
     public void save(File file) {
@@ -499,7 +504,7 @@ public class Playlist extends ArrayList<Track> {
     public String toString() {
         if (groupBy == null)
             groupBy = "";
-        return format.format(new Object[]{name, groupBy, libraryView});
+        return format.format(new Object[]{name, groupBy});
     }
 
     @Override
