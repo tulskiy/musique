@@ -504,7 +504,7 @@ public class Playlist extends ArrayList<Track> {
     public String toString() {
         if (groupBy == null)
             groupBy = "";
-        return format.format(new Object[]{name, groupBy, libraryView});
+        return format.format(new Object[]{name, groupBy});
     }
 
     @Override
