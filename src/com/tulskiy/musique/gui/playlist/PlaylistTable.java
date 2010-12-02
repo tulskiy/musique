@@ -208,7 +208,12 @@ public class PlaylistTable extends GroupTable {
                 switch (e.getEventCode()) {
                     case FILE_OPENED:
                         if (config.getBoolean("playlist.cursorFollowsPlayback", true)) {
-                            runAction("showNowPlaying");
+                            SwingUtilities.invokeLater(new Runnable() {
+                                @Override
+                                public void run() {
+                                    runAction("showNowPlaying");
+                                }
+                            });
                         }
 
                         if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
