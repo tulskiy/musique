@@ -39,6 +39,7 @@ public class PlaylistManager {
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private Playlist currentPlaylist;
     private PlaybackOrder order = new PlaybackOrder();
+    private Library library;
     private List<PlaylistListener> listeners = new ArrayList<PlaylistListener>();
 
     public ArrayList<Playlist> getPlaylists() {
@@ -57,8 +58,19 @@ public class PlaylistManager {
         return currentPlaylist;
     }
 
+    public Library getLibrary() {
+        return library;
+    }
+
     public void loadPlaylists() {
         ArrayList<String> list = config.getList("playlists", new ArrayList<String>());
+
+        Playlist libraryPlaylist = new Playlist();
+        File file = new File(PLAYLIST_PATH, "library.mus");
+        if (file.exists())
+            libraryPlaylist.load(file);
+        library = new Library(libraryPlaylist);
+
         for (int i = 0; i < list.size(); i++) {
             String fmt = list.get(i);
             Playlist playlist = new Playlist(fmt);

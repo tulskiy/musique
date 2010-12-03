@@ -37,7 +37,7 @@ import java.util.logging.Logger;
  * @Date: Dec 30, 2009
  */
 public class Playlist extends ArrayList<Track> {
-    private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\"");
+    private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\" {2}");
 
     private static final int VERSION = 1;
     private static final byte[] MAGIC = "BARABASHKA".getBytes();
@@ -54,13 +54,14 @@ public class Playlist extends ArrayList<Track> {
     private String sortBy;
     private String groupBy;
     private Expression groupExpression;
+    private boolean libraryView;
 
     public Playlist(String fmt) {
         try {
             Object[] objects = format.parse(fmt);
             setName((String) objects[0]);
             setGroupBy((String) objects[1]);
-            //setLibraryView(Boolean.valueOf((String) objects[2]));
+            setLibraryView(Boolean.valueOf((String) objects[2]));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -183,6 +184,14 @@ public class Playlist extends ArrayList<Track> {
         } catch (Exception e) {
             logger.warning("Failed to load playlist " + file.getName() + ": " + e.getMessage());
         }
+    }
+
+    public boolean isLibraryView() {
+        return libraryView;
+    }
+
+    public void setLibraryView(boolean libraryView) {
+        this.libraryView = libraryView;
     }
 
     public String getName() {
@@ -504,7 +513,7 @@ public class Playlist extends ArrayList<Track> {
     public String toString() {
         if (groupBy == null)
             groupBy = "";
-        return format.format(new Object[]{name, groupBy});
+        return format.format(new Object[]{name, groupBy, libraryView});
     }
 
     @Override
