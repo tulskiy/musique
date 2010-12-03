@@ -146,8 +146,10 @@ public class SearchDialog extends JDialog {
                                 view.clear();
                                 view.addAll(result);
                                 table.update();
-                                if (result.size() > 0)
+                                if (result.size() > 0) {
+                                    table.clearSelection();
                                     table.getSelectionModel().setSelectionInterval(0, 0);
+                                }
                                 result.clear();
                                 result.trimToSize();
                                 viewToModelList.clear();
