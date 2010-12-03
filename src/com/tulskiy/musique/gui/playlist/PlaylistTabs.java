@@ -278,7 +278,7 @@ public class PlaylistTabs extends JPanel {
                 String fileName = playlist.getName().toLowerCase().replaceAll("\\s+", "_");
                 fc.setSelectedFile(new File(fileName));
 
-                int ret = fc.showSaveDialog(getParent());
+                int ret = fc.showSaveDialog(getRootPane());
                 if (ret == JFileChooser.APPROVE_OPTION) {
                     FileNameExtensionFilter filter = (FileNameExtensionFilter) fc.getFileFilter();
                     File file = fc.getSelectedFile();
@@ -312,7 +312,7 @@ public class PlaylistTabs extends JPanel {
                 fc.addChoosableFileFilter(new FileNameExtensionFilter("M3U Playlist", "m3u", "m3u8"));
                 fc.addChoosableFileFilter(new FileNameExtensionFilter("PLS Playlist", "pls"));
 
-                int ret = fc.showOpenDialog(getParent());
+                int ret = fc.showOpenDialog(getRootPane());
                 if (ret == JFileChooser.APPROVE_OPTION) {
                     File file = fc.getSelectedFile();
                     Playlist playlist = addPlaylist(Util.capitalize(Util.removeExt(file.getName()), " "));

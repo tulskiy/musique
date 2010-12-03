@@ -192,8 +192,8 @@ public class PlaylistPanel extends JPanel {
 
     public void addMenu(JMenuBar menuBar) {
         ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
-        final JComponent comp = this;
-
+        final JComponent comp = getRootPane();
+        System.out.println(comp);
         JMenu fileMenu = new JMenu("File ");
         menuBar.add(fileMenu);
         JMenu editMenu = new JMenu("Edit");
@@ -522,22 +522,19 @@ public class PlaylistPanel extends JPanel {
     }
 
     private void addItems(int selectionMode) {
-        final JFileChooser fc = new JFileChooser();
-        String path = config.getString("playlist.lastDir", "");
-        if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
-        fc.setMultiSelectionEnabled(true);
-        fc.setFileSelectionMode(selectionMode);
-        int retVal = fc.showOpenDialog(null);
-        final PlaylistTable table = tabs.getSelectedTable();
-        if (table == null)
-            return;
+        boolean allowFiles = selectionMode != JFileChooser.DIRECTORIES_ONLY;
+        TreeFileChooser fc = new TreeFileChooser(this,
+                allowFiles ? "Open file" : "Open folder",
+                allowFiles);
+        File[] files = fc.showOpenDialog();
 
-        if (retVal == JFileChooser.APPROVE_OPTION) {
+        if (files != null) {
+            final PlaylistTable table = tabs.getSelectedTable();
+            if (table == null)
+                return;
             ProgressDialog dialog = new ProgressDialog(table.getParentFrame(), "Adding Files");
-            dialog.show(new Task.FileAddingTask(table.getPlaylist(), fc.getSelectedFiles(), -1));
+            dialog.show(new Task.FileAddingTask(table.getPlaylist(), files, -1));
         }
-
-        config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
     }
 
     public class TransferActionListener implements ActionListener,

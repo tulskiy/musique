@@ -67,11 +67,11 @@ public class MainWindow extends JFrame {
         side.setDividerLocation(sideBarSeparator);
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-        playlistPanel.addMenu(menuBar);
-        addHelpMenu(menuBar);
         add(controlPanel, BorderLayout.NORTH);
         add(statusBar, BorderLayout.SOUTH);
         add(center, BorderLayout.CENTER);
+        playlistPanel.addMenu(menuBar);
+        addHelpMenu(menuBar);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         Rectangle r = config.getRectangle("gui.mainWindowPosition", new Rectangle(50, 0, 1000, 730));

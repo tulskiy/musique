@@ -17,157 +17,281 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
+import com.sun.java.swing.Painter;
+import com.tulskiy.musique.images.Images;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileSystemView;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
-import javax.swing.tree.TreeSelectionModel;
+import javax.swing.plaf.TreeUI;
+import javax.swing.plaf.basic.BasicTreeUI;
+import javax.swing.plaf.metal.MetalTreeUI;
+import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.Arrays;
-import java.util.Enumeration;
+import java.util.*;
 
-public class DirectoryChooser extends JTree
-        implements TreeSelectionListener, MouseListener {
-
+@SuppressWarnings({"unchecked"})
+public class DirectoryChooser extends JTree {
     private static FileSystemView fsv = FileSystemView.getFileSystemView();
+    private boolean enableFiles;
 
-    /*--- Begin Public API -----*/
-
-    public DirectoryChooser() {
-        this(null);
+    public DirectoryChooser(boolean enableFiles) {
+        this(null, enableFiles);
     }
 
-    public DirectoryChooser(File dir) {
-        super(new DirNode(fsv.getRoots()[0]));
-        getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        setSelectedDirectory(dir);
-        addTreeSelectionListener(this);
-        addMouseListener(this);
+    public DirectoryChooser(File dir, boolean enableFiles) {
+        this.enableFiles = enableFiles;
+        setModel(new DefaultTreeModel(new DirectoryNode(fsv.getRoots()[0])));
+        getSelectionModel().setSelectionMode(TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        setSelectedFile(dir);
+        addTreeSelectionListener(new TreeSelectionListener() {
+            @Override
+            public void valueChanged(TreeSelectionEvent ev) {
+                File oldDir = null;
+                TreePath oldPath = ev.getOldLeadSelectionPath();
+                if (oldPath != null) {
+                    oldDir = ((FileNode) oldPath.getLastPathComponent()).getFile();
+                    if (!fsv.isFileSystem(oldDir)) {
+                        oldDir = null;
+                    }
+                }
+                File[] files = getSelectedFiles();
+                File newDir = files.length > 0 ? files[0] : null;
+                firePropertyChange("selectedDirectory", oldDir, newDir);
+            }
+        });
+        setToggleClickCount(2);
+        putClientProperty("JTree.lineStyle", "None");
+        buildListeners();
     }
 
-    public void setSelectedDirectory(File dir) {
-        if (dir == null) {
-            dir = fsv.getDefaultDirectory();
+    private void buildListeners() {
+        addMouseListener(new MouseAdapter() {
+            @SuppressWarnings({"unchecked"})
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                final int row = getClosestRowForLocation(e.getX(), e.getY());
+
+                if (row != -1) {
+                    Rectangle bounds = getRowBounds(row);
+                    boolean isInBounds = bounds.getX() < e.getX();
+                    boolean isExtraSpace = bounds.getX() + bounds.getWidth() < e.getX();
+                    if (e.getButton() == MouseEvent.BUTTON1 && isExtraSpace) {
+                        if (e.isControlDown()) {
+                            if (!isRowSelected(row))
+                                addSelectionRow(row);
+                            else
+                                removeSelectionRow(row);
+                        } else if (e.isShiftDown()) {
+                            int start = getSelectionModel().getLeadSelectionRow();
+                            if (start == -1)
+                                start = row;
+                            if (start < row)
+                                start = getSelectionModel().getMinSelectionRow();
+                            setSelectionInterval(
+                                    start,
+                                    row);
+                        } else {
+                            setSelectionRow(row);
+                        }
+                    }
+
+                    if (e.isPopupTrigger() && isInBounds) {
+                        if (!isRowSelected(row)) {
+                            setSelectionRow(row);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    public boolean isEnableFiles() {
+        return enableFiles;
+    }
+
+    public void setEnableFiles(boolean enableFiles) {
+        this.enableFiles = enableFiles;
+    }
+
+    public void setSelectedFile(File file) {
+        if (file == null) {
+            file = fsv.getDefaultDirectory();
         }
-        TreePath path = mkPath(dir);
+        TreePath path = makePath(file);
         setSelectionPath(path);
-        scrollPathToVisible(path);
+        expandPath(path);
+        int row = Math.max(0, getRowForPath(path) - 4);
+        Rectangle rect = getRowBounds(row);
+        rect.x = 0;
+        rect.width = getWidth();
+        scrollRectToVisible(rect);
     }
 
-    public File getSelectedDirectory() {
-        DirNode node = (DirNode) getLastSelectedPathComponent();
-        if (node != null) {
-            File dir = node.getDir();
-            if (fsv.isFileSystem(dir)) {
-                return dir;
+    public File[] getSelectedFiles() {
+        TreePath[] paths = getSelectionPaths();
+        ArrayList<File> files = new ArrayList<File>();
+        if (paths != null)
+            for (TreePath path : paths) {
+                FileNode node = (FileNode) path.getLastPathComponent();
+                File file = node.getFile();
+                if (fsv.isFileSystem(file)) {
+                    files.add(file);
+                }
+
             }
-        }
-        return null;
+
+        return files.toArray(new File[files.size()]);
     }
 
-    public void addActionListener(ActionListener l) {
-        listenerList.add(ActionListener.class, l);
-    }
-
-    public void removeActionListener(ActionListener l) {
-        listenerList.remove(ActionListener.class, l);
-    }
-
-    public ActionListener[] getActionListeners() {
-        return listenerList.getListeners(ActionListener.class);
-    }
-
-    /*--- End Public API -----*/
-
-
-    /*--- TreeSelectionListener Interface -----*/
-
-    public void valueChanged(TreeSelectionEvent ev) {
-        File oldDir = null;
-        TreePath oldPath = ev.getOldLeadSelectionPath();
-        if (oldPath != null) {
-            oldDir = ((DirNode) oldPath.getLastPathComponent()).getDir();
-            if (!fsv.isFileSystem(oldDir)) {
-                oldDir = null;
-            }
-        }
-        File newDir = getSelectedDirectory();
-        firePropertyChange("selectedDirectory", oldDir, newDir);
-    }
-
-    /*--- MouseListener Interface -----*/
-
-    public void mousePressed(MouseEvent e) {
-        if (e.getClickCount() == 2) {
-            TreePath path = getPathForLocation(e.getX(), e.getY());
-            if (path != null && path.equals(getSelectionPath()) &&
-                getSelectedDirectory() != null) {
-
-                fireActionPerformed("dirSelected", e);
-            }
-        }
-    }
-
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    public void mouseClicked(MouseEvent e) {
-    }
-
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    public void mouseExited(MouseEvent e) {
-    }
-
-
-    /*--- Private Section ------*/
-
-    private TreePath mkPath(File dir) {
-        DirNode root = (DirNode) getModel().getRoot();
-        if (root.getDir().equals(dir)) {
+    private TreePath makePath(File dir) {
+        DirectoryNode root = (DirectoryNode) getModel().getRoot();
+        if (root.getFile().equals(dir)) {
             return new TreePath(root);
         }
 
-        TreePath parentPath = mkPath(fsv.getParentDirectory(dir));
-        DirNode parentNode = (DirNode) parentPath.getLastPathComponent();
+        TreePath parentPath = makePath(fsv.getParentDirectory(dir));
+        DirectoryNode parentNode = (DirectoryNode) parentPath.getLastPathComponent();
         Enumeration enumeration = parentNode.children();
         while (enumeration.hasMoreElements()) {
-            DirNode child = (DirNode) enumeration.nextElement();
-            if (child.getDir().equals(dir)) {
+            FileNode child = (FileNode) enumeration.nextElement();
+            if (child.getFile().equals(dir)) {
                 return parentPath.pathByAddingChild(child);
             }
         }
         return null;
     }
 
+    public void updateUI() {
+        super.updateUI();
 
-    private void fireActionPerformed(String command, InputEvent evt) {
-        ActionEvent e =
-                new ActionEvent(this, ActionEvent.ACTION_PERFORMED,
-                        command, evt.getWhen(), evt.getModifiers());
-        ActionListener[] listeners = getActionListeners();
-        for (int i = listeners.length - 1; i >= 0; i--) {
-            listeners[i].actionPerformed(e);
+        String laf = UIManager.getLookAndFeel().getName();
+        if (laf.contains("GTK") || laf.contains("Metal")) {
+            MetalTreeUI newUI = new MetalTreeUI() {
+                @Override
+                protected void paintRow(Graphics g, Rectangle clipBounds, Insets insets, Rectangle bounds, TreePath path, int row, boolean isExpanded, boolean hasBeenExpanded, boolean isLeaf) {
+                    if (tree.isRowSelected(row)) {
+                        Color bgColor;
+                        bgColor = ((DefaultTreeCellRenderer) currentCellRenderer).getBackgroundSelectionColor();
+                        g.setColor(bgColor);
+                        g.fillRect(clipBounds.x, bounds.y, clipBounds.width, bounds.height);
+                    }
+                    super.paintRow(g, clipBounds, insets, bounds, path, row, isExpanded, hasBeenExpanded, isLeaf);
+
+                    if (shouldPaintExpandControl(path, row, isExpanded, hasBeenExpanded, isLeaf)) {
+                        paintExpandControl(g, clipBounds, insets, bounds,
+                                path, row, isExpanded,
+                                hasBeenExpanded, isLeaf);
+                    }
+                }
+
+
+            };
+            setUI(newUI);
+        }
+
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        if (UIManager.getLookAndFeel().getName().contains("GTK")) {
+            renderer.setClosedIcon(Images.loadIcon("directory.png"));
+            renderer.setOpenIcon(Images.loadIcon("directory.png"));
+            renderer.setLeafIcon(Images.loadIcon("file.png"));
+        }
+        setCellRenderer(renderer);
+
+        setForeground(renderer.getTextNonSelectionColor());
+
+        setBackground(renderer.getBackgroundNonSelectionColor());
+
+        UIDefaults defaults = new UIDefaults();
+
+        setRowHeight(getFont().getSize() + 10);
+        renderer.setBorderSelectionColor(renderer.getBackgroundSelectionColor());
+
+        Painter collapsedIconPainter = new Painter() {
+            @Override
+            public void paint(Graphics2D g, Object object, int width, int height) {
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.setColor(getForeground());
+                g.fillPolygon(
+                        new int[]{0, (int) (height * Math.sqrt(0.75)), 0},
+                        new int[]{0, height / 2, height},
+                        3
+                );
+            }
+        };
+        Painter expandedIconPainter = new Painter() {
+            @Override
+            public void paint(Graphics2D g, Object object, int width, int height) {
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g.setColor(getForeground());
+                g.fillPolygon(
+                        new int[]{0, height, height / 2},
+                        new int[]{0, 0, (int) (height * Math.sqrt(0.75))},
+                        3
+                );
+            }
+        };
+
+        defaults.put("Tree[Enabled].collapsedIconPainter", collapsedIconPainter);
+        defaults.put("Tree[Enabled].expandedIconPainter", expandedIconPainter);
+        defaults.put("Tree:TreeCell[Focused+Selected].backgroundPainter", new SelectionBackgroundPainter(renderer.getBackgroundSelectionColor()));
+
+        TreeUI treeUI = getUI();
+        if (treeUI instanceof MetalTreeUI) {
+            BasicTreeUI basicUI = (BasicTreeUI) treeUI;
+            int size = 7;
+            BufferedImage expandedIcon = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+            expandedIconPainter.paint(expandedIcon.createGraphics(), null, size, size);
+            BufferedImage collapsedIcon = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+            collapsedIconPainter.paint(collapsedIcon.createGraphics(), null, size, size);
+            basicUI.setCollapsedIcon(new ImageIcon(collapsedIcon));
+            basicUI.setExpandedIcon(new ImageIcon(expandedIcon));
+        }
+
+        putClientProperty("Nimbus.Overrides", defaults);
+        putClientProperty("Nimbus.Overrides.InheritDefaults", true);
+    }
+
+    private class SelectionBackgroundPainter implements Painter {
+        private final Color selection;
+
+        public SelectionBackgroundPainter(Color selection) {
+            this.selection = selection;
+        }
+
+        @Override
+        public void paint(Graphics2D g, Object object, int width, int height) {
+            g.setColor(selection);
+            g.fillRect(0, 0, width, height);
         }
     }
 
+    class FileNode extends DefaultMutableTreeNode {
+        File file;
 
-    private static class DirNode extends DefaultMutableTreeNode {
-        DirNode(File dir) {
-            super(dir);
+        FileNode(File file) {
+            super(file);
+            this.file = file;
         }
 
-        public File getDir() {
-            return (File) userObject;
+        public File getFile() {
+            return file;
+        }
+
+        @Override
+        public String toString() {
+            return file.getName();
+        }
+    }
+
+    class DirectoryNode extends FileNode {
+        DirectoryNode(File file) {
+            super(file);
         }
 
         public int getChildCount() {
@@ -184,13 +308,31 @@ public class DirectoryChooser extends JTree
             return false;
         }
 
+        public void reload() {
+            children = null;
+            populateChildren();
+        }
+
         private void populateChildren() {
             if (children == null) {
-                File[] files = fsv.getFiles(getDir(), true);
-                Arrays.sort(files);
+                children = new Vector();
+                File[] files = fsv.getFiles(file, true);
+                Arrays.sort(files, new Comparator<File>() {
+                    @Override
+                    public int compare(File o1, File o2) {
+                        if (o1.isDirectory() ^ o2.isDirectory()) {
+                            return o1.isDirectory() ? -1 : 1;
+                        } else {
+                            return o1.compareTo(o2);
+                        }
+                    }
+                });
                 for (File f : files) {
                     if (fsv.isTraversable(f)) {
-                        insert(new DirNode(f),
+                        insert(new DirectoryNode(f),
+                                (children == null) ? 0 : children.size());
+                    } else if (f.isFile() && isEnableFiles()) {
+                        insert(new FileNode(f),
                                 (children == null) ? 0 : children.size());
                     }
                 }
@@ -198,90 +340,12 @@ public class DirectoryChooser extends JTree
         }
 
         public String toString() {
-            return fsv.getSystemDisplayName(getDir());
+            return fsv.getSystemDisplayName(file);
         }
 
         public boolean equals(Object o) {
-            return (o instanceof DirNode &&
-                    userObject.equals(((DirNode) o).userObject));
+            return (o instanceof DirectoryNode &&
+                    userObject.equals(((DirectoryNode) o).getUserObject()));
         }
-    }
-
-
-    /*--- Main for testing  ---*/
-
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(new NimbusLookAndFeel());
-        } catch (Exception ignored) {
-        }
-
-        final JDialog dialog = new JDialog((JFrame) null, true);
-        final DirectoryChooser dc = new DirectoryChooser();
-        final JButton okButton = new JButton("   OK   ");
-        final JButton cancelButton = new JButton(" Cancel ");
-        dialog.getRootPane().setDefaultButton(okButton);
-
-        JPanel panel = new JPanel(new BorderLayout());
-        final JTextField path = new JTextField();
-        path.setText(String.valueOf(dc.getSelectedDirectory()));
-        panel.add(path, BorderLayout.NORTH);
-
-        dc.addPropertyChangeListener("selectedDirectory", new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                path.setText(String.valueOf(evt.getNewValue()));
-            }
-        });
-
-        path.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                File dir = new File(path.getText());
-                if (dir.exists() && dir.isDirectory())
-                    dc.setSelectedDirectory(dir);
-                dc.requestFocus();
-            }
-        });
-
-        panel.add(new JScrollPane(dc), BorderLayout.CENTER);
-
-        Box buttonBox = Box.createHorizontalBox();
-        buttonBox.add(Box.createHorizontalGlue());
-        buttonBox.add(okButton);
-        buttonBox.add(Box.createHorizontalStrut(5));
-        buttonBox.add(cancelButton);
-        panel.add(buttonBox, BorderLayout.SOUTH);
-
-        dialog.add(panel);
-
-        ActionListener actionListener = new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                Object c = e.getSource();
-                if (c == okButton || c == dc) {
-                    System.out.println("You selected: " + dc.getSelectedDirectory());
-                }
-                dialog.setVisible(false);
-            }
-        };
-
-        dc.addActionListener(actionListener);
-        okButton.addActionListener(actionListener);
-        cancelButton.addActionListener(actionListener);
-
-        dc.addPropertyChangeListener(new PropertyChangeListener() {
-            public void propertyChange(PropertyChangeEvent ev) {
-                if (ev.getPropertyName().equals("selectedDirectory")) {
-                    okButton.setEnabled(dc.getSelectedDirectory() != null);
-                }
-            }
-        });
-
-        dialog.setBounds(200, 200, 300, 350);
-        dc.setFocusCycleRoot(true);
-        dc.requestFocusInWindow();
-        dc.scrollRowToVisible(Math.max(0, dc.getMinSelectionRow() - 4));
-        dialog.setVisible(true);
-        System.exit(0);
     }
 }

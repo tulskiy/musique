@@ -32,6 +32,9 @@ import com.tulskiy.musique.playlist.PlaylistManager;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
 import javax.swing.*;
+import javax.swing.plaf.metal.MetalFileChooserUI;
+import javax.swing.plaf.metal.MetalIconFactory;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -75,7 +78,7 @@ public class Application {
         }
 
         if (configuration.getBoolean("system.oneInstance", false)
-            && !tryLock()) {
+                && !tryLock()) {
             JOptionPane.showMessageDialog(null, "Only one instance of Musique can be run at a time", VERSION, JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
@@ -148,6 +151,7 @@ public class Application {
         });
         UIManager.put("Slider.paintValue", Boolean.FALSE);
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
+        UIManager.put("swing.boldMetal", Boolean.FALSE);
         Object thumbWidth = configuration.get("gui.thumbWidth");
         if (thumbWidth != null) {
             try {
@@ -173,10 +177,34 @@ public class Application {
             public void propertyChange(PropertyChangeEvent evt) {
                 String laf = configuration.getString(evt.getPropertyName(), "");
                 if (laf.endsWith("GTKLookAndFeel")) {
-                    UIManager.put("FileChooserUI", "eu.kostia.gtkjfilechooser.ui.GtkFileChooserUI");
+                    UIManager.put("FileChooserUI", MetalFileChooserUI.class.getName());
+                    UIManager.put("FileChooser.newFolderIcon", MetalIconFactory.getFileChooserNewFolderIcon());
+                    UIManager.put("FileChooser.upFolderIcon", MetalIconFactory.getFileChooserUpFolderIcon());
+                    UIManager.put("FileChooser.homeFolderIcon", MetalIconFactory.getFileChooserHomeFolderIcon());
+                    UIManager.put("FileChooser.detailsViewIcon", MetalIconFactory.getFileChooserDetailViewIcon());
+                    UIManager.put("FileChooser.listViewIcon", MetalIconFactory.getFileChooserListViewIcon());
                 } else {
                     UIManager.put("FileChooserUI", null);
                 }
+//                Font defaultFont = new Font("Sans Serif", 0, 11);
+//                UIManager.put("defaultFont", defaultFont);
+//                UIManager.put("Table.font", defaultFont);
+//                UIManager.put("Menu.font", defaultFont);
+//                UIManager.put("Button.font", defaultFont);
+//                UIManager.put("ComboBox.font", defaultFont);
+//                UIManager.put("Tree.font", defaultFont);
+//                UIManager.put("CheckBox.font", defaultFont);
+//                UIManager.put("TableHeader.font", defaultFont);
+//                UIManager.put("PopupMenu.font", defaultFont);
+//                UIManager.put("RadioButtonMenuItem.font", defaultFont);
+//                UIManager.put("RadioButton.font", defaultFont);
+//                UIManager.put("CheckBoxMenuItem.font", defaultFont);
+//                UIManager.put("TextField.font", defaultFont);
+//                UIManager.put("MenuItem.font", defaultFont);
+//                UIManager.put("Label.font", defaultFont);
+//                UIManager.put("TitledBorder.font", defaultFont.deriveFont(Font.BOLD));
+//                UIManager.put("TabbedPane.font", defaultFont);
+//                UIManager.put("TextArea.font", defaultFont);
             }
         });
     }

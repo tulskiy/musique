@@ -23,9 +23,11 @@ import com.tulskiy.musique.system.Configuration;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.tree.TreeSelectionModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  * Author: Denis Tulskiy
@@ -43,16 +45,15 @@ public class PathChooser extends JPanel {
         setLayout(new BorderLayout());
         add(text, BorderLayout.CENTER);
         button = new JButton("...");
+        final JComponent comp = this;
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fc = new JFileChooser(config.getString("playlist.lastDir", ""));
-                fc.setSize(500, 500);
-                fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-                int ret = fc.showDialog(getParent(), "Choose Folder");
-                if (ret == JFileChooser.APPROVE_OPTION) {
-                    setPath(fc.getSelectedFile().getAbsolutePath());
+                TreeFileChooser fc = new TreeFileChooser(comp, "Select folder", false);
+                fc.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+                File[] files = fc.showOpenDialog();
+                if (files != null && files.length > 0) {
+                    setPath(files[0].getAbsolutePath());
                 }
             }
         });
