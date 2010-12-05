@@ -384,8 +384,15 @@ public class Playlist extends ArrayList<Track> {
                         queue.addAll(0, Arrays.asList(file.listFiles()));
                     } else if (file.isFile()) {
                         AudioFileReader reader = TrackIO.getAudioFileReader(file.getName());
-                        if (reader != null)
+                        if (reader != null) {
+                            if (!Util.getFileExt(file).equals("cue")) {
+                                String name = Util.removeExt(file.getAbsolutePath()) + ".cue";
+                                if (new File(name).exists()) {
+                                    continue;
+                                }
+                            }
                             reader.read(file, temp);
+                        }
                     }
                 }
             } catch (Exception ignored) {
