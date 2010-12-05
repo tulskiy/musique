@@ -30,7 +30,7 @@ import java.util.HashSet;
  * Date: 11/14/10
  */
 @SuppressWarnings({"UnusedDeclaration"})
-public class TrackData {
+public class TrackData implements Cloneable {
     //meta fields
     private String artist;
     private String album;
