@@ -167,7 +167,7 @@ public class PlaylistTransferHandler extends TransferHandler {
                 } else if (action == COPY) {
                     ArrayList<Track> temp = new ArrayList<Track>();
                     for (Track track : tracks) {
-                        temp.add(track.copy());
+                        temp.add(new Track(track));
                     }
                     //switcherooo
                     tracks.clear();

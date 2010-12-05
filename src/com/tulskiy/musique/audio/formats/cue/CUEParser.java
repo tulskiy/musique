@@ -59,19 +59,19 @@ public class CUEParser {
 
                         String album = trackData.getMetaData(CueSheet.MetaDataField.ALBUMTITLE);
                         if (album.length() > 0)
-                            track.setAlbum(album);
+                            track.setMeta("album", album);
                         String artist = trackData.getPerformer();
-                        track.setArtist(artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
-                        track.setAlbumArtist(cueSheet.getPerformer());
-                        track.setComment(cueSheet.getComment());
-                        track.setTitle(trackData.getTitle());
+                        track.setMeta("artist", artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
+                        track.setMeta("albumArtist", cueSheet.getPerformer());
+                        track.setMeta("comment", cueSheet.getComment());
+                        track.setMeta("title", trackData.getTitle());
                         String year = trackData.getMetaData(CueSheet.MetaDataField.YEAR);
                         if (year.length() > 0)
-                            track.setYear(year);
+                            track.setMeta("year", year);
                         track.setTrackNumber(String.valueOf(trackData.getNumber()));
                         String genre = trackData.getMetaData(CueSheet.MetaDataField.GENRE);
                         if (genre.length() > 0)
-                            track.setGenre(genre);
+                            track.setMeta("genre", genre);
                         int sampleRate = track.getSampleRate();
                         long startPosition = indexToSample(trackData.getIndex(1), sampleRate);
 //                        System.out.println(song.getFile().getName() + " " + startPosition);

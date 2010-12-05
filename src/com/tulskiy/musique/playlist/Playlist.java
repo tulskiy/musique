@@ -130,6 +130,7 @@ public class Playlist extends ArrayList<Track> {
 
     public void load(File file) {
         try {
+            TrackDataCache cache = TrackDataCache.getInstance();
             logger.fine("Loading musique playlist: " + file.getName());
             DataInputStream dis = new DataInputStream(
                     new BufferedInputStream(new FileInputStream(file)));
@@ -153,6 +154,7 @@ public class Playlist extends ArrayList<Track> {
                 track.setStartPosition(dis.readLong());
                 track.setTotalSamples(dis.readLong());
                 track.setSubsongIndex(dis.readInt());
+                cache.cache(track);
                 if (track.getSubsongIndex() > 0) {
                     track.setCueEmbedded(dis.readBoolean());
                     if (!track.isCueEmbedded())
@@ -367,7 +369,7 @@ public class Playlist extends ArrayList<Track> {
                     String title = uri.getPath();
                     if (Util.isEmpty(title))
                         title = uri.getHost();
-                    track.setTitle(title);
+                    track.setMeta("title", title);
                     track.setLocation(uri);
                     track.setTotalSamples(-1);
                     temp.add(track);
@@ -396,7 +398,10 @@ public class Playlist extends ArrayList<Track> {
                 return o1.getLocation().compareTo(o2.getLocation());
             }
         });
-
+        TrackDataCache cache = TrackDataCache.getInstance();
+        for (Track track : temp) {
+            cache.cache(track);
+        }
         addAll(location, temp);
         firePlaylistChanged();
         int size = temp.size();

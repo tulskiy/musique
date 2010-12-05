@@ -91,9 +91,9 @@ public class VorbisDecoder implements Decoder {
                     if (key.equals("tracknumber"))
                         track.setTrackNumber(value);
                     else if (key.equals("albumartist"))
-                        track.setAlbumArtist(value);
+                        track.setMeta("albumArtist", value);
                     else if (key.equals("date"))
-                        track.setYear(value);
+                        track.setMeta("year", value);
                     else
                         track.setMeta(key, value);
                 }
