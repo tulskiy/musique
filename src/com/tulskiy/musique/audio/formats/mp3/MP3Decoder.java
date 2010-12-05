@@ -200,9 +200,9 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
                             if (ss[0].equals("icy-metaint")) {
                                 metaIntString = ss[1];
                             } else if (ss[0].equals("icy-genre")) {
-                                track.setGenre(ss[1]);
+                                track.setMeta("genre", ss[1]);
                             } else if (ss[0].equals("icy-name")) {
-                                track.setAlbum(ss[1]);
+                                track.setMeta("album", ss[1]);
                             }
                         }
                     } else {
@@ -210,8 +210,8 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
                     }
                 } else {
                     metaIntString = urlConnection.getHeaderField("icy-metaint");
-                    track.setGenre(urlConnection.getHeaderField("icy-genre"));
-                    track.setAlbum(urlConnection.getHeaderField("icy-name"));
+                    track.setMeta("genre", urlConnection.getHeaderField("icy-genre"));
+                    track.setMeta("album", urlConnection.getHeaderField("icy-name"));
                 }
                 if (Util.isEmpty(metaIntString))
                     metaIntString = "0";
@@ -234,10 +234,10 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
                                         String[] ss = metaString.substring(title.length(), metaString.indexOf(";") - 1).split(" - ");
                                         if (ss.length > 0) {
                                             if (ss.length > 1) {
-                                                track.setArtist(ss[0]);
-                                                track.setTitle(ss[1]);
+                                                track.setMeta("artist", ss[0]);
+                                                track.setMeta("title", ss[1]);
                                             } else {
-                                                track.setTitle(ss[0]);
+                                                track.setMeta("title", ss[0]);
                                             }
                                         }
                                     }

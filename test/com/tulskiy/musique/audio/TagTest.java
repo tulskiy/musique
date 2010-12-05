@@ -92,15 +92,15 @@ public class TagTest {
     private void testWrite(String name) {
         Track track = new Track();
 
-        track.setAlbum("album");
-        track.setAlbumArtist("album artist");
-        track.setArtist("artist");
-        track.setComment("comment");
+        track.setMeta("album", "album");
+        track.setMeta("albumArtist", "album artist");
+        track.setMeta("artist", "artist");
+        track.setMeta("comment", "comment");
         track.setDiscNumber("3/4");
         track.setTrackNumber("1/2");
-        track.setGenre("genre");
-        track.setTitle("title");
-        track.setYear("date");
+        track.setMeta("genre", "genre");
+        track.setMeta("title", "title");
+        track.setMeta("year", "date");
 
         File file = new File(name);
         File fo = new File("testfiles/temp." + Util.getFileExt(name));
