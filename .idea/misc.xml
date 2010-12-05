@@ -5,6 +5,9 @@
     <scope name="musique" pattern="file[musique]:*//*" />
     <option name="SKIP_IMPORT_STATEMENTS" value="false" />
   </component>
+  <component name="EntryPointsManager">
+    <entry_points version="2.0" />
+  </component>
   <component name="ExportToHTMLSettings">
     <option name="printScope" value="4" />
     <option name="OPEN_IN_BROWSER" value="true" />

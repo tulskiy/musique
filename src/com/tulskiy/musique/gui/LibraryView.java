@@ -170,7 +170,7 @@ public class LibraryView extends JPanel {
                     Track nextTrack = null;
                     do {
                         nextTrack = player.getPlaybackOrder().next(nextTrack);
-                    } while (nextTrack.getLocation() == null);
+                    } while (nextTrack != null && nextTrack.getLocation() == null);
 
                     player.open(nextTrack);
                     player.play();
