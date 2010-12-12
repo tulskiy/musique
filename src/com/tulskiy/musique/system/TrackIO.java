@@ -81,7 +81,8 @@ public class TrackIO {
     public static void write(Track track) {
         if (track.isFile()) {
             AudioTagWriter writer = TrackIO.getAudioFileWriter(track.getFile().getName());
-            writer.write(track);
+            if (writer != null)
+                writer.write(track);
         }
     }
 }
