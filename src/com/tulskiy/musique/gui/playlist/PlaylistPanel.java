@@ -21,6 +21,7 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.dialogs.*;
+import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -36,7 +37,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -191,9 +191,9 @@ public class PlaylistPanel extends JPanel {
     }
 
     public void addMenu(JMenuBar menuBar) {
-        ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+        Icon emptyIcon = Images.getEmptyIcon();
+
         final JComponent comp = getRootPane();
-        System.out.println(comp);
         JMenu fileMenu = new JMenu("File ");
         menuBar.add(fileMenu);
         JMenu editMenu = new JMenu("Edit");
@@ -235,7 +235,7 @@ public class PlaylistPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (config.getBoolean("tray.enabled", false) &&
-                        config.getBoolean("tray.minimizeOnClose", true)) {
+                    config.getBoolean("tray.minimizeOnClose", true)) {
                     SwingUtilities.windowForComponent(comp).setVisible(false);
                 } else {
                     app.exit();

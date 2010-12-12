@@ -19,6 +19,7 @@ package com.tulskiy.musique.images;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.net.URL;
 
 /**
@@ -40,5 +41,12 @@ public class Images {
             return icon.getImage();
         else
             return null;
+    }
+
+    public static Icon getEmptyIcon() {
+        if (System.getProperty("java.runtime.name").contains("OpenJDK")) {
+            return new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+        }
+        return null;
     }
 }
