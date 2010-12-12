@@ -41,6 +41,7 @@ public class ProgressDialog extends JDialog {
         progress = new JProgressBar(0, 100);
         status = new JTextArea(2, 10);
         status.setEditable(false);
+        status.setOpaque(false);
         status.setBorder(BorderFactory.createEmptyBorder());
         status.setFont(status.getFont().deriveFont(11f));
         status.setEnabled(false);
@@ -74,7 +75,6 @@ public class ProgressDialog extends JDialog {
         box.add(Box.createVerticalStrut(10));
         box.add(buttonBox);
         box.add(Box.createVerticalStrut(5));
-        progress.setVisible(false);
 
         box.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
 
@@ -83,10 +83,7 @@ public class ProgressDialog extends JDialog {
 
     public void show(final Task task) {
         this.task = task;
-        if (task.isIndeterminate())
-            progress.setVisible(false);
-        else
-            progress.setVisible(true);
+        progress.setIndeterminate(task.isIndeterminate());
         pack();
         setSize(600, getHeight());
         setLocationRelativeTo(getParent());
@@ -112,7 +109,8 @@ public class ProgressDialog extends JDialog {
                 try {
                     task.start();
                     timer.stop();
-                } catch (Exception ignored) {
+                } catch (Exception e) {
+                    e.printStackTrace();
                 } finally {
                     setVisible(false);
                     dispose();
