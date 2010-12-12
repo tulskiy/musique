@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="gtkjfilechooser">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/gtkjfilechooser.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
