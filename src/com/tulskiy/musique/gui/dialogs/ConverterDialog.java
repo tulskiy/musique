@@ -303,7 +303,7 @@ public class ConverterDialog extends JDialog {
         labels.put(4, new JLabel("Extra High"));
         labels.put(5, new JLabel("Insane"));
         slider.setLabelTable(labels);
-        slider.setValue(config.getInt("ape.encoder.level", 3));
+        slider.setValue(config.getInt("ape.encoder.level", 2000) / 1000);
         Box box = Box.createVerticalBox();
         box.add(slider);
         box.add(Box.createVerticalGlue());
