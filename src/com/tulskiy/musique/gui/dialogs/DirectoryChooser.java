@@ -123,7 +123,12 @@ public class DirectoryChooser extends JTree {
         if (file == null) {
             file = fsv.getDefaultDirectory();
         }
-        TreePath path = makePath(file);
+        TreePath path;
+        try {
+            path = makePath(file);
+        } catch (Exception e) {
+            path = makePath(fsv.getDefaultDirectory());
+        }
         setSelectionPath(path);
         expandPath(path);
         int row = Math.max(0, getRowForPath(path) - 4);

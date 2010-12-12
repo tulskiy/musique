@@ -23,7 +23,9 @@ import com.tulskiy.musique.system.Configuration;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.tree.*;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
@@ -203,7 +205,9 @@ public class TreeFileChooser extends JDialog {
         Configuration config = app.getConfiguration();
         String path = config.getString("playlist.lastDir", null);
         if (path != null) {
-            directoryChooser.setSelectedFile(new File(path));
+            File file = new File(path);
+            if (file.exists())
+                directoryChooser.setSelectedFile(file);
         }
         setVisible(true);
         dispose();
