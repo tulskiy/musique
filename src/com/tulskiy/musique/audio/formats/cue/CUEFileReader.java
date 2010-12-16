@@ -30,15 +30,15 @@ import java.util.List;
 public class CUEFileReader extends AudioFileReader {
     private static CUEParser cueParser;
 
-    public void read(File f, List<Track> list) {
+    public void read(File file, List<Track> list) {
         Track track = new Track();
-        track.setLocation(f.toURI());
+        track.setLocation(file.toURI());
         if (cueParser == null)
             cueParser = new CUEParser();
         try {
             LineNumberReader numberReader = new LineNumberReader(
                     new InputStreamReader(
-                            new FileInputStream(f), defaultCharset));
+                            new FileInputStream(file), defaultCharset));
             cueParser.parse(list, track, numberReader, false);
         } catch (FileNotFoundException e) {
             e.printStackTrace();

@@ -46,7 +46,7 @@ public class CUEParser {
                             continue;
                         AudioFileReader reader = TrackIO.getAudioFileReader(referencedFile.getName());
                         if (reader == null) break;
-                        file = reader.readSingle(referencedFile);
+                        file = reader.read(referencedFile);
                     }
 
                     int size = fileData.getTrackData().size();

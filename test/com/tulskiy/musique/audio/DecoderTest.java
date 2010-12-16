@@ -92,7 +92,7 @@ public class DecoderTest {
 //    }
 
     private void test(AudioFileReader reader, String fileName) {
-        Track file = reader.readSingle(new File(fileName));
+        Track file = reader.read(new File(fileName));
         DecoderSeekTester test = new DecoderSeekTester(file, Codecs.getDecoder(file));
         test.start();
     }

@@ -40,9 +40,9 @@ public abstract class AudioFileReader {
     protected static Charset defaultCharset = Charset.forName("iso8859-1");
     protected final Logger logger = Logger.getLogger("musique");
 
-    public void read(File f, List<Track> list) {
-        logger.log(Level.FINE, "Reading file : {0}", f);
-        Track track = readSingle(f);
+    public void read(File file, List<Track> list) {
+        logger.log(Level.FINE, "Reading file : {0}", file);
+        Track track = read(file);
         String cueSheet = track.getCueSheet();
         if (cueSheet != null && cueSheet.length() > 0) {
             if (cueParser == null)
@@ -54,12 +54,17 @@ public abstract class AudioFileReader {
         }
     }
 
-    public abstract Track readSingle(Track track);
+    protected abstract Track readSingle(Track track);
 
-    public Track readSingle(File file) {
-        Track s = new Track();
-        s.setLocation(file.toURI());
-        return readSingle(s);
+    public Track reload(Track track) {
+        Track res = readSingle(track);
+        return res;
+    }
+
+    public Track read(File file) {
+        Track track = new Track();
+        track.setLocation(file.toURI());
+        return reload(track);
     }
 
     public abstract boolean isFileSupported(String ext);

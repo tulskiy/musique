@@ -587,7 +587,7 @@ public class PlaylistTable extends GroupTable {
                                 progress = (float) i / selectedSongs.size();
                                 AudioFileReader reader = TrackIO.getAudioFileReader(track.getFile().getName());
                                 track.clearTags();
-                                reader.readSingle(track);
+                                reader.reload(track);
                             }
                         }
                         playlist.firePlaylistChanged();

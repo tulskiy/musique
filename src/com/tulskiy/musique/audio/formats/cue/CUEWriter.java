@@ -45,7 +45,7 @@ public class CUEWriter {
             LineNumberReader numberReader;
 
             if (cueEmbedded) {
-                Track track = TrackIO.getAudioFileReader(file.getName()).readSingle(file);
+                Track track = TrackIO.getAudioFileReader(file.getName()).read(file);
                 numberReader = new LineNumberReader(new StringReader(track.getCueSheet()));
                 System.out.println(track.getCueSheet());
             } else {

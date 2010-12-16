@@ -74,7 +74,7 @@ public class TagTest {
 
 
     private void testRead(String file) {
-        Track track = getAudioFileReader(file).readSingle(new File(file));
+        Track track = getAudioFileReader(file).read(new File(file));
 
         assertEquals("artist", track.getArtist());
         assertEquals("title", track.getTitle());
