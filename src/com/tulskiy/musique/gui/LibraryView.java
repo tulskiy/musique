@@ -306,7 +306,7 @@ public class LibraryView extends JPanel {
             super.updateUI();
 
             String laf = UIManager.getLookAndFeel().getName();
-            if (laf.contains("GTK") || laf.contains("Metal")) {
+            if (laf.contains("GTK") || laf.contains("Metal") || laf.contains("Windows")) {
                 MetalTreeUI newUI = new MetalTreeUI() {
                     @Override
                     protected void paintRow(Graphics g, Rectangle clipBounds, Insets insets, Rectangle bounds, TreePath path, int row, boolean isExpanded, boolean hasBeenExpanded, boolean isLeaf) {
