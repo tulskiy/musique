@@ -116,6 +116,7 @@ public class PlaylistManager {
             Playlist playlist = playlists.get(i);
             playlist.save(new File(PLAYLIST_PATH, i + ".mus"));
         }
+        library.getData().save(new File(PLAYLIST_PATH, "library.mus"));
 
         config.setList("playlists", playlists);
         config.setInt("playlist.currentPlaylist", playlists.indexOf(currentPlaylist));
