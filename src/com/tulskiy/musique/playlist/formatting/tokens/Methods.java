@@ -67,6 +67,26 @@ public class Methods {
         return null;
     }
 
+    public String greater(Track track, ArrayList<Expression> args) {
+        if (args.size() != 2) {
+            return null;
+        }
+
+        try {
+            String sop1 = (String) args.get(0).eval(track);
+            String sop2 = (String) args.get(1).eval(track);
+            if (sop1 != null && sop2 != null) {
+                int op1 = Integer.valueOf(sop1);
+                int op2 = Integer.valueOf(sop2);
+
+                if (op1 > op2) return "1";
+            }
+        } catch (NumberFormatException ignored) {
+        }
+
+        return null;
+    }
+
     public Object eval(Track track, ArrayList<Expression> args) {
         if (args.size() == 1)
             return args.get(0).eval(track);

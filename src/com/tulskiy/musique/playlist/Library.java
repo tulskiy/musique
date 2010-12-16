@@ -17,30 +17,26 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.sun.java.swing.plaf.gtk.GTKLookAndFeel;
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Codecs;
 import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
 
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicTreeUI;
-import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.tree.*;
-import java.awt.*;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.FileFilter;
+import java.util.*;
 
 /**
  * Author: Denis Tulskiy
  * Date: 10/30/10
  */
 public class Library {
-    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'Unknown Artist')|[%year% - ]$if3(%album%,'Unknown Album')|[%trackNumber%. ]%title%";
+    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'Unknown Artist')|[%year% - ]$if3(%album%,'Unknown Album')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
     private Configuration config = Application.getInstance().getConfiguration();
     private Playlist data;
     private String view;
@@ -81,7 +77,9 @@ public class Library {
     }
 
     private void buildDataTree() {
-        rootNode = new DefaultMutableTreeNode("All Music");
+        if (rootNode == null)
+            rootNode = new DefaultMutableTreeNode("All Music");
+        rootNode.removeAllChildren();
         if (data == null)
             return;
         if (Util.isEmpty(view)) {
@@ -89,44 +87,42 @@ public class Library {
         }
         data.sort(view, false);
         Expression expr = Parser.parse(view);
-        DefaultMutableTreeNode currentNode = null;
+        DefaultMutableTreeNode currentNode = rootNode;
         for (Track track : data) {
             Object val = expr.eval(track);
             if (val != null) {
-                String[] parts = val.toString().split("\\|");
+                String[] path = val.toString().split("\\|");
 
-                if (parts.length < 2) {
+                if (path.length < 2) {
                     continue;
                 }
 
-                String parentName = parts[0];
-                TrackNode trackNode = new TrackNode(track, parts[parts.length - 1]);
-                if (currentNode == null || !compare(currentNode, parentName)) {
-                    currentNode = new DefaultMutableTreeNode(parentName);
-                    rootNode.add(currentNode);
-                }
-
-                DefaultMutableTreeNode subNode = null;
-                if (currentNode.getChildCount() > 0)
-                    subNode = (DefaultMutableTreeNode) currentNode.getLastChild();
-                DefaultMutableTreeNode parent = currentNode;
-                for (int i = 1; i < parts.length - 1; i++) {
-                    String part = parts[i];
-                    if (subNode == null || !subNode.getUserObject().equals(part)) {
-                        if (subNode != null)
-                            parent = (DefaultMutableTreeNode) subNode.getParent();
-                        subNode = new DefaultMutableTreeNode(part);
-                        parent.add(subNode);
+                TreeNode[] currentNodePath = currentNode.getPath();
+                int start = -1;
+                for (int i = 1; i < path.length; i++) {
+                    if (currentNodePath.length <= i) {
+                        currentNode = rootNode;
+                        start = 0;
+                        break;
+                    }
+                    currentNode = (DefaultMutableTreeNode) currentNodePath[i];
+                    if (!currentNode.getUserObject().equals(path[i - 1])) {
+                        currentNode = (DefaultMutableTreeNode) currentNode.getParent();
+                        start = i - 1;
+                        break;
                     }
                 }
-                if (subNode == null) {
-                    subNode = new DefaultMutableTreeNode("?");
-                    parent.add(subNode);
+
+                if (start != -1) {
+                    for (int i = start; i < path.length - 1; i++) {
+                        DefaultMutableTreeNode newChild = new DefaultMutableTreeNode(path[i]);
+                        currentNode.add(newChild);
+                        currentNode = newChild;
+                    }
                 }
 
-                subNode.add(trackNode);
+                currentNode.add(new TrackNode(track, path[path.length - 1]));
             }
-
         }
     }
 
