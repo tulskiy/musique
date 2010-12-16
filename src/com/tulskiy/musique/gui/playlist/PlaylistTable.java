@@ -72,6 +72,9 @@ public class PlaylistTable extends GroupTable {
     private JScrollPane scrollPane;
     private final ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
     private JPopupMenu tablePopupMenu;
+    private PlayerListener playerListener;
+    private PropertyChangeListener autoResizeChangeListener;
+    private PlaylistListener playlistListener;
 
     public PlaylistTable(Playlist playlist, ArrayList<PlaylistColumn> columns) {
         this.playlist = playlist;
@@ -202,7 +205,7 @@ public class PlaylistTable extends GroupTable {
                 }
             }
         });
-        player.addListener(new PlayerListener() {
+        playerListener = new PlayerListener() {
             public void onEvent(PlayerEvent e) {
                 update();
                 switch (e.getEventCode()) {
@@ -222,13 +225,14 @@ public class PlaylistTable extends GroupTable {
                         }
                         break;
                     case STOPPED:
-                        int index = indexOf(player.getTrack());
+                        int index = playlist.indexOf(player.getTrack());
                         if (index != -1)
                             setRowSelectionInterval(index, index);
                         break;
                 }
             }
-        });
+        };
+        player.addListener(playerListener);
 
         getTableHeader().addMouseListener(new MouseAdapter() {
             @Override
@@ -260,20 +264,28 @@ public class PlaylistTable extends GroupTable {
             }
         });
 
-        config.addPropertyChangeListener("gui.playlist.autoResizeMode", true, new PropertyChangeListener() {
+        autoResizeChangeListener = new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 int mode = config.getInt(evt.getPropertyName(), AUTO_RESIZE_OFF);
                 setAutoResizeMode(mode);
             }
-        });
+        };
+        config.addPropertyChangeListener("gui.playlist.autoResizeMode", true, autoResizeChangeListener);
 
-        playlist.addChangeListener(new PlaylistListener() {
+        playlistListener = new PlaylistListener() {
             @Override
             public void playlistUpdated(Playlist playlist) {
                 update();
             }
-        });
+        };
+        playlist.addChangeListener(playlistListener);
+    }
+
+    public void dispose() {
+        config.removePropertyChangeListener(autoResizeChangeListener);
+        playlist.removeChangeListener(playlistListener);
+        player.removeListener(playerListener);
     }
 
     private void adjustLastSongAfterDelete(ArrayList<Track> songs) {
@@ -355,12 +367,8 @@ public class PlaylistTable extends GroupTable {
         }
     }
 
-    public int indexOf(Track track) {
-        return playlist.indexOf(track);
-    }
-
     public void scrollToSong(Track track) {
-        int index = indexOf(track);
+        int index = playlist.indexOf(track);
         if (index != -1) {
             scrollToRow(index);
             setRowSelectionInterval(index, index);

@@ -99,7 +99,7 @@ public class SearchDialog extends JDialog {
         table.addKeyboardAction(KeyStroke.getKeyStroke("ESCAPE"), "escape", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setVisible(false);
+                hideDialog();
             }
         });
         table.addKeyboardAction(KeyStroke.getKeyStroke("ENTER"), "playSelected", new AbstractAction() {
@@ -125,8 +125,7 @@ public class SearchDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 playlistTable.runAction("playSelected");
-                setVisible(false);
-                dispose();
+                hideDialog();
             }
         });
         timer = new Timer(100, new ActionListener() {
@@ -192,7 +191,7 @@ public class SearchDialog extends JDialog {
                     if (!view.isEmpty())
                         table.setRowSelectionInterval(0, 0);
                 } else if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    setVisible(false);
+                    hideDialog();
                 }
             }
         });
@@ -202,5 +201,11 @@ public class SearchDialog extends JDialog {
                 playlistTable.runAction("playSelected");
             }
         });
+    }
+
+    private void hideDialog() {
+        table.dispose();
+        setVisible(false);
+        dispose();
     }
 }

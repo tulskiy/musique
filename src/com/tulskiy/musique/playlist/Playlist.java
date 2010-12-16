@@ -569,5 +569,9 @@ public class Playlist extends ArrayList<Track> {
     public void addChangeListener(PlaylistListener listener) {
         listeners.add(listener);
     }
+
+    public void removeChangeListener(PlaylistListener listener) {
+        listeners.remove(listener);
+    }
 }
 

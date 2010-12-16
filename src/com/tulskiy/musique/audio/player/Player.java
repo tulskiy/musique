@@ -105,6 +105,10 @@ public class Player {
         listeners.add(listener);
     }
 
+    public void removeListener(PlayerListener listener) {
+        listeners.remove(listener);
+    }
+
     public long getCurrentSample() {
         return playerThread.getCurrentSample();
     }
