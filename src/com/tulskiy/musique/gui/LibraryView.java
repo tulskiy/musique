@@ -147,15 +147,17 @@ public class LibraryView extends JPanel {
             public void valueChanged(TreeSelectionEvent e) {
                 ensureLibraryPlaylistVisible();
                 libraryPlaylist.clear();
-                for (TreePath path : tree.getSelectionPaths()) {
-                    DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-                    Enumeration<DefaultMutableTreeNode> en = node.breadthFirstEnumeration();
-                    while (en.hasMoreElements()) {
-                        DefaultMutableTreeNode o = en.nextElement();
-                        if (o.isLeaf() && o.getUserObject() instanceof Track)
-                            libraryPlaylist.add((Track) o.getUserObject());
+                TreePath[] selectionPaths = tree.getSelectionPaths();
+                if (selectionPaths != null)
+                    for (TreePath path : selectionPaths) {
+                        DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
+                        Enumeration<DefaultMutableTreeNode> en = node.breadthFirstEnumeration();
+                        while (en.hasMoreElements()) {
+                            DefaultMutableTreeNode o = en.nextElement();
+                            if (o.isLeaf() && o.getUserObject() instanceof Track)
+                                libraryPlaylist.add((Track) o.getUserObject());
+                        }
                     }
-                }
                 libraryPlaylist.firePlaylistChanged();
             }
         });
