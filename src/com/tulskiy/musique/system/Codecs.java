@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URLConnection;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.logging.Logger;
 
 /**
@@ -107,5 +108,9 @@ public class Codecs {
 
     public static Encoder getEncoder(String format) {
         return encoders.get(format);
+    }
+
+    public static Set<String> getFormats() {
+        return decoders.keySet();
     }
 }

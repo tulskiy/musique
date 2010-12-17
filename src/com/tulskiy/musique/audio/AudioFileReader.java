@@ -58,6 +58,8 @@ public abstract class AudioFileReader {
 
     public Track reload(Track track) {
         Track res = readSingle(track);
+        if (res.isFile())
+            res.setLastModified(res.getFile().lastModified());
         return res;
     }
 

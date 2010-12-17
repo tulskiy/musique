@@ -30,6 +30,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,12 +47,13 @@ public class SettingsDialog extends JDialog {
 
     private JButton applyButton;
     private JComponent owner;
+    private JTabbedPane tabs;
 
     public SettingsDialog(JComponent owner) {
         super(SwingUtilities.windowForComponent(owner), "Settings", ModalityType.MODELESS);
         this.owner = owner;
 
-        JTabbedPane tabs = new JTabbedPane();
+        tabs = new JTabbedPane();
         tabs.setFocusable(false);
 
         Box buttons = Box.createHorizontalBox();
@@ -84,6 +86,7 @@ public class SettingsDialog extends JDialog {
 
         tabs.add(createSystemPanel());
         tabs.add(createNetworkPanel());
+        tabs.add(createLibraryPanel());
         tabs.add(createGUIPanel());
         tabs.add(createColorsAndFontsPanel());
         add(tabs, BorderLayout.CENTER);
@@ -92,6 +95,16 @@ public class SettingsDialog extends JDialog {
         pack();
         setSize(670, getHeight());
         setLocationRelativeTo(SwingUtilities.windowForComponent(owner));
+    }
+
+    public SettingsDialog(JComponent owner, String tabName) {
+        this(owner);
+        for (Component component : tabs.getComponents()) {
+            if (component.getName().equals(tabName)) {
+                tabs.setSelectedComponent(component);
+                break;
+            }
+        }
     }
 
     private JComponent createGUIPanel() {
@@ -420,6 +433,64 @@ public class SettingsDialog extends JDialog {
             }
         });
 
+        return panel;
+    }
+
+    private JComponent createLibraryPanel() {
+        final JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setName("Library");
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 5, 30));
+        Box mainBox = Box.createVerticalBox();
+        panel.add(mainBox, BorderLayout.NORTH);
+
+        JPanel foldersPanel = new JPanel(new BorderLayout());
+        foldersPanel.setBorder(BorderFactory.createTitledBorder("Music folders"));
+        final ArrayList<String> model = new ArrayList<String>();
+        model.addAll(config.getList("library.folders", new ArrayList<String>()));
+        final JList list = new JList(model.toArray());
+        foldersPanel.add(new JScrollPane(list), BorderLayout.CENTER);
+        Container buttons = new JPanel(new GridLayout(0, 1));
+        JButton add = new JButton("Add");
+        buttons.add(add);
+        JButton remove = new JButton("Remove");
+        buttons.add(remove);
+        JPanel p1 = new JPanel(new FlowLayout());
+        p1.add(buttons);
+        foldersPanel.add(p1, BorderLayout.LINE_END);
+        mainBox.add(foldersPanel);
+
+        add.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TreeFileChooser fileChooser = new TreeFileChooser(getRootPane(), "Select folder", false);
+                File[] files = fileChooser.showOpenDialog();
+                for (File file : files) {
+                    String path = file.getAbsolutePath();
+                    if (!model.contains(path))
+                        model.add(path);
+                }
+                list.setListData(model.toArray());
+                list.repaint();
+            }
+        });
+
+        remove.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Object[] values = list.getSelectedValues();
+                if (values != null)
+                    model.removeAll(Arrays.asList(values));
+                list.setListData(model.toArray());
+                list.repaint();
+            }
+        });
+
+        applyButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                config.setList("library.folders", model);
+            }
+        });
         return panel;
     }
 

@@ -32,7 +32,6 @@ import com.tulskiy.musique.util.Util;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -57,7 +56,12 @@ public class MainWindow extends JFrame {
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
         LyricsPanel lyricsPanel = new LyricsPanel();
-        side = new JSplitPane(JSplitPane.VERTICAL_SPLIT, lyricsPanel, new AlbumArtPanel());
+        LibraryView libraryView = new LibraryView();
+        JTabbedPane topLeftSide = new JTabbedPane();
+        topLeftSide.add("Library", libraryView);
+        topLeftSide.add("Lyrics", lyricsPanel);
+        topLeftSide.setFocusable(false);
+        side = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topLeftSide, new AlbumArtPanel());
         side.setDividerSize(6);
         center = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, side, playlistPanel);
 
@@ -71,6 +75,7 @@ public class MainWindow extends JFrame {
         add(statusBar, BorderLayout.SOUTH);
         add(center, BorderLayout.CENTER);
         playlistPanel.addMenu(menuBar);
+        libraryView.addMenu(menuBar);
         addHelpMenu(menuBar);
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -132,7 +137,7 @@ public class MainWindow extends JFrame {
     }
 
     private void addHelpMenu(JMenuBar menuBar) {
-        ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+        Icon emptyIcon = Images.getEmptyIcon();
 
         JMenu helpMenu = new JMenu("Help");
         menuBar.add(helpMenu);

@@ -64,6 +64,16 @@ public class TrackData implements Cloneable {
     private String fileName;
     private File file;
     private String directory;
+    private long dateAdded;
+    private long lastModified;
+
+    public TrackData() {
+    }
+
+    public TrackData(URI location, int subsongIndex) {
+        setLocation(location);
+        setSubsongIndex(subsongIndex);
+    }
 
     public TrackData copy() {
         try {
@@ -166,6 +176,22 @@ public class TrackData implements Cloneable {
     public void setTotalSamples(long totalSamples) {
         this.totalSamples = totalSamples;
         length = null;
+    }
+
+    public long getDateAdded() {
+        return dateAdded;
+    }
+
+    public void setDateAdded(long dateAdded) {
+        this.dateAdded = dateAdded;
+    }
+
+    public long getLastModified() {
+        return lastModified;
+    }
+
+    public void setLastModified(long lastModified) {
+        this.lastModified = lastModified;
     }
 
     public URI getLocation() {
