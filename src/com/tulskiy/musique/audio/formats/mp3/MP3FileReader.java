@@ -92,8 +92,7 @@ public class MP3FileReader extends AudioFileReader {
 
         try {
             apeTagProcessor.readAPEv2Tag(track);
-        } catch (IOException ignored) {
-
+        } catch (Exception ignored) {
         }
 
         return track;
