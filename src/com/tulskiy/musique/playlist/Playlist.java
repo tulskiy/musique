@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 public class Playlist extends ArrayList<Track> {
     private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\" {2}");
 
-    private static final int VERSION = 1;
+    private static final int VERSION = 2;
     private static final byte[] MAGIC = "BARABASHKA".getBytes();
     private static String[] metaMap = {
             "artist", "album", "albumArtist", "title",
@@ -105,6 +105,8 @@ public class Playlist extends ArrayList<Track> {
                 dos.writeInt(track.getChannels());
                 dos.writeInt(track.getSampleRate());
                 dos.writeInt(track.getBitrate());
+                dos.writeLong(track.getDateAdded());
+                dos.writeLong(track.getLastModified());
 
                 meta.clear();
                 for (String key : metaMap) {
@@ -142,8 +144,8 @@ public class Playlist extends ArrayList<Track> {
                 throw new RuntimeException();
             }
             int version = dis.readInt();
-            if (version != VERSION) {
-                logger.warning("Wrong playlist version: " + version);
+            if (version > VERSION) {
+                logger.warning("Playlist has newer version, expected: " + VERSION + " got: " + version);
                 throw new RuntimeException();
             }
             int size = dis.readInt();
@@ -164,7 +166,14 @@ public class Playlist extends ArrayList<Track> {
                 track.setChannels(dis.readInt());
                 track.setSampleRate(dis.readInt());
                 track.setBitrate(dis.readInt());
-
+                if (version == 1) {
+                    track.setDateAdded(System.currentTimeMillis());
+                    if (track.isFile())
+                        track.setLastModified(track.getFile().lastModified());
+                } else {
+                    track.setDateAdded(dis.readLong());
+                    track.setLastModified(dis.readLong());
+                }
                 int metaSize = dis.readInt();
 
                 for (int j = 0; j < metaSize; j++) {
@@ -556,7 +565,7 @@ public class Playlist extends ArrayList<Track> {
                 Track t2 = get(j);
 
                 if (l1.equals(t2.getLocation()) &&
-                        t1.getSubsongIndex() == t2.getSubsongIndex()) {
+                    t1.getSubsongIndex() == t2.getSubsongIndex()) {
                     dup.add(t2);
                 }
             }

@@ -44,14 +44,91 @@ public class Library {
 
     public Library(Playlist data) {
         this.data = data;
-        buildDataTree();
+        rebuildTree();
     }
 
-    public void rescan() {
+    public void rescan(Map<String, Object> progress) {
         ArrayList<String> folders = config.getList("library.folders", null);
         if (folders == null || folders.isEmpty()) {
             return;
         }
+
+        data.removeDeadItems();
+
+        HashMap<TrackData, Track> trackDatas = new HashMap<TrackData, Track>();
+        for (Track track : data) {
+            trackDatas.put(track.getTrackData(), track);
+        }
+
+        LinkedList<File> queue = new LinkedList<File>();
+        for (String path : folders) {
+            File f = new File(path);
+            if (f.exists())
+                queue.add(f);
+        }
+
+        HashSet<Track> processed = new HashSet<Track>();
+        final Set<String> formats = Codecs.getFormats();
+        ArrayList<Track> temp = new ArrayList<Track>();
+        while (!queue.isEmpty()) {
+            try {
+                File file = queue.pop();
+                if (progress != null) {
+                    if (progress.get("processing.stop") != null) {
+                        break;
+                    }
+                    progress.put("processing.file", file.getAbsolutePath());
+                }
+                if (file.isDirectory()) {
+                    queue.addAll(0, Arrays.asList(file.listFiles(new FileFilter() {
+                        @Override
+                        public boolean accept(File file) {
+                            if (file.isHidden() || !file.canRead()) {
+                                return false;
+                            }
+
+                            if (file.isDirectory())
+                                return true;
+
+                            String ext = Util.getFileExt(file).toLowerCase();
+                            if (formats.contains(ext)) {
+                                String name = Util.removeExt(file.getAbsolutePath()) + ".cue";
+                                return !new File(name).exists();
+                            }
+                            return ext.equals("cue");
+                        }
+                    })));
+                } else {
+                    TrackData trackData = new TrackData(file.toURI(), 0);
+                    Track track = trackDatas.get(trackData);
+                    if (track != null) {
+                        if (track.getLastModified() != file.lastModified()) {
+                            track.clearTags();
+                            TrackIO.getAudioFileReader(file.getName()).reload(track);
+                        }
+                        processed.add(track);
+                    } else {
+                        temp.clear();
+                        TrackIO.getAudioFileReader(file.getName()).read(file, temp);
+                        for (Track newTrack : temp) {
+                            trackData = newTrack.getTrackData();
+                            if (trackDatas.containsKey(trackData)) {
+                                // it must be the cue file, so  merge the track data
+                                trackData.merge(newTrack.getTrackData());
+                            }
+                            processed.add(newTrack);
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        data.clear();
+        data.addAll(processed);
+        processed.clear();
+        trackDatas.clear();
+        rebuildTree();
     }
 
     public DefaultMutableTreeNode getRootNode() {
@@ -60,7 +137,7 @@ public class Library {
 
     public void setData(Playlist data) {
         this.data = data;
-        buildDataTree();
+        rebuildTree();
     }
 
     public Playlist getData() {
@@ -73,10 +150,10 @@ public class Library {
 
     public void setView(String view) {
         this.view = view;
-        buildDataTree();
+        rebuildTree();
     }
 
-    private void buildDataTree() {
+    private void rebuildTree() {
         if (rootNode == null)
             rootNode = new DefaultMutableTreeNode("All Music");
         rootNode.removeAllChildren();
@@ -128,8 +205,8 @@ public class Library {
 
     private boolean compare(DefaultMutableTreeNode node, Object value) {
         return value != null &&
-                node.getUserObject().toString().
-                        compareToIgnoreCase(value.toString()) == 0;
+               node.getUserObject().toString().
+                       compareToIgnoreCase(value.toString()) == 0;
     }
 
     class TrackNode extends DefaultMutableTreeNode {

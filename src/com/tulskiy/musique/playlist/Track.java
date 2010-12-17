@@ -17,8 +17,6 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.util.Util;
-
 import java.io.File;
 import java.net.URI;
 import java.util.Random;
@@ -150,6 +148,22 @@ public class Track implements Cloneable {
 
     public void setTotalSamples(long totalSamples) {
         trackData.setTotalSamples(totalSamples);
+    }
+
+    public long getDateAdded() {
+        return trackData.getDateAdded();
+    }
+
+    public void setDateAdded(long dateAdded) {
+        trackData.setDateAdded(dateAdded);
+    }
+
+    public long getLastModified() {
+        return trackData.getLastModified();
+    }
+
+    public void setLastModified(long lastModified) {
+        trackData.setLastModified(lastModified);
     }
 
     public URI getLocation() {

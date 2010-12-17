@@ -18,8 +18,11 @@
 package com.tulskiy.musique.gui;
 
 import com.sun.java.swing.Painter;
-import com.sun.java.swing.plaf.gtk.GTKLookAndFeel;
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.gui.dialogs.ProgressDialog;
+import com.tulskiy.musique.gui.dialogs.SettingsDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Library;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
@@ -39,9 +42,13 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalTreeUI;
 import javax.swing.tree.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Enumeration;
+import java.util.HashMap;
 
 /**
  * Author: Denis Tulskiy
@@ -195,44 +202,49 @@ public class LibraryView extends JPanel {
         playlistManager.selectPlaylist(libraryPlaylist);
     }
 
-    public static void main(String[] args) {
-        System.setProperty("awt.multiClickInterval", "500");
-        Application app = Application.getInstance();
-        app.load();
-        try {
-            UIManager.setLookAndFeel(new GTKLookAndFeel());
-        } catch (UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
-        }
-
-        final JFrame frame = new JFrame();
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        frame.setLayout(new BorderLayout());
-        final JComboBox comboBox = new JComboBox(UIManager.getInstalledLookAndFeels());
-        frame.add(comboBox, BorderLayout.NORTH);
-        frame.add(new LibraryView(), BorderLayout.CENTER);
-        frame.setSize(300, 500);
-
-        comboBox.addActionListener(new ActionListener() {
+    public void addMenu(JMenuBar menuBar) {
+        JMenu menu = new JMenu("Library");
+        menuBar.add(menu);
+        JMenuItem configure = menu.add("Configure     ");
+        configure.setIcon(Images.getEmptyIcon());
+        configure.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    String className = ((UIManager.LookAndFeelInfo) comboBox.getSelectedItem()).getClassName();
-                    UIManager.setLookAndFeel(className);
-                    SwingUtilities.updateComponentTreeUI(frame);
-                } catch (ClassNotFoundException e1) {
-                    e1.printStackTrace();
-                } catch (InstantiationException e1) {
-                    e1.printStackTrace();
-                } catch (IllegalAccessException e1) {
-                    e1.printStackTrace();
-                } catch (UnsupportedLookAndFeelException e1) {
-                    e1.printStackTrace();
-                }
+                new SettingsDialog(getRootPane(), "Library").setVisible(true);
             }
         });
-        frame.setVisible(true);
+        menu.add("Rescan").addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ProgressDialog progressDialog = new ProgressDialog(getRootPane(), "Library Rescan");
+                progressDialog.show(new Task() {
+                    HashMap<String, Object> map = new HashMap<String, Object>();
+
+                    @Override
+                    public String getStatus() {
+                        return "Scanning your library for changes\n" + String.valueOf(map.get("processing.file"));
+                    }
+
+                    @Override
+                    public void abort() {
+                        map.put("processing.stop", true);
+                    }
+
+                    @Override
+                    public void start() {
+                        int[] selectionRows = tree.getSelectionRows();
+                        library.rescan(map);
+                        ((DefaultTreeModel) tree.getModel()).reload();
+                        tree.revalidate();
+                        tree.repaint();
+                        if (selectionRows != null)
+                            tree.setSelectionRows(selectionRows);
+                    }
+                });
+            }
+        });
+
+        Util.fixIconTextGap(menu);
     }
 
 
