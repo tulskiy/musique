@@ -158,7 +158,7 @@ public class LibraryView extends JPanel {
                 if (selectionPaths != null)
                     for (TreePath path : selectionPaths) {
                         DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-                        Enumeration<DefaultMutableTreeNode> en = node.breadthFirstEnumeration();
+                        Enumeration<DefaultMutableTreeNode> en = node.depthFirstEnumeration();
                         while (en.hasMoreElements()) {
                             DefaultMutableTreeNode o = en.nextElement();
                             if (o.isLeaf() && o.getUserObject() instanceof Track)
