@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui.grouptable;
+package com.tulskiy.musique.gui.components;
 
 import com.tulskiy.musique.util.Util;
 
