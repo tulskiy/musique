@@ -15,10 +15,11 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui;
+package com.tulskiy.musique.gui.library;
 
 import com.sun.java.swing.Painter;
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.gui.SearchWorker;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SettingsDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
