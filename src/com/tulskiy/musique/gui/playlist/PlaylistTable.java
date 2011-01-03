@@ -132,7 +132,7 @@ public class PlaylistTable extends GroupTable {
                     player.play();
                     PlaybackOrder order = player.getPlaybackOrder();
                     order.setLastPlayed(null);
-                    app.getPlaylistManager().selectPlaylist(playlist);
+                    app.getPlaylistManager().setActivePlaylist(playlist);
                 }
             }
         });

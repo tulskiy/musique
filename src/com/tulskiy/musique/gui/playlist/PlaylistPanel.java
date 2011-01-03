@@ -97,7 +97,7 @@ public class PlaylistPanel extends JPanel {
             tabs.addTab(pl.getName(), newTable.getScrollPane());
         }
 
-        final Playlist playlist = playlistManager.getCurrentPlaylist();
+        final Playlist playlist = playlistManager.getActivePlaylist();
 
         tabs.setSelectedIndex(-1);
         tabs.setSelectedIndex(playlists.indexOf(playlist));

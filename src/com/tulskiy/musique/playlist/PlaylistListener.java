@@ -23,11 +23,12 @@ package com.tulskiy.musique.playlist;
  */
 public abstract class PlaylistListener {
     enum Event {
-        UPDATED, ADDED, REMOVED, SELECTED
+        UPDATED, ADDED, REMOVED, SELECTED, ACTIVATED
     }
 
     public void playlistUpdated(Playlist playlist) {}
     public void playlistAdded(Playlist playlist) {}
     public void playlistRemoved(Playlist playlist) {}
     public void playlistSelected(Playlist playlist) {}
+    public void playlistActivated(Playlist playlist) {}
 }

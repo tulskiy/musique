@@ -174,8 +174,8 @@ public class LibraryView extends JPanel {
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
                     Player player = app.getPlayer();
+                    playlistManager.setActivePlaylist(libraryPlaylist);
                     player.getPlaybackOrder().flushQueue();
-
                     Track nextTrack = null;
                     do {
                         nextTrack = player.getPlaybackOrder().next(nextTrack);
@@ -198,8 +198,7 @@ public class LibraryView extends JPanel {
             playlistManager.addPlaylist(libraryPlaylist);
         }
 
-        playlistManager.selectPlaylist(null);
-        playlistManager.selectPlaylist(libraryPlaylist);
+        playlistManager.setVisiblePlaylist(libraryPlaylist);
     }
 
     public void addMenu(JMenuBar menuBar) {

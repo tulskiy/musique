@@ -150,6 +150,7 @@ public class PlaylistTabs extends JPanel {
                 if (index == -1)
                     return;
                 selectedTable = getTableAt(index);
+                playlistManager.setVisiblePlaylist(selectedTable.getPlaylist());
             }
         });
 
