@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -37,7 +37,8 @@ public class PlaylistManager {
     private File PLAYLIST_PATH = new File(app.CONFIG_HOME, "playlists");
     private Logger logger = Logger.getLogger("musique");
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
-    private Playlist currentPlaylist;
+    private Playlist activePlaylist;
+    private Playlist visiblePlaylist;
     private PlaybackOrder order = new PlaybackOrder();
     private Library library;
     private List<PlaylistListener> listeners = new ArrayList<PlaylistListener>();
@@ -46,16 +47,26 @@ public class PlaylistManager {
         return playlists;
     }
 
-    public void selectPlaylist(Playlist playlist) {
-        if (currentPlaylist != playlist) {
-            currentPlaylist = playlist;
-            notifyListeners(playlist, Event.SELECTED);
+    public void setActivePlaylist(Playlist playlist) {
+        if (activePlaylist != playlist) {
+            activePlaylist = playlist;
+            notifyListeners(playlist, Event.ACTIVATED);
         }
         order.setPlaylist(playlist);
     }
 
-    public Playlist getCurrentPlaylist() {
-        return currentPlaylist;
+    public Playlist getActivePlaylist() {
+        return activePlaylist;
+    }
+
+    public void setVisiblePlaylist(Playlist playlist) {
+        if (visiblePlaylist != playlist)
+            notifyListeners(playlist, Event.SELECTED);
+        this.visiblePlaylist = playlist;
+    }
+
+    public Playlist getVisiblePlaylist() {
+        return visiblePlaylist;
     }
 
     public Library getLibrary() {
@@ -79,18 +90,18 @@ public class PlaylistManager {
         }
 
         if (playlists.size() == 0) {
-            selectPlaylist(addPlaylist("Default"));
+            setActivePlaylist(addPlaylist("Default"));
         }
 
-        int index = config.getInt("playlist.currentPlaylist", -1);
+        int index = config.getInt("playlist.activePlaylist", -1);
         if (index < 0 || index >= playlists.size())
             index = 0;
-        selectPlaylist(playlists.get(index));
+        setActivePlaylist(playlists.get(index));
         app.getPlayer().setPlaybackOrder(order);
 
         int lastPlayed = config.getInt("player.lastPlayed", 0);
-        if (lastPlayed >= 0 && lastPlayed < currentPlaylist.size()) {
-            order.setLastPlayed(currentPlaylist.get(lastPlayed));
+        if (lastPlayed >= 0 && lastPlayed < activePlaylist.size()) {
+            order.setLastPlayed(activePlaylist.get(lastPlayed));
         }
 
         //need to do it here because lastPlayed index gets shifted
@@ -119,12 +130,12 @@ public class PlaylistManager {
         library.getData().save(new File(PLAYLIST_PATH, "library.mus"));
 
         config.setList("playlists", playlists);
-        config.setInt("playlist.currentPlaylist", playlists.indexOf(currentPlaylist));
+        config.setInt("playlist.activePlaylist", playlists.indexOf(activePlaylist));
 
         Track lastPlayed = app.getPlayer().getTrack();
         if (lastPlayed != null) {
-            currentPlaylist.cleanUp();
-            int index = currentPlaylist.indexOf(lastPlayed);
+            activePlaylist.cleanUp();
+            int index = activePlaylist.indexOf(lastPlayed);
             config.setInt("player.lastPlayed", index);
         }
     }
@@ -179,6 +190,9 @@ public class PlaylistManager {
                     break;
                 case UPDATED:
                     listener.playlistUpdated(playlist);
+                    break;
+                case ACTIVATED:
+                    listener.playlistActivated(playlist);
                     break;
             }
 

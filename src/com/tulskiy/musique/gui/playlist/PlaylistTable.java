@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -21,10 +21,10 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.dialogs.*;
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.components.Separator;
-import com.tulskiy.musique.gui.playlist.dnd.PlaylistTransferHandler;
+import com.tulskiy.musique.gui.dialogs.*;
+import com.tulskiy.musique.gui.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistListener;
@@ -132,7 +132,7 @@ public class PlaylistTable extends GroupTable {
                     player.play();
                     PlaybackOrder order = player.getPlaybackOrder();
                     order.setLastPlayed(null);
-                    app.getPlaylistManager().selectPlaylist(playlist);
+                    app.getPlaylistManager().setActivePlaylist(playlist);
                 }
             }
         });

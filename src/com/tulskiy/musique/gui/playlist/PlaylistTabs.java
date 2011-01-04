@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -150,6 +150,7 @@ public class PlaylistTabs extends JPanel {
                 if (index == -1)
                     return;
                 selectedTable = getTableAt(index);
+                playlistManager.setVisiblePlaylist(selectedTable.getPlaylist());
             }
         });
 
@@ -187,7 +188,7 @@ public class PlaylistTabs extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 &&
-                        e.getClickCount() == 2) {
+                    e.getClickCount() == 2) {
                     tabbedPane.getActionMap().get("newPlaylist").actionPerformed(
                             new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                 }
@@ -214,12 +215,12 @@ public class PlaylistTabs extends JPanel {
             @Override
             public void playlistSelected(Playlist playlist) {
                 if (getTabCount() > 1)
-                for (int i = 0; i < getTabCount(); i++) {
-                    if (getTableAt(i).getPlaylist() == playlist) {
-                        tabbedPane.setSelectedIndex(i);
-                        break;
+                    for (int i = 0; i < getTabCount(); i++) {
+                        if (getTableAt(i).getPlaylist() == playlist) {
+                            tabbedPane.setSelectedIndex(i);
+                            break;
+                        }
                     }
-                }
             }
         });
     }

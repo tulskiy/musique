@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,6 +20,7 @@ package com.tulskiy.musique.gui;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.dialogs.TextDialog;
+import com.tulskiy.musique.gui.library.LibraryView;
 import com.tulskiy.musique.gui.playlist.PlaylistPanel;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Track;

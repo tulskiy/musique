@@ -15,29 +15,26 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.playlist;
+package com.tulskiy.musique.gui.dnd;
+
+import com.tulskiy.musique.gui.library.LibraryTree;
+
+import javax.swing.*;
+import java.awt.datatransfer.Transferable;
 
 /**
  * Author: Denis Tulskiy
- * Date: 11/6/10
+ * Date: 1/4/11
  */
-public abstract class PlaylistListener {
-    enum Event {
-        UPDATED, ADDED, REMOVED, SELECTED, ACTIVATED
+public class LibraryTransferHandler extends TransferHandler {
+    @Override
+    public int getSourceActions(JComponent c) {
+        return LINK;
     }
 
-    public void playlistUpdated(Playlist playlist) {
-    }
-
-    public void playlistAdded(Playlist playlist) {
-    }
-
-    public void playlistRemoved(Playlist playlist) {
-    }
-
-    public void playlistSelected(Playlist playlist) {
-    }
-
-    public void playlistActivated(Playlist playlist) {
+    @Override
+    protected Transferable createTransferable(JComponent c) {
+        LibraryTree tree = (LibraryTree) c;
+        return new SongsSelection(tree.getSelectedTracks(true));
     }
 }

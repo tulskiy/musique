@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -97,7 +97,7 @@ public class PlaylistPanel extends JPanel {
             tabs.addTab(pl.getName(), newTable.getScrollPane());
         }
 
-        final Playlist playlist = playlistManager.getCurrentPlaylist();
+        final Playlist playlist = playlistManager.getActivePlaylist();
 
         tabs.setSelectedIndex(-1);
         tabs.setSelectedIndex(playlists.indexOf(playlist));
