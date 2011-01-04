@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui.playlist.dnd;
+package com.tulskiy.musique.gui.dnd;
 
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
@@ -122,7 +122,8 @@ public class PlaylistTransferHandler extends TransferHandler {
                     if (insertRow != -1) {
                         int toSubstract = 0;
                         for (Track track : tracks) {
-                            if (playlist.indexOf(track) < insertRow)
+                            int i = playlist.indexOf(track);
+                            if (i > -1 && i < insertRow)
                                 toSubstract++;
                         }
 
