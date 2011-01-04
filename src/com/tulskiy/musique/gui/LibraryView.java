@@ -19,6 +19,7 @@ package com.tulskiy.musique.gui;
 
 import com.sun.java.swing.Painter;
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.gui.components.SearchField;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.SettingsDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
@@ -33,8 +34,8 @@ import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
@@ -85,7 +86,8 @@ public class LibraryView extends JPanel {
         JScrollPane scrollPane = new JScrollPane(tree);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         add(scrollPane, BorderLayout.CENTER);
-        final JTextField searchField = new JTextField(30);
+        final SearchField searchField = new SearchField();
+        searchField.setColumns(30);
         Box viewBox = Box.createHorizontalBox();
         JComboBox viewCombo = new JComboBox(new Object[]{"By Album Artist"});
         JPanel p1 = new JPanel(new BorderLayout());
@@ -103,24 +105,9 @@ public class LibraryView extends JPanel {
                 TitledBorder.TOP, new Font("Sans Serif", 0, 11)));
         viewBox.add(p2);
         add(viewBox, BorderLayout.PAGE_END);
-
-        searchField.getDocument().addDocumentListener(new DocumentListener() {
+        searchField.addChangeListener(new ChangeListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                search();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                search();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                search();
-            }
-
-            private void search() {
+            public void stateChanged(ChangeEvent e) {
                 if (searchWorker != null && !searchWorker.isDone()) {
                     searchWorker.cancel(true);
                 }
@@ -144,6 +131,7 @@ public class LibraryView extends JPanel {
                 };
                 searchWorker.execute();
             }
+
         });
     }
 

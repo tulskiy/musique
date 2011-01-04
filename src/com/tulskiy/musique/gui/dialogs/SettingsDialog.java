@@ -19,6 +19,8 @@ package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.AudioOutput;
+import com.tulskiy.musique.gui.components.ColorChooser;
+import com.tulskiy.musique.gui.components.FontChooser;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
@@ -28,8 +30,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -494,109 +494,4 @@ public class SettingsDialog extends JDialog {
         return panel;
     }
 
-    class ColorChooser extends JPanel {
-        private Color color;
-        private JPanel panel = new JPanel();
-
-        ColorChooser(Color color) {
-            super(new BorderLayout());
-            add(panel, BorderLayout.CENTER);
-            JButton clear = new JButton("X");
-            int width = 43;
-            String laf = UIManager.getLookAndFeel().getName();
-            if (laf.contains("GTK"))
-                width = 25;
-            else if (laf.contains("Nimbus"))
-                width = 35;
-
-            clear.setPreferredSize(new Dimension(width, 25));
-            clear.setFocusable(false);
-            add(clear, BorderLayout.LINE_END);
-            clear.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setColor(null);
-                }
-            });
-            setColor(color);
-            setPreferredSize(new Dimension(10, 25));
-            panel.setBorder(BorderFactory.createEtchedBorder());
-
-            final JComponent comp = this;
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    Color c = JColorChooser.showDialog(comp, "Choose Color", getColor());
-                    if (c != null)
-                        setColor(c);
-                }
-            });
-        }
-
-        public Color getColor() {
-            return color;
-        }
-
-        public void setColor(Color color) {
-            this.color = color;
-            panel.setBackground(color);
-        }
-    }
-
-    class FontChooser extends JPanel {
-        Font selectedFont;
-        JLabel text = new JLabel();
-
-        FontChooser(Font font) {
-            super(new BorderLayout());
-            add(text, BorderLayout.CENTER);
-            JButton clear = new JButton("X");
-            int width = 43;
-            String laf = UIManager.getLookAndFeel().getName();
-            if (laf.contains("GTK"))
-                width = 25;
-            else if (laf.contains("Nimbus"))
-                width = 35;
-
-            clear.setPreferredSize(new Dimension(width, 25));
-            clear.setFocusable(false);
-            add(clear, BorderLayout.LINE_END);
-            clear.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    setSelectedFont(null);
-                }
-            });
-
-            this.selectedFont = font;
-            setSelectedFont(font);
-            setPreferredSize(new Dimension(10, 25));
-            text.setHorizontalAlignment(JLabel.CENTER);
-            text.setBorder(BorderFactory.createEtchedBorder());
-            final JComponent comp = this;
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    Font f = FontChooserDialog.show(comp, getFont());
-                    if (f != null)
-                        setSelectedFont(f);
-                }
-            });
-        }
-
-        public Font getSelectedFont() {
-            return selectedFont;
-        }
-
-        public void setSelectedFont(Font font) {
-            setFont(font);
-            this.selectedFont = font;
-            String s = "";
-            if (font != null) {
-                s += font.getName() + ", " + font.getSize() + "pt";
-            }
-            if (text != null)
-                text.setText(s);
-        }
-    }
 }
