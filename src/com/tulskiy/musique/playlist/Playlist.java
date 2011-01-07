@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -168,8 +168,6 @@ public class Playlist extends ArrayList<Track> {
                 track.setBitrate(dis.readInt());
                 if (version == 1) {
                     track.setDateAdded(System.currentTimeMillis());
-                    if (track.isFile())
-                        track.setLastModified(track.getFile().lastModified());
                 } else {
                     track.setDateAdded(dis.readLong());
                     track.setLastModified(dis.readLong());
@@ -565,7 +563,7 @@ public class Playlist extends ArrayList<Track> {
                 Track t2 = get(j);
 
                 if (l1.equals(t2.getLocation()) &&
-                    t1.getSubsongIndex() == t2.getSubsongIndex()) {
+                        t1.getSubsongIndex() == t2.getSubsongIndex()) {
                     dup.add(t2);
                 }
             }
