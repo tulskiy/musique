@@ -188,7 +188,7 @@ public class PlaylistTabs extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getButton() == MouseEvent.BUTTON1 &&
-                    e.getClickCount() == 2) {
+                        e.getClickCount() == 2) {
                     tabbedPane.getActionMap().get("newPlaylist").actionPerformed(
                             new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
                 }
@@ -201,6 +201,7 @@ public class PlaylistTabs extends JPanel {
                 for (int i = 0; i < getTabCount(); i++) {
                     if (getTableAt(i).getPlaylist() == playlist) {
                         tabbedPane.remove(i);
+                        checkTabCount();
                         break;
                     }
                 }
