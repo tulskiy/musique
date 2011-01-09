@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -65,6 +65,7 @@ public class ControlPanel extends JPanel {
     private boolean progressEnabled = false;
     private JLabel statusLabel;
     private Expression statusExpression;
+    private MouseAdapter progressMouseListener;
 
     public ControlPanel() {
         setLayout(new BorderLayout());
@@ -74,9 +75,7 @@ public class ControlPanel extends JPanel {
         progressSlider.setValue(0);
         progressSlider.setFocusable(false);
         toolTip = progressSlider.createToolTip();
-
-        for (MouseListener ml : progressSlider.getMouseListeners())
-            progressSlider.removeMouseListener(ml);
+        progressSlider.setSnapToTicks(false);
 
         stopButton = createButton("stop.png", false);
         prevButton = createButton("prev.png", false);
@@ -89,6 +88,7 @@ public class ControlPanel extends JPanel {
         volumeSlider.setPreferredSize(new Dimension(100, 30));
         volumeSlider.setValue((int) (output.getVolume() * 100));
         volumeSlider.setFocusable(false);
+        volumeSlider.setSnapToTicks(false);
 
         //hack to make volume and progress sliders be on same level
         progressSlider.setMaximumSize(new Dimension(10000, 30));
@@ -115,6 +115,9 @@ public class ControlPanel extends JPanel {
                 config.setInt("player.playbackOrder", order.getSelectedIndex());
             }
         });
+        statusLabel = new JLabel();
+        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
+        statusExpression = Parser.parse("$if3($playingTime(), '0:00')[/%length%]");
 
         Box box = new Box(BoxLayout.X_AXIS);
         box.add(Box.createHorizontalStrut(5));
@@ -128,9 +131,6 @@ public class ControlPanel extends JPanel {
         box.add(Box.createHorizontalStrut(10));
         box.add(progressSlider);
         box.add(Box.createHorizontalStrut(5));
-        statusLabel = new JLabel();
-        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
-        statusExpression = Parser.parse("$if3($playingTime(), '0:00')[/%length%]");
         box.add(statusLabel);
         box.add(Box.createHorizontalStrut(5));
         box.add(order);
@@ -139,12 +139,13 @@ public class ControlPanel extends JPanel {
         add(box);
 
         buildListeners();
+        updateUI();
     }
 
     @Override
     public void updateUI() {
         super.updateUI();
-
+        fixSliderWidth();
         AbstractButton[] buttons = new AbstractButton[]{
                 stopButton, prevButton, playButton, pauseButton, nextButton
         };
@@ -158,6 +159,24 @@ public class ControlPanel extends JPanel {
                 if (b != null)
                     b.setBorderPainted(true);
             }
+        }
+    }
+
+    private void fixSliderWidth() {
+        if (progressSlider != null) {
+            boolean windowsLaF = Util.isWindowsLaF();
+            progressSlider.setPaintTicks(windowsLaF);
+            volumeSlider.setPaintTicks(windowsLaF);
+
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    for (MouseListener ml : progressSlider.getMouseListeners()) {
+                        progressSlider.removeMouseListener(ml);
+                    }
+                    progressSlider.addMouseListener(progressMouseListener);
+                }
+            });
         }
     }
 
@@ -217,7 +236,7 @@ public class ControlPanel extends JPanel {
             }
         });
 
-        progressSlider.addMouseListener(new MouseAdapter() {
+        progressMouseListener = new MouseAdapter() {
             public void mouseReleased(MouseEvent e) {
                 if (!progressEnabled)
                     return;
@@ -234,7 +253,8 @@ public class ControlPanel extends JPanel {
                 hideToolTip();
                 showToolTip(e);
             }
-        });
+        };
+        progressSlider.addMouseListener(progressMouseListener);
 
         progressSlider.addMouseMotionListener(new MouseMotionAdapter() {
             @Override
