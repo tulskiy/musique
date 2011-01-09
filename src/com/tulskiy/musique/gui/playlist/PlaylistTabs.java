@@ -68,7 +68,7 @@ public class PlaylistTabs extends JPanel {
         tabsVisible = true;
 
         tabbedPane.setFocusable(false);
-        if (UIManager.getLookAndFeel().getName().contains("GTK")) {
+        if (Util.isGTKLaF()) {
             tabbedPane.setPreferredSize(new Dimension(10000, 30));
         } else {
             tabbedPane.setPreferredSize(new Dimension(10000, 25));

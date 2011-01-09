@@ -19,6 +19,7 @@ package com.tulskiy.musique.gui.dialogs;
 
 import com.sun.java.swing.Painter;
 import com.tulskiy.musique.images.Images;
+import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
@@ -175,8 +176,7 @@ public class DirectoryChooser extends JTree {
     public void updateUI() {
         super.updateUI();
 
-        String laf = UIManager.getLookAndFeel().getName();
-        if (laf.contains("GTK") || laf.contains("Metal")) {
+        if (!Util.isNimbusLaF()) {
             MetalTreeUI newUI = new MetalTreeUI() {
                 @Override
                 protected void paintRow(Graphics g, Rectangle clipBounds, Insets insets, Rectangle bounds, TreePath path, int row, boolean isExpanded, boolean hasBeenExpanded, boolean isLeaf) {
@@ -201,7 +201,7 @@ public class DirectoryChooser extends JTree {
         }
 
         DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-        if (UIManager.getLookAndFeel().getName().contains("GTK")) {
+        if (Util.isGTKLaF()) {
             renderer.setClosedIcon(Images.loadIcon("directory.png"));
             renderer.setOpenIcon(Images.loadIcon("directory.png"));
             renderer.setLeafIcon(Images.loadIcon("file.png"));

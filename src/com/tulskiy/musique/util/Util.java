@@ -133,7 +133,7 @@ public class Util {
     }
 
     public static void fixIconTextGap(JComponent menu) {
-        if (UIManager.getLookAndFeel().getName().contains("Nimbus")) {
+        if (isNimbusLaF()) {
             Component[] components = menu.getComponents();
             for (Component component : components) {
                 if (component instanceof AbstractButton) {
@@ -145,5 +145,17 @@ public class Util {
                     fixIconTextGap(((JMenu) component).getPopupMenu());
             }
         }
+    }
+
+    public static boolean isNimbusLaF() {
+        return UIManager.getLookAndFeel().getName().contains("Nimbus");
+    }
+
+    public static boolean isWindowsLaF() {
+        return UIManager.getLookAndFeel().getName().contains("Windows");
+    }
+
+    public static boolean isGTKLaF() {
+        return UIManager.getLookAndFeel().getName().contains("GTK");
     }
 }

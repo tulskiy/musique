@@ -102,8 +102,7 @@ public class LibraryTree extends JTree {
         if (config == null)
             return;
 
-        String laf = UIManager.getLookAndFeel().getName();
-        if (!laf.contains("Nimbus")) {
+        if (!Util.isGTKLaF()) {
             MetalTreeUI newUI = new MetalTreeUI() {
                 @Override
                 protected void paintRow(Graphics g, Rectangle clipBounds, Insets insets, Rectangle bounds, TreePath path, int row, boolean isExpanded, boolean hasBeenExpanded, boolean isLeaf) {

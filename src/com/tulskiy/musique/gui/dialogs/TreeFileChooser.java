@@ -20,6 +20,7 @@ package com.tulskiy.musique.gui.dialogs;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -185,7 +186,7 @@ public class TreeFileChooser extends JDialog {
         Dimension size = new Dimension(30, 24);
         refresh.setPreferredSize(size);
         home.setPreferredSize(size);
-        if (UIManager.getLookAndFeel().getName().contains("GTK")) {
+        if (Util.isGTKLaF()) {
             home.setBorderPainted(false);
             refresh.setBorderPainted(false);
         }

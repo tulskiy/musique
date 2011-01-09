@@ -148,7 +148,7 @@ public class ControlPanel extends JPanel {
         AbstractButton[] buttons = new AbstractButton[]{
                 stopButton, prevButton, playButton, pauseButton, nextButton
         };
-        if (UIManager.getLookAndFeel().getName().contains("GTK")) {
+        if (Util.isGTKLaF()) {
             for (AbstractButton b : buttons) {
                 if (b != null)
                     b.setBorderPainted(false);
@@ -171,10 +171,6 @@ public class ControlPanel extends JPanel {
         Dimension buttonSize = new Dimension(30, 30);
         b.setIcon(Images.loadIcon(icon));
         b.setFocusable(false);
-        String laf = UIManager.getLookAndFeel().getName();
-        if (laf.contains("GTK")) {
-            b.setBorderPainted(false);
-        }
 
         b.setPreferredSize(buttonSize);
 
