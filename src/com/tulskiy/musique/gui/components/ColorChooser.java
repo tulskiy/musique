@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package com.tulskiy.musique.gui.components;
+
+import com.tulskiy.musique.images.Images;
 
 import javax.swing.*;
 import java.awt.*;
@@ -39,17 +41,11 @@ public class ColorChooser extends JPanel {
     public ColorChooser(Color color) {
         super(new BorderLayout());
         add(panel, BorderLayout.CENTER);
-        JButton clear = new JButton("X");
-        int width = 43;
-        String laf = UIManager.getLookAndFeel().getName();
-        if (laf.contains("GTK"))
-            width = 25;
-        else if (laf.contains("Nimbus"))
-            width = 35;
-
-        setPreferredSize(new Dimension(100, -1));
-        clear.setPreferredSize(new Dimension(width, 25));
+        JButton clear = new JButton(Images.loadIcon("clear.png"));
+        clear.setMargin(new Insets(1, 1, 1, 1));
+        clear.setPreferredSize(new Dimension(25, -1));
         clear.setFocusable(false);
+        setPreferredSize(new Dimension(100, -1));
         add(clear, BorderLayout.LINE_END);
         clear.addActionListener(new ActionListener() {
             @Override
