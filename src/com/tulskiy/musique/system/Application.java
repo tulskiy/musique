@@ -34,7 +34,6 @@ import javax.sound.sampled.Mixer;
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalFileChooserUI;
 import javax.swing.plaf.metal.MetalIconFactory;
-import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -42,8 +41,6 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 public class Application {

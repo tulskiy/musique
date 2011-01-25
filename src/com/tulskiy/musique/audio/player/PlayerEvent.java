@@ -23,7 +23,7 @@ package com.tulskiy.musique.audio.player;
  */
 public class PlayerEvent {
     public enum PlayerEventCode {
-        FILE_OPENED, PLAYING_STARTED, PAUSED, STOPPED
+        FILE_OPENED, PLAYING_STARTED, PAUSED, STOPPED, LOVED
     }
 
     private PlayerEventCode eventCode;

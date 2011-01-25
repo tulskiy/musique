@@ -317,4 +317,9 @@ public class Track implements Cloneable {
     public void setMeta(String key, String value) {
         trackData.setMeta(key, value);
     }
+
+    @Override
+    public int hashCode() {
+        return trackData.hashCode();
+    }
 }

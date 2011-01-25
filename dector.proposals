@@ -1,0 +1,4 @@
+* Plugins as singletones
+* Last.fm scrobbler as plug-in
+* Checking plugin <-> program versions for correct work
+* Plugins not as listeners but decorators

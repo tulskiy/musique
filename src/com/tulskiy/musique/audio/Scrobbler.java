@@ -39,6 +39,14 @@ import java.util.logging.Logger;
 import static net.roarsoftware.lastfm.scrobble.Scrobbler.newScrobbler;
 
 /**
+ * @todo Some developing notes
+ * Look like methods in class have small cohension :)
+ * This class is not expanded enough, i think.
+ * May be it needs refactoring?
+ * 25Jan2011 dector
+ */
+
+/**
  * Author: Denis Tulskiy
  * Date: Sep 3, 2010
  */

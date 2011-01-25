@@ -165,6 +165,19 @@ public class PlaylistTable extends GroupTable {
                 model.fireTableDataChanged();
             }
         });
+        aMap.put("loveTrack", new AbstractAction("Love track") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (Track track : getSelectedSongs()) {
+                    System.out.println("Love track: " + track.getArtist() + " - "
+                            + track.getTitle() + " from " + track.getAlbum() + " ("
+                            + track.getLength() + ")");
+
+                    // Update love track to last.fm, but HOW???
+                    // Application.getInstance().getPlaylistManager().addLovedSong(track);
+                }
+            }
+        });
         aMap.put("enqueue", new AbstractAction("Add to Queue  ") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -196,6 +209,7 @@ public class PlaylistTable extends GroupTable {
         iMap.put(KeyStroke.getKeyStroke("SPACE"), "showNowPlaying");
         iMap.put(KeyStroke.getKeyStroke("DELETE"), "removeSelected");
         iMap.put(KeyStroke.getKeyStroke("Q"), "enqueue");
+        iMap.put(KeyStroke.getKeyStroke("ctrl L"), "loveTrack");
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -551,6 +565,9 @@ public class PlaylistTable extends GroupTable {
         item = tableMenu.add("Paste");
         item.addActionListener(listener);
         item.setActionCommand((String) TransferHandler.getPasteAction().getValue(Action.NAME));
+
+        item = tableMenu.add(aMap.get("loveTrack"));
+        item.setAccelerator(KeyStroke.getKeyStroke("ctrl L"));
 
         tableMenu.addSeparator();
         item = tableMenu.add(aMap.get("enqueue"));

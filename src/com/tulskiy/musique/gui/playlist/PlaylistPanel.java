@@ -52,9 +52,10 @@ import java.util.Enumeration;
 public class PlaylistPanel extends JPanel {
     private PlaylistColumn[] defaultColumns = {
             new PlaylistColumn("Playing", 55, "$isPlaying()"),
-            new PlaylistColumn("Name", 325, "[%artist% - ]%title%"),
+            new PlaylistColumn("Artist", 125, "%artist%"),
+            new PlaylistColumn("Title", 225, "%title%"),
             new PlaylistColumn("Length", 70, "%length%"),
-            new PlaylistColumn("Album", 225, "%album%"),
+            new PlaylistColumn("Album", 125, "%album%"),
             new PlaylistColumn("Date", 55, "%year%")
     };
 
