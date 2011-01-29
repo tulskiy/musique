@@ -28,7 +28,6 @@ import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
-import com.tulskiy.musique.util.GlobalTimer;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
@@ -41,8 +40,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 07.09.2008
+ * Author: Denis Tulskiy
+ * Date: 07.09.2008
  */
 public class ControlPanel extends JPanel {
     private Application app = Application.getInstance();
@@ -318,7 +317,7 @@ public class ControlPanel extends JPanel {
             }
         });
 
-        GlobalTimer.addActionListener(new ActionListener() {
+        new Timer(333, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (progressEnabled && player.isPlaying() && !isSeeking) {
                     progressSlider.setValue((int) player.getCurrentSample());
@@ -326,7 +325,7 @@ public class ControlPanel extends JPanel {
                 if (player.isPlaying())
                     updateStatus();
             }
-        });
+        }).start();
     }
 
     private void updateStatus() {
