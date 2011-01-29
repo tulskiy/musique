@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -112,6 +112,8 @@ public class AlbumArtPanel extends JPanel {
                                 continue;
                             image = cache.get(file);
                             if (image == null) {
+                                if (file.length() > 102400) //100 Kb
+                                    continue;
                                 logger.fine("Loading Album Art from file: " + file);
                                 final ImageIcon newImage = new ImageIcon(file.getAbsolutePath());
                                 double iconHeight = newImage.getIconHeight();
@@ -123,7 +125,6 @@ public class AlbumArtPanel extends JPanel {
                                             Image.SCALE_SMOOTH
                                     );
                                     image = new ImageIcon(instance);
-                                    System.gc();
                                 } else {
                                     image = newImage;
                                 }
