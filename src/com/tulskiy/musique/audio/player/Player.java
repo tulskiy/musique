@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import static com.tulskiy.musique.audio.player.Actor.Message;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: Jan 21, 2010
+ * Author: Denis Tulskiy
+ * Date: Jan 21, 2010
  */
 public class Player {
     private static final int BUFFER_SIZE = (int) Math.pow(2, 18);
@@ -36,20 +36,15 @@ public class Player {
     private PlayingThread playingThread;
     private BufferingThread bufferingThread;
     private ArrayList<PlayerListener> listeners = new ArrayList<PlayerListener>();
-    private boolean stopAfterCurrent = false;
-    private Buffer buffer = new Buffer(BUFFER_SIZE);
 
     public Player() {
+        Buffer buffer = new Buffer(BUFFER_SIZE);
         playingThread = new PlayingThread(this, buffer);
         Thread t1 = new Thread(playingThread, "Playing Thread");
         t1.setPriority(Thread.MAX_PRIORITY);
         t1.start();
         bufferingThread = new BufferingThread(this, buffer);
         new Thread(bufferingThread, "Buffer Thread").start();
-    }
-
-    public Buffer getBuffer() {
-        return buffer;
     }
 
     public void open(Track track) {
@@ -69,7 +64,6 @@ public class Player {
     }
 
     public void seek(long sample) {
-        System.out.println("Seek to " + sample);
         bufferingThread.send(Message.SEEK, sample);
     }
 
@@ -117,8 +111,7 @@ public class Player {
     }
 
     public double getPlaybackTime() {
-//        return playerThread.playbackTime;
-        return 0;
+        return playingThread.getPlaybackTime();
     }
 
     public boolean isPlaying() {
@@ -134,7 +127,7 @@ public class Player {
     }
 
     public void setStopAfterCurrent(boolean stopAfterCurrent) {
-        this.stopAfterCurrent = stopAfterCurrent;
+        bufferingThread.setStopAfterCurrent(stopAfterCurrent);
     }
 
     public void setPlaybackOrder(PlaybackOrder order) {

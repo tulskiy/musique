@@ -24,6 +24,7 @@ import com.tulskiy.musique.util.AudioMath;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.LineUnavailableException;
+import java.util.logging.Logger;
 
 import static com.tulskiy.musique.audio.player.PlayerEvent.PlayerEventCode;
 
@@ -32,10 +33,10 @@ import static com.tulskiy.musique.audio.player.PlayerEvent.PlayerEventCode;
  * Date: 1/15/11
  */
 public class PlayingThread extends Actor implements Runnable {
-    private AudioFormat format;
-
+    public static final Logger logger = Logger.getLogger("musique");
     private static final int BUFFER_SIZE = AudioOutput.BUFFER_SIZE;
 
+    private AudioFormat format;
     private Player player;
     private Buffer buffer;
     private final Object lock = new Object();
@@ -43,6 +44,8 @@ public class PlayingThread extends Actor implements Runnable {
     private Track currentTrack;
     private long currentByte;
     private boolean active = false;
+    private double playbackTime;
+    private long playbackBytes;
 
     public PlayingThread(Player player, Buffer buffer) {
         this.player = player;
@@ -59,11 +62,17 @@ public class PlayingThread extends Actor implements Runnable {
                 setState(true);
                 break;
             case STOP:
-                output.flush();
-                setState(false);
-                output.close();
+                stop();
                 break;
         }
+    }
+
+    private void stop() {
+        output.flush();
+        setState(false);
+        output.close();
+        updatePlaybackTime();
+        player.fireEvent(PlayerEventCode.STOPPED);
     }
 
     private void setState(boolean newState) {
@@ -93,19 +102,16 @@ public class PlayingThread extends Actor implements Runnable {
                     while (active) {
                         int len = buffer.read(buf, 0, BUFFER_SIZE);
                         if (len == -1) {
-                            openNext();
+                            if (!openNext()) {
+                                output.drain();
+                                stop();
+                                break;
+                            }
                             len = buffer.read(buf, 0, BUFFER_SIZE / 4);
                         }
                         currentByte += len;
-                        int available = output.available();
-                        long time = System.currentTimeMillis();
+                        playbackBytes += len;
                         output.write(buf, 0, len);
-
-                        long x = System.currentTimeMillis() - time;
-                        if (x > 235) {
-                            System.out.printf("Was writing %d bytes, avaliable %d bytes, time to write %d\n", len, available, x);
-                        }
-
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -114,11 +120,13 @@ public class PlayingThread extends Actor implements Runnable {
         }
     }
 
-    private void openNext() throws LineUnavailableException {
-        System.out.println("Getting next track");
+    private boolean openNext() throws LineUnavailableException {
+        logger.fine("Getting next track");
         Buffer.NextEntry nextEntry = buffer.pollNextTrack();
         currentTrack = nextEntry.track;
-        System.out.println(currentTrack);
+        if (currentTrack == null) {
+            return false;
+        }
         format = nextEntry.format;
         output.init(format);
         if (nextEntry.startSample > 0) {
@@ -126,9 +134,18 @@ public class PlayingThread extends Actor implements Runnable {
             player.fireEvent(PlayerEventCode.SEEK_FINISHED);
         } else {
             currentByte = 0;
+            updatePlaybackTime();
             player.fireEvent(PlayerEventCode.FILE_OPENED);
         }
-        System.out.println("Got it");
+        return true;
+    }
+
+    private void updatePlaybackTime() {
+        if (format != null) {
+            playbackTime = AudioMath.bytesToMillis(
+                    playbackBytes, format);
+        }
+        playbackBytes = 0;
     }
 
     public Track getCurrentTrack() {
@@ -147,5 +164,9 @@ public class PlayingThread extends Actor implements Runnable {
         if (format != null) {
             return AudioMath.bytesToSamples(currentByte, format.getFrameSize());
         } else return 0;
+    }
+
+    public double getPlaybackTime() {
+        return playbackTime;
     }
 }

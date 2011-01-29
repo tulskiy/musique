@@ -24,13 +24,14 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Codecs;
 import com.tulskiy.musique.util.AudioMath;
 
-import static com.tulskiy.musique.audio.player.PlayerEvent.PlayerEventCode;
+import java.util.logging.Logger;
 
 /**
  * Author: Denis Tulskiy
  * Date: 1/15/11
  */
 public class BufferingThread extends Actor implements Runnable {
+    private static final Logger logger = Logger.getLogger("musique");
     private PlaybackOrder order;
 
     private final Object lock = new Object();
@@ -39,12 +40,11 @@ public class BufferingThread extends Actor implements Runnable {
     private Track nextTrack;
     private Decoder decoder;
     private long cueTotalBytes;
-    private long totalBytes;
-    private double playbackTime;
     private boolean active;
 
     private Player player;
     private Buffer buffer;
+    private boolean stopAfterCurrent = false;
 
     public BufferingThread(Player player, Buffer buffer) {
         this.player = player;
@@ -58,7 +58,7 @@ public class BufferingThread extends Actor implements Runnable {
             case OPEN:
                 if (params.length > 0 && params[0] instanceof Track) {
                     Track track = (Track) params[0];
-                    pause();
+                    flush();
                     open(track);
                 }
                 break;
@@ -70,11 +70,11 @@ public class BufferingThread extends Actor implements Runnable {
                 break;
             case STOP:
                 stop();
-                player.fireEvent(PlayerEventCode.STOPPED);
                 break;
         }
     }
 
+    @SuppressWarnings({"InfiniteLoopStatement"})
     @Override
     public void run() {
         byte[] buf = new byte[65536];
@@ -92,12 +92,18 @@ public class BufferingThread extends Actor implements Runnable {
 
                     while (active) {
                         if (nextTrack != null) {
+                            if (stopAfterCurrent) {
+                                buffer.addNextTrack(null, null, 0);
+                                active = false;
+                                if (decoder != null) {
+                                    decoder.close();
+                                    decoder = null;
+                                }
+                                nextTrack = null;
+                                continue;
+                            }
                             open(nextTrack);
                             nextTrack = null;
-//                            if (stopAfterCurrent) {
-//                                stopPlaying();
-//                                continue;
-//                            }
                         }
 
                         len = decoder.decode(buf);
@@ -128,7 +134,6 @@ public class BufferingThread extends Actor implements Runnable {
                         }
 
                         currentByte += len;
-                        totalBytes += len;
 
                         buffer.write(buf, 0, len);
                     }
@@ -140,24 +145,19 @@ public class BufferingThread extends Actor implements Runnable {
     }
 
     public void stop() {
-        System.out.println("Stop buffering");
-        pause();
+        logger.fine("Stop buffering");
+        flush();
         if (decoder != null) {
-            playbackTime = AudioMath.bytesToMillis(
-                    totalBytes, decoder.getAudioFormat());
             decoder.close();
         }
         decoder = null;
     }
 
-    private void pause() {
+    private void flush() {
         active = false;
         buffer.flush();
         synchronized (lock) {
-
         }
-        byte[] b = new byte[(int) Math.pow(2, 10)];
-        buffer.write(b, 0, b.length);
     }
 
     private void start() {
@@ -168,16 +168,13 @@ public class BufferingThread extends Actor implements Runnable {
     }
 
     public synchronized void open(Track track) {
-        System.out.println("In open");
-
         if (decoder != null) {
-            playbackTime = AudioMath.bytesToMillis(
-                    totalBytes, decoder.getAudioFormat());
-
             decoder.close();
         }
 
         if (track != null) {
+            logger.fine("Opening track " + track.getLocation());
+
             if (track.isFile() && !track.getFile().exists()) {
                 //try to get the next one
                 track = order.next(track);
@@ -190,7 +187,6 @@ public class BufferingThread extends Actor implements Runnable {
             decoder = Codecs.getDecoder(track);
             currentTrack = track;
             currentByte = 0;
-            totalBytes = 0;
 
             if (decoder == null || !decoder.open(track)) {
                 currentTrack = null;
@@ -199,8 +195,6 @@ public class BufferingThread extends Actor implements Runnable {
             }
 
             buffer.addNextTrack(currentTrack, decoder.getAudioFormat(), 0);
-//            byte[] empty = new byte[44100];
-//            buffer.write(empty, 0, empty.length);
 
             if (track.getStartPosition() > 0)
                 decoder.seekSample(track.getStartPosition());
@@ -211,13 +205,13 @@ public class BufferingThread extends Actor implements Runnable {
             }
 
             start();
-            System.out.println("finished open");
+            logger.fine("Finished opening track");
         }
     }
 
     public void seek(long sample) {
         boolean oldState = active;
-        pause();
+        flush();
 
         if (decoder != null) {
             decoder.seekSample(currentTrack.getStartPosition() + sample);
@@ -239,5 +233,9 @@ public class BufferingThread extends Actor implements Runnable {
 
     public boolean isActive() {
         return active;
+    }
+
+    public void setStopAfterCurrent(boolean stopAfterCurrent) {
+        this.stopAfterCurrent = stopAfterCurrent;
     }
 }

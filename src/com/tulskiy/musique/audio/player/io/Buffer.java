@@ -48,7 +48,6 @@ public class Buffer {
     }
 
     public void addNextTrack(Track track, AudioFormat format, long startSample) {
-        System.out.println("addNextTrack");
         int bytesLeft = available();
         for (Integer left : when) {
             bytesLeft -= left;
@@ -61,7 +60,6 @@ public class Buffer {
     }
 
     public NextEntry pollNextTrack() {
-        System.out.println("pollNextTrack");
         NextEntry nextEntry = null;
         try {
             nextEntry = trackQueue.take();
@@ -100,28 +98,6 @@ public class Buffer {
 
     public void flush() {
         buffer.empty();
-    }
-
-    public void removeTail(long bytes) {
-        buffer.removeTail(bytes);
-    }
-
-    public synchronized void fadeout() {
-        int fadeout = buffer.getAvailable() / 2;
-
-        buffer.removeTail(buffer.size() - fadeout);
-        byte[] bytes = new byte[fadeout];
-        buffer.get(bytes, 0, bytes.length);
-
-        double val = 1;
-        double d = 1 / fadeout;
-        for (int i = 0; i < bytes.length; i += 2) {
-            int v = bytes[i] << 8 | bytes[i + 1];
-            v *= val;
-            bytes[i] = (byte) (v >> 8 & 0xFF);
-            bytes[i+1] = (byte) (v & 0xFF);
-            val -= d;
-        }
     }
 
     public class NextEntry {
