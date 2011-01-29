@@ -24,7 +24,6 @@ import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
-import com.tulskiy.musique.util.GlobalTimer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,8 +33,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 10.10.2008
+ * Author: Denis Tulskiy
+ * Date: 10.10.2008
  */
 public class StatusBar extends JPanel {
     private JLabel info;
@@ -64,19 +63,25 @@ public class StatusBar extends JPanel {
     }
 
     private void buildListeners() {
-        GlobalTimer.addActionListener(new ActionListener() {
+        final Timer timer = new Timer(333, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (player.isPlaying()) {
                     info.setText((String) statusFormat.eval(player.getTrack()));
                 }
             }
         });
+        timer.start();
 
         player.addListener(new PlayerListener() {
             public void onEvent(PlayerEvent e) {
                 switch (e.getEventCode()) {
+                    case PLAYING_STARTED:
+                        timer.start();
+                        break;
                     case STOPPED:
                         info.setText("Stopped");
+                    case PAUSED:
+                        timer.stop();
                 }
             }
         });

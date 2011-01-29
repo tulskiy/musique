@@ -18,7 +18,7 @@
 package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.player.AudioOutput;
+import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.gui.components.ColorChooser;
 import com.tulskiy.musique.gui.components.FontChooser;
 import com.tulskiy.musique.system.Application;

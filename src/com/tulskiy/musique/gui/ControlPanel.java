@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui;
 
-import com.tulskiy.musique.audio.player.AudioOutput;
+import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -28,7 +28,6 @@ import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
-import com.tulskiy.musique.util.GlobalTimer;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
@@ -41,8 +40,8 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 07.09.2008
+ * Author: Denis Tulskiy
+ * Date: 07.09.2008
  */
 public class ControlPanel extends JPanel {
     private Application app = Application.getInstance();
@@ -242,7 +241,6 @@ public class ControlPanel extends JPanel {
                     return;
                 hideToolTip();
                 player.seek(progressSlider.getValue());
-                isSeeking = false;
             }
 
             public void mousePressed(MouseEvent e) {
@@ -284,7 +282,6 @@ public class ControlPanel extends JPanel {
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 player.pause();
-                pauseButton.setSelected(player.isPaused());
             }
         });
         nextButton.addActionListener(new ActionListener() {
@@ -314,11 +311,14 @@ public class ControlPanel extends JPanel {
                         }
                         progressSlider.setValue((int) player.getCurrentSample());
                         break;
+                    case SEEK_FINISHED:
+                        isSeeking = false;
+                        break;
                 }
             }
         });
 
-        GlobalTimer.addActionListener(new ActionListener() {
+        new Timer(333, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (progressEnabled && player.isPlaying() && !isSeeking) {
                     progressSlider.setValue((int) player.getCurrentSample());
@@ -326,7 +326,7 @@ public class ControlPanel extends JPanel {
                 if (player.isPlaying())
                     updateStatus();
             }
-        });
+        }).start();
     }
 
     private void updateStatus() {

@@ -23,7 +23,7 @@ package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Scrobbler;
-import com.tulskiy.musique.audio.player.AudioOutput;
+import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaybackOrder;
@@ -34,7 +34,6 @@ import javax.sound.sampled.Mixer;
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalFileChooserUI;
 import javax.swing.plaf.metal.MetalIconFactory;
-import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
@@ -42,8 +41,6 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 public class Application {
@@ -226,13 +223,17 @@ public class Application {
 
     public void start() {
         try {
-            if (mainWindow != null) {
-                mainWindow.shutdown();
-                mainWindow = null;
-            }
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    if (mainWindow != null) {
+                        mainWindow.shutdown();
+                        mainWindow = null;
+                    }
 
-            mainWindow = new MainWindow();
-            mainWindow.setVisible(true);
+                    mainWindow = new MainWindow();
+                    mainWindow.setVisible(true);
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }

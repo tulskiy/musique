@@ -161,7 +161,7 @@ public class LibraryView extends JPanel {
                     } while (nextTrack != null && nextTrack.getLocation() == null);
 
                     player.open(nextTrack);
-                    player.play();
+//                    player.play();
                 }
             }
         });
