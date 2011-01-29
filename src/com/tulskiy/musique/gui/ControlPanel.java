@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui;
 
-import com.tulskiy.musique.audio.player.AudioOutput;
+import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
@@ -241,7 +241,6 @@ public class ControlPanel extends JPanel {
                     return;
                 hideToolTip();
                 player.seek(progressSlider.getValue());
-                isSeeking = false;
             }
 
             public void mousePressed(MouseEvent e) {
@@ -283,7 +282,6 @@ public class ControlPanel extends JPanel {
         pauseButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 player.pause();
-                pauseButton.setSelected(player.isPaused());
             }
         });
         nextButton.addActionListener(new ActionListener() {
@@ -312,6 +310,9 @@ public class ControlPanel extends JPanel {
                             }
                         }
                         progressSlider.setValue((int) player.getCurrentSample());
+                        break;
+                    case SEEK_FINISHED:
+                        isSeeking = false;
                         break;
                 }
             }

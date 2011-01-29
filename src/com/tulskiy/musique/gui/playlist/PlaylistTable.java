@@ -129,7 +129,6 @@ public class PlaylistTable extends GroupTable {
                 ArrayList<Track> tracks = getSelectedSongs();
                 if (!tracks.isEmpty()) {
                     player.open(tracks.get(0));
-                    player.play();
                     PlaybackOrder order = player.getPlaybackOrder();
                     order.setLastPlayed(null);
                     app.getPlaylistManager().setActivePlaylist(playlist);

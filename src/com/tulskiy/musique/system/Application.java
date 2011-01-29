@@ -23,7 +23,7 @@ package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Scrobbler;
-import com.tulskiy.musique.audio.player.AudioOutput;
+import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaybackOrder;

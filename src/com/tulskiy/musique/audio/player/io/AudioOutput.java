@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.audio.player;
+package com.tulskiy.musique.audio.player.io;
 
 import javax.sound.sampled.*;
 import java.util.logging.Logger;
@@ -25,8 +25,8 @@ import java.util.logging.Logger;
  * Date: Jul 25, 2010
  */
 public class AudioOutput {
+    public static final int BUFFER_SIZE = (int) Math.pow(2, 15);
     private final Logger logger = Logger.getLogger("musique");
-    private final int BUFFER_SIZE = (int) Math.pow(2, 16);
 
     private SourceDataLine line;
     private FloatControl volumeControl;
@@ -81,6 +81,12 @@ public class AudioOutput {
             line.start();
     }
 
+    public void close() {
+        if (line != null) {
+            line.close();
+        }
+    }
+
     public void flush() {
         if (line != null && line.isOpen())
             line.flush();
@@ -131,5 +137,20 @@ public class AudioOutput {
             return mixer.getMixerInfo();
         else
             return null;
+    }
+
+    public boolean isOverrun() {
+        return line.available() - line.getBufferSize() == 0;
+    }
+
+    public int available() {
+        if (line != null)
+            return line.available();
+        else
+            return BUFFER_SIZE;
+    }
+
+    public void drain() {
+        line.drain();
     }
 }
