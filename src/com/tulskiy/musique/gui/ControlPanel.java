@@ -17,10 +17,10 @@
 
 package com.tulskiy.musique.gui;
 
-import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
+import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Track;
@@ -289,11 +289,27 @@ public class ControlPanel extends JPanel {
                 player.next();
             }
         });
+        final Timer timer = new Timer(333, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (progressEnabled && player.isPlaying() && !isSeeking) {
+                    progressSlider.setValue((int) player.getCurrentSample());
+                }
+                if (player.isPlaying())
+                    updateStatus();
+            }
+        });
         player.addListener(new PlayerListener() {
             public void onEvent(PlayerEvent e) {
                 pauseButton.setSelected(player.isPaused());
                 switch (e.getEventCode()) {
+                    case PLAYING_STARTED:
+                        timer.start();
+                        break;
+                    case PAUSED:
+                        timer.stop();
+                        break;
                     case STOPPED:
+                        timer.stop();
                         progressEnabled = false;
                         progressSlider.setValue(progressSlider.getMinimum());
                         statusLabel.setText(null);
@@ -317,16 +333,6 @@ public class ControlPanel extends JPanel {
                 }
             }
         });
-
-        new Timer(333, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (progressEnabled && player.isPlaying() && !isSeeking) {
-                    progressSlider.setValue((int) player.getCurrentSample());
-                }
-                if (player.isPlaying())
-                    updateStatus();
-            }
-        }).start();
     }
 
     private void updateStatus() {
