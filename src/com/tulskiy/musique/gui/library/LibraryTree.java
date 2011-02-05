@@ -102,7 +102,7 @@ public class LibraryTree extends JTree {
         if (config == null)
             return;
 
-        if (!Util.isGTKLaF()) {
+        if (!Util.isNimbusLaF()) {
             MetalTreeUI newUI = new MetalTreeUI() {
                 @Override
                 protected void paintRow(Graphics g, Rectangle clipBounds, Insets insets, Rectangle bounds, TreePath path, int row, boolean isExpanded, boolean hasBeenExpanded, boolean isLeaf) {
