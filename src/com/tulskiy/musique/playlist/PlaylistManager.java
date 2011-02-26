@@ -130,13 +130,15 @@ public class PlaylistManager {
         library.getData().save(new File(PLAYLIST_PATH, "library.mus"));
 
         config.setList("playlists", playlists);
-        config.setInt("playlist.activePlaylist", playlists.indexOf(activePlaylist));
+        if (activePlaylist != null && playlists.contains(activePlaylist)) {
+            config.setInt("playlist.activePlaylist", playlists.indexOf(activePlaylist));
 
-        Track lastPlayed = app.getPlayer().getTrack();
-        if (lastPlayed != null) {
-            activePlaylist.cleanUp();
-            int index = activePlaylist.indexOf(lastPlayed);
-            config.setInt("player.lastPlayed", index);
+            Track lastPlayed = app.getPlayer().getTrack();
+            if (lastPlayed != null) {
+                activePlaylist.cleanUp();
+                int index = activePlaylist.indexOf(lastPlayed);
+                config.setInt("player.lastPlayed", index);
+            }
         }
     }
 
@@ -159,6 +161,9 @@ public class PlaylistManager {
 
     public void removePlaylist(Playlist playlist) {
         playlists.remove(playlist);
+        if (playlists.size() == 0) {
+            addPlaylist("Default");
+        }
         notifyListeners(playlist, Event.REMOVED);
     }
 

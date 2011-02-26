@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -158,4 +158,27 @@ public class Util {
     public static boolean isGTKLaF() {
         return UIManager.getLookAndFeel().getName().contains("GTK");
     }
+
+    public static String center(String str, int maxSize, int size) {
+        if (str == null || size <= 0 || str.length() >= maxSize) {
+            return str;
+        }
+        int strLen = str.length();
+        int pads = size - strLen;
+        if (pads <= 0) {
+            return str;
+        }
+        str = leftPad(str, strLen + pads / 2);
+        str = rightPad(str, size);
+        return str;
+    }
+
+    public static String rightPad(String s, int n) {
+        return String.format("%1$-" + n + "s", s);
+    }
+
+    public static String leftPad(String s, int n) {
+        return String.format("%1$#" + n + "s", s);
+    }
+
 }

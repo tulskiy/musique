@@ -65,6 +65,7 @@ public class PlaylistTabs extends JPanel {
         this.columns = columns;
         setLayout(new BorderLayout());
         tabbedPane = new JTabbedPane();
+        add(tabbedPane);
         tabsVisible = true;
 
         tabbedPane.setFocusable(false);
@@ -191,6 +192,12 @@ public class PlaylistTabs extends JPanel {
                         e.getClickCount() == 2) {
                     tabbedPane.getActionMap().get("newPlaylist").actionPerformed(
                             new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+                } else if (e.getButton() == MouseEvent.BUTTON2) {
+                    int index = tabbedPane.indexAtLocation(e.getX(), e.getY());
+                    if (index != -1) {
+                        Playlist playlist = getTableAt(index).getPlaylist();
+                        playlistManager.removePlaylist(playlist);
+                    }
                 }
             }
         });
@@ -198,12 +205,16 @@ public class PlaylistTabs extends JPanel {
         playlistManager.addPlaylistListener(new PlaylistListener() {
             @Override
             public void playlistRemoved(Playlist playlist) {
-                for (int i = 0; i < getTabCount(); i++) {
-                    if (getTableAt(i).getPlaylist() == playlist) {
-                        tabbedPane.remove(i);
-                        checkTabCount();
-                        break;
+                if (tabbedPane.getTabCount() > 0) {
+                    for (int i = 0; i < getTabCount(); i++) {
+                        if (getTableAt(i).getPlaylist() == playlist) {
+                            tabbedPane.remove(i);
+                            checkTabCount();
+                            break;
+                        }
                     }
+                } else {
+                    singleTab = null;
                 }
             }
 
@@ -233,7 +244,8 @@ public class PlaylistTabs extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String name = JOptionPane.showInputDialog("Enter Playlist Name", "New Playlist");
-                addPlaylist(name);
+                if (!Util.isEmpty(name))
+                    addPlaylist(name);
             }
         });
         aMap.put("renamePlaylist", new AbstractAction("Rename") {
@@ -244,7 +256,7 @@ public class PlaylistTabs extends JPanel {
                     String name = JOptionPane.showInputDialog("Rename", playlist.getName());
                     if (!Util.isEmpty(name)) {
                         playlist.setName(name);
-                        tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), name);
+                        tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), center(name));
                     }
                 }
             }
@@ -252,12 +264,8 @@ public class PlaylistTabs extends JPanel {
         aMap.put("removePlaylist", new AbstractAction("Remove Playlist") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int index = tabbedPane.getSelectedIndex();
-                if (index != -1) {
+                if (selectedTable != null) {
                     playlistManager.removePlaylist(selectedTable.getPlaylist());
-                    if (playlistManager.getTotalPlaylists() == 0) {
-                        addPlaylist("Default");
-                    }
                     checkTabCount();
                 }
             }
@@ -373,8 +381,8 @@ public class PlaylistTabs extends JPanel {
         } else {
             newTable.setColumnModel(columnModel);
         }
-        tabbedPane.add(playlist.getName(), newTable.getScrollPane());
-        checkTabCount();
+
+        addTab(playlist.getName(), newTable.getScrollPane());
         return newTable;
     }
 
@@ -409,9 +417,14 @@ public class PlaylistTabs extends JPanel {
         }
     }
 
-    public void addTab(String name, JScrollPane comp) {
-        tabbedPane.addTab(name, comp);
+    public void addTab(String name, JComponent comp) {
+        String title = center(name);
+        tabbedPane.addTab(title, comp);
         checkTabCount();
+    }
+
+    private String center(String name) {
+        return Util.center(name, 7, 10);
     }
 
     public ActionMap getActions() {
