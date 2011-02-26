@@ -40,16 +40,14 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
+import static com.tulskiy.musique.gui.library.LibraryAction.*;
+
 
 /**
  * Author: Denis Tulskiy
  * Date: 1/4/11
  */
 public class LibraryTree extends JTree {
-    public static final KeyStroke SEND_TO_CURRENT_KEY_STROKE = KeyStroke.getKeyStroke("ENTER");
-    public static final KeyStroke SEND_TO_NEW_KEY_STROKE = KeyStroke.getKeyStroke("ctrl ENTER");
-    public static final KeyStroke ADD_TO_CURRENT_KEY_STROKE = KeyStroke.getKeyStroke("shift ENTER");
-
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private PlaylistManager playlistManager = app.getPlaylistManager();
@@ -67,62 +65,41 @@ public class LibraryTree extends JTree {
     }
 
     private void buildListeners() {
+        addMouseListener(new ExpandListener());
+
         addMouseListener(new MouseAdapter() {
-            @SuppressWarnings({"unchecked"})
             @Override
             public void mouseClicked(MouseEvent e) {
-                final int row = getClosestRowForLocation(e.getX(), e.getY());
+                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+                    LibraryAction action = config.getEnum("library.doubleClickAction", SEND_TO_CURRENT);
+                    getActionMap().get(action).actionPerformed(null);
+                }
 
-                if (row != -1) {
-                    Rectangle bounds = getRowBounds(row);
-                    boolean isInBounds = bounds.getX() < e.getX();
-                    boolean isExtraSpace = bounds.getX() + bounds.getWidth() < e.getX();
-                    if (e.getButton() == MouseEvent.BUTTON1 && isExtraSpace) {
-                        if (e.isControlDown()) {
-                            if (!isRowSelected(row))
-                                addSelectionRow(row);
-                            else
-                                removeSelectionRow(row);
-                        } else if (e.isShiftDown()) {
-                            int start = getSelectionModel().getLeadSelectionRow();
-                            if (start == -1)
-                                start = row;
-                            if (start < row)
-                                start = getSelectionModel().getMinSelectionRow();
-                            setSelectionInterval(
-                                    start,
-                                    row);
-                        } else {
-                            setSelectionRow(row);
-                        }
-                    }
-
-                    if (e.isPopupTrigger() && isInBounds) {
-                        if (!isRowSelected(row)) {
-                            setSelectionRow(row);
-                        }
+                if (e.getButton() == MouseEvent.BUTTON2) {
+                    if (selectRowAt(e.getPoint())) {
+                        LibraryAction action = config.getEnum("library.middleClickAction", SEND_TO_CURRENT);
+                        getActionMap().get(action).actionPerformed(null);
                     }
                 }
             }
         });
 
-
         final ActionMap aMap = getActionMap();
-        aMap.put("sendToCurrent", new AbstractAction("Send to Current Playlist") {
+        aMap.put(SEND_TO_CURRENT, new AbstractAction(SEND_TO_CURRENT.getName()) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 sendToPlaylist(playlistManager.getVisiblePlaylist());
             }
         });
 
-        aMap.put("sendToNew", new AbstractAction("Send to New Playlist") {
+        aMap.put(SEND_TO_NEW, new AbstractAction(SEND_TO_NEW.getName()) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Playlist playlist = playlistManager.addPlaylist(getSelectionPath().getLastPathComponent().toString());
                 sendToPlaylist(playlist);
             }
         });
-        aMap.put("addToCurrent", new AbstractAction("Add to Current Playlist") {
+        aMap.put(ADD_TO_CURRENT, new AbstractAction(ADD_TO_CURRENT.getName()) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Playlist playlist = playlistManager.getVisiblePlaylist();
@@ -131,10 +108,21 @@ public class LibraryTree extends JTree {
             }
         });
 
+        aMap.put(EXPAND_COLLAPSE, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                TreePath path = getSelectionPath();
+                if (isExpanded(path))
+                    collapsePath(path);
+                else
+                    expandPath(path);
+            }
+        });
+
         InputMap iMap = getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        iMap.put(SEND_TO_CURRENT_KEY_STROKE, "sendToCurrent");
-        iMap.put(SEND_TO_NEW_KEY_STROKE, "sendToNew");
-        iMap.put(ADD_TO_CURRENT_KEY_STROKE, "addToCurrent");
+        iMap.put(SEND_TO_CURRENT.getKeyStroke(), SEND_TO_CURRENT);
+        iMap.put(SEND_TO_NEW.getKeyStroke(), SEND_TO_NEW);
+        iMap.put(ADD_TO_CURRENT.getKeyStroke(), ADD_TO_CURRENT);
 
         addMouseListener(new MouseAdapter() {
             @Override
@@ -325,6 +313,45 @@ public class LibraryTree extends JTree {
         public void paint(Graphics2D g, Object object, int width, int height) {
             g.setColor(selection);
             g.fillRect(0, 0, width, height);
+        }
+    }
+
+    private class ExpandListener extends MouseAdapter {
+        @SuppressWarnings({"unchecked"})
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            final int row = getClosestRowForLocation(e.getX(), e.getY());
+
+            if (row != -1) {
+                Rectangle bounds = getRowBounds(row);
+                boolean isInBounds = bounds.getX() < e.getX();
+                boolean isExtraSpace = bounds.getX() + bounds.getWidth() < e.getX();
+                if (e.getButton() == MouseEvent.BUTTON1 && isExtraSpace) {
+                    if (e.isControlDown()) {
+                        if (!isRowSelected(row))
+                            addSelectionRow(row);
+                        else
+                            removeSelectionRow(row);
+                    } else if (e.isShiftDown()) {
+                        int start = getSelectionModel().getLeadSelectionRow();
+                        if (start == -1)
+                            start = row;
+                        if (start < row)
+                            start = getSelectionModel().getMinSelectionRow();
+                        setSelectionInterval(
+                                start,
+                                row);
+                    } else {
+                        setSelectionRow(row);
+                    }
+                }
+
+                if (e.isPopupTrigger() && isInBounds) {
+                    if (!isRowSelected(row)) {
+                        setSelectionRow(row);
+                    }
+                }
+            }
         }
     }
 }

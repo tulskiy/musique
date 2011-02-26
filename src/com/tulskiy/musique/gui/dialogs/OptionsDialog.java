@@ -19,7 +19,7 @@ package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.io.AudioOutput;
-import com.tulskiy.musique.gui.library.LibraryView;
+import com.tulskiy.musique.gui.library.LibraryAction;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
@@ -199,22 +199,22 @@ public class OptionsDialog extends JDialog {
 
         enableLibraryView.setSelected(config.getBoolean("library.libraryView", false));
 
-        libraryDoubleClickAction.setModel(new DefaultComboBoxModel(new LibraryView.Actions[]{
-                LibraryView.Actions.SEND_TO_CURRENT,
-                LibraryView.Actions.ADD_TO_CURRENT,
-                LibraryView.Actions.SEND_TO_NEW,
-                LibraryView.Actions.EXPAND_COLLAPSE
+        libraryDoubleClickAction.setModel(new DefaultComboBoxModel(new LibraryAction[]{
+                LibraryAction.SEND_TO_CURRENT,
+                LibraryAction.ADD_TO_CURRENT,
+                LibraryAction.SEND_TO_NEW,
+                LibraryAction.EXPAND_COLLAPSE
         }));
 
-        libraryMiddleClickAction.setModel(new DefaultComboBoxModel(new LibraryView.Actions[]{
-                LibraryView.Actions.SEND_TO_NEW,
-                LibraryView.Actions.SEND_TO_CURRENT,
-                LibraryView.Actions.ADD_TO_CURRENT,
+        libraryMiddleClickAction.setModel(new DefaultComboBoxModel(new LibraryAction[]{
+                LibraryAction.SEND_TO_NEW,
+                LibraryAction.SEND_TO_CURRENT,
+                LibraryAction.ADD_TO_CURRENT,
         }));
-        LibraryView.Actions doubleAction = config.getEnum("library.doubleClickAction", LibraryView.Actions.SEND_TO_CURRENT);
+        LibraryAction doubleAction = config.getEnum("library.doubleClickAction", LibraryAction.SEND_TO_CURRENT);
         libraryDoubleClickAction.setSelectedItem(doubleAction);
 
-        LibraryView.Actions middleAction = config.getEnum("library.middleClickAction", LibraryView.Actions.SEND_TO_NEW);
+        LibraryAction middleAction = config.getEnum("library.middleClickAction", LibraryAction.SEND_TO_NEW);
         libraryMiddleClickAction.setSelectedItem(middleAction);
 
         applyButton.addActionListener(new ActionListener() {

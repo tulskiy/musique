@@ -22,6 +22,8 @@ import com.tulskiy.musique.images.Images;
 
 import javax.swing.*;
 
+import static com.tulskiy.musique.gui.library.LibraryAction.*;
+
 /**
  * Author: Denis Tulskiy
  * Date: 2/5/11
@@ -30,17 +32,17 @@ public class LibraryMenu implements ContextMenu<LibraryTree> {
     public JPopupMenu create(LibraryTree tree) {
         ActionMap aMap = tree.getActionMap();
         JPopupMenu popup = new JPopupMenu();
-        JMenuItem sendToCurrent = new JMenuItem(aMap.get("sendToCurrent"));
+        JMenuItem sendToCurrent = new JMenuItem(aMap.get(SEND_TO_CURRENT));
         sendToCurrent.setIcon(Images.getEmptyIcon());
-        sendToCurrent.setAccelerator(LibraryTree.SEND_TO_CURRENT_KEY_STROKE);
+        sendToCurrent.setAccelerator(SEND_TO_CURRENT.getKeyStroke());
         popup.add(sendToCurrent);
 
-        JMenuItem sendToNew = new JMenuItem(aMap.get("sendToNew"));
-        sendToNew.setAccelerator(LibraryTree.SEND_TO_NEW_KEY_STROKE);
+        JMenuItem sendToNew = new JMenuItem(aMap.get(SEND_TO_NEW));
+        sendToNew.setAccelerator(SEND_TO_NEW.getKeyStroke());
         popup.add(sendToNew);
 
-        JMenuItem addToCurrent = new JMenuItem(aMap.get("addToCurrent"));
-        addToCurrent.setAccelerator(LibraryTree.ADD_TO_CURRENT_KEY_STROKE);
+        JMenuItem addToCurrent = new JMenuItem(aMap.get(ADD_TO_CURRENT));
+        addToCurrent.setAccelerator(ADD_TO_CURRENT.getKeyStroke());
         popup.add(addToCurrent);
 
         return popup;

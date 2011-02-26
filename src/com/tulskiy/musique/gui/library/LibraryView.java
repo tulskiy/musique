@@ -17,7 +17,6 @@
 
 package com.tulskiy.musique.gui.library;
 
-import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.SearchWorker;
 import com.tulskiy.musique.gui.components.SearchField;
 import com.tulskiy.musique.gui.dialogs.OptionsDialog;
@@ -28,7 +27,6 @@ import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Library;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
-import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
@@ -43,8 +41,6 @@ import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
@@ -54,23 +50,6 @@ import java.util.HashMap;
  * Date: 10/31/10
  */
 public class LibraryView extends JPanel {
-    public enum Actions {
-        SEND_TO_CURRENT("Send to Current Playlist"),
-        SEND_TO_NEW("Send to New Playlist"),
-        ADD_TO_CURRENT("Add to Current Playlist"),
-        EXPAND_COLLAPSE("Expand / Collapse");
-
-        String name;
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        Actions(String name) {
-            this.name = name;
-        }
-    }
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
@@ -166,23 +145,24 @@ public class LibraryView extends JPanel {
             }
         });
 
-        tree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-                    Player player = app.getPlayer();
-                    playlistManager.setActivePlaylist(libraryPlaylist);
-                    player.getPlaybackOrder().flushQueue();
-                    Track nextTrack = null;
-                    do {
-                        nextTrack = player.getPlaybackOrder().next(nextTrack);
-                    } while (nextTrack != null && nextTrack.getLocation() == null);
-
-                    player.open(nextTrack);
-//                    player.play();
-                }
-            }
-        });
+//        tree.addMouseListener(new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
+//
+//                    Player player = app.getPlayer();
+//                    playlistManager.setActivePlaylist(libraryPlaylist);
+//                    player.getPlaybackOrder().flushQueue();
+//                    Track nextTrack = null;
+//                    do {
+//                        nextTrack = player.getPlaybackOrder().next(nextTrack);
+//                    } while (nextTrack != null && nextTrack.getLocation() == null);
+//
+//                    player.open(nextTrack);
+////                    player.play();
+//                }
+//            }
+//        });
 
         config.addPropertyChangeListener("library.libraryView", new PropertyChangeListener() {
             @Override
