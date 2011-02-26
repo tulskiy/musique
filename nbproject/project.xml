@@ -10,14 +10,14 @@
         <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
             <name>musique</name>
             <source-roots>
-                <root id="musique2.dir" name="musique"/>
-                <root id="src.dir" name="wavpack"/>
-                <root id="musique3.dir" name="jflac"/>
-                <root id="musique4.dir" name="jaudiotagger"/>
-                <root id="musique5.dir" name="cuelib"/>
-                <root id="musique6.dir" name="jmac"/>
-                <root id="musique7.dir" name="javalayer"/>
-                <root id="musique8.dir" name="jorbis"/>
+                <root id="src.dir"/>
+                <root id="musique2.dir"/>
+                <root id="musique3.dir"/>
+                <root id="musique4.dir"/>
+                <root id="musique5.dir"/>
+                <root id="musique6.dir"/>
+                <root id="musique7.dir"/>
+                <root id="musique8.dir"/>
             </source-roots>
             <test-roots>
                 <root id="test.src.dir"/>
