@@ -90,11 +90,11 @@ public class LibraryView extends JPanel {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         add(scrollPane, BorderLayout.CENTER);
         final SearchField searchField = new SearchField();
-        searchField.setColumns(30);
         Box viewBox = Box.createHorizontalBox();
         JComboBox viewCombo = new JComboBox(new Object[]{"By Album Artist"});
         JPanel p1 = new JPanel(new BorderLayout());
         p1.add(viewCombo);
+        p1.setMaximumSize(new Dimension(200, 100));
         p1.setBorder(BorderFactory.createTitledBorder(
                 BorderFactory.createEtchedBorder(), "View",
                 TitledBorder.DEFAULT_JUSTIFICATION,
@@ -144,25 +144,6 @@ public class LibraryView extends JPanel {
                     fillLibraryView();
             }
         });
-
-//        tree.addMouseListener(new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
-//
-//                    Player player = app.getPlayer();
-//                    playlistManager.setActivePlaylist(libraryPlaylist);
-//                    player.getPlaybackOrder().flushQueue();
-//                    Track nextTrack = null;
-//                    do {
-//                        nextTrack = player.getPlaybackOrder().next(nextTrack);
-//                    } while (nextTrack != null && nextTrack.getLocation() == null);
-//
-//                    player.open(nextTrack);
-////                    player.play();
-//                }
-//            }
-//        });
 
         config.addPropertyChangeListener("library.libraryView", new PropertyChangeListener() {
             @Override
