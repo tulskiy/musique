@@ -20,8 +20,8 @@ package com.tulskiy.musique.gui.library;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.SearchWorker;
 import com.tulskiy.musique.gui.components.SearchField;
+import com.tulskiy.musique.gui.dialogs.OptionsDialog;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
-import com.tulskiy.musique.gui.dialogs.SettingsDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.gui.dnd.LibraryTransferHandler;
 import com.tulskiy.musique.images.Images;
@@ -54,6 +54,24 @@ import java.util.HashMap;
  * Date: 10/31/10
  */
 public class LibraryView extends JPanel {
+    public enum Actions {
+        SEND_TO_CURRENT("Send to Current Playlist"),
+        SEND_TO_NEW("Send to New Playlist"),
+        ADD_TO_CURRENT("Add to Current Playlist"),
+        EXPAND_COLLAPSE("Expand / Collapse");
+
+        String name;
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        Actions(String name) {
+            this.name = name;
+        }
+    }
+
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private LibraryTree tree;
@@ -212,7 +230,7 @@ public class LibraryView extends JPanel {
         configure.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SettingsDialog(getRootPane(), "Library").setVisible(true);
+                new OptionsDialog(getRootPane(), "Library").setVisible(true);
             }
         });
         menu.add("Rescan").addActionListener(new ActionListener() {

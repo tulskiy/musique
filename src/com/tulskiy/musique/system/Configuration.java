@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -273,6 +273,17 @@ public class Configuration {
             }
             put(key, s);
         }
+    }
+
+    @SuppressWarnings({"unchecked"})
+    public <E extends Enum<E>> E getEnum(String key, E def) {
+        String val = getString(key, def.name());
+        Class<E> clazz = (Class<E>) def.getClass();
+        return E.valueOf(clazz, val);
+    }
+
+    public <E extends Enum<E>> void setEnum(String key, E value) {
+        setString(key, value.name());
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {

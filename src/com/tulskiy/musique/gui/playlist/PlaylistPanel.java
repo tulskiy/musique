@@ -235,7 +235,7 @@ public class PlaylistPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (config.getBoolean("tray.enabled", false) &&
-                    config.getBoolean("tray.minimizeOnClose", true)) {
+                        config.getBoolean("tray.minimizeOnClose", true)) {
                     SwingUtilities.windowForComponent(comp).setVisible(false);
                 } else {
                     app.exit();
@@ -452,7 +452,7 @@ public class PlaylistPanel extends JPanel {
         propsItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new SettingsDialog(comp).setVisible(true);
+                new OptionsDialog(comp).setVisible(true);
             }
         });
 

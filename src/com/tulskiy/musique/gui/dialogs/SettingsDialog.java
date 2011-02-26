@@ -41,6 +41,7 @@ import java.util.Vector;
  * Author: Denis Tulskiy
  * Date: Jul 18, 2010
  */
+@Deprecated
 public class SettingsDialog extends JDialog {
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
