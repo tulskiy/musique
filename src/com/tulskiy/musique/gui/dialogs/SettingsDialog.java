@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -53,7 +53,7 @@ public class SettingsDialog extends JDialog {
         super(SwingUtilities.windowForComponent(owner), "Settings", ModalityType.MODELESS);
         this.owner = owner;
 
-        tabs = new JTabbedPane();
+        tabs = new JTabbedPane(JTabbedPane.LEFT);
         tabs.setFocusable(false);
 
         Box buttons = Box.createHorizontalBox();
@@ -93,7 +93,7 @@ public class SettingsDialog extends JDialog {
         add(buttons, BorderLayout.SOUTH);
 
         pack();
-        setSize(670, getHeight());
+        setSize(700, getHeight());
         setLocationRelativeTo(SwingUtilities.windowForComponent(owner));
     }
 
@@ -485,10 +485,15 @@ public class SettingsDialog extends JDialog {
             }
         });
 
+        final JCheckBox libraryView = new JCheckBox("Enable Library view playlist");
+        libraryView.setSelected(config.getBoolean("library.libraryView", false));
+        mainBox.add(libraryView);
+
         applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 config.setList("library.folders", model);
+                config.setBoolean("library.libraryView", libraryView.isSelected());
             }
         });
         return panel;
