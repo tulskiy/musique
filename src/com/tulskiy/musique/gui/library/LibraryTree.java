@@ -18,6 +18,10 @@
 package com.tulskiy.musique.gui.library;
 
 import com.sun.java.swing.Painter;
+import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.gui.ContextMenu;
+import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
@@ -29,6 +33,7 @@ import javax.swing.plaf.basic.BasicTreeUI;
 import javax.swing.plaf.metal.MetalTreeUI;
 import javax.swing.tree.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -41,8 +46,15 @@ import java.util.Enumeration;
  * Date: 1/4/11
  */
 public class LibraryTree extends JTree {
+    public static final KeyStroke SEND_TO_CURRENT_KEY_STROKE = KeyStroke.getKeyStroke("ENTER");
+    public static final KeyStroke SEND_TO_NEW_KEY_STROKE = KeyStroke.getKeyStroke("ctrl ENTER");
+    public static final KeyStroke ADD_TO_CURRENT_KEY_STROKE = KeyStroke.getKeyStroke("shift ENTER");
+
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
+    private PlaylistManager playlistManager = app.getPlaylistManager();
+    private Player player = app.getPlayer();
+    private ContextMenu<LibraryTree> menu = new LibraryMenu();
 
     public LibraryTree() {
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -93,7 +105,76 @@ public class LibraryTree extends JTree {
                 }
             }
         });
+
+
+        final ActionMap aMap = getActionMap();
+        aMap.put("sendToCurrent", new AbstractAction("Send to Current Playlist") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                sendToPlaylist(playlistManager.getVisiblePlaylist());
+            }
+        });
+
+        aMap.put("sendToNew", new AbstractAction("Send to New Playlist") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Playlist playlist = playlistManager.addPlaylist(getSelectionPath().getLastPathComponent().toString());
+                sendToPlaylist(playlist);
+            }
+        });
+        aMap.put("addToCurrent", new AbstractAction("Add to Current Playlist") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Playlist playlist = playlistManager.getVisiblePlaylist();
+                playlist.addAll(getSelectedTracks(true));
+                playlist.firePlaylistChanged();
+            }
+        });
+
+        InputMap iMap = getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        iMap.put(SEND_TO_CURRENT_KEY_STROKE, "sendToCurrent");
+        iMap.put(SEND_TO_NEW_KEY_STROKE, "sendToNew");
+        iMap.put(ADD_TO_CURRENT_KEY_STROKE, "addToCurrent");
+
+        addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                show(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                show(e);
+            }
+
+            public void show(MouseEvent e) {
+                if (e.isPopupTrigger() && selectRowAt(e.getPoint())) {
+                    JPopupMenu popup = menu.create(LibraryTree.this);
+                    popup.show(getParent(), e.getX(), e.getY());
+                }
+            }
+        });
     }
+
+    public boolean selectRowAt(Point p) {
+        int row = getClosestRowForLocation(p.x, p.y);
+        if (row != -1) {
+            setSelectionRow(row);
+            return true;
+        }
+        return false;
+    }
+
+    private void sendToPlaylist(Playlist playlist) {
+        ArrayList<Track> tracks = getSelectedTracks(true);
+        if (tracks.size() > 0) {
+            playlist.clear();
+            playlist.addAll(tracks);
+            player.open(playlist.get(0));
+            playlist.firePlaylistChanged();
+        }
+    }
+
 
     @SuppressWarnings({"unchecked"})
     @Override
