@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -37,6 +37,7 @@ import java.util.*;
  */
 public class Library {
     private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'Unknown Artist')|[%year% - ]$if3(%album%,'Unknown Album')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
+    //    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'?')$if1(%album%,[|[%year% - ]%album%],'')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
     private Configuration config = Application.getInstance().getConfiguration();
     private Playlist data;
     private String view;
@@ -205,8 +206,8 @@ public class Library {
 
     private boolean compare(DefaultMutableTreeNode node, Object value) {
         return value != null &&
-               node.getUserObject().toString().
-                       compareToIgnoreCase(value.toString()) == 0;
+                node.getUserObject().toString().
+                        compareToIgnoreCase(value.toString()) == 0;
     }
 
     class TrackNode extends DefaultMutableTreeNode {
