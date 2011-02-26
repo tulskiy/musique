@@ -277,14 +277,22 @@ public class PlaylistTable extends GroupTable {
             public void playlistUpdated(Playlist playlist) {
                 update();
             }
+
+            @Override
+            public void playlistRemoved(Playlist pl) {
+                if (pl == playlist)
+                    dispose();
+            }
         };
         playlist.addChangeListener(playlistListener);
+        app.getPlaylistManager().addPlaylistListener(playlistListener);
     }
 
     public void dispose() {
         config.removePropertyChangeListener(autoResizeChangeListener);
         playlist.removeChangeListener(playlistListener);
         player.removeListener(playerListener);
+        app.getPlaylistManager().removePlaylistListener(playlistListener);
     }
 
     private void adjustLastSongAfterDelete(ArrayList<Track> songs) {

@@ -203,4 +203,8 @@ public class PlaylistManager {
 
         }
     }
+
+    public void removePlaylistListener(PlaylistListener playlistListener) {
+        listeners.remove(playlistListener);
+    }
 }
