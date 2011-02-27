@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui.playlist;
+package com.tulskiy.musique.gui.menu;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
@@ -23,6 +23,7 @@ import com.tulskiy.musique.gui.dialogs.ConverterDialog;
 import com.tulskiy.musique.gui.dialogs.FileOperations;
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
@@ -42,7 +43,7 @@ import java.util.ArrayList;
  * Author: Denis Tulskiy
  * Date: 2/26/11
  */
-public class TracksMenu {
+public class TracksMenu extends Menu {
     private static Application app = Application.getInstance();
     private static Player player = app.getPlayer();
 
@@ -165,6 +166,13 @@ public class TracksMenu {
             }
         });
         tableMenu.add(fileOps);
+
+        for (MenuCallback callback : menus) {
+            JMenu menu = callback.create(tracks, playlist);
+            if (menu != null)
+                tableMenu.add(menu);
+        }
+
         JMenuItem properties = new JMenuItem("Properties");
         properties.setAccelerator(KeyStroke.getKeyStroke("alt ENTER"));
         properties.addActionListener(new ActionListener() {

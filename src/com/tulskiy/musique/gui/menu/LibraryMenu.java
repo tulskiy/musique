@@ -15,11 +15,11 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.gui.library;
+package com.tulskiy.musique.gui.menu;
 
+import com.tulskiy.musique.gui.library.LibraryTree;
 import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
-import com.tulskiy.musique.gui.playlist.TracksMenu;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
@@ -34,7 +34,7 @@ import static com.tulskiy.musique.gui.library.LibraryAction.*;
  * Author: Denis Tulskiy
  * Date: 2/5/11
  */
-public class LibraryMenu {
+public class LibraryMenu extends Menu {
     private PlaylistTable fakeTable;
 
     public JPopupMenu create(LibraryTree parent, Playlist playlist, ArrayList<Track> tracks) {
@@ -66,5 +66,9 @@ public class LibraryMenu {
         }
 
         return popup;
+    }
+
+    public static void addMenu(JMenu menu) {
+
     }
 }

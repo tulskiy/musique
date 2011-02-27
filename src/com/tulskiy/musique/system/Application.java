@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -23,11 +23,12 @@ package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Scrobbler;
-import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.PlaylistManager;
+import com.tulskiy.musique.spi.PluginLoader;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
@@ -85,6 +86,9 @@ public class Application {
 
         playlistManager = new PlaylistManager();
         playlistManager.loadPlaylists();
+
+        PluginLoader pluginLoader = new PluginLoader();
+        pluginLoader.load();
 
         loadSettings();
     }

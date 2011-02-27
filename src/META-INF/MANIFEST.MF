@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: lib/last.fm-bindings.jar
+Main-Class: com.tulskiy.musique.system.Main
+

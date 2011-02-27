@@ -12,8 +12,10 @@
       <element id="module-output" name="cuelib" />
       <element id="directory" name="META-INF">
         <element id="file-copy" path="$PROJECT_DIR$/src/META-INF/MANIFEST.MF" />
+        <element id="directory" name="services">
+          <element id="dir-copy" path="$PROJECT_DIR$/src/META-INF/services" />
+        </element>
       </element>
-      <element id="file-copy" path="$PROJECT_DIR$/Copying" />
     </root>
   </artifact>
 </component>

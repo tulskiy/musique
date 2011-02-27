@@ -25,6 +25,7 @@ import com.tulskiy.musique.gui.components.Separator;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
 import com.tulskiy.musique.gui.dialogs.TracksInfoDialog;
 import com.tulskiy.musique.gui.dnd.PlaylistTransferHandler;
+import com.tulskiy.musique.gui.menu.TracksMenu;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistListener;
@@ -280,7 +281,7 @@ public class PlaylistTable extends GroupTable {
         app.getPlaylistManager().addPlaylistListener(playlistListener);
     }
 
-    void showProperties(ArrayList<Track> tracks) {
+    public void showProperties(ArrayList<Track> tracks) {
         TracksInfoDialog dialog = new TracksInfoDialog(this, tracks);
         dialog.setVisible(true);
     }
@@ -292,7 +293,7 @@ public class PlaylistTable extends GroupTable {
         app.getPlaylistManager().removePlaylistListener(playlistListener);
     }
 
-    void adjustLastSongAfterDelete(ArrayList<Track> songs) {
+    public void adjustLastSongAfterDelete(ArrayList<Track> songs) {
         if (songs.contains(player.getTrack())) {
             int index = getSelectionModel().getMinSelectionIndex();
             if (index < playlist.size()) {
