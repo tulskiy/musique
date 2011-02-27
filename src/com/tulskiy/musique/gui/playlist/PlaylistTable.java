@@ -17,13 +17,13 @@
 
 package com.tulskiy.musique.gui.playlist;
 
-import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.components.Separator;
-import com.tulskiy.musique.gui.dialogs.*;
+import com.tulskiy.musique.gui.dialogs.ColumnDialog;
+import com.tulskiy.musique.gui.dialogs.TracksInfoDialog;
 import com.tulskiy.musique.gui.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
@@ -31,7 +31,6 @@ import com.tulskiy.musique.playlist.PlaylistListener;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
-import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
@@ -49,12 +48,8 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-
-import static com.tulskiy.musique.gui.dialogs.FileOperations.Operation;
 
 /**
  * Author: Denis Tulskiy
@@ -70,7 +65,6 @@ public class PlaylistTable extends GroupTable {
     private PlaylistModel model;
 
     private JScrollPane scrollPane;
-    private final ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
     private JPopupMenu tablePopupMenu;
     private PlayerListener playerListener;
     private PropertyChangeListener autoResizeChangeListener;
@@ -135,15 +129,13 @@ public class PlaylistTable extends GroupTable {
                 }
             }
         });
-        final PlaylistTable comp = this;
         aMap.put("showProperties", new AbstractAction("Properties") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ArrayList<Track> tracks = getSelectedSongs();
                 if (tracks.isEmpty())
                     return;
-                TracksInfoDialog dialog = new TracksInfoDialog(comp, tracks);
-                dialog.setVisible(true);
+                showProperties(tracks);
             }
         });
         aMap.put("showNowPlaying", new AbstractAction("Scroll to Now Playing") {
@@ -288,6 +280,11 @@ public class PlaylistTable extends GroupTable {
         app.getPlaylistManager().addPlaylistListener(playlistListener);
     }
 
+    void showProperties(ArrayList<Track> tracks) {
+        TracksInfoDialog dialog = new TracksInfoDialog(this, tracks);
+        dialog.setVisible(true);
+    }
+
     public void dispose() {
         config.removePropertyChangeListener(autoResizeChangeListener);
         playlist.removeChangeListener(playlistListener);
@@ -295,7 +292,7 @@ public class PlaylistTable extends GroupTable {
         app.getPlaylistManager().removePlaylistListener(playlistListener);
     }
 
-    private void adjustLastSongAfterDelete(ArrayList<Track> songs) {
+    void adjustLastSongAfterDelete(ArrayList<Track> songs) {
         if (songs.contains(player.getTrack())) {
             int index = getSelectionModel().getMinSelectionIndex();
             if (index < playlist.size()) {
@@ -546,7 +543,8 @@ public class PlaylistTable extends GroupTable {
                             null));
             }
         };
-
+        tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));
+        tableMenu.addSeparator();
         item = tableMenu.add("Cut");
         item.addActionListener(listener);
         item.setActionCommand((String) TransferHandler.getCutAction().getValue(Action.NAME));
@@ -560,125 +558,11 @@ public class PlaylistTable extends GroupTable {
         item.setActionCommand((String) TransferHandler.getPasteAction().getValue(Action.NAME));
 
         tableMenu.addSeparator();
-        item = tableMenu.add(aMap.get("enqueue"));
-        item.setIcon(emptyIcon);
-        item.setAccelerator(KeyStroke.getKeyStroke("Q"));
-        tableMenu.add(new JMenuItem("Reload Tags")).addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ProgressDialog dialog = new ProgressDialog(getParentFrame(), "Reloading Tags");
-                dialog.show(new Task() {
-                    String currentTrack;
-                    float progress = 0;
-                    boolean abort = false;
-
-                    @Override
-                    public String getStatus() {
-                        return "Reading tags: " + currentTrack;
-                    }
-
-                    @Override
-                    public void abort() {
-                        abort = true;
-                    }
-
-                    @Override
-                    public void start() {
-                        ArrayList<Track> selectedSongs = getSelectedSongs();
-                        for (int i = 0; i < selectedSongs.size(); i++) {
-                            Track track = selectedSongs.get(i);
-                            if (abort)
-                                break;
-                            if (track.isFile() && track.getSubsongIndex() == 0) {
-                                currentTrack = track.getFile().getName();
-                                progress = (float) i / selectedSongs.size();
-                                AudioFileReader reader = TrackIO.getAudioFileReader(track.getFile().getName());
-                                track.clearTags();
-                                reader.reload(track);
-                            }
-                        }
-                        playlist.firePlaylistChanged();
-                    }
-
-                    @Override
-                    public boolean isIndeterminate() {
-                        return false;
-                    }
-
-                    @Override
-                    public float getProgress() {
-                        return progress;
-                    }
-                });
-            }
-        });
-
-        ActionListener fileOpsListener = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String cmd = e.getActionCommand();
-                Operation op = Operation.valueOf(cmd);
-                new FileOperations(owner, op, getSelectedSongs()).setVisible(true);
-            }
-        };
-        JMenu fileOps = new JMenu("File Operations");
-        fileOps.add("Open containing folder").addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<Track> tracks = getSelectedSongs();
-                for (Track track : tracks) {
-                    if (track.isFile()) {
-                        File file = track.getFile().getParentFile();
-                        try {
-                            Desktop.getDesktop().open(file);
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
-                        break;
-                    }
-                }
-            }
-        });
-        fileOps.addSeparator();
-        for (Operation op : Operation.values()) {
-            fileOps.add(op.name()).addActionListener(fileOpsListener);
+        TracksMenu tracksMenu = new TracksMenu();
+        JPopupMenu menu = tracksMenu.create(this, playlist, getSelectedSongs());
+        for (Component component : menu.getComponents()) {
+            tableMenu.add(component);
         }
-        fileOps.addSeparator();
-        JMenuItem deleteItem = fileOps.add("Delete       ");
-        deleteItem.setIcon(emptyIcon);
-        deleteItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                ArrayList<Track> tracks = getSelectedSongs();
-                int ret = JOptionPane.showConfirmDialog(null, "This will delete file(s) permanently. Are you sure?", "Delete File(s)?", JOptionPane.YES_NO_OPTION);
-                if (ret == JOptionPane.YES_OPTION) {
-                    for (Track track : tracks) {
-                        if (track.isFile() && !track.isCue()) {
-                            if (player.getTrack() == track) {
-                                player.stop();
-                            }
-
-                            if (track.getFile().delete()) {
-                                playlist.remove(track);
-                            }
-                        }
-
-                        playlist.firePlaylistChanged();
-                    }
-                }
-                adjustLastSongAfterDelete(tracks);
-            }
-        });
-
-        tableMenu.add("Convert").addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new ConverterDialog(owner, getSelectedSongs()).setVisible(true);
-            }
-        });
-        tableMenu.add(fileOps);
-        tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));
-        tableMenu.add(aMap.get("showProperties")).setAccelerator(KeyStroke.getKeyStroke("alt ENTER"));
         Util.fixIconTextGap(tableMenu);
         return tableMenu;
     }

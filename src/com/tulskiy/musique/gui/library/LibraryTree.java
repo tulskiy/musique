@@ -19,7 +19,6 @@ package com.tulskiy.musique.gui.library;
 
 import com.sun.java.swing.Painter;
 import com.tulskiy.musique.audio.player.Player;
-import com.tulskiy.musique.gui.ContextMenu;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Track;
@@ -52,7 +51,6 @@ public class LibraryTree extends JTree {
     private Configuration config = app.getConfiguration();
     private PlaylistManager playlistManager = app.getPlaylistManager();
     private Player player = app.getPlayer();
-    private ContextMenu<LibraryTree> menu = new LibraryMenu();
 
     public LibraryTree() {
         setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -123,25 +121,6 @@ public class LibraryTree extends JTree {
         iMap.put(SEND_TO_CURRENT.getKeyStroke(), SEND_TO_CURRENT);
         iMap.put(SEND_TO_NEW.getKeyStroke(), SEND_TO_NEW);
         iMap.put(ADD_TO_CURRENT.getKeyStroke(), ADD_TO_CURRENT);
-
-        addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                show(e);
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-                show(e);
-            }
-
-            public void show(MouseEvent e) {
-                if (e.isPopupTrigger() && selectRowAt(e.getPoint())) {
-                    JPopupMenu popup = menu.create(LibraryTree.this);
-                    popup.show(getParent(), e.getX(), e.getY());
-                }
-            }
-        });
     }
 
     public boolean selectRowAt(Point p) {

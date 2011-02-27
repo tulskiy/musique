@@ -41,6 +41,8 @@ import javax.swing.tree.DefaultTreeModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
@@ -63,6 +65,7 @@ public class LibraryView extends JPanel {
     public LibraryView() {
         playlistManager = app.getPlaylistManager();
         library = playlistManager.getLibrary();
+
         for (Playlist playlist : playlistManager.getPlaylists()) {
             if (playlist.isLibraryView()) {
                 libraryPlaylist = playlist;
@@ -159,6 +162,30 @@ public class LibraryView extends JPanel {
                     }
                 }
 
+            }
+        });
+
+        tree.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                show(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                show(e);
+            }
+
+            public void show(MouseEvent e) {
+                if (e.isPopupTrigger() && tree.selectRowAt(e.getPoint())) {
+                    LibraryMenu menu = new LibraryMenu();
+                    JPopupMenu popup = menu.create(
+                            tree,
+                            library.getData(),
+                            tree.getSelectedTracks(false));
+                    System.out.println(e.getPoint());
+                    popup.show(tree, e.getX(), e.getY());
+                }
             }
         });
     }

@@ -17,10 +17,16 @@
 
 package com.tulskiy.musique.gui.library;
 
-import com.tulskiy.musique.gui.ContextMenu;
+import com.tulskiy.musique.gui.playlist.PlaylistColumn;
+import com.tulskiy.musique.gui.playlist.PlaylistTable;
+import com.tulskiy.musique.gui.playlist.TracksMenu;
 import com.tulskiy.musique.images.Images;
+import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.Track;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.ArrayList;
 
 import static com.tulskiy.musique.gui.library.LibraryAction.*;
 
@@ -28,9 +34,15 @@ import static com.tulskiy.musique.gui.library.LibraryAction.*;
  * Author: Denis Tulskiy
  * Date: 2/5/11
  */
-public class LibraryMenu implements ContextMenu<LibraryTree> {
-    public JPopupMenu create(LibraryTree tree) {
-        ActionMap aMap = tree.getActionMap();
+public class LibraryMenu {
+    private PlaylistTable fakeTable;
+
+    public JPopupMenu create(LibraryTree parent, Playlist playlist, ArrayList<Track> tracks) {
+        if (fakeTable == null) {
+            fakeTable = new PlaylistTable(playlist, new ArrayList<PlaylistColumn>());
+            fakeTable.dispose();
+        }
+        ActionMap aMap = parent.getActionMap();
         JPopupMenu popup = new JPopupMenu();
         JMenuItem sendToCurrent = new JMenuItem(aMap.get(SEND_TO_CURRENT));
         sendToCurrent.setIcon(Images.getEmptyIcon());
@@ -44,6 +56,14 @@ public class LibraryMenu implements ContextMenu<LibraryTree> {
         JMenuItem addToCurrent = new JMenuItem(aMap.get(ADD_TO_CURRENT));
         addToCurrent.setAccelerator(ADD_TO_CURRENT.getKeyStroke());
         popup.add(addToCurrent);
+
+        popup.addSeparator();
+
+        TracksMenu tracksMenu = new TracksMenu();
+        JPopupMenu menu = tracksMenu.create(fakeTable, playlist, tracks);
+        for (Component component : menu.getComponents()) {
+            popup.add(component);
+        }
 
         return popup;
     }

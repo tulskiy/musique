@@ -136,11 +136,6 @@ public class Library {
         return rootNode;
     }
 
-    public void setData(Playlist data) {
-        this.data = data;
-        rebuildTree();
-    }
-
     public Playlist getData() {
         return data;
     }
