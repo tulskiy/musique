@@ -116,7 +116,7 @@ public class PlaylistManager {
         PLAYLIST_PATH.mkdir();
         File[] files = PLAYLIST_PATH.listFiles();
         for (File file : files) {
-            if (file.getName().endsWith(".dat")) {
+            if (file.getName().endsWith(".mus")) {
                 if (!file.delete()) {
                     logger.severe("Could not delete old playlist. Check file permissions");
                 }
