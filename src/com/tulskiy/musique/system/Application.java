@@ -76,7 +76,7 @@ public class Application {
         }
 
         if (configuration.getBoolean("system.oneInstance", false)
-                && !tryLock()) {
+            && !tryLock()) {
             JOptionPane.showMessageDialog(null, "Only one instance of Musique can be run at a time", VERSION, JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
@@ -244,11 +244,12 @@ public class Application {
     }
 
     public void exit() {
-        player.stop();
-        if (mainWindow != null)
-            mainWindow.shutdown();
-        playlistManager.saveSettings();
         saveSettings();
+        player.stop();
+        if (mainWindow != null) {
+            mainWindow.shutdown();
+        }
+        playlistManager.saveSettings();
         try {
             configuration.save(new FileWriter(configFile));
         } catch (IOException e) {
