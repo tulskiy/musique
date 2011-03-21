@@ -53,6 +53,7 @@ public class Library {
         if (folders == null || folders.isEmpty()) {
             return;
         }
+        progress.put("processing.file", "");
 
         data.removeDeadItems();
 
