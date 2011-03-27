@@ -19,6 +19,7 @@ package com.tulskiy.musique.gui.library;
 
 import com.sun.java.swing.Painter;
 import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.playlist.Library;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Track;
@@ -265,13 +266,13 @@ public class LibraryTree extends JTree {
         TreePath[] selectionPaths = getSelectionPaths();
         if (selectionPaths != null)
             for (TreePath path : selectionPaths) {
-                DefaultMutableTreeNode node = (DefaultMutableTreeNode) path.getLastPathComponent();
-                Enumeration<DefaultMutableTreeNode> en = node.depthFirstEnumeration();
+                TreeNode node = (TreeNode) path.getLastPathComponent();
+                Enumeration<TreeNode> en = new PostorderEnumeration(node);
                 while (en.hasMoreElements()) {
-                    DefaultMutableTreeNode o = en.nextElement();
-                    Object object = o.getUserObject();
-                    if (o.isLeaf() && object instanceof Track) {
-                        Track track = (Track) object;
+                    TreeNode o = en.nextElement();
+                    if (o.isLeaf()) {
+                        Library.TrackNode trackNode = (Library.TrackNode) o;
+                        Track track = trackNode.getTrack();
                         if (createNew)
                             track = new Track(track);
                         objects.add(track);
@@ -280,6 +281,42 @@ public class LibraryTree extends JTree {
             }
         return objects;
     }
+
+    class PostorderEnumeration implements Enumeration<TreeNode> {
+        protected TreeNode root;
+        protected Enumeration<TreeNode> children;
+        protected Enumeration<TreeNode> subtree;
+
+        public PostorderEnumeration(TreeNode rootNode) {
+            super();
+            root = rootNode;
+            children = root.children();
+            subtree = DefaultMutableTreeNode.EMPTY_ENUMERATION;
+        }
+
+        public boolean hasMoreElements() {
+            return root != null;
+        }
+
+        public TreeNode nextElement() {
+            TreeNode retval;
+
+            if (subtree.hasMoreElements()) {
+                retval = subtree.nextElement();
+            } else if (children.hasMoreElements()) {
+                subtree = new PostorderEnumeration(
+                        (TreeNode) children.nextElement());
+                retval = subtree.nextElement();
+            } else {
+                retval = root;
+                root = null;
+            }
+
+            return retval;
+        }
+
+    }  // End of class PostorderEnumeration
+
 
     private class SelectionBackgroundPainter implements Painter {
         private final Color selection;

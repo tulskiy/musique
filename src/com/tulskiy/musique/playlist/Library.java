@@ -25,23 +25,24 @@ import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
 
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeNode;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.*;
+import java.util.logging.Logger;
 
 /**
  * Author: Denis Tulskiy
  * Date: 10/30/10
  */
 public class Library {
-    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'Unknown Artist')|[%year% - ]$if3(%album%,'Unknown Album')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
-    //    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'?')$if1(%album%,[|[%year% - ]%album%],'')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
+    private final Logger logger = Logger.getLogger("musique");
+    //    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'Unknown Artist')|[%year% - ]$if3(%album%,'Unknown Album')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
+    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'?')|$if1(%album%,[[%year% - ]%album%],'?')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
     private Configuration config = Application.getInstance().getConfiguration();
     private Playlist data;
     private String view;
-    private DefaultMutableTreeNode rootNode;
+    private TreeNode rootNode;
 
     public Library(Playlist data) {
         this.data = data;
@@ -133,7 +134,7 @@ public class Library {
         rebuildTree();
     }
 
-    public DefaultMutableTreeNode getRootNode() {
+    public TreeNode getRootNode() {
         return rootNode;
     }
 
@@ -151,17 +152,22 @@ public class Library {
     }
 
     private void rebuildTree() {
-        if (rootNode == null)
-            rootNode = new DefaultMutableTreeNode("All Music");
-        rootNode.removeAllChildren();
-        if (data == null)
+        logger.fine("Rebuilding tree");
+        long time = System.currentTimeMillis();
+        if (rootNode == null) {
+            rootNode = new SortedTreeNode("All music");
+        }
+
+        ((SortedTreeNode) rootNode).removeAllChildren();
+        if (data == null) {
             return;
+        }
+
         if (Util.isEmpty(view)) {
             view = DEFAULT_VIEW;
         }
-        data.sort(view, false);
+
         Expression expr = Parser.parse(view);
-        DefaultMutableTreeNode currentNode = rootNode;
         for (Track track : data) {
             Object val = expr.eval(track);
             if (val != null) {
@@ -171,54 +177,137 @@ public class Library {
                     continue;
                 }
 
-                TreeNode[] currentNodePath = currentNode.getPath();
-                int start = -1;
-                for (int i = 1; i < path.length; i++) {
-                    if (currentNodePath.length <= i) {
-                        currentNode = rootNode;
-                        start = 0;
-                        break;
-                    }
-                    currentNode = (DefaultMutableTreeNode) currentNodePath[i];
-                    if (!currentNode.getUserObject().equals(path[i - 1])) {
-                        currentNode = (DefaultMutableTreeNode) currentNode.getParent();
-                        start = i - 1;
-                        break;
-                    }
+                SortedTreeNode node = (SortedTreeNode) rootNode;
+                for (int i = 0; i < path.length - 1; i++) {
+                    node = node.get(path[i]);
                 }
 
-                if (start != -1) {
-                    for (int i = start; i < path.length - 1; i++) {
-                        DefaultMutableTreeNode newChild = new DefaultMutableTreeNode(path[i]);
-                        currentNode.add(newChild);
-                        currentNode = newChild;
-                    }
-                }
-
-                currentNode.add(new TrackNode(track, path[path.length - 1]));
+                node.add(new TrackNode(track, path[path.length - 1]));
             }
         }
+        logger.fine("Finished rebuilding tree: total time: " + (System.currentTimeMillis() - time) + " ms");
     }
 
-    private boolean compare(DefaultMutableTreeNode node, Object value) {
-        return value != null &&
-                node.getUserObject().toString().
-                        compareToIgnoreCase(value.toString()) == 0;
-    }
+    class SortedTreeNode implements TreeNode, Comparable<SortedTreeNode> {
+        private TreeMap<String, SortedTreeNode> children = new TreeMap<String, SortedTreeNode>();
+        private SortedTreeNode parent;
+        private String name;
 
-    class TrackNode extends DefaultMutableTreeNode {
-        public Track track;
-        public String text;
+        SortedTreeNode(String name) {
+            this.name = name;
+        }
 
-        TrackNode(Track track, String text) {
-            super(track);
-            this.track = track;
-            this.text = text;
+        @Override
+        public int compareTo(SortedTreeNode o) {
+            return toString().compareTo(o.toString());
+        }
+
+        @Override
+        public TreeNode getChildAt(int childIndex) {
+            Iterator<SortedTreeNode> it = children.values().iterator();
+            for (int i = 0; i < childIndex; i++) {
+                it.next();
+            }
+            return it.next();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public SortedTreeNode get(String object) {
+            SortedTreeNode node = children.get(object);
+            if (node == null) {
+                node = new SortedTreeNode(object);
+                add(node);
+            }
+
+            return node;
+        }
+
+        public void add(SortedTreeNode node) {
+            children.put(node.getName(), node);
+            node.setParent(this);
+        }
+
+        @Override
+        public int getChildCount() {
+            return children.size();
+        }
+
+        public void setParent(SortedTreeNode parent) {
+            this.parent = parent;
+        }
+
+        @Override
+        public TreeNode getParent() {
+            return parent;
+        }
+
+        @Override
+        public int getIndex(TreeNode node) {
+            int i = 0;
+            for (SortedTreeNode child : children.values()) {
+                if (child.equals(node)) {
+                    return i;
+                }
+                i++;
+            }
+            return -1;
+        }
+
+        @Override
+        public boolean getAllowsChildren() {
+            return true;
+        }
+
+        @Override
+        public boolean isLeaf() {
+            return children.isEmpty();
+        }
+
+        @Override
+        public Enumeration<SortedTreeNode> children() {
+            return new Enumeration<SortedTreeNode>() {
+                Iterator<SortedTreeNode> itr = children.values().iterator();
+
+                @Override
+                public boolean hasMoreElements() {
+                    return itr.hasNext();
+                }
+
+                @Override
+                public SortedTreeNode nextElement() {
+                    return itr.next();
+                }
+            };
         }
 
         @Override
         public String toString() {
-            return text;
+            return name;
+        }
+
+        public void removeAllChildren() {
+            for (SortedTreeNode child : children.values()) {
+                child.removeAllChildren();
+            }
+            children.clear();
+        }
+    }
+
+    public class TrackNode extends SortedTreeNode {
+        public Track track;
+        public String text;
+
+        TrackNode(Track track, String text) {
+            super(text);
+            this.track = track;
+            this.text = text;
+        }
+
+        public Track getTrack() {
+            return track;
         }
     }
 }
