@@ -178,11 +178,11 @@ public class PlaylistManager {
         playlists.remove(from);
     }
 
-    public void addPlaylistListener(PlaylistListener listener) {
+    public synchronized void addPlaylistListener(PlaylistListener listener) {
         listeners.add(listener);
     }
 
-    private void notifyListeners(Playlist playlist, Event event) {
+    private synchronized void notifyListeners(Playlist playlist, Event event) {
         for (PlaylistListener listener : listeners) {
             switch (event) {
                 case ADDED:
@@ -205,7 +205,7 @@ public class PlaylistManager {
         }
     }
 
-    public void removePlaylistListener(PlaylistListener playlistListener) {
+    public synchronized void removePlaylistListener(PlaylistListener playlistListener) {
         listeners.remove(playlistListener);
     }
 }

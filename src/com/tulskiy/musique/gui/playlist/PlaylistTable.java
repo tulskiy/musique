@@ -278,7 +278,12 @@ public class PlaylistTable extends GroupTable {
             }
         };
         playlist.addChangeListener(playlistListener);
-        app.getPlaylistManager().addPlaylistListener(playlistListener);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                app.getPlaylistManager().addPlaylistListener(playlistListener);
+            }
+        });
     }
 
     public void showProperties(ArrayList<Track> tracks) {
@@ -287,10 +292,15 @@ public class PlaylistTable extends GroupTable {
     }
 
     public void dispose() {
-        config.removePropertyChangeListener(autoResizeChangeListener);
-        playlist.removeChangeListener(playlistListener);
-        player.removeListener(playerListener);
-        app.getPlaylistManager().removePlaylistListener(playlistListener);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                config.removePropertyChangeListener(autoResizeChangeListener);
+                playlist.removeChangeListener(playlistListener);
+                player.removeListener(playerListener);
+                app.getPlaylistManager().removePlaylistListener(playlistListener);
+            }
+        });
     }
 
     public void adjustLastSongAfterDelete(ArrayList<Track> songs) {
