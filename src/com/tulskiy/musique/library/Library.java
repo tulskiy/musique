@@ -15,8 +15,11 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.playlist;
+package com.tulskiy.musique.library;
 
+import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
@@ -37,7 +40,6 @@ import java.util.logging.Logger;
  */
 public class Library {
     private final Logger logger = Logger.getLogger("musique");
-    //    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'Unknown Artist')|[%year% - ]$if3(%album%,'Unknown Album')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
     private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'?')|$if1(%album%,[[%year% - ]%album%],'?')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
     private Configuration config = Application.getInstance().getConfiguration();
     private Playlist data;
@@ -155,10 +157,10 @@ public class Library {
         logger.fine("Rebuilding tree");
         long time = System.currentTimeMillis();
         if (rootNode == null) {
-            rootNode = new SortedTreeNode("All music");
+            rootNode = new MappedTreeNode("All music");
         }
 
-        ((SortedTreeNode) rootNode).removeAllChildren();
+        ((MappedTreeNode) rootNode).removeAllChildren();
         if (data == null) {
             return;
         }
@@ -177,7 +179,7 @@ public class Library {
                     continue;
                 }
 
-                SortedTreeNode node = (SortedTreeNode) rootNode;
+                MappedTreeNode node = (MappedTreeNode) rootNode;
                 for (int i = 0; i < path.length - 1; i++) {
                     node = node.get(path[i]);
                 }
@@ -186,128 +188,5 @@ public class Library {
             }
         }
         logger.fine("Finished rebuilding tree: total time: " + (System.currentTimeMillis() - time) + " ms");
-    }
-
-    class SortedTreeNode implements TreeNode, Comparable<SortedTreeNode> {
-        private TreeMap<String, SortedTreeNode> children = new TreeMap<String, SortedTreeNode>();
-        private SortedTreeNode parent;
-        private String name;
-
-        SortedTreeNode(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public int compareTo(SortedTreeNode o) {
-            return toString().compareTo(o.toString());
-        }
-
-        @Override
-        public TreeNode getChildAt(int childIndex) {
-            Iterator<SortedTreeNode> it = children.values().iterator();
-            for (int i = 0; i < childIndex; i++) {
-                it.next();
-            }
-            return it.next();
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public SortedTreeNode get(String object) {
-            SortedTreeNode node = children.get(object);
-            if (node == null) {
-                node = new SortedTreeNode(object);
-                add(node);
-            }
-
-            return node;
-        }
-
-        public void add(SortedTreeNode node) {
-            children.put(node.getName(), node);
-            node.setParent(this);
-        }
-
-        @Override
-        public int getChildCount() {
-            return children.size();
-        }
-
-        public void setParent(SortedTreeNode parent) {
-            this.parent = parent;
-        }
-
-        @Override
-        public TreeNode getParent() {
-            return parent;
-        }
-
-        @Override
-        public int getIndex(TreeNode node) {
-            int i = 0;
-            for (SortedTreeNode child : children.values()) {
-                if (child.equals(node)) {
-                    return i;
-                }
-                i++;
-            }
-            return -1;
-        }
-
-        @Override
-        public boolean getAllowsChildren() {
-            return true;
-        }
-
-        @Override
-        public boolean isLeaf() {
-            return children.isEmpty();
-        }
-
-        @Override
-        public Enumeration<SortedTreeNode> children() {
-            return new Enumeration<SortedTreeNode>() {
-                Iterator<SortedTreeNode> itr = children.values().iterator();
-
-                @Override
-                public boolean hasMoreElements() {
-                    return itr.hasNext();
-                }
-
-                @Override
-                public SortedTreeNode nextElement() {
-                    return itr.next();
-                }
-            };
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        public void removeAllChildren() {
-            for (SortedTreeNode child : children.values()) {
-                child.removeAllChildren();
-            }
-            children.clear();
-        }
-    }
-
-    public class TrackNode extends SortedTreeNode {
-        public Track track;
-        public String text;
-
-        TrackNode(Track track, String text) {
-            super(text);
-            this.track = track;
-            this.text = text;
-        }
-
-        public Track getTrack() {
-            return track;
-        }
     }
 }

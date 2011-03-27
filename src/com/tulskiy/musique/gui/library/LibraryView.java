@@ -25,7 +25,7 @@ import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.gui.dnd.LibraryTransferHandler;
 import com.tulskiy.musique.gui.menu.LibraryMenu;
 import com.tulskiy.musique.images.Images;
-import com.tulskiy.musique.playlist.Library;
+import com.tulskiy.musique.library.Library;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;

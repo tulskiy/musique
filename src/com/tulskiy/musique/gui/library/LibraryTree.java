@@ -19,7 +19,8 @@ package com.tulskiy.musique.gui.library;
 
 import com.sun.java.swing.Painter;
 import com.tulskiy.musique.audio.player.Player;
-import com.tulskiy.musique.playlist.Library;
+import com.tulskiy.musique.library.MappedTreeNode;
+import com.tulskiy.musique.library.TrackNode;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Track;
@@ -38,7 +39,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.List;
 
 import static com.tulskiy.musique.gui.library.LibraryAction.*;
 
@@ -262,61 +263,26 @@ public class LibraryTree extends JTree {
 
     @SuppressWarnings({"unchecked"})
     public ArrayList<Track> getSelectedTracks(boolean createNew) {
-        ArrayList<Track> objects = new ArrayList<Track>();
+        ArrayList<Track> tracks = new ArrayList<Track>();
         TreePath[] selectionPaths = getSelectionPaths();
         if (selectionPaths != null)
             for (TreePath path : selectionPaths) {
-                TreeNode node = (TreeNode) path.getLastPathComponent();
-                Enumeration<TreeNode> en = new PostorderEnumeration(node);
-                while (en.hasMoreElements()) {
-                    TreeNode o = en.nextElement();
-                    if (o.isLeaf()) {
-                        Library.TrackNode trackNode = (Library.TrackNode) o;
-                        Track track = trackNode.getTrack();
-                        if (createNew)
+                MappedTreeNode node = (MappedTreeNode) path.getLastPathComponent();
+                List<MappedTreeNode> nodes = node.iterate();
+                for (MappedTreeNode treeNode : nodes) {
+                    if (treeNode instanceof TrackNode) {
+                        Track track = ((TrackNode) treeNode).getTrack();
+
+                        if (createNew) {
                             track = new Track(track);
-                        objects.add(track);
+                        }
+
+                        tracks.add(track);
                     }
                 }
             }
-        return objects;
+        return tracks;
     }
-
-    class PostorderEnumeration implements Enumeration<TreeNode> {
-        protected TreeNode root;
-        protected Enumeration<TreeNode> children;
-        protected Enumeration<TreeNode> subtree;
-
-        public PostorderEnumeration(TreeNode rootNode) {
-            super();
-            root = rootNode;
-            children = root.children();
-            subtree = DefaultMutableTreeNode.EMPTY_ENUMERATION;
-        }
-
-        public boolean hasMoreElements() {
-            return root != null;
-        }
-
-        public TreeNode nextElement() {
-            TreeNode retval;
-
-            if (subtree.hasMoreElements()) {
-                retval = subtree.nextElement();
-            } else if (children.hasMoreElements()) {
-                subtree = new PostorderEnumeration(
-                        (TreeNode) children.nextElement());
-                retval = subtree.nextElement();
-            } else {
-                retval = root;
-                root = null;
-            }
-
-            return retval;
-        }
-
-    }  // End of class PostorderEnumeration
-
 
     private class SelectionBackgroundPainter implements Painter {
         private final Color selection;

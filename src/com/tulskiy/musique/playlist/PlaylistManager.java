@@ -21,6 +21,7 @@
  */
 package com.tulskiy.musique.playlist;
 
+import com.tulskiy.musique.library.Library;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
