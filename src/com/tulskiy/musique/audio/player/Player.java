@@ -54,7 +54,12 @@ public class Player {
 
     public void play() {
         if (!isPaused()) {
-            bufferingThread.send(Message.OPEN, getTrack());
+            Track track = getTrack();
+            if (track == null) {
+                next();
+            } else {
+                bufferingThread.send(Message.OPEN, track);
+            }
         }
         playingThread.send(Message.PLAY);
     }
