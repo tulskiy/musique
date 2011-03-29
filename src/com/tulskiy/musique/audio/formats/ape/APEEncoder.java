@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -35,14 +35,16 @@ import java.nio.ByteBuffer;
  */
 public class APEEncoder implements Encoder {
     private IAPECompress encoder;
-    private ByteBuffer buffer = ByteBuffer.allocate((int) Math.pow(2, 18));
+    private ByteBuffer buffer;
     private int available;
-    private byte[] tempBuf = new byte[(int) Math.pow(2, 15)];
+    private byte[] tempBuf;
 
     @Override
     public boolean open(File outputFile, AudioFormat fmt, Configuration options) {
         try {
             outputFile.delete();
+            buffer = ByteBuffer.allocate((int) Math.pow(2, 18));
+            tempBuf = new byte[(int) Math.pow(2, 15)];
             encoder = IAPECompress.CreateIAPECompress();
             WaveFormat format = new WaveFormat();
             fillWaveFormat(format, fmt);

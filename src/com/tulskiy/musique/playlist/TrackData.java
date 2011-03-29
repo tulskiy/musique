@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -22,6 +22,7 @@ import com.tulskiy.musique.util.Util;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Formatter;
 import java.util.HashSet;
 
@@ -29,7 +30,6 @@ import java.util.HashSet;
  * Author: Denis Tulskiy
  * Date: 11/14/10
  */
-@SuppressWarnings({"UnusedDeclaration"})
 public class TrackData implements Cloneable {
     //meta fields
     private String artist;
@@ -52,7 +52,7 @@ public class TrackData implements Cloneable {
     private int subsongIndex;
     private long startPosition;
     private long totalSamples;
-    private URI location;
+    private String locationString;
     private boolean cueEmbedded;
     private String cueLocation;
     private String codec;
@@ -62,7 +62,6 @@ public class TrackData implements Cloneable {
     private String track;
     private String length;
     private String fileName;
-    private File file;
     private String directory;
     private long dateAdded;
     private long lastModified;
@@ -71,7 +70,7 @@ public class TrackData implements Cloneable {
     }
 
     public TrackData(URI location, int subsongIndex) {
-        setLocation(location);
+        locationString = location.toString();
         setSubsongIndex(subsongIndex);
     }
 
@@ -195,28 +194,28 @@ public class TrackData implements Cloneable {
     }
 
     public URI getLocation() {
-        return location;
+        try {
+            return new URI(locationString);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    public void setLocation(URI location) {
-        this.location = location;
-        if (isFile()) {
-            this.file = new File(location.getPath());
-            fileName = Util.removeExt(file.getName());
-            directory = file.getParentFile().getName();
-        }
+    public void setLocation(String location) {
+        locationString = location;
     }
 
     public File getFile() {
-        return file;
+        return new File(getLocation());
     }
 
     public boolean isFile() {
-        return location != null && !isStream();
+        return getLocation() != null && !isStream();
     }
 
     public boolean isStream() {
-        return location != null && "http".equals(location.getScheme());
+        return getLocation() != null && "http".equals(getLocation().getScheme());
     }
 
     public String getArtist() {
@@ -324,6 +323,9 @@ public class TrackData implements Cloneable {
     }
 
     public String getDirectory() {
+        if (directory == null) {
+            directory = getFile().getParentFile().getName();
+        }
         return directory;
     }
 
@@ -382,6 +384,9 @@ public class TrackData implements Cloneable {
     }
 
     public String getFileName() {
+        if (fileName == null) {
+            fileName = Util.removeExt(getFile().getName());
+        }
         return fileName;
     }
 
@@ -407,6 +412,7 @@ public class TrackData implements Cloneable {
         add("album");
         add("genre");
         add("albumArtist");
+        add("artist");
     }};
 
     public void setMeta(String key, String value) {
@@ -425,15 +431,15 @@ public class TrackData implements Cloneable {
 
         TrackData trackData = (TrackData) o;
 
-        return location.equals(trackData.location)
-               && subsongIndex == trackData.subsongIndex;
+        return locationString.equals(trackData.locationString)
+                && subsongIndex == trackData.subsongIndex;
 
     }
 
     @Override
     public int hashCode() {
         int result = subsongIndex;
-        result = 31 * result + (location != null ? location.hashCode() : 0);
+        result = 31 * result + (locationString != null ? locationString.hashCode() : 0);
         return result;
     }
 }

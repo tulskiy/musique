@@ -152,7 +152,7 @@ public class Playlist extends ArrayList<Track> {
             ensureCapacity(size);
             for (int i = 0; i < size; i++) {
                 Track track = new Track();
-                track.setLocation(new URI(dis.readUTF()));
+                track.setLocation(dis.readUTF());
                 track.setStartPosition(dis.readLong());
                 track.setTotalSamples(dis.readLong());
                 track.setSubsongIndex(dis.readInt());
@@ -377,7 +377,7 @@ public class Playlist extends ArrayList<Track> {
                     if (Util.isEmpty(title))
                         title = uri.getHost();
                     track.setMeta("title", title);
-                    track.setLocation(uri);
+                    track.setLocation(uri.toString());
                     track.setTotalSamples(-1);
                     temp.add(track);
                 } else {

@@ -184,7 +184,8 @@ public class Library {
                     node = node.get(path[i]);
                 }
 
-                node.add(new TrackNode(track, path[path.length - 1]));
+                //noinspection RedundantStringConstructorCall
+                node.add(new TrackNode(track, new String(path[path.length - 1])));
             }
         }
         logger.fine("Finished rebuilding tree: total time: " + (System.currentTimeMillis() - time) + " ms");

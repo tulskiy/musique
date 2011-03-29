@@ -56,10 +56,10 @@ public class AlbumArtPanel extends JPanel {
             "folder.jpg"));
     private ImageIcon image;
     private Track track;
-    private LinkedHashMap<File, ImageIcon> cache = new LinkedHashMap<File, ImageIcon>(3, 0.7f, true) {
+    private LinkedHashMap<File, ImageIcon> cache = new LinkedHashMap<File, ImageIcon>(2, 0.7f, true) {
         @Override
         protected boolean removeEldestEntry(Map.Entry<File, ImageIcon> eldest) {
-            return size() > 10;
+            return size() > 2;
         }
     };
 

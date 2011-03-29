@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -299,7 +299,7 @@ public class FileOperations extends JDialog {
 
                         if (src.renameTo(dest)) {
                             processed += src.length();
-                            entry.getKey().setLocation(dest.toURI());
+                            entry.getKey().setLocation(dest.toURI().toString());
                             continue;
                         }
                     }
@@ -341,8 +341,8 @@ public class FileOperations extends JDialog {
                 }
 
                 if ((mode == Operation.Move || mode == Operation.Rename)
-                    && dest.exists()) {
-                    entry.getKey().setLocation(dest.toURI());
+                        && dest.exists()) {
+                    entry.getKey().setLocation(dest.toURI().toString());
                 }
             }
         }

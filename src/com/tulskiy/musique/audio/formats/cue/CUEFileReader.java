@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -32,7 +32,7 @@ public class CUEFileReader extends AudioFileReader {
 
     public void read(File file, List<Track> list) {
         Track track = new Track();
-        track.setLocation(file.toURI());
+        track.setLocation(file.toURI().toString());
         if (cueParser == null)
             cueParser = new CUEParser();
         try {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,16 +19,16 @@ package com.tulskiy.musique.audio;
 
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
-
-import static com.tulskiy.musique.system.TrackIO.*;
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import static com.tulskiy.musique.system.TrackIO.getAudioFileReader;
+import static com.tulskiy.musique.system.TrackIO.getAudioFileWriter;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @Author: Denis Tulskiy
@@ -105,7 +105,7 @@ public class TagTest {
         File file = new File(name);
         File fo = new File("testfiles/temp." + Util.getFileExt(name));
         copy(file, fo);
-        track.setLocation(fo.toURI());
+        track.setLocation(fo.toURI().toString());
         getAudioFileWriter(fo.getName()).write(track);
 
         testRead(fo.getPath());

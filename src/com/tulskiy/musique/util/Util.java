@@ -20,8 +20,6 @@ package com.tulskiy.musique.util;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
-import java.util.Formatter;
-import java.util.Locale;
 
 /**
  * @Author: Denis Tulskiy
@@ -55,9 +53,12 @@ public class Util {
         if (hrs > 0) builder.append(hrs).append(":");
         if (hrs > 0 && min < 10) builder.append("0");
         builder.append(min).append(":");
-        int n = precision + ((precision == 0) ? 2 : 3);
-        String fmt = "%0" + n + "." + precision + "f";
-        builder.append(new Formatter().format(Locale.US, fmt, seconds));
+//        int n = precision + ((precision == 0) ? 2 : 3);
+//        String fmt = "%0" + n + "." + precision + "f";
+//        builder.append(new Formatter().format(Locale.US, fmt, seconds));
+        int sec = (int) seconds;
+        if (sec < 10) builder.append("0");
+        builder.append(sec);
         return builder.toString();
     }
 

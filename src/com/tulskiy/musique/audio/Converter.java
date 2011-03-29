@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -106,7 +106,7 @@ public class Converter {
 
             if (!merge) {
                 Track newTrack = track.copy();
-                newTrack.setLocation(output.toURI());
+                newTrack.setLocation(output.toURI().toString());
                 encoder.close();
                 encoder = null;
 
@@ -205,7 +205,7 @@ public class Converter {
 
         String format = config.getString("converter.encoder", "wav");
         String fileName = String.valueOf(fileNameFormat.eval(track)) +
-                          "." + format;
+                "." + format;
         output = new File(parent, fileName);
 
         if (output.exists()) {

@@ -25,7 +25,7 @@ import java.util.*;
  * Date: 3/27/11
  */
 public class MappedTreeNode implements TreeNode, Comparable<MappedTreeNode> {
-    private TreeMap<String, MappedTreeNode> children = new TreeMap<String, MappedTreeNode>();
+    private TreeMap<String, MappedTreeNode> children;
     private MappedTreeNode parent;
     private String name;
 
@@ -52,9 +52,11 @@ public class MappedTreeNode implements TreeNode, Comparable<MappedTreeNode> {
     }
 
     public MappedTreeNode get(String object) {
-        MappedTreeNode node = children.get(object);
+        MappedTreeNode node = null;
+        if (children != null)
+            node = children.get(object);
         if (node == null) {
-            node = new MappedTreeNode(object);
+            node = new MappedTreeNode(new String(object));
             add(node);
         }
 
@@ -62,13 +64,19 @@ public class MappedTreeNode implements TreeNode, Comparable<MappedTreeNode> {
     }
 
     public void add(MappedTreeNode node) {
+        if (children == null) {
+            children = new TreeMap<String, MappedTreeNode>();
+        }
         children.put(node.getName(), node);
         node.setParent(this);
     }
 
     @Override
     public int getChildCount() {
-        return children.size();
+        if (children == null)
+            return 0;
+        else
+            return children.size();
     }
 
     public void setParent(MappedTreeNode parent) {
@@ -99,7 +107,7 @@ public class MappedTreeNode implements TreeNode, Comparable<MappedTreeNode> {
 
     @Override
     public boolean isLeaf() {
-        return children.isEmpty();
+        return getChildCount() == 0;
     }
 
     @Override
@@ -122,11 +130,16 @@ public class MappedTreeNode implements TreeNode, Comparable<MappedTreeNode> {
     public List<MappedTreeNode> iterate() {
         List<MappedTreeNode> list = new ArrayList<MappedTreeNode>();
 
-        for (MappedTreeNode node : children.values()) {
-            if (node.isLeaf()) {
-                list.add(node);
-            } else {
-                list.addAll(node.iterate());
+        if (isLeaf()) {
+            list.add(this);
+        }
+        if (children != null) {
+            for (MappedTreeNode node : children.values()) {
+                if (node.isLeaf()) {
+                    list.add(node);
+                } else {
+                    list.addAll(node.iterate());
+                }
             }
         }
 
@@ -139,9 +152,11 @@ public class MappedTreeNode implements TreeNode, Comparable<MappedTreeNode> {
     }
 
     public void removeAllChildren() {
-        for (MappedTreeNode child : children.values()) {
-            child.removeAllChildren();
+        if (children != null) {
+            for (MappedTreeNode child : children.values()) {
+                child.removeAllChildren();
+            }
+            children.clear();
         }
-        children.clear();
     }
 }
