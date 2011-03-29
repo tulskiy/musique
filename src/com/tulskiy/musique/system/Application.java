@@ -29,6 +29,7 @@ import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.spi.PluginLoader;
+import com.tulskiy.musique.util.Util;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
@@ -53,15 +54,20 @@ public class Application {
     private PlaylistManager playlistManager;
     private MainWindow mainWindow;
     public final String VERSION = "Musique 0.2";
-    public final File CONFIG_HOME =
+    public File CONFIG_HOME =
             new File(System.getProperty("user.home"), ".musique").getAbsoluteFile();
-    private final File configFile = new File(CONFIG_HOME, "config");
+    private File configFile = new File(CONFIG_HOME, "config");
 
     public static Application getInstance() {
         return ourInstance;
     }
 
     private Application() {
+        String home = System.getenv("APPDATA");
+        if (Util.isEmpty(home)) {
+            home = System.getProperty("user.home");
+        }
+        CONFIG_HOME = new File(home, ".musique").getAbsoluteFile();
         //noinspection ResultOfMethodCallIgnored
         CONFIG_HOME.mkdirs();
 
@@ -76,7 +82,7 @@ public class Application {
         }
 
         if (configuration.getBoolean("system.oneInstance", false)
-            && !tryLock()) {
+                && !tryLock()) {
             JOptionPane.showMessageDialog(null, "Only one instance of Musique can be run at a time", VERSION, JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
