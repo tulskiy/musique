@@ -41,7 +41,7 @@ public abstract class AudioFileReader {
     protected final Logger logger = Logger.getLogger("musique");
 
     public void read(File file, List<Track> list) {
-        logger.log(Level.FINE, "Reading file : {0}", file);
+        logger.log(Level.FINEST, "Reading file : {0}", file);
         Track track = read(file);
         String cueSheet = track.getCueSheet();
         if (cueSheet != null && cueSheet.length() > 0) {
