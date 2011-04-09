@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -23,6 +23,7 @@ import com.tulskiy.musique.audio.formats.ape.APEDecoder;
 import com.tulskiy.musique.audio.formats.ape.APEEncoder;
 import com.tulskiy.musique.audio.formats.flac.FLACDecoder;
 import com.tulskiy.musique.audio.formats.mp3.MP3Decoder;
+import com.tulskiy.musique.audio.formats.mp4.MP4Demuxer;
 import com.tulskiy.musique.audio.formats.ogg.VorbisDecoder;
 import com.tulskiy.musique.audio.formats.ogg.VorbisEncoder;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMDecoder;
@@ -58,6 +59,9 @@ public class Codecs {
         decoders.put("flac", new FLACDecoder());
         decoders.put("ape", new APEDecoder());
         decoders.put("wv", new WavPackDecoder());
+        MP4Demuxer mp4Demuxer = new MP4Demuxer();
+        decoders.put("mp4", mp4Demuxer);
+        decoders.put("m4a", mp4Demuxer);
 
         encoders.put("wav", new PCMEncoder());
         encoders.put("ape", new APEEncoder());

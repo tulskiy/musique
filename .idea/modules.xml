@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/modules/aac/aac.iml" filepath="$PROJECT_DIR$/modules/aac/aac.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/alac/alac.iml" filepath="$PROJECT_DIR$/modules/alac/alac.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/cuelib/cuelib.iml" filepath="$PROJECT_DIR$/modules/cuelib/cuelib.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/jaudiotagger/jaudiotagger.iml" filepath="$PROJECT_DIR$/modules/jaudiotagger/jaudiotagger.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/javalayer/javalayer.iml" filepath="$PROJECT_DIR$/modules/javalayer/javalayer.iml" />

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,6 +20,7 @@ package com.tulskiy.musique.audio;
 import com.tulskiy.musique.audio.formats.ape.APEFileReader;
 import com.tulskiy.musique.audio.formats.flac.FLACFileReader;
 import com.tulskiy.musique.audio.formats.mp3.MP3FileReader;
+import com.tulskiy.musique.audio.formats.mp4.MP4FileReader;
 import com.tulskiy.musique.audio.formats.ogg.OGGFileReader;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMFileReader;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackFileReader;
@@ -84,12 +85,21 @@ public class DecoderTest {
         test(new PCMFileReader(), "testfiles/uncompressed/sample.wav");
     }
 
-//    @Test
-//    public void testAAC() {
+    @Test
+    public void testAAC() {
+        test(new MP4FileReader(), "testfiles/aac/sample_faac.mp4");
+        test(new MP4FileReader(), "testfiles/aac/sample_ffmpeg.mp4");
 //        test(new MP4FileReader(), "testfiles/aac/sample.mp4");
-//        test(new MP4FileReader(), "testfiles/aac/sample_faac.mp4");
-//        test(new MP4FileReader(), "testfiles/aac/sample_itunes.m4a");
-//    }
+//        test(new MP4FileReader(), "testfiles/aac/sample_nero.mp4");
+        test(new MP4FileReader(), "testfiles/aac/sample_itunes.m4a");
+        test(new MP4FileReader(), "testfiles/aac/sample_itunes_new.m4a");
+    }
+
+    @Test
+    public void testALAC() {
+        test(new MP4FileReader(), "testfiles/alac/sample_ffmpeg.m4a");
+//        test(new MP4FileReader(), "testfiles/alac/sample_dbpoweramp.m4a");
+    }
 
     private void test(AudioFileReader reader, String fileName) {
         Track file = reader.read(new File(fileName));

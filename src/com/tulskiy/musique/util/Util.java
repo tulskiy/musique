@@ -58,7 +58,7 @@ public class Util {
 //        builder.append(new Formatter().format(Locale.US, fmt, seconds));
         int sec = (int) seconds;
         if (sec < 10) builder.append("0");
-        builder.append(sec);
+        builder.append(Math.round(sec));
         return builder.toString();
     }
 
