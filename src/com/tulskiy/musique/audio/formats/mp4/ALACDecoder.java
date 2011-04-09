@@ -19,6 +19,7 @@ package com.tulskiy.musique.audio.formats.mp4;
 
 import com.beatofthedrum.alacdecoder.AlacContext;
 import com.beatofthedrum.alacdecoder.AlacUtils;
+import com.beatofthedrum.alacdecoder.DecodeResult;
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
 
@@ -67,45 +68,43 @@ public class ALACDecoder implements Decoder {
 
     @Override
     public int decode(byte[] buf) {
-        int bytesUnpacked = AlacUtils.AlacUnpackSamples(alacContext, pDestBuffer);
+        DecodeResult result = AlacUtils.AlacUnpackSamples(alacContext, pDestBuffer);
+        int bytesUnpacked = result.bytesUnpacked;
         if (bytesUnpacked > 0) {
-            formatSamples(bps, pDestBuffer, buf, bytesUnpacked);
+            formatSamples(bps, pDestBuffer, result.offset, buf, bytesUnpacked);
             return bytesUnpacked;
         }
         return -1;
     }
 
-    private void formatSamples(int bps, int[] src, byte[] dst, int samcnt) {
+    private void formatSamples(int bps, int[] src, int offset, byte[] dst, int samcnt) {
         int temp;
-        int counter = 0;
-        int counter2 = 0;
+        int destPos = 0;
+        int srcPos = offset;
 
         switch (bps) {
             case 1:
                 while (samcnt > 0) {
-                    dst[counter] = (byte) (0x00FF & (src[counter] + 128));
-                    counter++;
+                    dst[destPos] = (byte) (0x00FF & (src[srcPos] + 128));
+                    destPos++;
                     samcnt--;
                 }
                 break;
 
             case 2:
                 while (samcnt > 0) {
-                    temp = src[counter2];
-                    dst[counter] = (byte) temp;
-                    counter++;
-                    dst[counter] = (byte) (temp >>> 8);
-                    counter++;
-                    counter2++;
+                    temp = src[srcPos++];
+                    dst[destPos++] = (byte) temp;
+                    dst[destPos++] = (byte) (temp >>> 8);
                     samcnt = samcnt - 2;
                 }
                 break;
 
             case 3:
                 while (samcnt > 0) {
-                    dst[counter] = (byte) src[counter2];
-                    counter++;
-                    counter2++;
+                    dst[destPos] = (byte) src[srcPos];
+                    destPos++;
+                    srcPos++;
                     samcnt--;
                 }
                 break;

@@ -98,7 +98,7 @@ public class DecoderTest {
     @Test
     public void testALAC() {
         test(new MP4FileReader(), "testfiles/alac/sample_ffmpeg.m4a");
-//        test(new MP4FileReader(), "testfiles/alac/sample_dbpoweramp.m4a");
+        test(new MP4FileReader(), "testfiles/alac/sample_dbpoweramp.m4a");
     }
 
     private void test(AudioFileReader reader, String fileName) {
