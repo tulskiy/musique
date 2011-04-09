@@ -72,10 +72,9 @@ class BitsUtils {
         return (value);
     }
 
-    static Bitstream bs_open_read(byte[] stream, short buffer_start, short buffer_end, RandomAccessFile file,
+    static Bitstream bs_open_read(Bitstream bs, byte[] stream, short buffer_start, short buffer_end, RandomAccessFile file,
                                   long file_bytes, int passed) {
         //   CLEAR (*bs);
-        Bitstream bs = new Bitstream();
 
         bs.buf = stream;
         bs.buf_index = buffer_start;
@@ -110,8 +109,7 @@ class BitsUtils {
                 bytes_read = bs.file.read(buf, 0, (int) bytes_to_read);
                 bs.buf_index = 0;
                 bs.buf = buf;
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 System.err.println("Big error while reading file: " + e);
                 bytes_read = 0;
             }

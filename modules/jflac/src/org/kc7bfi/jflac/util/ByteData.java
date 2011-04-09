@@ -49,6 +49,10 @@ public class ByteData {
         len = 0;
     }
 
+    public void setData(byte[] data) {
+        this.data = data;
+    }
+
     /**
      * Append byte to storage.
      *

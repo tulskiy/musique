@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -39,7 +39,7 @@ public class FLACDecoder implements Decoder {
     private StreamInfo streamInfo;
     private SeekTable seekTable;
     private org.kc7bfi.jflac.FLACDecoder decoder;
-    private ByteData byteData;
+    private ByteData byteData = new ByteData(0);
     private int offset = -1;
 
     public synchronized boolean open(Track track) {
@@ -103,10 +103,11 @@ public class FLACDecoder implements Decoder {
                 return len;
             }
             Frame readFrame = decoder.readNextFrame();
-            if (readFrame == null)
+            if (readFrame == null) {
                 return -1;
-            byteData = decoder.decodeFrame(readFrame, null);
-            System.arraycopy(byteData.getData(), 0, buf, 0, byteData.getLen());
+            }
+            byteData.setData(buf);
+            decoder.decodeFrame(readFrame, byteData);
             return byteData.getLen();
         } catch (IOException e) {
             e.printStackTrace();
@@ -282,8 +283,8 @@ public class FLACDecoder implements Decoder {
             /* find the closest seekPosition point <= target_sample, if it exists */
             for (i = seekTable.numberOfPoints() - 1; i >= 0; i--) {
                 if (seekTable.getSeekPoint(i).getFrameSamples() > 0 && /* defense against bad seekpoints */
-                    (total_samples <= 0 || seekTable.getSeekPoint(i).getSampleNumber() < total_samples) && /* defense against bad seekpoints */
-                    seekTable.getSeekPoint(i).getSampleNumber() <= target_sample)
+                        (total_samples <= 0 || seekTable.getSeekPoint(i).getSampleNumber() < total_samples) && /* defense against bad seekpoints */
+                        seekTable.getSeekPoint(i).getSampleNumber() <= target_sample)
                     break;
             }
             if (i >= 0) { /* i.e. we found a suitable seekPosition point... */
@@ -294,8 +295,8 @@ public class FLACDecoder implements Decoder {
             /* find the closest seekPosition point > target_sample, if it exists */
             for (i = 0; i < seekTable.numberOfPoints(); i++) {
                 if (seekTable.getSeekPoint(i).getFrameSamples() > 0 && /* defense against bad seekpoints */
-                    (total_samples <= 0 || seekTable.getSeekPoint(i).getSampleNumber() < total_samples) && /* defense against bad seekpoints */
-                    seekTable.getSeekPoint(i).getSampleNumber() > target_sample)
+                        (total_samples <= 0 || seekTable.getSeekPoint(i).getSampleNumber() < total_samples) && /* defense against bad seekpoints */
+                        seekTable.getSeekPoint(i).getSampleNumber() > target_sample)
                     break;
             }
             if (i < seekTable.numberOfPoints()) { /* i.e. we found a suitable seekPosition point... */
@@ -335,10 +336,10 @@ public class FLACDecoder implements Decoder {
                 Frame frame = decoder.readNextFrame();
 //                System.out.println("Found: " + frame.header.sampleNumber);
                 if (frame.header.sampleNumber <= target_sample &&
-                    target_sample <= frame.header.sampleNumber + frame.header.blockSize) {
+                        target_sample <= frame.header.sampleNumber + frame.header.blockSize) {
 //                    System.out.println("Done seeking");
                     offset = (int) (target_sample - frame.header.sampleNumber) * frame.header.channels * frame.header.bitsPerSample / 8;
-                    byteData = decoder.decodeFrame(frame, null);
+                    byteData = decoder.decodeFrame(frame, byteData);
                     break;
                 }
                 /* our write callback will change the state when it gets to the target frame */

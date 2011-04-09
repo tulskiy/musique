@@ -19,6 +19,8 @@ public class WavpackContext {
 
 
     byte read_buffer[] = new byte[65536];    // was uchar in C
+    int[] temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
+    int[] temp_buffer2 = new int[Defines.SAMPLE_BUFFER_SIZE];
     String error_message = "";
     boolean error;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -51,7 +51,6 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
 
     private long totalSamples;
     private long streamSize;
-    private byte[] buffer = new byte[5000];
     private int samplesPerFrame;
     private int sampleOffset = 0;
     private int encDelay;
@@ -90,7 +89,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
             //then we get the seek table or create it if needed
             SeekTable seekTable = seekTableCache.get(file);
             if (seekTable == null &&
-                samplesToMinutes(totalSamples) > 10) {
+                    samplesToMinutes(totalSamples) > 10) {
                 seekTable = new SeekTable();
                 seekTableCache.put(file, seekTable);
             }
@@ -319,13 +318,12 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
                 return 0;
             }
 
-            toByteArray(output.getBuffer(), 0, output.getBufferLength());
             currentSample += AudioMath.bytesToSamples(len, audioFormat.getFrameSize());
 
             if (!streaming && currentSample > totalSamples) {
                 len -= AudioMath.samplesToBytes(currentSample - totalSamples, audioFormat.getFrameSize());
             }
-            System.arraycopy(buffer, sampleOffset, buf, 0, len);
+            toByteArray(output.getBuffer(), sampleOffset / 2, len / 2, buf);
             sampleOffset = 0;
             readFrame = null;
             return len;
@@ -344,16 +342,13 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         readFrame = null;
     }
 
-    private void toByteArray(short[] samples, int offs, int len) {
-        if (buffer.length < len * 2) {
-            buffer = new byte[len * 2 + 1024];
-        }
+    private void toByteArray(short[] samples, int offs, int len, byte[] dest) {
         int idx = 0;
         short s;
         while (len-- > 0) {
             s = samples[offs++];
-            buffer[idx++] = (byte) s;
-            buffer[idx++] = (byte) (s >>> 8);
+            dest[idx++] = (byte) s;
+            dest[idx++] = (byte) (s >>> 8);
         }
     }
 }

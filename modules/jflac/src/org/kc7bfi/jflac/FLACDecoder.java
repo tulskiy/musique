@@ -22,7 +22,6 @@ package org.kc7bfi.jflac;
 
 import org.kc7bfi.jflac.frame.*;
 import org.kc7bfi.jflac.io.BitInputStream;
-import org.kc7bfi.jflac.io.RandomFileInputStream;
 import org.kc7bfi.jflac.metadata.*;
 import org.kc7bfi.jflac.util.ByteData;
 import org.kc7bfi.jflac.util.CRC16;
@@ -153,7 +152,7 @@ public class FLACDecoder {
      */
     public ByteData decodeFrame(Frame frame, ByteData pcmData) {
         // required size of the byte buffer
-        int byteSize = frame.header.blockSize * channels * ((streamInfo.getBitsPerSample() + 7) / 2);
+        int byteSize = frame.header.blockSize * channels * ((streamInfo.getBitsPerSample() / 8));
         if (pcmData == null || pcmData.getData().length < byteSize) {
             pcmData = new ByteData(byteSize);
         } else {
@@ -233,8 +232,6 @@ public class FLACDecoder {
         } while (!metadata.isLast());
         return metadataList.toArray(new Metadata[metadataList.size()]);
     }
-
-
 
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -38,7 +38,6 @@ public class WavPackDecoder implements Decoder {
     private AudioFormat audioFormat;
     private WavpackContext wpc;
     private int[] buffer = new int[BUFFER_SIZE];
-    private byte[] pcmBuffer = new byte[BUFFER_SIZE * 4];
     private int channels;
     private int bps;
     private RandomAccessFile ras;
@@ -77,11 +76,9 @@ public class WavPackDecoder implements Decoder {
         int samplesUnpacked = (int) WavPackUtils.WavpackUnpackSamples(wpc, buffer, BUFFER_SIZE / channels);
         if (samplesUnpacked <= 0) return -1;
         samplesUnpacked *= channels;
-        format_samples(samplesUnpacked);
-        int len = samplesUnpacked * bps / 8;
-        System.arraycopy(pcmBuffer, 0, buf, 0, len);
+        format_samples(samplesUnpacked, buf);
 
-        return len;
+        return samplesUnpacked * bps / 8;
     }
 
     public void close() {
@@ -93,7 +90,7 @@ public class WavPackDecoder implements Decoder {
         }
     }
 
-    private void format_samples(long samcnt) {
+    private void format_samples(long samcnt, byte[] buf) {
         int temp;
         int counter = 0;
         int counter2 = 0;
@@ -102,7 +99,7 @@ public class WavPackDecoder implements Decoder {
         switch (bytesPerSample) {
             case 1:
                 while (samcnt > 0) {
-                    pcmBuffer[counter] = (byte) (0x00FF & (buffer[counter] + 128));
+                    buf[counter] = (byte) (0x00FF & (buffer[counter] + 128));
                     counter++;
                     samcnt--;
                 }
@@ -111,9 +108,9 @@ public class WavPackDecoder implements Decoder {
             case 2:
                 while (samcnt > 0) {
                     temp = buffer[counter2];
-                    pcmBuffer[counter] = (byte) temp;
+                    buf[counter] = (byte) temp;
                     counter++;
-                    pcmBuffer[counter] = (byte) (temp >>> 8);
+                    buf[counter] = (byte) (temp >>> 8);
                     counter++;
                     counter2++;
                     samcnt--;
@@ -124,11 +121,11 @@ public class WavPackDecoder implements Decoder {
             case 3:
                 while (samcnt > 0) {
                     temp = buffer[counter2];
-                    pcmBuffer[counter] = (byte) temp;
+                    buf[counter] = (byte) temp;
                     counter++;
-                    pcmBuffer[counter] = (byte) (temp >>> 8);
+                    buf[counter] = (byte) (temp >>> 8);
                     counter++;
-                    pcmBuffer[counter] = (byte) (temp >>> 16);
+                    buf[counter] = (byte) (temp >>> 16);
                     counter++;
                     counter2++;
                     samcnt--;
@@ -139,13 +136,13 @@ public class WavPackDecoder implements Decoder {
             case 4:
                 while (samcnt > 0) {
                     temp = buffer[counter2];
-                    pcmBuffer[counter] = (byte) temp;
+                    buf[counter] = (byte) temp;
                     counter++;
-                    pcmBuffer[counter] = (byte) (temp >>> 8);
+                    buf[counter] = (byte) (temp >>> 8);
                     counter++;
-                    pcmBuffer[counter] = (byte) (temp >>> 16);
+                    buf[counter] = (byte) (temp >>> 16);
                     counter++;
-                    pcmBuffer[counter] = (byte) (temp >>> 24);
+                    buf[counter] = (byte) (temp >>> 24);
                     counter++;
                     counter2++;
                     samcnt--;

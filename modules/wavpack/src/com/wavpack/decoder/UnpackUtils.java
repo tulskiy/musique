@@ -56,10 +56,10 @@ class UnpackUtils {
                 wpc.lossy_blocks = 1;
 
             if ((wps.wphdr.flags & Defines.FLOAT_DATA)
-                != 0
-                && (wps.float_flags & (Defines.FLOAT_EXCEPTIONS | Defines.FLOAT_ZEROS_SENT
-                                       | Defines.FLOAT_SHIFT_SENT | Defines.FLOAT_SHIFT_SAME))
-                   != 0)
+                    != 0
+                    && (wps.float_flags & (Defines.FLOAT_EXCEPTIONS | Defines.FLOAT_ZEROS_SENT
+                    | Defines.FLOAT_SHIFT_SENT | Defines.FLOAT_SHIFT_SAME))
+                    != 0)
                 wpc.lossy_blocks = 1;
         }
 
@@ -75,11 +75,11 @@ class UnpackUtils {
         WavpackStream wps = wpc.stream;
 
         if (wpmd.hasdata == Defines.TRUE)
-            wps.wvbits = BitsUtils.bs_open_read(wpmd.data, (short) 0, (short) wpmd.byte_length, wpc.infile,
+            wps.wvbits = BitsUtils.bs_open_read(wps.wvbits, wpmd.data, (short) 0, (short) wpmd.byte_length, wpc.infile,
                     (long) 0, 0);
         else if (wpmd.byte_length > 0) {
             int len = wpmd.byte_length & 1;
-            wps.wvbits = BitsUtils.bs_open_read(wpc.read_buffer, (short) -1, (short) wpc.read_buffer.length, wpc.infile,
+            wps.wvbits = BitsUtils.bs_open_read(wps.wvbits, wpc.read_buffer, (short) -1, (short) wpc.read_buffer.length, wpc.infile,
                     (long) (wpmd.byte_length + len), 1);
         }
 
@@ -97,7 +97,6 @@ class UnpackUtils {
     static int read_decorr_terms(WavpackStream wps, WavpackMetadata wpmd) {
         int termcnt = wpmd.byte_length;
         byte byteptr[] = wpmd.data;
-        WavpackStream tmpwps = new WavpackStream();
 
         int counter = 0;
         int dcounter = 0;
@@ -105,24 +104,24 @@ class UnpackUtils {
         if (termcnt > Defines.MAX_NTERMS)
             return Defines.FALSE;
 
-        tmpwps.num_terms = termcnt;
+        wps.num_terms = termcnt;
 
         dcounter = termcnt - 1;
 
         for (dcounter = termcnt - 1; dcounter >= 0; dcounter--) {
-            tmpwps.decorr_passes[dcounter].term = (short) ((int) (byteptr[counter] & 0x1f) - 5);
-            tmpwps.decorr_passes[dcounter].delta = (short) ((byteptr[counter] >> 5) & 0x7);
+            wps.decorr_passes[dcounter].term = (short) ((int) (byteptr[counter] & 0x1f) - 5);
+            wps.decorr_passes[dcounter].delta = (short) ((byteptr[counter] >> 5) & 0x7);
 
             counter++;
 
-            if (tmpwps.decorr_passes[dcounter].term < -3
-                || (tmpwps.decorr_passes[dcounter].term > Defines.MAX_TERM && tmpwps.decorr_passes[dcounter].term < 17)
-                || tmpwps.decorr_passes[dcounter].term > 18)
+            if (wps.decorr_passes[dcounter].term < -3
+                    || (wps.decorr_passes[dcounter].term > Defines.MAX_TERM && wps.decorr_passes[dcounter].term < 17)
+                    || wps.decorr_passes[dcounter].term > 18)
                 return Defines.FALSE;
         }
 
-        wps.decorr_passes = tmpwps.decorr_passes;
-        wps.num_terms = tmpwps.num_terms;
+        wps.decorr_passes = wps.decorr_passes;
+        wps.num_terms = wps.num_terms;
 
         return Defines.TRUE;
     }
@@ -392,7 +391,8 @@ class UnpackUtils {
 
     static long unpack_samples(WavpackContext wpc, int[] buffer, long sample_count) {
         WavpackStream wps = wpc.stream;
-        int[] temp_buffer = new int[Defines.SAMPLE_BUFFER_SIZE];
+        int[] temp_buffer = wpc.temp_buffer2;
+
         long flags = wps.wphdr.flags;
         long i;
         int crc = (int) wps.crc;
@@ -503,7 +503,7 @@ class UnpackUtils {
 
                     bf_abs = (buffer[buffer_counter] < 0 ? -buffer[buffer_counter] : buffer[buffer_counter]);
                     bf1_abs = (buffer[buffer_counter + 1]
-                               < 0
+                            < 0
                             ? -buffer[buffer_counter + 1]
                             : buffer[buffer_counter + 1]);
 
@@ -520,7 +520,7 @@ class UnpackUtils {
                 for (buffer_counter = 0; buffer_counter < sample_count * 2; buffer_counter += 2) {
                     bf_abs = (buffer[buffer_counter] < 0 ? -buffer[buffer_counter] : buffer[buffer_counter]);
                     bf1_abs = (buffer[buffer_counter + 1]
-                               < 0
+                            < 0
                             ? -buffer[buffer_counter + 1]
                             : buffer[buffer_counter + 1]);
 
@@ -810,8 +810,8 @@ class UnpackUtils {
                 sam_A = 0;
 
                 for (m = 0,
-                        k = dpp.term & (Defines.MAX_TERM - 1),
-                        bptr_counter = buf_idx; bptr_counter < buf_idx + sample_count * 2; bptr_counter += 2) {
+                             k = dpp.term & (Defines.MAX_TERM - 1),
+                             bptr_counter = buf_idx; bptr_counter < buf_idx + sample_count * 2; bptr_counter += 2) {
                     sam_A = dpp.samples_A[m];
                     dpp.samples_A[k] = (int) ((weight_A * (long) sam_A + 512) >> 10) + buffer[bptr_counter];
 
@@ -845,9 +845,7 @@ class UnpackUtils {
                 if (m != 0) {
                     int[] temp_samples = new int[Defines.MAX_TERM];
 
-                    for (int t = 0; t < dpp.samples_A.length; t++) {
-                        temp_samples[t] = dpp.samples_A[t];
-                    }
+                    System.arraycopy(dpp.samples_A, 0, temp_samples, 0, dpp.samples_A.length);
 
                     for (k = 0; k < Defines.MAX_TERM; k++,
                             m++)
@@ -881,7 +879,7 @@ class UnpackUtils {
                     sam_A = 2 * buffer[buffer_index - 2] - buffer[buffer_index - 4];
 
                     buffer[buffer_index] = (int) ((weight_A * (long) sam_A + 512) >> 10)
-                                           + (sam_B = buffer[buffer_index]);
+                            + (sam_B = buffer[buffer_index]);
 
                     if (sam_A != 0 && sam_B != 0)
                         weight_A += (((sam_A ^ sam_B) >> 30) | 1) * delta;
@@ -889,7 +887,7 @@ class UnpackUtils {
 
                     sam_A = 2 * buffer[buffer_index - 1] - buffer[buffer_index - 3];
                     buffer[buffer_index + 1] = (int) ((weight_B * (long) sam_A + 512) >> 10)
-                                               + (sam_B = buffer[buffer_index + 1]);
+                            + (sam_B = buffer[buffer_index + 1]);
 
                     if (sam_A != 0 && sam_B != 0)
                         weight_B += (((sam_A ^ sam_B) >> 30) | 1) * delta;
@@ -905,14 +903,14 @@ class UnpackUtils {
                 for (buffer_index = buf_idx; buffer_index < end_index; buffer_index += 2) {
                     sam_A = (3 * buffer[buffer_index - 2] - buffer[buffer_index - 4]) >> 1;
                     buffer[buffer_index] = (int) ((weight_A * (long) sam_A + 512) >> 10)
-                                           + (sam_B = buffer[buffer_index]);
+                            + (sam_B = buffer[buffer_index]);
 
                     if (sam_A != 0 && sam_B != 0)
                         weight_A += (((sam_A ^ sam_B) >> 30) | 1) * delta;
 
                     sam_A = (3 * buffer[buffer_index - 1] - buffer[buffer_index - 3]) >> 1;
                     buffer[buffer_index + 1] = (int) ((weight_B * (long) sam_A + 512) >> 10)
-                                               + (sam_B = buffer[buffer_index + 1]);
+                            + (sam_B = buffer[buffer_index + 1]);
 
                     if (sam_A != 0 && sam_B != 0)
                         weight_B += (((sam_A ^ sam_B) >> 30) | 1) * delta;
@@ -927,7 +925,7 @@ class UnpackUtils {
             case -1:
                 for (buffer_index = buf_idx; buffer_index < end_index; buffer_index += 2) {
                     buffer[buffer_index] = (int) ((weight_A * (long) buffer[buffer_index - 1] + 512) >> 10)
-                                           + (sam_A = buffer[buffer_index]);
+                            + (sam_A = buffer[buffer_index]);
 
                     if ((buffer[buffer_index - 1] ^ sam_A) < 0) {
                         if (buffer[buffer_index - 1] != 0 && sam_A != 0 && (weight_A -= delta) < -1024) {
@@ -948,7 +946,7 @@ class UnpackUtils {
                     }
 
                     buffer[buffer_index + 1] = (int) ((weight_B * (long) buffer[buffer_index] + 512) >> 10)
-                                               + (sam_A = buffer[buffer_index + 1]);
+                            + (sam_A = buffer[buffer_index + 1]);
 
                     if ((buffer[buffer_index] ^ sam_A) < 0) {
                         if (buffer[buffer_index] != 0 && sam_A != 0 && (weight_B -= delta) < -1024) {
@@ -979,7 +977,7 @@ class UnpackUtils {
                 for (buffer_index = buf_idx; buffer_index < end_index; buffer_index += 2) {
 
                     buffer[buffer_index + 1] = (int) ((weight_B * (long) buffer[buffer_index - 2] + 512) >> 10)
-                                               + (sam_A = buffer[buffer_index + 1]);
+                            + (sam_A = buffer[buffer_index + 1]);
 
                     if ((buffer[buffer_index - 2] ^ sam_A) < 0) {
                         if (buffer[buffer_index - 2] != 0 && sam_A != 0 && (weight_B -= delta) < -1024) {
@@ -1000,7 +998,7 @@ class UnpackUtils {
                     }
 
                     buffer[buffer_index] = (int) ((weight_A * (long) buffer[buffer_index + 1] + 512) >> 10)
-                                           + (sam_A = buffer[buffer_index]);
+                            + (sam_A = buffer[buffer_index]);
 
                     if ((buffer[buffer_index + 1] ^ sam_A) < 0) {
                         if (buffer[buffer_index + 1] != 0 && sam_A != 0 && (weight_A -= delta) < -1024) {
@@ -1028,7 +1026,7 @@ class UnpackUtils {
                 for (buffer_index = buf_idx; buffer_index < end_index; buffer_index += 2) {
 
                     buffer[buffer_index] = (int) ((weight_A * (long) buffer[buffer_index - 1] + 512) >> 10)
-                                           + (sam_A = buffer[buffer_index]);
+                            + (sam_A = buffer[buffer_index]);
 
                     if ((buffer[buffer_index - 1] ^ sam_A) < 0) {
                         if (buffer[buffer_index - 1] != 0 && sam_A != 0 && (weight_A -= delta) < -1024) {
@@ -1049,7 +1047,7 @@ class UnpackUtils {
                     }
 
                     buffer[buffer_index + 1] = (int) ((weight_B * (long) buffer[buffer_index - 2] + 512) >> 10)
-                                               + (sam_A = buffer[buffer_index + 1]);
+                            + (sam_A = buffer[buffer_index + 1]);
 
                     if ((buffer[buffer_index - 2] ^ sam_A) < 0) {
                         if (buffer[buffer_index - 2] != 0 && sam_A != 0 && (weight_B -= delta) < -1024) {
@@ -1079,13 +1077,13 @@ class UnpackUtils {
 
                 for (buffer_index = buf_idx; buffer_index < end_index; buffer_index += 2) {
                     buffer[buffer_index] = (int) ((weight_A * (long) buffer[tptr] + 512) >> 10)
-                                           + (sam_A = buffer[buffer_index]);
+                            + (sam_A = buffer[buffer_index]);
 
                     if (buffer[tptr] != 0 && sam_A != 0)
                         weight_A += (((buffer[tptr] ^ sam_A) >> 30) | 1) * delta;
 
                     buffer[buffer_index + 1] = (int) ((weight_B * (long) buffer[tptr + 1] + 512) >> 10)
-                                               + (sam_A = buffer[buffer_index + 1]);
+                            + (sam_A = buffer[buffer_index + 1]);
 
                     if (buffer[tptr + 1] != 0 && sam_A != 0)
                         weight_B += (((buffer[tptr + 1] ^ sam_A) >> 30) | 1) * delta;
@@ -1096,7 +1094,7 @@ class UnpackUtils {
                 buffer_index--;
 
                 for (k = dpp.term - 1,
-                        i = 8; i > 0; k--) {
+                             i = 8; i > 0; k--) {
                     i--;
                     dpp.samples_B[k & (Defines.MAX_TERM - 1)] = buffer[buffer_index];
                     buffer_index--;
@@ -1156,8 +1154,8 @@ class UnpackUtils {
 
             default:
                 for (m = 0,
-                        k = dpp.term & (Defines.MAX_TERM - 1),
-                        bptr_counter = buf_idx; bptr_counter < buf_idx + sample_count; bptr_counter++) {
+                             k = dpp.term & (Defines.MAX_TERM - 1),
+                             bptr_counter = buf_idx; bptr_counter < buf_idx + sample_count; bptr_counter++) {
                     sam_A = dpp.samples_A[m];
                     dpp.samples_A[k] = (int) ((weight_A * (long) sam_A + 512) >> 10) + buffer[bptr_counter];
 
@@ -1239,7 +1237,7 @@ class UnpackUtils {
 
                     else if (dups != 0)
                         buffer[buffer_counter] = ((buffer[buffer_counter] + (buffer[buffer_counter] & 1)) << dups)
-                                                 - (buffer[buffer_counter] & 1);
+                                - (buffer[buffer_counter] & 1);
 
                     buffer_counter++;
                     count--;
