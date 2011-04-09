@@ -1,0 +1,3 @@
+[submodule "modules/alac/src"]
+	path = modules/alac/src
+	url = c:/Programs/java-alac
