@@ -24,6 +24,7 @@ import com.tulskiy.musique.util.AudioMath;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.LineUnavailableException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.tulskiy.musique.audio.player.PlayerEvent.PlayerEventCode;
@@ -104,7 +105,7 @@ public class PlayingThread extends Actor implements Runnable {
                         int len = buffer.read(buf, 0, BUFFER_SIZE);
                         if (len == -1) {
                             if (!openNext()) {
-                                output.drain();
+                                currentTrack = null;
                                 stop();
                                 break;
                             }
@@ -115,30 +116,37 @@ public class PlayingThread extends Actor implements Runnable {
                         output.write(buf, 0, len);
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.log(Level.WARNING, "Exception while playing. Stopping now");
+                    currentTrack = null;
+                    stop();
                 }
             }
         }
     }
 
-    private boolean openNext() throws LineUnavailableException {
-        logger.fine("Getting next track");
-        Buffer.NextEntry nextEntry = buffer.pollNextTrack();
-        currentTrack = nextEntry.track;
-        if (currentTrack == null) {
+    private boolean openNext() {
+        try {
+            logger.fine("Getting next track");
+            Buffer.NextEntry nextEntry = buffer.pollNextTrack();
+            currentTrack = nextEntry.track;
+            if (currentTrack == null) {
+                return false;
+            }
+            format = nextEntry.format;
+            output.init(format);
+            if (nextEntry.startSample > 0) {
+                currentByte = AudioMath.samplesToBytes(nextEntry.startSample, format.getFrameSize());
+                player.fireEvent(PlayerEventCode.SEEK_FINISHED);
+            } else {
+                currentByte = 0;
+                updatePlaybackTime();
+                player.fireEvent(PlayerEventCode.FILE_OPENED);
+            }
+            return true;
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not open next track", e);
             return false;
         }
-        format = nextEntry.format;
-        output.init(format);
-        if (nextEntry.startSample > 0) {
-            currentByte = AudioMath.samplesToBytes(nextEntry.startSample, format.getFrameSize());
-            player.fireEvent(PlayerEventCode.SEEK_FINISHED);
-        } else {
-            currentByte = 0;
-            updatePlaybackTime();
-            player.fireEvent(PlayerEventCode.FILE_OPENED);
-        }
-        return true;
     }
 
     private void updatePlaybackTime() {
