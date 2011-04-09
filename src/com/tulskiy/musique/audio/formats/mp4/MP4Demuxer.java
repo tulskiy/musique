@@ -27,7 +27,7 @@ import javax.sound.sampled.AudioFormat;
  * Date: 4/2/11
  */
 public class MP4Demuxer implements Decoder {
-//    private static final Decoder alacDecoder = new ALACDecoder();
+    private static final Decoder alacDecoder = new ALACDecoder();
     private static final Decoder aacDecoder = new AACDecoder();
 
     private Decoder decoder;
@@ -38,8 +38,7 @@ public class MP4Demuxer implements Decoder {
         if ("AAC".equals(codec)) {
             decoder = aacDecoder;
         } else if ("Apple Lossless".equals(codec)) {
-//            decoder = alacDecoder;
-            return false;
+            decoder = alacDecoder;
         } else {
             return false;
         }
