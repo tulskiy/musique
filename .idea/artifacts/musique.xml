@@ -16,6 +16,8 @@
           <element id="dir-copy" path="$PROJECT_DIR$/src/META-INF/services" />
         </element>
       </element>
+      <element id="module-output" name="aac" />
+      <element id="module-output" name="alac" />
     </root>
   </artifact>
 </component>
