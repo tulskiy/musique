@@ -94,6 +94,7 @@ public class PlayingThread extends Actor implements Runnable {
                     while (!active) {
                         player.fireEvent(PlayerEventCode.PAUSED);
                         output.stop();
+                        System.gc();
                         lock.wait();
                     }
 
