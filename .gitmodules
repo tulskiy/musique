@@ -1,4 +1,0 @@
-[submodule "modules/alac/src"]
-	path = modules/alac/src
-	url = git@github.com:tulskiy/Java-Apple-Lossless-decoder.git
-	ignore = dirty
