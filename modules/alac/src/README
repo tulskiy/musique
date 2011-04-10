@@ -1,0 +1,46 @@
+////////////////////////////////////////////////////////////////////////////
+//            Java Implementation of Apple Lossless Decoder               //
+//                 Copyright (c) 2011 Peter McQuillan                     //
+//                          All Rights Reserved.                          //
+//      Distributed under the BSD Software License (see license.txt)      //
+////////////////////////////////////////////////////////////////////////////
+
+This package contains a Java implementation of an Apple Lossless decoder.
+It is ported from v0.2.0 of the Apple Lossless decoder written by David Hammerton.
+This code supports both 16-bit and 24-bit Apple Lossless files.
+
+It is packaged with a demo command-line program that accepts a
+Apple Lossless audio file as input and output a RIFF wav file.
+
+The Java source code files can be compiled to class files very simply by going 
+to the directory where you have downloaded the .java files and running
+
+javac *.java
+
+To run the demo program, use the following command
+
+java DecoderDemo <input.m4a> <output.wav>
+
+where input.m4a is the name of the Apple Lossless file you wish to decode to a WAV file.
+
+This code is ported from v0.2.0 of the Apple Lossless decoder written by David Hammerton.
+However there are also some extra changes, for example:
+
+* The original code to read the hdlr atom was capable of generating a minus value seek
+after reading strlen - this causes problems if there is poor or non-existent seeking 
+support
+* The stream handling code is now written so that it keeps track of where in the input
+stream it is - this is needed for handling the case where the mdat atom comes before the
+moov atom (and you have poor/non-existent seeking support)
+* The stsz atom handling code assumed variable sample sizes, it now also handles fixed
+sample sizes.
+
+
+Please note: This code currently uses java.io.DataInputStream as the main stream object.
+This does not support seeking; the code is able to handle seeking in most cases using its
+own stream handling mechanisms.
+However it would be very straightforward to replace this with a stream object that does
+support seeking.
+
+
+Please direct any questions or comments to beatofthedrum@gmail.com
