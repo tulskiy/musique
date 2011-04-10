@@ -26,7 +26,6 @@ import net.sourceforge.jaad.mp4.MP4Reader;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.logging.Level;
 
@@ -34,7 +33,7 @@ import java.util.logging.Level;
  * Author: Denis Tulskiy
  * Date: 4/5/11
  */
-public class AACDecoder implements Decoder {
+public class MP4AACDecoder implements Decoder {
     private FileInputStream is;
     private net.sourceforge.jaad.Decoder decoder;
     private MP4Reader mp4;
@@ -42,7 +41,6 @@ public class AACDecoder implements Decoder {
     private AudioFormat audioFormat;
     private int currentSample;
     private int totalSamples;
-    private int gaplessDelay;
     private int gaplessPadding;
     private int offset;
     private int bps = 2;
