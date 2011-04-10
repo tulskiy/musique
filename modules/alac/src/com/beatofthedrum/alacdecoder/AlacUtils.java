@@ -124,7 +124,7 @@ public class AlacUtils
 	
 	// Heres where we extract the actual music data
 	
-	public static DecodeResult AlacUnpackSamples(AlacContext ac, int[] pDestBuffer)
+	public static int AlacUnpackSamples(AlacContext ac, int[] pDestBuffer)
 	{
         int sample_byte_size;
 		SampleDuration sampleinfo = new SampleDuration();
@@ -132,21 +132,20 @@ public class AlacUtils
 		int destBufferSize = 1024 *24 * 3; // 24kb buffer = 4096 frames = 1 alac sample (we support max 24bps)
 		int outputBytes;
 		MyStream inputStream = new MyStream();
-        DecodeResult result = new DecodeResult();
-		
+
 		inputStream.stream = ac.input_stream;
 		
 		// if current_sample_block is beyond last block then finished
 		
 		if(ac.current_sample_block >= ac.demux_res.sample_byte_size.length)
 		{
-			return result;
+			return 0;
 		}
 		
 		if (get_sample_info(ac.demux_res, ac.current_sample_block , sampleinfo) == 0)
 		{
 			// getting sample failed
-				return result;
+				return 0;
 		}
 
         sample_byte_size = sampleinfo.sample_byte_size;
@@ -159,10 +158,10 @@ public class AlacUtils
 		outputBytes = AlacDecodeUtils.decode_frame(ac.alac, read_buffer, pDestBuffer, outputBytes);
 		
 		ac.current_sample_block = ac.current_sample_block + 1;
-		result.bytesUnpacked = outputBytes - ac.offset * AlacGetBytesPerSample(ac);
-        result.offset = ac.offset;
+		outputBytes -= ac.offset * AlacGetBytesPerSample(ac);
+        System.arraycopy(pDestBuffer, ac.offset, pDestBuffer, 0, outputBytes);
         ac.offset = 0;
-		return result;
+        return outputBytes;
 	
 	}
 	
@@ -318,7 +317,9 @@ public class AlacUtils
                     if (position < current_position) {
                         ac.input_stream.seek(pos);
                         ac.current_sample_block = current_sample;
-                        ac.offset = (int) (position - (current_position - sample_info.sample_duration)) * AlacGetNumChannels(ac);
+                        ac.offset =
+                                (int) (position - (current_position - sample_info.sample_duration))
+                                        * AlacGetNumChannels(ac);
                         return;
                     }
                     pos += sample_info.sample_byte_size;

@@ -68,10 +68,9 @@ public class ALACDecoder implements Decoder {
 
     @Override
     public int decode(byte[] buf) {
-        DecodeResult result = AlacUtils.AlacUnpackSamples(alacContext, pDestBuffer);
-        int bytesUnpacked = result.bytesUnpacked;
+        int bytesUnpacked = AlacUtils.AlacUnpackSamples(alacContext, pDestBuffer);
         if (bytesUnpacked > 0) {
-            formatSamples(bps, pDestBuffer, result.offset, buf, bytesUnpacked);
+            formatSamples(bps, pDestBuffer, 0, buf, bytesUnpacked);
             return bytesUnpacked;
         }
         return -1;
