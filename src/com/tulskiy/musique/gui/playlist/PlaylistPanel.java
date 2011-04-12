@@ -31,6 +31,7 @@ import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
@@ -119,9 +120,13 @@ public class PlaylistPanel extends JPanel {
         final Timer update = new Timer(1000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                PlaylistTable table = tabs.getSelectedTable();
-                if (table != null)
-                    table.update();
+                if (player.isPlaying()) {
+                    PlaylistTable table = tabs.getSelectedTable();
+                    if (table != null) {
+                        int index = table.getPlaylist().indexOf(player.getTrack());
+                        ((AbstractTableModel) table.getModel()).fireTableRowsUpdated(index, index);
+                    }
+                }
             }
         });
 
