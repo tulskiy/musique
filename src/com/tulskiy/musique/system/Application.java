@@ -54,9 +54,8 @@ public class Application {
     private PlaylistManager playlistManager;
     private MainWindow mainWindow;
     public final String VERSION = "Musique 0.2";
-    public File CONFIG_HOME =
-            new File(System.getProperty("user.home"), ".musique").getAbsoluteFile();
-    private File configFile = new File(CONFIG_HOME, "config");
+    public File CONFIG_HOME;
+    private File configFile;
 
     public static Application getInstance() {
         return ourInstance;
@@ -70,6 +69,7 @@ public class Application {
         CONFIG_HOME = new File(home, ".musique").getAbsoluteFile();
         //noinspection ResultOfMethodCallIgnored
         CONFIG_HOME.mkdirs();
+        configFile = new File(CONFIG_HOME, "config");
 
         logger.fine("Using '" + CONFIG_HOME + "' as a home directory");
     }
@@ -113,7 +113,7 @@ public class Application {
     }
 
     private void loadSettings() {
-        System.setProperty("http.agent", "Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101");
+//        System.setProperty("http.agent", "Mozilla/5.001 (windows; U; NT4.0; en-US; rv:1.0) Gecko/25250101");
 
         AudioOutput audioOutput = player.getAudioOutput();
         audioOutput.setVolume(configuration.getFloat("player.volume", 1));
