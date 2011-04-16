@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -17,9 +17,7 @@
 
 package com.tulskiy.musique.playlist;
 
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
-import java.util.WeakHashMap;
+import java.util.HashMap;
 
 /**
  * Author: Denis Tulskiy
@@ -32,15 +30,15 @@ public class TrackDataCache {
         return instance;
     }
 
-    private WeakHashMap<TrackData, WeakReference<TrackData>> cache = new WeakHashMap<TrackData, WeakReference<TrackData>>();
+    private HashMap<TrackData, TrackData> cache = new HashMap<TrackData, TrackData>();
 
     public void cache(Track track) {
         TrackData key = track.getTrackData();
-        WeakReference<TrackData> trackData = cache.get(key);
+        TrackData trackData = cache.get(key);
         if (trackData == null) {
-            cache.put(key, new WeakReference<TrackData>(key));
+            cache.put(key, key);
         } else {
-            track.setTrackData(trackData.get().merge(key));
+            track.setTrackData(trackData.merge(key));
         }
     }
 }
