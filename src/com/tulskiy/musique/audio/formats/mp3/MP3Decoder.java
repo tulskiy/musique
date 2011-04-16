@@ -17,15 +17,14 @@
 
 package com.tulskiy.musique.audio.formats.mp3;
 
+import com.tulskiy.musique.audio.IcyInputStream;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.AudioMath;
-import com.tulskiy.musique.util.Util;
 import javazoom.jl.decoder.*;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.*;
 import java.net.URI;
-import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -134,27 +133,6 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
         return false;
     }
 
-    public String readLine(InputStream is) {
-        try {
-            int ch = is.read();
-
-            StringBuilder sb = new StringBuilder();
-            while (ch != '\n' && ch != '\r' && ch >= 0) {
-                sb.append((char) ch);
-                ch = is.read();
-            }
-
-            if (ch == '\n' || ch == '\r') {
-                //noinspection ResultOfMethodCallIgnored
-                is.read();
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public boolean open(final Track track) {
         if (track == null)
             return false;
@@ -171,89 +149,7 @@ public class MP3Decoder implements com.tulskiy.musique.audio.Decoder {
                 track.setCodec("MP3 Stream");
                 logger.fine("Opening stream: " + URLDecoder.decode(location.toString(), "utf8"));
                 streaming = true;
-                URLConnection urlConnection = location.toURL().openConnection();
-                urlConnection.setRequestProperty("Icy-MetaData", "1");
-                fis = urlConnection.getInputStream();
-
-                String metaIntString = null;
-                String contentType = urlConnection.getContentType();
-                if (!contentType.equals("audio/mpeg")) {
-                    if (contentType.equals("unknown/unknown")) {
-                        //Java does not parse non-standart headers
-                        //used by SHOUTCast
-                        logger.fine("Reading SHOUTCast response");
-                        String s = readLine(fis);
-                        if (!s.equals("ICY 200 OK")) {
-                            logger.warning("SHOUTCast invalid response: " + s);
-                            return false;
-                        }
-
-                        while (true) {
-                            s = readLine(fis);
-
-                            if (s.isEmpty()) {
-                                break;
-                            }
-
-                            String[] ss = s.split(":");
-                            if (ss[0].equals("icy-metaint")) {
-                                metaIntString = ss[1];
-                            } else if (ss[0].equals("icy-genre")) {
-                                track.setMeta("genre", ss[1]);
-                            } else if (ss[0].equals("icy-name")) {
-                                track.setMeta("album", ss[1]);
-                            }
-                        }
-                    } else {
-                        return false;
-                    }
-                } else {
-                    metaIntString = urlConnection.getHeaderField("icy-metaint");
-                    track.setMeta("genre", urlConnection.getHeaderField("icy-genre"));
-                    track.setMeta("album", urlConnection.getHeaderField("icy-name"));
-                }
-                if (Util.isEmpty(metaIntString))
-                    metaIntString = "0";
-                final int metaInt = Integer.valueOf(metaIntString);
-                if (metaInt > 0) {
-                    fis = new FilterInputStream(fis) {
-                        private int count = 0;
-
-                        @Override
-                        public int read(byte[] b, int off, int len) throws IOException {
-                            int bytesToMeta = metaInt - count;
-                            if (bytesToMeta == 0) {
-                                int size = read() * 16;
-                                if (size > 1) {
-                                    byte[] meta = new byte[size];
-                                    int i = super.read(meta, 0, size);
-                                    String metaString = new String(meta, 0, i, "UTF-8");
-                                    String title = "StreamTitle='";
-                                    if (metaString.startsWith(title)) {
-                                        String[] ss = metaString.substring(title.length(), metaString.indexOf(";") - 1).split(" - ");
-                                        if (ss.length > 0) {
-                                            if (ss.length > 1) {
-                                                track.setMeta("artist", ss[0]);
-                                                track.setMeta("title", ss[1]);
-                                            } else {
-                                                track.setMeta("title", ss[0]);
-                                            }
-                                        }
-                                    }
-                                }
-                                count = 0;
-                            }
-
-                            if (bytesToMeta >= 0 && bytesToMeta < len)
-                                len = bytesToMeta;
-
-                            int read = super.read(b, off, len);
-                            count += read;
-                            return read;
-                        }
-                    };
-                }
-
+                fis = IcyInputStream.create(track);
                 decoder = new Decoder();
             }
             bitstream = new Bitstream(fis);

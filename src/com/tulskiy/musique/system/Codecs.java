@@ -19,6 +19,7 @@ package com.tulskiy.musique.system;
 
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.Encoder;
+import com.tulskiy.musique.audio.IcyInputStream;
 import com.tulskiy.musique.audio.formats.ape.APEDecoder;
 import com.tulskiy.musique.audio.formats.ape.APEEncoder;
 import com.tulskiy.musique.audio.formats.flac.FLACDecoder;
@@ -75,24 +76,23 @@ public class Codecs {
             return null;
         }
         if (track.isStream()) {
+            IcyInputStream inputStream = IcyInputStream.create(track);
+            String contentType = inputStream.getContentType().trim();
             try {
-                URLConnection con = location.toURL().openConnection();
-                String contentType = con.getContentType();
-
-                if ("audio/mpeg".equals(contentType) || "unknown/unknown".equals(contentType)) {
-                    // if ContentType is unknown, it is probably
-                    // shoutcast, let mp3 decoder decide
-                    return decoders.get("mp3");
-                }
-
-                if ("application/ogg".equals(contentType)) {
-                    return decoders.get("ogg");
-                }
-                logger.warning("Unsupported ContentType: " + contentType);
-                return null;
+                inputStream.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            if ("audio/mpeg".equals(contentType)) {
+                return decoders.get("mp3");
+            }
+
+            if ("application/ogg".equals(contentType)) {
+                return decoders.get("ogg");
+            }
+            logger.warning("Unsupported ContentType: " + contentType);
+            return null;
         }
         String ext = Util.getFileExt(location.toString()).toLowerCase();
         return decoders.get(ext);
