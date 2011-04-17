@@ -38,8 +38,8 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 07.06.2009
+ * Author: Denis Tulskiy
+ * Date: 07.06.2009
  */
 public class MainWindow extends JFrame {
     private Application app = Application.getInstance();

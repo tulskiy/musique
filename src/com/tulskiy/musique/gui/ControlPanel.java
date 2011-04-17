@@ -21,7 +21,6 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.audio.player.io.AudioOutput;
-import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.formatting.Parser;
@@ -34,175 +33,117 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.plaf.basic.BasicSliderUI;
-import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 /**
  * Author: Denis Tulskiy
- * Date: 07.09.2008
+ * Date: 17.04.2011
  */
-public class ControlPanel extends JPanel {
+
+public class ControlPanel extends javax.swing.JPanel {
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
-    private JSlider progressSlider;
-    private JSlider volumeSlider;
-    private AbstractButton prevButton = new JButton();
-    private AbstractButton nextButton = new JButton();
-    private AbstractButton playButton = new JButton();
-    private AbstractButton pauseButton = new JButton();
-    private AbstractButton stopButton = new JButton();
-    private AbstractButton nextRandomButton = new JButton();
     private Player player = app.getPlayer();
     private AudioOutput output = player.getAudioOutput();
-
     private Popup popup;
     private JToolTip toolTip;
     private PopupFactory popupFactory = PopupFactory.getSharedInstance();
 
     private boolean isSeeking = false;
     private boolean progressEnabled = false;
-    private JLabel statusLabel;
-    private Expression statusExpression;
+    private Expression statusExpression = Parser.parse("$if3($playingTime(), '0:00')[/%length%]");
     private MouseAdapter progressMouseListener;
 
+    /**
+     * Creates new form ControlBar
+     */
     public ControlPanel() {
-        setLayout(new BorderLayout());
-        setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.gray));
+        initComponents();
+        initButtonListeners();
+        initSliders();
+        initPlayerListeners();
+        initPlaybackOrder();
+        updateUI();
+    }
 
-        progressSlider = new JSlider();
-        progressSlider.setValue(0);
-        progressSlider.setFocusable(false);
-        toolTip = progressSlider.createToolTip();
-        progressSlider.setSnapToTicks(false);
+    private void initPlayerListeners() {
+        final Timer timer = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (progressEnabled && player.isPlaying() && !isSeeking) {
+                    progressSlider.setValue((int) player.getCurrentSample());
+                }
+                if (player.isPlaying())
+                    updateStatus();
+            }
+        });
+        timer.start();
 
-        stopButton = createButton("stop.png", false);
-        prevButton = createButton("prev.png", false);
-        playButton = createButton("play.png", false);
-        pauseButton = createButton("pause.png", true);
-        nextButton = createButton("next.png", false);
-        nextRandomButton = createButton("next-random.png", false);
+        player.addListener(new PlayerListener() {
+            public void onEvent(PlayerEvent e) {
+                pauseButton.setSelected(player.isPaused());
+                switch (e.getEventCode()) {
+                    case PLAYING_STARTED:
+                        timer.start();
+                        updateStatus();
+                        break;
+                    case PAUSED:
+                        timer.stop();
+                        break;
+                    case STOPPED:
+                        timer.stop();
+                        progressEnabled = false;
+                        progressSlider.setValue(progressSlider.getMinimum());
+                        statusLabel.setText(null);
+                        break;
+                    case FILE_OPENED:
+                        Track track = player.getTrack();
+                        if (track != null) {
+                            int max = (int) track.getTotalSamples();
+                            if (max == -1) {
+                                progressEnabled = false;
+                            } else {
+                                progressEnabled = true;
+                                progressSlider.setMaximum(max);
+                            }
+                        }
+                        progressSlider.setValue((int) player.getCurrentSample());
+                        break;
+                    case SEEK_FINISHED:
+                        isSeeking = false;
+                        break;
+                }
+            }
+        });
+    }
 
-        volumeSlider = new JSlider(0, 100);
-        volumeSlider.setMaximumSize(new Dimension(100, 30));
-        volumeSlider.setPreferredSize(new Dimension(100, 30));
-        volumeSlider.setValue((int) (output.getVolume() * 100));
-        volumeSlider.setFocusable(false);
-        volumeSlider.setSnapToTicks(false);
-
-        //hack to make volume and progress sliders be on same level
-        progressSlider.setMaximumSize(new Dimension(10000, 30));
-        progressSlider.setPreferredSize(new Dimension(100, 30));
-
-        final JComboBox order = new JComboBox(PlaybackOrder.Order.values());
-        order.setFocusable(false);
-        Dimension orderSize = order.getMinimumSize();
-        orderSize.width += 10;
-        order.setMaximumSize(orderSize);
-        order.setPreferredSize(orderSize);
+    private void initPlaybackOrder() {
+        playbackOrder.setModel(new DefaultComboBoxModel(PlaybackOrder.Order.values()));
 
         config.addPropertyChangeListener("player.playbackOrder", true, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 int value = config.getInt(evt.getPropertyName(), 0);
-                order.setSelectedIndex(value);
+                playbackOrder.setSelectedIndex(value);
             }
         });
 
-        order.addActionListener(new ActionListener() {
+        playbackOrder.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                config.setInt("player.playbackOrder", order.getSelectedIndex());
+                config.setInt("player.playbackOrder", playbackOrder.getSelectedIndex());
             }
         });
-        statusLabel = new JLabel();
-        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));
-        statusExpression = Parser.parse("$if3($playingTime(), '0:00')[/%length%]");
-
-        Box box = new Box(BoxLayout.X_AXIS);
-        box.add(Box.createHorizontalStrut(5));
-        box.add(stopButton);
-        box.add(playButton);
-        box.add(pauseButton);
-        box.add(prevButton);
-        box.add(nextButton);
-        box.add(nextRandomButton);
-        box.add(Box.createHorizontalStrut(10));
-        box.add(volumeSlider);
-        box.add(Box.createHorizontalStrut(10));
-        box.add(progressSlider);
-        box.add(Box.createHorizontalStrut(5));
-        box.add(statusLabel);
-        box.add(Box.createHorizontalStrut(5));
-        box.add(order);
-        box.add(Box.createHorizontalStrut(5));
-
-        add(box);
-
-        buildListeners();
-        updateUI();
     }
 
-    @Override
-    public void updateUI() {
-        super.updateUI();
-        fixSliderWidth();
-        AbstractButton[] buttons = new AbstractButton[]{
-                stopButton, prevButton, playButton, pauseButton, nextButton, nextRandomButton
-        };
-        if (Util.isGTKLaF()) {
-            for (AbstractButton b : buttons) {
-                if (b != null)
-                    b.setBorderPainted(false);
-            }
-        } else {
-            for (AbstractButton b : buttons) {
-                if (b != null)
-                    b.setBorderPainted(true);
-            }
-        }
+    private void updateStatus() {
+        statusLabel.setText((String) statusExpression.eval(player.getTrack()));
     }
 
-    private void fixSliderWidth() {
-        if (progressSlider != null) {
-            boolean windowsLaF = Util.isWindowsLaF();
-            progressSlider.setPaintTicks(windowsLaF);
-            volumeSlider.setPaintTicks(windowsLaF);
+    private void initSliders() {
+        toolTip = progressSlider.createToolTip();
 
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    for (MouseListener ml : progressSlider.getMouseListeners()) {
-                        progressSlider.removeMouseListener(ml);
-                    }
-                    progressSlider.addMouseListener(progressMouseListener);
-                }
-            });
-        }
-    }
-
-    private AbstractButton createButton(String icon, boolean toggle) {
-        AbstractButton b;
-        if (toggle) {
-            b = new JToggleButton();
-        } else {
-            b = new JButton();
-        }
-        Dimension buttonSize = new Dimension(30, 30);
-        b.setIcon(Images.loadIcon(icon));
-        b.setFocusable(false);
-
-        b.setPreferredSize(buttonSize);
-
-        return b;
-    }
-
-    private int getSliderValueForX(JSlider slider, int x) {
-        return ((BasicSliderUI) slider.getUI()).valueForXPosition(x);
-    }
-
-    private void buildListeners() {
         volumeSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
                 output.setVolume(volumeSlider.getValue() / 100f);
@@ -265,7 +206,32 @@ public class ControlPanel extends JPanel {
                 progressSlider.setValue(getSliderValueForX(progressSlider, e.getX()));
             }
         });
+    }
 
+    private int getSliderValueForX(JSlider slider, int x) {
+        return ((BasicSliderUI) slider.getUI()).valueForXPosition(x);
+    }
+
+    private void showToolTip(MouseEvent e) {
+        Track s = player.getTrack();
+        if (s != null) {
+            toolTip.setTipText(Util.samplesToTime(progressSlider.getValue() - progressSlider.getMinimum(), s.getSampleRate(), 1));
+            int x = e.getXOnScreen();
+            x = Math.max(x, progressSlider.getLocationOnScreen().x);
+            x = Math.min(x, progressSlider.getLocationOnScreen().x + progressSlider.getWidth() - toolTip.getWidth());
+            popup = popupFactory.getPopup(progressSlider, toolTip, x, progressSlider.getLocationOnScreen().y + 25);
+            popup.show();
+        }
+    }
+
+    private void hideToolTip() {
+        if (popup != null) {
+            popup.hide();
+            popup = null;
+        }
+    }
+
+    private void initButtonListeners() {
         prevButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 player.prev();
@@ -299,72 +265,155 @@ public class ControlPanel extends JPanel {
                 player.open(track);
             }
         });
-        final Timer timer = new Timer(1000, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (progressEnabled && player.isPlaying() && !isSeeking) {
-                    progressSlider.setValue((int) player.getCurrentSample());
-                }
-                if (player.isPlaying())
-                    updateStatus();
-            }
-        });
-        player.addListener(new PlayerListener() {
-            public void onEvent(PlayerEvent e) {
-                pauseButton.setSelected(player.isPaused());
-                switch (e.getEventCode()) {
-                    case PLAYING_STARTED:
-                        timer.start();
-                        break;
-                    case PAUSED:
-                        timer.stop();
-                        break;
-                    case STOPPED:
-                        timer.stop();
-                        progressEnabled = false;
-                        progressSlider.setValue(progressSlider.getMinimum());
-                        statusLabel.setText(null);
-                        break;
-                    case FILE_OPENED:
-                        Track track = player.getTrack();
-                        if (track != null) {
-                            int max = (int) track.getTotalSamples();
-                            if (max == -1) {
-                                progressEnabled = false;
-                            } else {
-                                progressEnabled = true;
-                                progressSlider.setMaximum(max);
-                            }
-                        }
-                        progressSlider.setValue((int) player.getCurrentSample());
-                        break;
-                    case SEEK_FINISHED:
-                        isSeeking = false;
-                        break;
-                }
-            }
-        });
     }
 
-    private void updateStatus() {
-        statusLabel.setText((String) statusExpression.eval(player.getTrack()));
+    @Override
+    public void updateUI() {
+        super.updateUI();
+        fixSliderWidth();
     }
 
-    private void showToolTip(MouseEvent e) {
-        Track s = player.getTrack();
-        if (s != null) {
-            toolTip.setTipText(Util.samplesToTime(progressSlider.getValue() - progressSlider.getMinimum(), s.getSampleRate(), 1));
-            int x = e.getXOnScreen();
-            x = Math.max(x, progressSlider.getLocationOnScreen().x);
-            x = Math.min(x, progressSlider.getLocationOnScreen().x + progressSlider.getWidth() - toolTip.getWidth());
-            popup = popupFactory.getPopup(progressSlider, toolTip, x, progressSlider.getLocationOnScreen().y + 25);
-            popup.show();
+    private void fixSliderWidth() {
+        if (progressSlider != null) {
+            boolean windowsLaF = Util.isWindowsLaF();
+            progressSlider.setPaintTicks(windowsLaF);
+            volumeSlider.setPaintTicks(windowsLaF);
+
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    for (MouseListener ml : progressSlider.getMouseListeners()) {
+                        progressSlider.removeMouseListener(ml);
+                    }
+                    progressSlider.addMouseListener(progressMouseListener);
+                }
+            });
         }
     }
 
-    private void hideToolTip() {
-        if (popup != null) {
-            popup.hide();
-            popup = null;
-        }
-    }
+    /**
+     * This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        javax.swing.JToolBar jToolBar1 = new javax.swing.JToolBar();
+        stopButton = new javax.swing.JButton();
+        playButton = new javax.swing.JButton();
+        pauseButton = new javax.swing.JToggleButton();
+        prevButton = new javax.swing.JButton();
+        nextButton = new javax.swing.JButton();
+        nextRandomButton = new javax.swing.JButton();
+        volumeSlider = new javax.swing.JSlider();
+        progressSlider = new javax.swing.JSlider();
+        playbackOrder = new javax.swing.JComboBox();
+        statusLabel = new javax.swing.JLabel();
+
+        setBorder(javax.swing.BorderFactory.createCompoundBorder(javax.swing.BorderFactory.createMatteBorder(0, 0, 1, 0, java.awt.Color.gray), javax.swing.BorderFactory.createEmptyBorder(0, 5, 0, 5)));
+        setFocusable(false);
+        setPreferredSize(new java.awt.Dimension(669, 32));
+
+        jToolBar1.setFloatable(false);
+        jToolBar1.setForeground(javax.swing.UIManager.getDefaults().getColor("Panel.background"));
+        jToolBar1.setRollover(true);
+        jToolBar1.setBorderPainted(false);
+        jToolBar1.setFocusable(false);
+
+        stopButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/stop.png"))); // NOI18N
+        stopButton.setFocusable(false);
+        stopButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        stopButton.setMargin(new java.awt.Insets(2, 3, 2, 3));
+        stopButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(stopButton);
+
+        playButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/play.png"))); // NOI18N
+        playButton.setFocusable(false);
+        playButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        playButton.setMargin(new java.awt.Insets(2, 3, 2, 3));
+        playButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(playButton);
+
+        pauseButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/pause.png"))); // NOI18N
+        pauseButton.setFocusable(false);
+        pauseButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        pauseButton.setMargin(new java.awt.Insets(2, 3, 2, 3));
+        pauseButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(pauseButton);
+
+        prevButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/prev.png"))); // NOI18N
+        prevButton.setFocusable(false);
+        prevButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        prevButton.setMargin(new java.awt.Insets(2, 3, 2, 3));
+        prevButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(prevButton);
+
+        nextButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/next.png"))); // NOI18N
+        nextButton.setFocusable(false);
+        nextButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        nextButton.setMargin(new java.awt.Insets(2, 3, 2, 3));
+        nextButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(nextButton);
+
+        nextRandomButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/tulskiy/musique/images/next-random.png"))); // NOI18N
+        nextRandomButton.setFocusable(false);
+        nextRandomButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        nextRandomButton.setIconTextGap(0);
+        nextRandomButton.setMargin(new java.awt.Insets(2, 3, 2, 3));
+        nextRandomButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jToolBar1.add(nextRandomButton);
+
+        volumeSlider.setValue((int) (output.getVolume() * 100));
+        volumeSlider.setFocusable(false);
+
+        progressSlider.setValue(0);
+        progressSlider.setFocusable(false);
+
+        playbackOrder.setMaximumRowCount(10);
+        playbackOrder.setFocusable(false);
+
+        statusLabel.setFont(statusLabel.getFont().deriveFont(statusLabel.getFont().getStyle() | java.awt.Font.BOLD));
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(4, 4, 4)
+                .addComponent(volumeSlider, javax.swing.GroupLayout.PREFERRED_SIZE, 119, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(progressSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 233, Short.MAX_VALUE)
+                .addGap(9, 9, 9)
+                .addComponent(statusLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(playbackOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(volumeSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+            .addComponent(progressSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 31, Short.MAX_VALUE)
+            .addComponent(playbackOrder, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+        );
+    }// </editor-fold>//GEN-END:initComponents
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    javax.swing.JButton nextButton;
+    javax.swing.JButton nextRandomButton;
+    javax.swing.JToggleButton pauseButton;
+    javax.swing.JButton playButton;
+    javax.swing.JComboBox playbackOrder;
+    javax.swing.JButton prevButton;
+    javax.swing.JSlider progressSlider;
+    javax.swing.JLabel statusLabel;
+    javax.swing.JButton stopButton;
+    javax.swing.JSlider volumeSlider;
+    // End of variables declaration//GEN-END:variables
+
 }
