@@ -53,6 +53,7 @@ public class ControlPanel extends JPanel {
     private AbstractButton playButton = new JButton();
     private AbstractButton pauseButton = new JButton();
     private AbstractButton stopButton = new JButton();
+    private AbstractButton nextRandomButton = new JButton();
     private Player player = app.getPlayer();
     private AudioOutput output = player.getAudioOutput();
 
@@ -81,6 +82,7 @@ public class ControlPanel extends JPanel {
         playButton = createButton("play.png", false);
         pauseButton = createButton("pause.png", true);
         nextButton = createButton("next.png", false);
+        nextRandomButton = createButton("next-random.png", false);
 
         volumeSlider = new JSlider(0, 100);
         volumeSlider.setMaximumSize(new Dimension(100, 30));
@@ -125,6 +127,7 @@ public class ControlPanel extends JPanel {
         box.add(pauseButton);
         box.add(prevButton);
         box.add(nextButton);
+        box.add(nextRandomButton);
         box.add(Box.createHorizontalStrut(10));
         box.add(volumeSlider);
         box.add(Box.createHorizontalStrut(10));
@@ -146,7 +149,7 @@ public class ControlPanel extends JPanel {
         super.updateUI();
         fixSliderWidth();
         AbstractButton[] buttons = new AbstractButton[]{
-                stopButton, prevButton, playButton, pauseButton, nextButton
+                stopButton, prevButton, playButton, pauseButton, nextButton, nextRandomButton
         };
         if (Util.isGTKLaF()) {
             for (AbstractButton b : buttons) {
@@ -163,7 +166,7 @@ public class ControlPanel extends JPanel {
 
     private void fixSliderWidth() {
         if (progressSlider != null) {
-            boolean windowsLaF = Util.isWindowsLaF();
+            boolean windowsLaF = true;
             progressSlider.setPaintTicks(windowsLaF);
             volumeSlider.setPaintTicks(windowsLaF);
 
@@ -287,6 +290,13 @@ public class ControlPanel extends JPanel {
         nextButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 player.next();
+            }
+        });
+        nextRandomButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Track track = player.getPlaybackOrder().nextRandom();
+                player.open(track);
             }
         });
         final Timer timer = new Timer(1000, new ActionListener() {
