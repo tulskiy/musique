@@ -289,7 +289,7 @@ public class ControlPanel extends JPanel {
                 player.next();
             }
         });
-        final Timer timer = new Timer(333, new ActionListener() {
+        final Timer timer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (progressEnabled && player.isPlaying() && !isSeeking) {
                     progressSlider.setValue((int) player.getCurrentSample());
