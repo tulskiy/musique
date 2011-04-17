@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -201,7 +201,6 @@ public class PlaybackOrder {
             if (index == -1)
                 return playlist.get(0);
 
-            int size = playlist.size();
             Track track;
 
             switch (order) {
@@ -248,7 +247,7 @@ public class PlaybackOrder {
                     }
                     return playlist.get(0);
                 case RANDOM:
-                    return getTrack((int) (Math.random() * size));
+                    return nextRandom();
                 case SHUFFLE:
                     return nextShuffle(currentTrack, false, null);
             }
@@ -340,12 +339,16 @@ public class PlaybackOrder {
                 }
                 return playlist.get(0);
             case RANDOM:
-                return getTrack((int) (Math.random() * size));
+                return nextRandom();
             case SHUFFLE:
                 return prevShuffle(currentTrack, false, null);
         }
 
         return getTrack(index);
+    }
+
+    public Track nextRandom() {
+        return getTrack((int) (Math.random() * playlist.size()));
     }
 
     private boolean equals(Object o1, Object o2) {
