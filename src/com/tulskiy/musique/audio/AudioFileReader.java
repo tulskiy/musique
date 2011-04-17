@@ -93,7 +93,7 @@ public abstract class AudioFileReader {
 //            track.setTotalSamples((long) (header.getPreciseLength() * header.getSampleRateAsNumber()));
             track.setSampleRate(header.getSampleRateAsNumber());
             track.setStartPosition(0);
-            track.setCodec(header.getFormat());
+            track.setMeta("codec", header.getFormat());
             track.setBitrate((int) header.getBitRateAsNumber());
         }
     }

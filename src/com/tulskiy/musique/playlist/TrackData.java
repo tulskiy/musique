@@ -413,6 +413,7 @@ public class TrackData implements Cloneable {
         add("genre");
         add("albumArtist");
         add("artist");
+        add("codec");
     }};
 
     public void setMeta(String key, String value) {
