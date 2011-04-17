@@ -11,6 +11,8 @@
             <name>musique</name>
             <source-roots>
                 <root id="src.dir"/>
+                <root id="src.aac.dir"/>
+                <root id="src.alac.dir"/>
                 <root id="musique2.dir"/>
                 <root id="musique3.dir"/>
                 <root id="musique4.dir"/>
