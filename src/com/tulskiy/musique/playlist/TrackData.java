@@ -227,7 +227,7 @@ public class TrackData implements Cloneable {
     }
 
     public String getTitle() {
-        return Util.firstNotEmpty(title, fileName);
+        return Util.firstNotEmpty(title, getFileName());
     }
 
     public String getAlbumArtist() {
