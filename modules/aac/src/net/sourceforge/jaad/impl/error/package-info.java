@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package jaad.impl.error;
+package net.sourceforge.jaad.impl.error;
 
 /**
 * Error resilience and error protection classes.
