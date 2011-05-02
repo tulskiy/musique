@@ -17,29 +17,60 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.playlist.Track;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Map.Entry;
+
+import org.jaudiotagger.audio.generic.AbstractTag;
 import org.jaudiotagger.tag.FieldDataInvalidException;
+import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagField;
+import org.jaudiotagger.tag.TagFieldKey;
+
+import com.tulskiy.musique.playlist.Track;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: Oct 9, 2009
  */
 public abstract class AudioTagWriter {
-    public abstract void write(Track track);
+
+	public abstract void write(Track track);
 
     public abstract boolean isFileSupported(String ext);
 
-    protected void copyCommonFields(Tag abstractTag, Track track) {
-        try {
-            abstractTag.setAlbum(track.getMeta("album"));
-            abstractTag.setArtist(track.getMeta("artist"));
-            abstractTag.setComment(track.getMeta("comment"));
-            abstractTag.setGenre(track.getMeta("genre"));
-            abstractTag.setTitle(track.getMeta("title"));
-            abstractTag.setYear(track.getMeta("year"));
-        } catch (FieldDataInvalidException e) {
-            e.printStackTrace();
-        }
+    /**
+     * Copies Musique track tag field values to destination format specific container.
+     * 
+     * @param tag destination format specific container
+     * @param abstractTag destination format specific container implementation (just to create specific TagFields)
+     * @param track Musique track
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    // TODO take a look if refactoring to AbstractTag only fits (in format specific writers)
+    public void copyTagFields(Tag tag, AbstractTag abstractTag, Track track)
+    		throws KeyNotFoundException, FieldDataInvalidException {
+    	TagField field;
+    	boolean firstValue;
+
+    	Iterator<Entry<TagFieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
+		while (entries.hasNext()) {
+			Entry<TagFieldKey, Set<String>> entry = entries.next();
+			Iterator<String> values = entry.getValue().iterator();
+			firstValue = true;
+			while (values.hasNext()) {
+				field = abstractTag.createTagField(entry.getKey(), values.next());
+				if (firstValue) {
+					tag.set(field);
+					firstValue = false;
+				}
+				else {
+					tag.add(field);
+				}
+			}
+		}
     }
+
 }

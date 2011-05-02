@@ -65,7 +65,7 @@ public class Converter {
         startTime = System.currentTimeMillis();
         boolean merge = config.getBoolean("converter.merge", false);
         for (Track track : tracks) {
-            totalSamples += track.getTotalSamples();
+            totalSamples += track.getTrackData().getTotalSamples();
         }
         byte[] buf = new byte[65536];
         for (Track track : tracks) {
@@ -73,12 +73,12 @@ public class Converter {
                 break;
             this.track = track;
             if (!openDecoder()) {
-                currentSample += track.getTotalSamples();
+                currentSample += track.getTrackData().getTotalSamples();
                 continue;
             }
             if (!merge || encoder == null) {
                 if (!openEncoder()) {
-                    currentSample += track.getTotalSamples();
+                    currentSample += track.getTrackData().getTotalSamples();
                     continue;
                 }
             }
@@ -90,7 +90,7 @@ public class Converter {
                 if (len == -1)
                     break;
 
-                if (track.isCue()) {
+                if (track.getTrackData().isCue()) {
                     if (cueTotalBytes <= currentByte + len) {
                         len = (int) (cueTotalBytes - currentByte);
                         cueFinished = true;
@@ -106,7 +106,7 @@ public class Converter {
 
             if (!merge) {
                 Track newTrack = track.copy();
-                newTrack.setLocation(output.toURI().toString());
+                newTrack.getTrackData().setLocation(output.toURI().toString());
                 encoder.close();
                 encoder = null;
 
@@ -162,15 +162,15 @@ public class Converter {
         decoder = Codecs.getNewDecoder(track);
 
         if (decoder == null || !decoder.open(track)) {
-            logger.info("Couldn't initialize decoder for track: " + track.getLocation());
+            logger.info("Couldn't initialize decoder for track: " + track.getTrackData().getLocation());
             return false;
         }
 
         cueTotalBytes = 0;
         currentByte = 0;
-        if (track.isCue()) {
-            decoder.seekSample(track.getStartPosition());
-            cueTotalBytes = AudioMath.samplesToBytes(track.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
+        if (track.getTrackData().isCue()) {
+            decoder.seekSample(track.getTrackData().getStartPosition());
+            cueTotalBytes = AudioMath.samplesToBytes(track.getTrackData().getTotalSamples(), decoder.getAudioFormat().getFrameSize());
         }
         return true;
     }
@@ -180,11 +180,11 @@ public class Converter {
             logger.severe("Need to initialize decoder before encoder!");
         }
 
-        logger.info("Converting track: " + track.getLocation());
+        logger.info("Converting track: " + track.getTrackData().getLocation());
         File parent = null;
         if (config.getBoolean("converter.saveToSourceFolder", true)) {
-            if (track.isFile()) {
-                parent = track.getFile().getParentFile();
+            if (track.getTrackData().isFile()) {
+                parent = track.getTrackData().getFile().getParentFile();
             }
         } else {
             String path = config.getString("converter.path", "");
@@ -192,7 +192,7 @@ public class Converter {
         }
 
         if (parent == null || !parent.isDirectory()) {
-            logger.warning("Don't know where to save track: " + track.getLocation());
+            logger.warning("Don't know where to save track: " + track.getTrackData().getLocation());
             return false;
         }
 
@@ -235,7 +235,7 @@ public class Converter {
         logger.info("Saving track to file: " + output.getAbsolutePath());
         encoder = Codecs.getEncoder(format);
         if (!encoder.open(output, decoder.getAudioFormat(), config)) {
-            logger.warning("Couldn't initialize encoder for track: " + track.getLocation());
+            logger.warning("Couldn't initialize encoder for track: " + track.getTrackData().getLocation());
             return false;
         }
         return true;

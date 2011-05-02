@@ -17,15 +17,20 @@
 
 package com.tulskiy.musique.audio.formats.cue;
 
-import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.TrackIO;
-import jwbroek.cuelib.*;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.List;
+
+import jwbroek.cuelib.CueParser;
+import jwbroek.cuelib.CueSheet;
+import jwbroek.cuelib.FileData;
+import jwbroek.cuelib.Index;
+import jwbroek.cuelib.TrackData;
+
+import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.system.TrackIO;
 
 /**
  * @Author: Denis Tulskiy
@@ -36,11 +41,11 @@ public class CUEParser {
         try {
             CueSheet cueSheet = CueParser.parse(cueStream);
             List<FileData> datas = cueSheet.getFileData();
-            String cueLocation = file.getFile().getAbsolutePath();
+            String cueLocation = file.getTrackData().getFile().getAbsolutePath();
             if (datas.size() > 0) {
                 for (FileData fileData : datas) {
                     if (!embedded) {
-                        String parent = file.getFile().getParent();
+                        String parent = file.getTrackData().getFile().getParent();
                         File referencedFile = new File(parent, fileData.getFile());
                         if (!referencedFile.exists())
                             continue;
@@ -53,38 +58,39 @@ public class CUEParser {
                     for (int i = 0; i < size; i++) {
                         TrackData trackData = fileData.getTrackData().get(i);
                         Track track = file.copy();
-                        track.setCueEmbedded(embedded);
+                        track.getTrackData().setCueEmbedded(embedded);
                         if (!embedded)
-                            track.setCueLocation(cueLocation);
+                            track.getTrackData().setCueLocation(cueLocation);
 
                         String album = trackData.getMetaData(CueSheet.MetaDataField.ALBUMTITLE);
+                        // TODO review all this and rewrite
                         if (album.length() > 0)
-                            track.setMeta("album", album);
+                            track.getTrackData().addAlbum(album);
                         String artist = trackData.getPerformer();
-                        track.setMeta("artist", artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
-                        track.setMeta("albumArtist", cueSheet.getPerformer());
-                        track.setMeta("comment", cueSheet.getComment());
-                        track.setMeta("title", trackData.getTitle());
-                        String year = trackData.getMetaData(CueSheet.MetaDataField.YEAR);
-                        if (year.length() > 0)
-                            track.setMeta("year", year);
-                        track.setTrackNumber(String.valueOf(trackData.getNumber()));
-                        String genre = trackData.getMetaData(CueSheet.MetaDataField.GENRE);
-                        if (genre.length() > 0)
-                            track.setMeta("genre", genre);
-                        int sampleRate = track.getSampleRate();
+                        track.getTrackData().addArtist(artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
+//                        track.setMeta("albumArtist", cueSheet.getPerformer());
+//                        track.setMeta("comment", cueSheet.getComment());
+//                        track.setMeta("title", trackData.getTitle());
+//                        String year = trackData.getMetaData(CueSheet.MetaDataField.YEAR);
+//                        if (year.length() > 0)
+//                            track.setMeta("year", year);
+//                        track.setTrackNumber(String.valueOf(trackData.getNumber()));
+//                        String genre = trackData.getMetaData(CueSheet.MetaDataField.GENRE);
+//                        if (genre.length() > 0)
+//                            track.setMeta("genre", genre);
+                        int sampleRate = track.getTrackData().getSampleRate();
                         long startPosition = indexToSample(trackData.getIndex(1), sampleRate);
 //                        System.out.println(song.getFile().getName() + " " + startPosition);
                         long endPosition;
                         if (i >= size - 1) {
-                            endPosition = track.getTotalSamples();
+                            endPosition = track.getTrackData().getTotalSamples();
                         } else {
                             TrackData nextTrack = fileData.getTrackData().get(i + 1);
                             endPosition = indexToSample(nextTrack.getIndex(1), sampleRate);
                         }
-                        track.setTotalSamples(endPosition - startPosition);
-                        track.setSubsongIndex(i + 1);
-                        track.setStartPosition(startPosition);
+                        track.getTrackData().setTotalSamples(endPosition - startPosition);
+                        track.getTrackData().setSubsongIndex(i + 1);
+                        track.getTrackData().setStartPosition(startPosition);
                         list.add(track);
                     }
                 }

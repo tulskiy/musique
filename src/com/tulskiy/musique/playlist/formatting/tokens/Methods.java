@@ -17,14 +17,16 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
+import java.util.ArrayList;
+import java.util.Set;
+
+import javax.swing.ImageIcon;
+
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.util.Util;
-
-import javax.swing.*;
-import java.util.ArrayList;
 
 /**
  * @Author: Denis Tulskiy
@@ -142,9 +144,35 @@ public class Methods {
     public String playingTime(Track track, ArrayList<Expression> args) {
         Player player = app.getPlayer();
         if (player.isPlaying()) {
-            return Util.samplesToTime(player.getCurrentSample(), player.getTrack().getSampleRate(), 0);
+            return Util.samplesToTime(player.getCurrentSample(), player.getTrack().getTrackData().getSampleRate(), 0);
         } else {
             return null;
         }
+    }
+    
+    public String combine(Track track, ArrayList<Expression> args) {
+        if (args.size() != 2) {
+            return null;
+        }
+
+    	Object tagFieldValues = args.get(0).eval(track);
+        String separator = (String) args.get(1).eval(track);
+        if (tagFieldValues != null && separator != null) {
+        	if (tagFieldValues instanceof String) {
+        		return (String) tagFieldValues;
+        	}
+        	else {
+            	StringBuilder sb = new StringBuilder();
+            	for (Object value : ((Set<String>) tagFieldValues).toArray()) {
+            		if (sb.length() != 0) {
+            			sb.append(separator);
+            		}
+            		sb.append(value.toString());
+            	}
+            	return sb.toString();
+        	}
+        }
+
+        return null;
     }
 }

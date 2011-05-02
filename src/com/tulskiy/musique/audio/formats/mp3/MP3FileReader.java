@@ -17,19 +17,28 @@
 
 package com.tulskiy.musique.audio.formats.mp3;
 
-import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
-import com.tulskiy.musique.playlist.Track;
-import davaguine.jmac.info.ID3Tag;
+import java.io.IOException;
+import java.util.List;
+
 import org.jaudiotagger.audio.mp3.LameFrame;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.audio.mp3.XingFrame;
+import org.jaudiotagger.tag.KeyNotFoundException;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
+import org.jaudiotagger.tag.id3.framebody.AbstractFrameBodyTextInfo;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
-import java.io.IOException;
+import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
+
+import davaguine.jmac.info.ID3Tag;
 
 /**
  * @Author: Denis Tulskiy
@@ -41,23 +50,22 @@ public class MP3FileReader extends AudioFileReader {
     private APETagProcessor apeTagProcessor = new APETagProcessor();
 
     public Track readSingle(Track track) {
+    	TrackData trackData = track.getTrackData();
         TextEncoding.getInstanceOf().setDefaultNonUnicode(defaultCharset.name());
         ID3Tag.setDefaultEncoding(defaultCharset.name());
         MP3File mp3File = null;
         try {
-            mp3File = new MP3File(track.getFile(), MP3File.LOAD_IDV2TAG, true);
+            mp3File = new MP3File(trackData.getFile(), MP3File.LOAD_IDV2TAG, true);
         } catch (Exception ignored) {
-            System.out.println("Couldn't read file: " + track.getFile());
+            System.out.println("Couldn't read file: " + trackData.getFile());
         }
 
         if (mp3File != null) {
             try {
                 ID3v24Tag v24Tag = mp3File.getID3v2TagAsv24();
                 if (v24Tag != null) {
-                    copyTagFields(v24Tag, track);
-                    track.addMeta("year", v24Tag.getFirst(TagFieldKey.DATE).trim());
-                    track.addMeta("albumArtist", v24Tag.getFirst(TagFieldKey.ALBUM_ARTIST).trim());
-                    track.setDiscNumber(v24Tag.getFirst(TagFieldKey.DISC_NO));
+                    copyCommonTagFields(v24Tag, track);
+                    copySpecificTagFields(v24Tag, track);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -66,7 +74,7 @@ public class MP3FileReader extends AudioFileReader {
             MP3AudioHeader mp3AudioHeader = mp3File.getMP3AudioHeader();
             copyHeaderFields(mp3AudioHeader, track);
 
-            long totalSamples = track.getTotalSamples();
+            long totalSamples = trackData.getTotalSamples();
             int enc_delay = GAPLESS_DELAY;
 
             XingFrame xingFrame = mp3AudioHeader.getXingFrame();
@@ -87,7 +95,7 @@ public class MP3FileReader extends AudioFileReader {
             }
 
             totalSamples -= enc_delay;
-            track.setTotalSamples(totalSamples);
+            trackData.setTotalSamples(totalSamples);
         }
 
         try {
@@ -101,5 +109,43 @@ public class MP3FileReader extends AudioFileReader {
     public boolean isFileSupported(String ext) {
         return ext.equalsIgnoreCase("mp3");
     }
+
+	@Override
+	protected void copyCommonTagFields(Tag tag, Track track) throws IOException {
+		ID3v24Tag v24Tag = (ID3v24Tag) tag;
+		for (TagFieldKey key : TagFieldKey.values()) {
+			setMusiqueTagFieldValues(track, key, v24Tag);
+		}
+		// TODO review below stuff later
+//      track.addMeta("year", v24Tag.getFirst(TagFieldKey.DATE).trim());
+//      track.addMeta("albumArtist", v24Tag.getFirst(TagFieldKey.ALBUM_ARTIST).trim());
+//      track.setDiscNumber(v24Tag.getFirst(TagFieldKey.DISC_NO));
+	}
+
+//	@Override
+//	protected void copySpecificTagFields(Tag tag, Track track) {
+//		ID3v24Tag v24Tag = (ID3v24Tag) tag;
+//	}
+
+	// TODO review (T?? [but not TXXX] are only supported at the moment)
+	private void setMusiqueTagFieldValues(Track track, TagFieldKey key, ID3v24Tag tag) {
+		List<TagField> fields;
+
+		try {
+			fields = tag.get(key);
+		}
+		catch (KeyNotFoundException ignored) {
+			return;
+		}
+
+		for (TagField field : fields) {
+			ID3v24Frame frame = (ID3v24Frame) field;
+			if (frame.getBody() instanceof AbstractFrameBodyTextInfo) {
+				AbstractFrameBodyTextInfo body = (AbstractFrameBodyTextInfo) frame.getBody();
+				// TODO not sure about body.getFirstTextValue()
+				track.getTrackData().addTagFieldValues(key, body.getFirstTextValue());
+			}
+		}
+	}
 
 }

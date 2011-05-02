@@ -42,7 +42,7 @@ public class IcyInputStream extends FilterInputStream {
 
     public static IcyInputStream create(Track track) {
         try {
-            URLConnection connection = track.getLocation().toURL().openConnection();
+            URLConnection connection = track.getTrackData().getLocation().toURL().openConnection();
             connection.setRequestProperty("Icy-Metadata", "1");
             IcyInputStream icyInputStream = new IcyInputStream(new BufferedInputStream(connection.getInputStream()));
             icyInputStream.setTrack(track);
@@ -117,17 +117,17 @@ public class IcyInputStream extends FilterInputStream {
                 if (ss[0].equals("icy-metaint")) {
                     metaIntString = ss[1];
                 } else if (ss[0].equals("icy-genre")) {
-                    track.setMeta("genre ", ss[1]);
+                    track.getTrackData().addGenre(ss[1]);
                 } else if (ss[0].equals("icy-name")) {
-                    track.setMeta("album ", ss[1]);
+                    track.getTrackData().addAlbum(ss[1]);
                 } else if (ss[0].equals("content-type")) {
                     contentType = ss[1];
                 }
             }
         } else {
             metaIntString = connection.getHeaderField("icy-metaint");
-            track.setMeta("genre ", connection.getHeaderField("icy-genre"));
-            track.setMeta("album ", connection.getHeaderField("icy-name"));
+            track.getTrackData().addGenre(connection.getHeaderField("icy-genre"));
+            track.getTrackData().addAlbum(connection.getHeaderField("icy-name"));
         }
         try {
             metaInt = Integer.parseInt(metaIntString.trim());

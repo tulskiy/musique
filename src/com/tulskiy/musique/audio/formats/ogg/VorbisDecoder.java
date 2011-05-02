@@ -22,8 +22,12 @@ import com.jcraft.jorbis.Info;
 import com.jcraft.jorbis.VorbisFile;
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 
 import javax.sound.sampled.AudioFormat;
+
+import org.jaudiotagger.tag.TagFieldKey;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -43,15 +47,16 @@ public class VorbisDecoder implements Decoder {
     private int oldBitrate;
 
     public boolean open(Track track) {
+    	TrackData trackData = track.getTrackData();
         try {
             this.track = track;
-            if (track.isFile()) {
-                logger.fine("Opening file: " + track.getFile());
-                vorbisFile = new VorbisFile(track.getFile().getAbsolutePath());
+            if (trackData.isFile()) {
+                logger.fine("Opening file: " + trackData.getFile());
+                vorbisFile = new VorbisFile(trackData.getFile().getAbsolutePath());
                 streaming = false;
-                oldBitrate = track.getBitrate();
-            } else if (track.isStream()) {
-                URL url = track.getLocation().toURL();
+                oldBitrate = trackData.getBitrate();
+            } else if (trackData.isStream()) {
+                URL url = trackData.getLocation().toURL();
                 logger.fine("Opening stream: " + URLDecoder.decode(url.toString(), "utf8"));
                 URLConnection urlConnection = url.openConnection();
                 String contentType = urlConnection.getContentType();
@@ -64,11 +69,11 @@ public class VorbisDecoder implements Decoder {
                 vorbisFile = new VorbisFile(bis, null, 0);
                 streaming = true;
                 reloadComments(track);
-                track.setCodec("OGG Vorbis Stream");
+                trackData.setCodec("OGG Vorbis Stream");
             }
             Info info = vorbisFile.getInfo()[0];
-            track.setSampleRate(info.rate);
-            track.setChannels(info.channels);
+            trackData.setSampleRate(info.rate);
+            trackData.setChannels(info.channels);
             audioFormat = new AudioFormat(info.rate, 16, info.channels, true, false);
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,17 +90,11 @@ public class VorbisDecoder implements Decoder {
                     byte[] data = c.user_comments[i];
                     String comment = new String(data, 0, data.length - 1, "UTF-8");
                     String[] strings = comment.split("=");
-                    String key = strings[0].toLowerCase();
+                    String key = strings[0];
+//                    String key = strings[0].toLowerCase();
                     String value = strings[1];
 
-                    if (key.equals("tracknumber"))
-                        track.setTrackNumber(value);
-                    else if (key.equals("albumartist"))
-                        track.setMeta("albumArtist", value);
-                    else if (key.equals("date"))
-                        track.setMeta("year", value);
-                    else
-                        track.setMeta(key, value);
+                    track.getTrackData().addTagFieldValues(TagFieldKey.valueOf(key), value);
                 }
             }
         } catch (Exception e) {
@@ -113,7 +112,7 @@ public class VorbisDecoder implements Decoder {
 
     public int decode(byte[] buf) {
         int ret = vorbisFile.read(buf, buf.length);
-        track.setBitrate(vorbisFile.bitrate_instant() / 1000);
+        track.getTrackData().setBitrate(vorbisFile.bitrate_instant() / 1000);
         if (ret <= 0) {
             //it's a stream, open it again
             if (streaming) {
@@ -131,7 +130,7 @@ public class VorbisDecoder implements Decoder {
         try {
             if (vorbisFile != null) {
                 vorbisFile.close();
-                track.setBitrate(oldBitrate);
+                track.getTrackData().setBitrate(oldBitrate);
             }
         } catch (IOException e) {
             e.printStackTrace();

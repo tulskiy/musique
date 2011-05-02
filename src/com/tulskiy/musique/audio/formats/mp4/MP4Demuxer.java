@@ -34,7 +34,7 @@ public class MP4Demuxer implements Decoder {
 
     @Override
     public boolean open(Track track) {
-        String codec = track.getCodec();
+        String codec = track.getTrackData().getCodec();
         if ("AAC".equals(codec)) {
             decoder = aacDecoder;
         } else if ("Apple Lossless".equals(codec)) {

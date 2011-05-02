@@ -17,34 +17,41 @@
 
 package com.tulskiy.musique.playlist;
 
-import com.tulskiy.musique.util.Util;
-
 import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
+
+import org.jaudiotagger.tag.TagFieldKey;
+
+import com.tulskiy.musique.util.Util;
 
 /**
  * Author: Denis Tulskiy
  * Date: 11/14/10
  */
 public class TrackData implements Cloneable {
-    //meta fields
-    private String artist;
-    private String album;
-    private String title;
-    private String albumArtist;
+
+	// common jaudiotagger tag field values
+	private Map<TagFieldKey, Set<String>> tagFields = new HashMap<TagFieldKey, Set<String>>();
+	
+	// meta fields
     private String trackNumber;
     private String totalTracks;
     private String discNumber;
     private String totalDiscs;
-    private String year;
-    private String genre;
-    private String comment;
 
-    //song info
+    // song info
     private int sampleRate;
     private int channels;
     private int bps;
@@ -57,7 +64,7 @@ public class TrackData implements Cloneable {
     private String cueLocation;
     private String codec;
 
-    //runtime stuff
+    // runtime stuff
     private String cueSheet;
     private String track;
     private String length;
@@ -65,6 +72,16 @@ public class TrackData implements Cloneable {
     private String directory;
     private long dateAdded;
     private long lastModified;
+
+    private static HashSet<String> internedFields = new HashSet<String>() {{
+        add("year");
+        add("artist");
+        add("album");
+        add("genre");
+        add("albumArtist");
+        add("artist");
+        add("codec");
+    }};
 
     public TrackData() {
     }
@@ -89,24 +106,315 @@ public class TrackData implements Cloneable {
      * @return current instance
      */
     public TrackData merge(TrackData newData) {
+    	// merge technical fields
         Field[] fields = getClass().getDeclaredFields();
         for (Field field : fields) {
             try {
                 Object value = field.get(newData);
-                if (value != null)
-                    field.set(this, value);
-            } catch (IllegalAccessException ignored) {
+                if (value != null && !(value instanceof Map<?, ?>)) {
+            		field.set(this, value);
+                }
+            }
+            catch (IllegalAccessException ignored) {
             }
         }
-        return this;
+
+        // merge tag fields
+        Iterator<Entry<TagFieldKey, Set<String>>> entries = newData.getAllTagFieldValuesIterator();
+		while (entries.hasNext()) {
+			Entry<TagFieldKey, Set<String>> entry = entries.next();
+			addTagFieldValues(entry.getKey(), entry.getValue());
+		}
+
+		return this;
     }
 
     public void clearTags() {
-        String[] tags = {"artist", "album", "albumArtist", "title",
-                "year", "genre", "comment"};
-        for (String tag : tags) {
-            setMeta(tag, "");
+    	tagFields.clear();
+    	setCodec("");
+    }
+
+    // ------------------- meta methods ------------------- //
+
+    public Iterator<Entry<TagFieldKey, Set<String>>> getAllTagFieldValuesIterator() {
+		return tagFields.entrySet().iterator();
+    }
+
+    public Set<String> getTagFieldValuesSafeAsSet(TagFieldKey key) {
+    	Set<String> result = tagFields.get(key);
+
+    	if (result == null) {
+    		result = new HashSet<String>();
+    	}
+    	
+    	return result;
+    }
+
+    public List<String> getTagFieldValuesSafeAsList(TagFieldKey key) {
+    	List<String> result = new ArrayList<String>();
+    	
+    	Set<String> values = getTagFieldValuesSafeAsSet(key);
+
+    	if (!values.isEmpty()) {
+    		result.addAll(Arrays.asList(values.toArray(new String[values.size()])));
+    	}
+
+    	return result;
+    }
+    
+    // TODO add String.intern() support
+    public void setTagFieldValues(TagFieldKey key, Set<String> values) {
+    	tagFields.put(key, values);
+    }
+    
+    // TODO add String.intern() support
+    public void setTagFieldValues(TagFieldKey key, String value) {
+    	Set<String> newValues = new HashSet<String>();
+    	newValues.add(value);
+    	setTagFieldValues(key, newValues);
+    }
+    
+    // TODO add String.intern() support
+    public void addTagFieldValues(TagFieldKey key, Set<String> values) {
+    	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
+    	existingValues.addAll(values);
+    	tagFields.put(key, existingValues);
+    }
+    
+    // TODO add String.intern() support
+    public void addTagFieldValues(TagFieldKey key, String value) {
+    	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
+    	existingValues.add(value);
+    	setTagFieldValues(key, existingValues);
+    }
+    
+    public String getFirstTagFieldValue(TagFieldKey key) {
+    	List<String> values = getTagFieldValuesSafeAsList(key);
+    	
+    	if (!values.isEmpty()) {
+    		return values.get(0);
+    	}
+    	
+    	return null;
+    }
+
+    // ------------------- common methods ------------------- //
+
+    public String getArtist() {
+        return Util.firstNotEmpty(getFirstTagFieldValue(TagFieldKey.ARTIST),
+        		getFirstTagFieldValue(TagFieldKey.ALBUM_ARTIST));
+    }
+    
+    public void addArtist(String value) {
+    	addTagFieldValues(TagFieldKey.ARTIST, value);
+    }
+
+    public String getAlbum() {
+        return getFirstTagFieldValue(TagFieldKey.ALBUM);
+    }
+    
+    public void addAlbum(String value) {
+    	addTagFieldValues(TagFieldKey.ALBUM, value);
+    }
+
+    public String getTitle() {
+        return Util.firstNotEmpty(getFirstTagFieldValue(TagFieldKey.TITLE), getFileName());
+    }
+    
+    public void addTitle(String value) {
+    	addTagFieldValues(TagFieldKey.TITLE, value);
+    }
+
+    public String getAlbumArtist() {
+        return Util.firstNotEmpty(getFirstTagFieldValue(TagFieldKey.ALBUM_ARTIST),
+        		getFirstTagFieldValue(TagFieldKey.ARTIST));
+    }
+    
+    public void addAlbumArtist(String value) {
+    	addTagFieldValues(TagFieldKey.ALBUM_ARTIST, value);
+    }
+
+    public String getYear() {
+    	// TODO think about TagFieldKey.DATE
+        return getFirstTagFieldValue(TagFieldKey.YEAR);
+    }
+    
+    public void addYear(String value) {
+    	addTagFieldValues(TagFieldKey.YEAR, value);
+    }
+
+    public String getGenre() {
+        return getFirstTagFieldValue(TagFieldKey.GENRE);
+    }
+
+    public Set<String> getGenres() {
+        return getTagFieldValuesSafeAsSet(TagFieldKey.GENRE);
+    }
+    
+    public void addGenre(String value) {
+    	addTagFieldValues(TagFieldKey.GENRE, value);
+    }
+
+    public String getComment() {
+        return getFirstTagFieldValue(TagFieldKey.COMMENT);
+    }
+    
+    public void addComment(String value) {
+    	addTagFieldValues(TagFieldKey.COMMENT, value);
+    }
+
+    // TODO rewrite all that TRACK/DISC number stuff
+    public String getTrack() {
+        if (trackNumber != null) {
+            if (totalTracks != null && !totalTracks.isEmpty()) {
+                return trackNumber + "/" + totalTracks;
+            } else {
+                return trackNumber;
+            }
         }
+
+        return "";
+    }
+
+    /**
+     * @return track number formatted to two digits
+     */
+    public String getTrackNumber() {
+        return track;
+    }
+
+    public void setTrackNumber(String value) {
+        if (value != null) {
+            String[] s = value.split("/");
+            if (s.length > 0) {
+                try {
+                    int i = Integer.parseInt(s[0]);
+                    if (i != 0)
+                        track = new Formatter().format("%02d", i).toString();
+                    else
+                        track = null;
+                } catch (NumberFormatException ignored) {
+                    track = s[0];
+                }
+
+                trackNumber = s[0];
+
+            }
+
+            if (s.length > 1)
+                totalTracks = s[1];
+        }
+    }
+
+    public String getTrackTotal() {
+        return totalTracks;
+    }
+
+    public void setTrackTotal(String value) {
+        totalTracks = value.intern();
+    }
+
+    public String getDisc() {
+        if (discNumber != null) {
+            if (totalDiscs != null && !totalDiscs.isEmpty()) {
+                return discNumber + "/" + totalDiscs;
+            } else {
+                return discNumber;
+            }
+        }
+
+        return "";
+    }
+
+    public String getDiscNumber() {
+        return discNumber;
+    }
+
+    public void setDiscNumber(String value) {
+        if (value != null && value.length() > 0) {
+            String[] s = value.split("/");
+            if (s.length > 0)
+                discNumber = s[0];
+            if (s.length > 1)
+                totalDiscs = s[1];
+        }
+    }
+
+    public String getDiscTotal() {
+        return totalDiscs;
+    }
+
+    public void setDiscTotal(String value) {
+        totalDiscs = value.intern();
+    }
+
+    public String getRecordLabel() {
+    	return getFirstTagFieldValue(TagFieldKey.RECORD_LABEL);
+    }
+
+    public Set<String> getRecordLabels() {
+    	return getTagFieldValuesSafeAsSet(TagFieldKey.RECORD_LABEL);
+    }
+
+    public void addRecordLabel(String value) {
+    	addTagFieldValues(TagFieldKey.RECORD_LABEL, value);
+    }
+
+    public String getCatalogNo() {
+    	return getFirstTagFieldValue(TagFieldKey.CATALOG_NO);
+    }
+
+    public Set<String> getCatalogNos() {
+    	return getTagFieldValuesSafeAsSet(TagFieldKey.CATALOG_NO);
+    }
+
+    public void addCatalogNo(String value) {
+    	addTagFieldValues(TagFieldKey.CATALOG_NO, value);
+    }
+
+    // ------------------- cuesheet methods ------------------- //
+
+    public String getCueSheet() {
+        return cueSheet;
+    }
+
+    public void setCueSheet(String cueSheet) {
+        this.cueSheet = cueSheet;
+    }
+
+    public boolean isCueEmbedded() {
+        return cueEmbedded;
+    }
+
+    public void setCueEmbedded(boolean cueEmbedded) {
+        this.cueEmbedded = cueEmbedded;
+    }
+
+    public String getCueLocation() {
+        return cueLocation;
+    }
+
+    public void setCueLocation(String cueLocation) {
+        this.cueLocation = cueLocation;
+    }
+
+    public boolean isCue() {
+        return subsongIndex > 0;
+    }
+
+    // ------------------- technical methods ------------------- //
+
+    public String getLength() {
+        if (length == null)
+            length = Util.samplesToTime(totalSamples, sampleRate, 0);
+        return length;
+    }
+
+    public String getFileName() {
+        if (fileName == null) {
+            fileName = Util.removeExt(getFile().getName());
+        }
+        return fileName;
     }
 
     public int getSampleRate() {
@@ -218,102 +526,6 @@ public class TrackData implements Cloneable {
         return getLocation() != null && "http".equals(getLocation().getScheme());
     }
 
-    public String getArtist() {
-        return Util.firstNotEmpty(artist, albumArtist);
-    }
-
-    public String getAlbum() {
-        return album;
-    }
-
-    public String getTitle() {
-        return Util.firstNotEmpty(title, getFileName());
-    }
-
-    public String getAlbumArtist() {
-        return Util.firstNotEmpty(albumArtist, artist);
-    }
-
-    /**
-     * @return track number formatted to two digits
-     */
-    public String getTrackNumber() {
-        return track;
-    }
-
-    public void setTrackNumber(String trackNumber) {
-        if (trackNumber != null) {
-            String[] s = trackNumber.split("/");
-            if (s.length > 0) {
-                try {
-                    int i = Integer.parseInt(s[0]);
-                    if (i != 0)
-                        track = new Formatter().format("%02d", i).toString();
-                    else
-                        track = null;
-                } catch (NumberFormatException ignored) {
-                    track = s[0];
-                }
-
-                this.trackNumber = s[0];
-
-            }
-
-            if (s.length > 1)
-                this.totalTracks = s[1];
-        }
-    }
-
-    public String getTotalTracks() {
-        return totalTracks;
-    }
-
-    public void setTotalTracks(String totalTracks) {
-        this.totalTracks = totalTracks.intern();
-    }
-
-    public void setTotalDiscs(String totalDiscs) {
-        this.totalDiscs = totalDiscs.intern();
-    }
-
-    public String getDiscNumber() {
-        return discNumber;
-    }
-
-    public void setDiscNumber(String discNumber) {
-        if (discNumber != null && discNumber.length() > 0) {
-            String[] s = discNumber.split("/");
-            if (s.length > 0)
-                this.discNumber = s[0];
-            if (s.length > 1)
-                this.totalDiscs = s[1];
-        }
-    }
-
-    public String getTotalDiscs() {
-        return totalDiscs;
-    }
-
-    public String getYear() {
-        return year;
-    }
-
-    public String getGenre() {
-        return genre;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public String getCueSheet() {
-        return cueSheet;
-    }
-
-    public void setCueSheet(String cueSheet) {
-        this.cueSheet = cueSheet;
-    }
-
     public String getCodec() {
         return codec;
     }
@@ -333,97 +545,7 @@ public class TrackData implements Cloneable {
         this.directory = directory;
     }
 
-    public String getTrack() {
-        if (trackNumber != null) {
-            if (totalTracks != null && !totalTracks.isEmpty()) {
-                return trackNumber + "/" + totalTracks;
-            } else {
-                return trackNumber;
-            }
-        }
-
-        return "";
-    }
-
-    public String getDisc() {
-        if (discNumber != null) {
-            if (totalDiscs != null && !totalDiscs.isEmpty()) {
-                return discNumber + "/" + totalDiscs;
-            } else {
-                return discNumber;
-            }
-        }
-
-        return "";
-    }
-
-    public String getLength() {
-        if (length == null)
-            length = Util.samplesToTime(totalSamples, sampleRate, 0);
-        return length;
-    }
-
-    public boolean isCueEmbedded() {
-        return cueEmbedded;
-    }
-
-    public void setCueEmbedded(boolean cueEmbedded) {
-        this.cueEmbedded = cueEmbedded;
-    }
-
-    public String getCueLocation() {
-        return cueLocation;
-    }
-
-    public void setCueLocation(String cueLocation) {
-        this.cueLocation = cueLocation;
-    }
-
-    public boolean isCue() {
-        return subsongIndex > 0;
-    }
-
-    public String getFileName() {
-        if (fileName == null) {
-            fileName = Util.removeExt(getFile().getName());
-        }
-        return fileName;
-    }
-
-    //OK, this is a hack, but I don't want to redo all this stuff
-
-    public void addMeta(String key, String value) {
-        setMeta(key, Util.longest(getMeta(key), value));
-    }
-
-    public String getMeta(String key) {
-        try {
-            Object o = getClass().getDeclaredField(key).get(this);
-            if (o != null)
-                return o.toString();
-        } catch (Exception ignored) {
-        }
-        return "";
-    }
-
-    private static HashSet<String> internedFields = new HashSet<String>() {{
-        add("year");
-        add("artist");
-        add("album");
-        add("genre");
-        add("albumArtist");
-        add("artist");
-        add("codec");
-    }};
-
-    public void setMeta(String key, String value) {
-        try {
-            if (value != null && internedFields.contains(key))
-                value = value.intern();
-            getClass().getDeclaredField(key).set(this, value);
-        } catch (Exception ignored) {
-        }
-    }
+    // ------------------- java object methods ------------------- //
 
     @Override
     public boolean equals(Object o) {
@@ -434,7 +556,6 @@ public class TrackData implements Cloneable {
 
         return locationString.equals(trackData.locationString)
                 && subsongIndex == trackData.subsongIndex;
-
     }
 
     @Override
@@ -443,4 +564,5 @@ public class TrackData implements Cloneable {
         result = 31 * result + (locationString != null ? locationString.hashCode() : 0);
         return result;
     }
+
 }

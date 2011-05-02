@@ -32,6 +32,8 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
+import org.jaudiotagger.tag.TagFieldKey;
+
 /**
  * @Author: Denis Tulskiy
  * @Date: Dec 30, 2009
@@ -41,11 +43,6 @@ public class Playlist extends ArrayList<Track> {
 
     private static final int VERSION = 2;
     private static final byte[] MAGIC = "BARABASHKA".getBytes();
-    private static String[] metaMap = {
-            "artist", "album", "albumArtist", "title",
-            "trackNumber", "totalTracks", "discNumber", "totalDiscs",
-            "year", "genre", "comment", "codec"
-    };
 
     private static final Logger logger = Logger.getLogger("musique");
     private ArrayList<PlaylistListener> listeners = new ArrayList<PlaylistListener>();
@@ -91,28 +88,32 @@ public class Playlist extends ArrayList<Track> {
             dos.writeInt(VERSION);
             dos.writeInt(size());
             HashMap<String, String> meta = new HashMap<String, String>();
+            TrackData trackData;
             for (Track track : this) {
-                dos.writeUTF(track.getLocation().toString());
-                dos.writeLong(track.getStartPosition());
-                dos.writeLong(track.getTotalSamples());
-                dos.writeInt(track.getSubsongIndex());
-                if (track.getSubsongIndex() > 0) {
-                    dos.writeBoolean(track.isCueEmbedded());
-                    if (!track.isCueEmbedded())
-                        dos.writeUTF(track.getCueLocation());
+            	trackData = track.getTrackData();
+                dos.writeUTF(trackData.getLocation().toString());
+                dos.writeLong(trackData.getStartPosition());
+                dos.writeLong(trackData.getTotalSamples());
+                dos.writeInt(trackData.getSubsongIndex());
+                if (trackData.getSubsongIndex() > 0) {
+                    dos.writeBoolean(trackData.isCueEmbedded());
+                    if (!trackData.isCueEmbedded())
+                        dos.writeUTF(trackData.getCueLocation());
                 }
-                dos.writeInt(track.getBps());
-                dos.writeInt(track.getChannels());
-                dos.writeInt(track.getSampleRate());
-                dos.writeInt(track.getBitrate());
-                dos.writeLong(track.getDateAdded());
-                dos.writeLong(track.getLastModified());
+                dos.writeInt(trackData.getBps());
+                dos.writeInt(trackData.getChannels());
+                dos.writeInt(trackData.getSampleRate());
+                dos.writeInt(trackData.getBitrate());
+                dos.writeLong(trackData.getDateAdded());
+                dos.writeLong(trackData.getLastModified());
 
                 meta.clear();
-                for (String key : metaMap) {
-                    String value = track.getMeta(key);
-                    if (value != null && !value.isEmpty()) {
-                        meta.put(key, value);
+                // TODO use CODEC const
+                meta.put("codec", trackData.getCodec());
+                for (TagFieldKey key : TagFieldKey.values()) {
+                    List<String> values = trackData.getTagFieldValuesSafeAsList(key);
+                    for (String value : values) {
+                    	meta.put(key.toString(), value);
                     }
                 }
 
@@ -152,37 +153,38 @@ public class Playlist extends ArrayList<Track> {
             ensureCapacity(size);
             for (int i = 0; i < size; i++) {
                 Track track = new Track();
-                track.setLocation(dis.readUTF());
-                track.setStartPosition(dis.readLong());
-                track.setTotalSamples(dis.readLong());
-                track.setSubsongIndex(dis.readInt());
+                TrackData trackData = track.getTrackData();
+                trackData.setLocation(dis.readUTF());
+                trackData.setStartPosition(dis.readLong());
+                trackData.setTotalSamples(dis.readLong());
+                trackData.setSubsongIndex(dis.readInt());
                 cache.cache(track);
-                if (track.getSubsongIndex() > 0) {
-                    track.setCueEmbedded(dis.readBoolean());
-                    if (!track.isCueEmbedded())
-                        track.setCueLocation(dis.readUTF());
+                if (trackData.getSubsongIndex() > 0) {
+                    trackData.setCueEmbedded(dis.readBoolean());
+                    if (!trackData.isCueEmbedded())
+                        trackData.setCueLocation(dis.readUTF());
                 }
-                track.setBps(dis.readInt());
-                track.setChannels(dis.readInt());
-                track.setSampleRate(dis.readInt());
-                track.setBitrate(dis.readInt());
+                trackData.setBps(dis.readInt());
+                trackData.setChannels(dis.readInt());
+                trackData.setSampleRate(dis.readInt());
+                trackData.setBitrate(dis.readInt());
                 if (version == 1) {
-                    track.setDateAdded(System.currentTimeMillis());
+                    trackData.setDateAdded(System.currentTimeMillis());
                 } else {
-                    track.setDateAdded(dis.readLong());
-                    track.setLastModified(dis.readLong());
+                    trackData.setDateAdded(dis.readLong());
+                    trackData.setLastModified(dis.readLong());
                 }
                 int metaSize = dis.readInt();
 
                 for (int j = 0; j < metaSize; j++) {
                     String key = dis.readUTF();
                     String value = dis.readUTF();
-                    if (key.equals("trackNumber"))
-                        track.setTrackNumber(value);
-                    else if (key.equals("discNumber")) {
-                        track.setDiscNumber(value);
-                    } else {
-                        track.setMeta(key, value);
+                    // TODO use CODEC const
+                    if (key.equals("codec")) {
+                        trackData.setCodec(value);
+                    }
+                	else {
+                        trackData.addTagFieldValues(TagFieldKey.valueOf(key), value);
                     }
                 }
 
@@ -262,16 +264,16 @@ public class Playlist extends ArrayList<Track> {
             pw.println("#EXTM3U");
             Expression expression = Parser.parse("[%artist% - ]%title%");
             for (Track track : this) {
-                if (track.isStream()) {
-                    pw.println(track.getLocation());
-                } else if (track.isFile()) {
+                if (track.getTrackData().isStream()) {
+                    pw.println(track.getTrackData().getLocation());
+                } else if (track.getTrackData().isFile()) {
                     int seconds = (int) AudioMath.samplesToMillis(
-                            track.getTotalSamples(),
-                            track.getSampleRate()) / 1000;
+                            track.getTrackData().getTotalSamples(),
+                            track.getTrackData().getSampleRate()) / 1000;
                     String title = String.valueOf(expression.eval(track));
                     pw.printf("#EXTINF:%d,%s\n%s\n",
                             seconds, title,
-                            track.getFile().getAbsolutePath());
+                            track.getTrackData().getFile().getAbsolutePath());
                 }
             }
             pw.close();
@@ -321,14 +323,14 @@ public class Playlist extends ArrayList<Track> {
             for (int i = 0; i < size(); i++) {
                 Track track = get(i);
                 int index = i + 1;
-                if (track.isFile()) {
-                    pw.printf("File%d=%s\n", index, track.getFile().getAbsolutePath());
+                if (track.getTrackData().isFile()) {
+                    pw.printf("File%d=%s\n", index, track.getTrackData().getFile().getAbsolutePath());
                     pw.printf("Title%d=%s\n", index, expression.eval(track));
                     pw.printf("Length%d=%s\n", index, (int) AudioMath.samplesToMillis(
-                            track.getTotalSamples(),
-                            track.getSampleRate()) / 1000);
-                } else if (track.isStream()) {
-                    pw.printf("File%d=%s\n", index, track.getLocation().normalize());
+                            track.getTrackData().getTotalSamples(),
+                            track.getTrackData().getSampleRate()) / 1000);
+                } else if (track.getTrackData().isStream()) {
+                    pw.printf("File%d=%s\n", index, track.getTrackData().getLocation().normalize());
                 }
                 pw.println();
             }
@@ -376,9 +378,9 @@ public class Playlist extends ArrayList<Track> {
                     String title = uri.getPath();
                     if (Util.isEmpty(title))
                         title = uri.getHost();
-                    track.setMeta("title", title);
-                    track.setLocation(uri.toString());
-                    track.setTotalSamples(-1);
+                    track.getTrackData().addTitle(title);
+                    track.getTrackData().setLocation(uri.toString());
+                    track.getTrackData().setTotalSamples(-1);
                     temp.add(track);
                 } else {
                     File file = null;
@@ -409,7 +411,7 @@ public class Playlist extends ArrayList<Track> {
         Collections.sort(temp, new Comparator<Track>() {
             @Override
             public int compare(Track o1, Track o2) {
-                return o1.getLocation().compareTo(o2.getLocation());
+                return o1.getTrackData().getLocation().compareTo(o2.getTrackData().getLocation());
             }
         });
         TrackDataCache cache = TrackDataCache.getInstance();
@@ -543,9 +545,9 @@ public class Playlist extends ArrayList<Track> {
     public void removeDeadItems() {
         for (Iterator it = this.iterator(); it.hasNext();) {
             Track track = (Track) it.next();
-            if (track.getLocation() == null)
+            if (track.getTrackData().getLocation() == null)
                 continue;
-            if (track.isFile() && !track.getFile().exists()) {
+            if (track.getTrackData().isFile() && !track.getTrackData().getFile().exists()) {
                 it.remove();
             }
         }
@@ -556,14 +558,14 @@ public class Playlist extends ArrayList<Track> {
         ArrayList<Track> dup = new ArrayList<Track>();
         for (int i = 0; i < size() - 1; i++) {
             Track t1 = get(i);
-            URI l1 = t1.getLocation();
+            URI l1 = t1.getTrackData().getLocation();
             if (l1 == null)
                 continue;
             for (int j = i + 1; j < size(); j++) {
                 Track t2 = get(j);
 
-                if (l1.equals(t2.getLocation()) &&
-                        t1.getSubsongIndex() == t2.getSubsongIndex()) {
+                if (l1.equals(t2.getTrackData().getLocation()) &&
+                        t1.getTrackData().getSubsongIndex() == t2.getTrackData().getSubsongIndex()) {
                     dup.add(t2);
                 }
             }

@@ -335,10 +335,10 @@ public class ConverterDialog extends JDialog {
             try {
                 Track track = converter.getTrack();
                 String status = "Input: ";
-                if (track.isFile())
-                    status += track.getFile().getAbsolutePath();
+                if (track.getTrackData().isFile())
+                    status += track.getTrackData().getFile().getAbsolutePath();
                 else
-                    status += track.getLocation().toString();
+                    status += track.getTrackData().getLocation().toString();
 
                 status += "\nOutput: ";
                 status += converter.getOutput().getAbsolutePath();
@@ -374,7 +374,7 @@ public class ConverterDialog extends JDialog {
                     converter.getElapsed() / 1000f, 0);
             String estimated = Util.samplesToTime(
                     (long) converter.getEstimated(),
-                    converter.getTrack().getSampleRate(), 0);
+                    converter.getTrack().getTrackData().getSampleRate(), 0);
             sb.setLength(0);
             formatter.format("Converting. Elapsed: %s Estimated: %s Speed: %.2fx",
                     elapsed, estimated, converter.getSpeed());

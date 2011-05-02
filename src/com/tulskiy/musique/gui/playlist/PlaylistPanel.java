@@ -134,7 +134,7 @@ public class PlaylistPanel extends JPanel {
             @Override
             public void onEvent(PlayerEvent e) {
                 Track track = player.getTrack();
-                if (track != null && track.isStream()) {
+                if (track != null && track.getTrackData().isStream()) {
                     update.start();
                 } else {
                     update.stop();
@@ -309,7 +309,7 @@ public class PlaylistPanel extends JPanel {
                 Track firstVisibleTrack;
                 do {
                     firstVisibleTrack = playlist.get(row++);
-                } while (firstVisibleTrack.getLocation() == null);
+                } while (firstVisibleTrack.getTrackData().getLocation() == null);
 
                 JMenuItem src = (JMenuItem) e.getSource();
                 Integer index = (Integer) src.getClientProperty("index");

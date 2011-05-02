@@ -23,6 +23,8 @@ import com.tulskiy.musique.playlist.Track;
 import java.io.*;
 import java.util.List;
 
+import org.jaudiotagger.tag.Tag;
+
 /**
  * @Author: Denis Tulskiy
  * @Date: 29.06.2009
@@ -32,12 +34,11 @@ public class CUEFileReader extends AudioFileReader {
 
     public void read(File file, List<Track> list) {
         Track track = new Track();
-        track.setLocation(file.toURI().toString());
+        track.getTrackData().setLocation(file.toURI().toString());
         if (cueParser == null)
             cueParser = new CUEParser();
         try {
-            LineNumberReader numberReader = new LineNumberReader(
-                    new InputStreamReader(
+            LineNumberReader numberReader = new LineNumberReader(new InputStreamReader(
                             new FileInputStream(file), defaultCharset));
             cueParser.parse(list, track, numberReader, false);
         } catch (FileNotFoundException e) {

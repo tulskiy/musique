@@ -49,12 +49,12 @@ public class MP4AACDecoder implements Decoder {
     @Override
     public boolean open(Track track) {
         try {
-            is = new FileInputStream(track.getFile());
+            is = new FileInputStream(track.getTrackData().getFile());
             sampleBuffer = new SampleBuffer();
             initDecoder(0);
             return true;
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Error opening file " + track.getFile().getAbsolutePath(), e);
+            logger.log(Level.WARNING, "Error opening file " + track.getTrackData().getFile().getAbsolutePath(), e);
         }
         return false;
     }

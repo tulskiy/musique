@@ -17,20 +17,26 @@
 
 package com.tulskiy.musique.audio.formats.mp3;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Map.Entry;
+
+import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.tag.FieldDataInvalidException;
+import org.jaudiotagger.tag.KeyNotFoundException;
+import org.jaudiotagger.tag.TagField;
+import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.id3.ID3v11Tag;
+import org.jaudiotagger.tag.id3.ID3v24Tag;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
+
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.AudioTagWriter;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
 import com.tulskiy.musique.playlist.Track;
-import org.jaudiotagger.audio.mp3.MP3File;
-import org.jaudiotagger.tag.TagFieldKey;
-import org.jaudiotagger.tag.id3.AbstractTag;
-import org.jaudiotagger.tag.id3.ID3v11Tag;
-import org.jaudiotagger.tag.id3.ID3v23Tag;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
-import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
-
-import java.io.File;
-import java.io.IOException;
+import com.tulskiy.musique.playlist.TrackData;
 
 /**
  * @Author: Denis Tulskiy
@@ -41,7 +47,8 @@ public class MP3TagWriter extends AudioTagWriter {
 
     @Override
     public void write(Track track) {
-        File file = track.getFile();
+    	TrackData trackData = track.getTrackData();
+        File file = trackData.getFile();
         TextEncoding.getInstanceOf().setDefaultNonUnicode(AudioFileReader.getDefaultCharset().name());
 
         if (/*song.getCustomHeaderField("hasApeTag") != null*/false) {
@@ -59,11 +66,7 @@ public class MP3TagWriter extends AudioTagWriter {
                 if (id3v2tag == null) {
                     id3v2tag = new ID3v24Tag();
                 }
-                copyCommonFields(id3v2tag, track);
-
-                id3v2tag.setTrack(track.getTrack());
-                id3v2tag.set(id3v2tag.createTagField(TagFieldKey.DISC_NO, track.getDisc()));
-                id3v2tag.set(id3v2tag.createTagField(TagFieldKey.ALBUM_ARTIST, track.getMeta("albumArtist")));
+                copyTagFields(id3v2tag, track);
 
                 ID3v11Tag id3v1Tag = new ID3v11Tag(id3v2tag);
                 mp3File.setID3v1Tag(id3v1Tag);
@@ -80,4 +83,28 @@ public class MP3TagWriter extends AudioTagWriter {
     public boolean isFileSupported(String ext) {
         return ext.equalsIgnoreCase("mp3");
     }
+
+    // @see AudioTagWriter#copyTagFields(Tag, AbstractTag, Track) as source
+    public void copyTagFields(ID3v24Tag tag, Track track) throws KeyNotFoundException, FieldDataInvalidException {
+    	TagField field;
+    	boolean firstValue;
+
+    	Iterator<Entry<TagFieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
+		while (entries.hasNext()) {
+			Entry<TagFieldKey, Set<String>> entry = entries.next();
+			Iterator<String> values = entry.getValue().iterator();
+			firstValue = true;
+			while (values.hasNext()) {
+				field = tag.createTagField(entry.getKey(), values.next());
+				if (firstValue) {
+					tag.set(field);
+					firstValue = false;
+				}
+				else {
+					tag.add(field);
+				}
+			}
+		}
+    }
+
 }

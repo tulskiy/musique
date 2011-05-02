@@ -17,25 +17,52 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.tulskiy.musique.gui.components.GroupTable;
-import com.tulskiy.musique.gui.playlist.PlaylistTable;
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.TrackIO;
-import com.tulskiy.musique.util.Util;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+
+import org.jaudiotagger.tag.TagFieldKey;
+
+import com.tulskiy.musique.gui.components.GroupTable;
+import com.tulskiy.musique.gui.playlist.PlaylistTable;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
+import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.util.Util;
 
 /**
  * Author: Denis Tulskiy
@@ -124,7 +151,8 @@ public class TracksInfoDialog extends JDialog {
                 HashMap<File, ArrayList<Track>> cues = new HashMap<File, ArrayList<Track>>();
 
                 for (Track track : tracks) {
-                    if (!track.isFile()) {
+                	TrackData trackData = track.getTrackData();
+                    if (!trackData.isFile()) {
                         processed++;
                         continue;
                     }
@@ -132,12 +160,12 @@ public class TracksInfoDialog extends JDialog {
                     if (abort)
                         break;
 
-                    if (track.isCue()) {
+                    if (trackData.isCue()) {
                         File file;
-                        if (track.isCueEmbedded()) {
-                            file = track.getFile();
+                        if (trackData.isCueEmbedded()) {
+                            file = trackData.getFile();
                         } else {
-                            file = new File(track.getCueLocation());
+                            file = new File(trackData.getCueLocation());
                         }
 
                         if (!cues.containsKey(file)) {
@@ -147,13 +175,13 @@ public class TracksInfoDialog extends JDialog {
                         cues.get(file).add(track);
                         continue;
                     }
-                    status = track.getFile().getName();
+                    status = trackData.getFile().getName();
+                    // TODO no hardcodes, rewrite
                     String[] writeValues = metaModel.writeValues;
                     for (int i = 0; i < writeValues.length; i++) {
                         String value = writeValues[i];
                         if (value != null) {
-                            String key = metaModel.tagsMeta[i];
-                            track.setMeta(key, value);
+                            trackData.addTagFieldValues(metaModel.TAG_FIELD_KEYS[i], value);
                         }
                     }
                     TrackIO.write(track);
@@ -319,13 +347,14 @@ public class TracksInfoDialog extends JDialog {
             HashMap<String, Integer> sampleRate = new HashMap<String, Integer>();
             HashSet<String> files = new HashSet<String>();
             for (Track track : tracks) {
-                if (track.isFile()) {
-                    fileSize += track.getFile().length();
-                    length += track.getTotalSamples() / (double) track.getSampleRate();
-                    files.add(track.getFile().getAbsolutePath());
-                    increment(formats, track.getCodec());
-                    increment(channels, track.getChannelsAsString());
-                    increment(sampleRate, track.getSampleRate() + " Hz");
+            	TrackData trackData = track.getTrackData();
+                if (trackData.isFile()) {
+                    fileSize += trackData.getFile().length();
+                    length += trackData.getTotalSamples() / (double) trackData.getSampleRate();
+                    files.add(trackData.getFile().getAbsolutePath());
+                    increment(formats, trackData.getCodec());
+                    increment(channels, trackData.getChannelsAsString());
+                    increment(sampleRate, trackData.getSampleRate() + " Hz");
                 }
             }
 
@@ -373,22 +402,23 @@ public class TracksInfoDialog extends JDialog {
         }
 
         private void fillSingleTrack(Track track) {
-            list.add(new Entry("Location", track.getLocation().toString().replaceAll("%\\d\\d", " ")));
-            if (track.isFile())
-                list.add(new Entry("File Size (bytes)", track.getFile().length()));
-            if (track.getTotalSamples() >= 0)
-                list.add(new Entry("Length", Util.samplesToTime(track.getTotalSamples(), track.getSampleRate(), 3) +
-                                             " (" + track.getTotalSamples() + " samples)"));
-            list.add(new Entry("Subsong Index", track.getSubsongIndex()));
-            if (track.isCue()) {
-                list.add(new Entry("Cue Embedded", track.isCueEmbedded()));
-                if (!track.isCueEmbedded()) {
-                    list.add(new Entry("Cue Path", track.getCueLocation()));
+        	TrackData trackData = track.getTrackData();
+            list.add(new Entry("Location", trackData.getLocation().toString().replaceAll("%\\d\\d", " ")));
+            if (trackData.isFile())
+                list.add(new Entry("File Size (bytes)", trackData.getFile().length()));
+            if (trackData.getTotalSamples() >= 0)
+                list.add(new Entry("Length", Util.samplesToTime(trackData.getTotalSamples(), trackData.getSampleRate(), 3) +
+                                             " (" + trackData.getTotalSamples() + " samples)"));
+            list.add(new Entry("Subsong Index", trackData.getSubsongIndex()));
+            if (trackData.isCue()) {
+                list.add(new Entry("Cue Embedded", trackData.isCueEmbedded()));
+                if (!trackData.isCueEmbedded()) {
+                    list.add(new Entry("Cue Path", trackData.getCueLocation()));
                 }
             }
-            if (track.getSampleRate() > 0)
-                list.add(new Entry("Sample Rate", track.getSampleRate() + " Hz"));
-            list.add(new Entry("Channels", track.getChannels()));
+            if (trackData.getSampleRate() > 0)
+                list.add(new Entry("Sample Rate", trackData.getSampleRate() + " Hz"));
+            list.add(new Entry("Channels", trackData.getChannels()));
         }
 
         @Override
@@ -412,27 +442,24 @@ public class TracksInfoDialog extends JDialog {
     }
 
     private class MetadataModel extends AbstractTableModel {
-        private final String[] tagsMeta = {
-                "artist", "title", "album", "year", "genre",
-                "albumArtist", "track", "totalTracks",
-                "discNumber", "totalDiscs"
-        };
+    	
+    	public final TagFieldKey[] TAG_FIELD_KEYS = TagFieldKey.values();
 
-        private String[] readValues = new String[tagsMeta.length];
-        private String[] writeValues = new String[tagsMeta.length];
-        private boolean[] isMultiple = new boolean[tagsMeta.length];
+    	private String[] readValues = new String[TAG_FIELD_KEYS.length];
+        private String[] writeValues = new String[TAG_FIELD_KEYS.length];
+        private boolean[] isMultiple = new boolean[TAG_FIELD_KEYS.length];
 
         private MetadataModel(List<Track> tracks) {
             loadTracks(tracks);
         }
 
         protected void loadTracks(List<Track> tracks) {
-            for (int i = 0; i < tagsMeta.length; i++) {
-                String meta = tagsMeta[i];
+            for (int i = 0; i < TAG_FIELD_KEYS.length; i++) {
+                TagFieldKey key = TAG_FIELD_KEYS[i];
                 LinkedHashSet<String> set = new LinkedHashSet<String>();
 
                 for (Track track : tracks) {
-                    set.add(track.getMeta(meta));
+                    set.addAll(track.getTrackData().getTagFieldValuesSafeAsSet(key));
                 }
                 set.remove(null);
 
@@ -448,7 +475,7 @@ public class TracksInfoDialog extends JDialog {
 
         @Override
         public int getRowCount() {
-            return tagsMeta.length;
+            return TAG_FIELD_KEYS.length;
         }
 
         @Override
@@ -458,11 +485,11 @@ public class TracksInfoDialog extends JDialog {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if (rowIndex < 0 || rowIndex > tagsMeta.length)
+            if (rowIndex < 0 || rowIndex > TAG_FIELD_KEYS.length)
                 return null;
 
             if (columnIndex == 0)
-                return Util.humanize(tagsMeta[rowIndex]);
+                return Util.humanize(TAG_FIELD_KEYS[rowIndex].toString());
             else
                 return readValues[rowIndex];
         }

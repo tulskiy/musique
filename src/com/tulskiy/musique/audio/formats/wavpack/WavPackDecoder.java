@@ -44,8 +44,8 @@ public class WavPackDecoder implements Decoder {
 
     public boolean open(Track track) {
         try {
-            logger.fine("Opening file: " + track.getFile());
-            ras = new RandomAccessFile(track.getFile(), "r");
+            logger.fine("Opening file: " + track.getTrackData().getFile());
+            ras = new RandomAccessFile(track.getTrackData().getFile(), "r");
             wpc = WavPackUtils.WavpackOpenFileInput(ras);
             if (wpc.isError()) {
                 logger.warning("WavPack error: " + wpc.getErrorMessage());
