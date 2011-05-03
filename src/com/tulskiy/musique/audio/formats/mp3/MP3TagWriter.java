@@ -37,6 +37,7 @@ import com.tulskiy.musique.audio.AudioTagWriter;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
+import com.tulskiy.musique.util.Util;
 
 /**
  * @Author: Denis Tulskiy
@@ -87,6 +88,7 @@ public class MP3TagWriter extends AudioTagWriter {
     // @see AudioTagWriter#copyTagFields(Tag, AbstractTag, Track) as source
     public void copyTagFields(ID3v24Tag tag, Track track) throws KeyNotFoundException, FieldDataInvalidException {
     	TagField field;
+    	String value;
     	boolean firstValue;
 
     	Iterator<Entry<TagFieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
@@ -95,13 +97,19 @@ public class MP3TagWriter extends AudioTagWriter {
 			Iterator<String> values = entry.getValue().iterator();
 			firstValue = true;
 			while (values.hasNext()) {
-				field = tag.createTagField(entry.getKey(), values.next());
-				if (firstValue) {
-					tag.set(field);
-					firstValue = false;
+				value = values.next();
+				if (Util.isEmpty(value)) {
+					tag.deleteTagField(entry.getKey());
 				}
 				else {
-					tag.add(field);
+					field = tag.createTagField(entry.getKey(), value);
+					if (firstValue) {
+						tag.set(field);
+						firstValue = false;
+					}
+					else {
+						tag.add(field);
+					}
 				}
 			}
 		}

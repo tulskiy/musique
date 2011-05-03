@@ -76,6 +76,7 @@ public abstract class AudioFileReader {
 
     public abstract boolean isFileSupported(String ext);
 
+    // in case of logic change, review MP3TagReader and APETagProcessor
     protected void copyCommonTagFields(Tag tag, Track track) throws IOException {
     	TrackData trackData = track.getTrackData();
         if (tag != null && track != null) {

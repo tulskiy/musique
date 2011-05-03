@@ -50,6 +50,7 @@ public abstract class AudioTagWriter {
      * @throws KeyNotFoundException
      * @throws FieldDataInvalidException
      */
+    // in case of logic change, review MP3TagWriter and APETagProcessor
     // TODO take a look if refactoring to AbstractTag only fits (in format specific writers)
     public void copyTagFields(Tag tag, AbstractTag abstractTag, Track track)
     		throws KeyNotFoundException, FieldDataInvalidException {
