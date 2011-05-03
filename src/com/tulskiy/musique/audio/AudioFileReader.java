@@ -84,8 +84,12 @@ public abstract class AudioFileReader {
     			try {
     				fields = tag.get(key);
     			}
-    			catch (KeyNotFoundException e) {
+    			catch (KeyNotFoundException knfe) {
     				// TODO review
+    				continue;
+    			}
+    			catch (NullPointerException npe) {
+    				// TODO review workaround for mp4tag (throws nullpointer if no mapping found for generic key)
     				continue;
     			}
     			for (TagField field : fields) {
