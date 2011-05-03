@@ -45,13 +45,13 @@ public class APETagProcessor {
             ras = new RandomAccessFile(trackData.getFile(), "r");
             APETag tag = new APETag(ras, true);
             if (tag.GetHasAPETag() || tag.GetHasID3Tag()) {
-            	trackData.setTagFieldValues(TagFieldKey.ARTIST, tag.GetFieldString(APETag.APE_TAG_FIELD_ARTIST));
-            	trackData.setTagFieldValues(TagFieldKey.ALBUM, tag.GetFieldString(APETag.APE_TAG_FIELD_ALBUM));
-            	trackData.setTagFieldValues(TagFieldKey.TITLE, tag.GetFieldString(APETag.APE_TAG_FIELD_TITLE));
-            	trackData.setTagFieldValues(TagFieldKey.YEAR, tag.GetFieldString(APETag.APE_TAG_FIELD_YEAR));
-            	trackData.setTagFieldValues(TagFieldKey.GENRE, tag.GetFieldString(APETag.APE_TAG_FIELD_GENRE));
-            	trackData.setTagFieldValues(TagFieldKey.COMMENT, tag.GetFieldString(APETag.APE_TAG_FIELD_COMMENT));
-            	trackData.setTagFieldValues(TagFieldKey.TRACK, tag.GetFieldString(APETag.APE_TAG_FIELD_TRACK));
+            	setMusiqueTagFieldValue(tag, trackData, TagFieldKey.ARTIST, APETag.APE_TAG_FIELD_ARTIST);
+            	setMusiqueTagFieldValue(tag, trackData, TagFieldKey.ALBUM, APETag.APE_TAG_FIELD_ALBUM);
+            	setMusiqueTagFieldValue(tag, trackData, TagFieldKey.TITLE, APETag.APE_TAG_FIELD_TITLE);
+            	setMusiqueTagFieldValue(tag, trackData, TagFieldKey.YEAR, APETag.APE_TAG_FIELD_YEAR);
+            	setMusiqueTagFieldValue(tag, trackData, TagFieldKey.GENRE, APETag.APE_TAG_FIELD_GENRE);
+            	setMusiqueTagFieldValue(tag, trackData, TagFieldKey.COMMENT, APETag.APE_TAG_FIELD_COMMENT);
+            	setMusiqueTagFieldValue(tag, trackData, TagFieldKey.TRACK, APETag.APE_TAG_FIELD_TRACK);
 
             	setCustomMusiqueTagFieldValue(tag, trackData, TagFieldKey.DISC_NO);
             	// TODO add TRACK/DISC TOTAL fields
@@ -78,13 +78,14 @@ public class APETagProcessor {
         try {
             ras = new RandomAccessFile(trackData.getFile(), "rw");
             APETag tag = new APETag(ras, true);
-            tag.SetFieldString(APETag.APE_TAG_FIELD_ARTIST, trackData.getFirstTagFieldValue(TagFieldKey.ARTIST));
-            tag.SetFieldString(APETag.APE_TAG_FIELD_ALBUM, trackData.getFirstTagFieldValue(TagFieldKey.ALBUM));
-            tag.SetFieldString(APETag.APE_TAG_FIELD_TITLE, trackData.getFirstTagFieldValue(TagFieldKey.TITLE));
-            tag.SetFieldString(APETag.APE_TAG_FIELD_YEAR, trackData.getFirstTagFieldValue(TagFieldKey.YEAR));
-            tag.SetFieldString(APETag.APE_TAG_FIELD_GENRE, trackData.getFirstTagFieldValue(TagFieldKey.GENRE));
-            tag.SetFieldString(APETag.APE_TAG_FIELD_COMMENT, trackData.getFirstTagFieldValue(TagFieldKey.COMMENT));
-            tag.SetFieldString(APETag.APE_TAG_FIELD_TRACK, trackData.getFirstTagFieldValue(TagFieldKey.TRACK));
+
+            setApeTagFieldValue(tag, trackData, TagFieldKey.ARTIST, APETag.APE_TAG_FIELD_ARTIST);
+            setApeTagFieldValue(tag, trackData, TagFieldKey.ALBUM, APETag.APE_TAG_FIELD_ALBUM);
+            setApeTagFieldValue(tag, trackData, TagFieldKey.TITLE, APETag.APE_TAG_FIELD_TITLE);
+            setApeTagFieldValue(tag, trackData, TagFieldKey.YEAR, APETag.APE_TAG_FIELD_YEAR);
+            setApeTagFieldValue(tag, trackData, TagFieldKey.GENRE, APETag.APE_TAG_FIELD_GENRE);
+            setApeTagFieldValue(tag, trackData, TagFieldKey.COMMENT, APETag.APE_TAG_FIELD_COMMENT);
+            setApeTagFieldValue(tag, trackData, TagFieldKey.TRACK, APETag.APE_TAG_FIELD_TRACK);
 
             setCustomApeTagFieldValue(tag, trackData, TagFieldKey.DISC_NO);
         	// TODO add TRACK/DISC TOTAL fields
@@ -92,6 +93,7 @@ public class APETagProcessor {
             setCustomApeTagFieldValue(tag, trackData, TagFieldKey.RECORD_LABEL);
             setCustomApeTagFieldValue(tag, trackData, TagFieldKey.CATALOG_NO);
 
+            // TODO review this hardcoded const
             tag.SetFieldString("CUESHEET", trackData.getCueSheet());
 
             tag.Save();
@@ -104,12 +106,29 @@ public class APETagProcessor {
         return false;
     }
 
-    private void setCustomMusiqueTagFieldValue(APETag tag, TrackData trackData, TagFieldKey key) throws IOException {
-    	trackData.setTagFieldValues(key, tag.GetFieldString(key.toString()));
+    private void setMusiqueTagFieldValue(APETag tag, TrackData trackData, TagFieldKey musiqueKey, String apeKey) throws IOException {
+    	String value = tag.GetFieldString(apeKey);
+    	if (value != null) {
+    		trackData.setTagFieldValues(musiqueKey, value);
+    	}
     }
 
-    private void setCustomApeTagFieldValue(APETag tag, TrackData trackData, TagFieldKey key) throws IOException {
-    	tag.SetFieldString(key.toString(), trackData.getFirstTagFieldValue(key));
+    private void setApeTagFieldValue(APETag tag, TrackData trackData, TagFieldKey musiqueKey, String apeKey) throws IOException {
+    	String value = trackData.getFirstTagFieldValue(musiqueKey);
+    	if (value != null) {
+    		tag.SetFieldString(apeKey, value);
+    	}
+    	else if (tag.GetFieldString(apeKey) != null) {
+    		tag.RemoveField(apeKey);
+    	}
+    }
+
+    private void setCustomMusiqueTagFieldValue(APETag tag, TrackData trackData, TagFieldKey musiqueKey) throws IOException {
+    	setMusiqueTagFieldValue(tag, trackData, musiqueKey, musiqueKey.toString());
+    }
+
+    private void setCustomApeTagFieldValue(APETag tag, TrackData trackData, TagFieldKey musiqueKey) throws IOException {
+    	setApeTagFieldValue(tag, trackData, musiqueKey, musiqueKey.toString());
     }
 
 }
