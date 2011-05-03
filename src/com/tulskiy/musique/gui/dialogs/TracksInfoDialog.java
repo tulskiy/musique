@@ -31,9 +31,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -176,13 +180,8 @@ public class TracksInfoDialog extends JDialog {
                         continue;
                     }
                     status = trackData.getFile().getName();
-                    // TODO no hardcodes, rewrite
-                    String[] writeValues = metaModel.writeValues;
-                    for (int i = 0; i < writeValues.length; i++) {
-                        String value = writeValues[i];
-                        if (value != null) {
-                            trackData.addTagFieldValues(metaModel.TAG_FIELD_KEYS[i], value);
-                        }
+                    for (TrackInfoItem item : metaModel.trackInfoItems) {
+                    	item.updateTracks();
                     }
                     TrackIO.write(track);
                     processed++;
@@ -240,7 +239,7 @@ public class TracksInfoDialog extends JDialog {
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 TableModel tableModel = table.getModel();
                 if (tableModel instanceof MetadataModel) {
-                    if (((MetadataModel) tableModel).isMultiple[row]) {
+                    if (((MetadataModel) tableModel).trackInfoItems.get(row).isMultiple()) {
                         value = "";
                     }
                 }
@@ -261,7 +260,7 @@ public class TracksInfoDialog extends JDialog {
                 TableModel tableModel = table.getModel();
                 if (tableModel instanceof MetadataModel) {
                     String value = (String) table.getCellEditor().getCellEditorValue();
-                    if (Util.isEmpty(value) && ((MetadataModel) tableModel).isMultiple[table.getEditingRow()]) {
+                    if (Util.isEmpty(value) && ((MetadataModel) tableModel).trackInfoItems.get(table.getEditingRow()).isMultiple()) {
                         super.fireEditingCanceled();
                         return;
                     }
@@ -441,41 +440,91 @@ public class TracksInfoDialog extends JDialog {
         }
     }
 
+    // TODO add support of MultiValue editing
+    private class TrackInfoItem {
+
+    	private TagFieldKey key;
+    	private List<Track> tracks;
+
+    	private Set<String> allValues;
+    	private boolean isUpdated;
+    	
+    	public TrackInfoItem(TagFieldKey key, List<Track> tracks) {
+    		this.key = key;
+    		this.tracks = tracks;
+    		
+    		allValues = new LinkedHashSet<String>();
+    		for (Track track : tracks) {
+    			allValues.addAll(track.getTrackData().getTagFieldValuesSafeAsSet(key));
+    		}
+    		
+    		isUpdated = false;
+    	}
+    	
+    	public TagFieldKey getKey() {
+    		return key;
+    	}
+    	
+    	public void setCommonValue(String value) {
+    		allValues.clear();
+    		allValues.add(value);
+    		isUpdated = true;
+    	}
+    	
+    	public void updateTracks() {
+    		if (isUpdated) {
+	    		for (Track track : tracks) {
+	    			track.getTrackData().setTagFieldValues(key, allValues);
+	    		}
+    		}
+    	}
+    	
+    	public boolean isMultiple() {
+    		return allValues.size() > 1;
+    	}
+    	
+    	public String toString() {
+    		String result = null;
+
+    		if (allValues.size() > 1) {
+    			result = "<multiple values> " + allValues.toString();
+            }
+            else if (allValues.size() == 1) {
+            	result = allValues.iterator().next();
+            }
+    		
+    		return result;
+    	}
+
+    }
+
     private class MetadataModel extends AbstractTableModel {
     	
-    	public final TagFieldKey[] TAG_FIELD_KEYS = TagFieldKey.values();
-
-    	private String[] readValues = new String[TAG_FIELD_KEYS.length];
-        private String[] writeValues = new String[TAG_FIELD_KEYS.length];
-        private boolean[] isMultiple = new boolean[TAG_FIELD_KEYS.length];
+    	private List<TrackInfoItem> trackInfoItems = new LinkedList<TrackInfoItem>();
 
         private MetadataModel(List<Track> tracks) {
             loadTracks(tracks);
         }
 
         protected void loadTracks(List<Track> tracks) {
-            for (int i = 0; i < TAG_FIELD_KEYS.length; i++) {
-                TagFieldKey key = TAG_FIELD_KEYS[i];
-                LinkedHashSet<String> set = new LinkedHashSet<String>();
-
-                for (Track track : tracks) {
-                    set.addAll(track.getTrackData().getTagFieldValuesSafeAsSet(key));
-                }
-                set.remove(null);
-
-                isMultiple[i] = false;
-                if (set.size() > 1) {
-                    readValues[i] = "<multiple values> " + set.toString();
-                    isMultiple[i] = true;
-                } else if (set.size() == 1) {
-                    readValues[i] = set.iterator().next();
-                }
+        	Set<TagFieldKey> usedKeys = new LinkedHashSet<TagFieldKey>();
+            for (int i = 0; i < tracks.size(); i++) {
+            	Iterator<Entry<TagFieldKey, Set<String>>> entries =
+            			tracks.get(i).getTrackData().getAllTagFieldValuesIterator();
+            	while (entries.hasNext()) {
+            		Entry<TagFieldKey, Set<String>> entry = entries.next();
+            		if (!usedKeys.contains(entry.getKey())) {
+            			usedKeys.add(entry.getKey());
+            			trackInfoItems.add(new TrackInfoItem(entry.getKey(), tracks));
+            		}
+            	}
             }
+            // TODO comparator to sort tag fields in user friendly way (ARTIST, then ALBUM, then YEAR, etc.)
         }
 
         @Override
         public int getRowCount() {
-            return TAG_FIELD_KEYS.length;
+            return trackInfoItems.size();
         }
 
         @Override
@@ -485,13 +534,13 @@ public class TracksInfoDialog extends JDialog {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if (rowIndex < 0 || rowIndex > TAG_FIELD_KEYS.length)
+            if (rowIndex < 0 || rowIndex > trackInfoItems.size())
                 return null;
 
             if (columnIndex == 0)
-                return Util.humanize(TAG_FIELD_KEYS[rowIndex].toString());
+                return Util.humanize(trackInfoItems.get(rowIndex).getKey().toString());
             else
-                return readValues[rowIndex];
+                return trackInfoItems.get(rowIndex).toString();
         }
 
         @Override
@@ -501,9 +550,7 @@ public class TracksInfoDialog extends JDialog {
 
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            writeValues[rowIndex] = (String) aValue;
-            readValues[rowIndex] = (String) aValue;
-            isMultiple[rowIndex] = false;
+        	trackInfoItems.get(rowIndex).setCommonValue((String) aValue);
         }
 
         @Override
