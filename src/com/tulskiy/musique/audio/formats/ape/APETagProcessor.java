@@ -19,6 +19,7 @@ package com.tulskiy.musique.audio.formats.ape;
 
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
+import com.tulskiy.musique.util.Util;
 
 import davaguine.jmac.info.APETag;
 import davaguine.jmac.info.ID3Tag;
@@ -115,7 +116,7 @@ public class APETagProcessor {
 
     private void setApeTagFieldValue(APETag tag, TrackData trackData, TagFieldKey musiqueKey, String apeKey) throws IOException {
     	String value = trackData.getFirstTagFieldValue(musiqueKey);
-    	if (value != null) {
+    	if (!Util.isEmpty(value)) {
     		tag.SetFieldString(apeKey, value);
     	}
     	else if (tag.GetFieldString(apeKey) != null) {

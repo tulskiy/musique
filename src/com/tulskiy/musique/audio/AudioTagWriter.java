@@ -29,6 +29,7 @@ import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.TagFieldKey;
 
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.util.Util;
 
 /**
  * @Author: Denis Tulskiy
@@ -53,6 +54,7 @@ public abstract class AudioTagWriter {
     public void copyTagFields(Tag tag, AbstractTag abstractTag, Track track)
     		throws KeyNotFoundException, FieldDataInvalidException {
     	TagField field;
+    	String value;
     	boolean firstValue;
 
     	Iterator<Entry<TagFieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
@@ -61,13 +63,19 @@ public abstract class AudioTagWriter {
 			Iterator<String> values = entry.getValue().iterator();
 			firstValue = true;
 			while (values.hasNext()) {
-				field = abstractTag.createTagField(entry.getKey(), values.next());
-				if (firstValue) {
-					tag.set(field);
-					firstValue = false;
+				value = values.next();
+				if (Util.isEmpty(value)) {
+					tag.deleteTagField(entry.getKey());
 				}
 				else {
-					tag.add(field);
+					field = abstractTag.createTagField(entry.getKey(), value);
+					if (firstValue) {
+						tag.set(field);
+						firstValue = false;
+					}
+					else {
+						tag.add(field);
+					}
 				}
 			}
 		}
