@@ -509,8 +509,11 @@ public class TracksInfoDialog extends JDialog {
         protected void loadTracks(List<Track> tracks) {
         	Set<TagFieldKey> usedKeys = new LinkedHashSet<TagFieldKey>();
             for (int i = 0; i < tracks.size(); i++) {
+            	TrackData trackData = tracks.get(i).getTrackData();
+            	trackData.populateWithEmptyCommonTagFields();
+
             	Iterator<Entry<TagFieldKey, Set<String>>> entries =
-            			tracks.get(i).getTrackData().getAllTagFieldValuesIterator();
+            			trackData.getAllTagFieldValuesIterator();
             	while (entries.hasNext()) {
             		Entry<TagFieldKey, Set<String>> entry = entries.next();
             		if (!usedKeys.contains(entry.getKey())) {

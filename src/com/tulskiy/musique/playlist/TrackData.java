@@ -42,8 +42,15 @@ import com.tulskiy.musique.util.Util;
  */
 public class TrackData implements Cloneable {
 
-	// common jaudiotagger tag field values
+	// generic jaudiotagger tag field values
 	private Map<TagFieldKey, Set<String>> tagFields = new HashMap<TagFieldKey, Set<String>>();
+	
+	// common tag fields (to be displayed in TrackInfoDialog even if missed)
+	private static final TagFieldKey[] COMMON_TAG_FIELDS = {
+			TagFieldKey.ARTIST, TagFieldKey.ALBUM_ARTIST, TagFieldKey.ALBUM,
+			TagFieldKey.YEAR, TagFieldKey.TITLE, TagFieldKey.TRACK, TagFieldKey.DISC_NO,
+			TagFieldKey.RECORD_LABEL, TagFieldKey.CATALOG_NO
+	};
 	
 	// meta fields
     private String trackNumber;
@@ -164,6 +171,11 @@ public class TrackData implements Cloneable {
     
     // TODO add String.intern() support
     public void setTagFieldValues(TagFieldKey key, Set<String> values) {
+    	// skipping technical info
+    	if (TagFieldKey.ENCODER.equals(key)) {
+    		return;
+    	}
+
     	tagFields.put(key, values);
     }
     
@@ -178,7 +190,7 @@ public class TrackData implements Cloneable {
     public void addTagFieldValues(TagFieldKey key, Set<String> values) {
     	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
     	existingValues.addAll(values);
-    	tagFields.put(key, existingValues);
+    	setTagFieldValues(key, existingValues);
     }
     
     // TODO add String.intern() support
@@ -196,6 +208,10 @@ public class TrackData implements Cloneable {
     	}
     	
     	return null;
+    }
+    
+    public void removeTagField(TagFieldKey key) {
+    	tagFields.remove(key);
     }
 
     // ------------------- common methods ------------------- //
@@ -543,6 +559,24 @@ public class TrackData implements Cloneable {
 
     public void setDirectory(String directory) {
         this.directory = directory;
+    }
+
+    // ------------------- business logic methods ------------------- //
+    
+    public void populateWithEmptyCommonTagFields() {
+    	for (TagFieldKey key : COMMON_TAG_FIELDS) {
+    		if (getTagFieldValuesSafeAsSet(key).isEmpty()) {
+    			setTagFieldValues(key, "");
+    		}
+    	}
+    }
+    
+    public void removeEmptyCommonTagFields() {
+    	for (TagFieldKey key : COMMON_TAG_FIELDS) {
+    		if (Util.isEmpty(getFirstTagFieldValue(key))) {
+    			removeTagField(key);
+    		}
+    	}
     }
 
     // ------------------- java object methods ------------------- //
