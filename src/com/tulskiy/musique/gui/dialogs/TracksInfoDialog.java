@@ -415,9 +415,13 @@ public class TracksInfoDialog extends JDialog {
                     list.add(new Entry("Cue Path", trackData.getCueLocation()));
                 }
             }
+            list.add(new Entry("Format", trackData.getCodec()));
+            if (!Util.isEmpty(trackData.getEncoder())) {
+            	list.add(new Entry("Encoder", trackData.getEncoder()));
+            }
+            list.add(new Entry("Channels", trackData.getChannels()));
             if (trackData.getSampleRate() > 0)
                 list.add(new Entry("Sample Rate", trackData.getSampleRate() + " Hz"));
-            list.add(new Entry("Channels", trackData.getChannels()));
         }
 
         @Override

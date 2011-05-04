@@ -70,6 +70,7 @@ public class TrackData implements Cloneable {
     private boolean cueEmbedded;
     private String cueLocation;
     private String codec;
+    private String encoder;
 
     // runtime stuff
     private String cueSheet;
@@ -171,12 +172,13 @@ public class TrackData implements Cloneable {
     
     // TODO add String.intern() support
     public void setTagFieldValues(TagFieldKey key, Set<String> values) {
-    	// skipping technical info
-    	if (TagFieldKey.ENCODER.equals(key)) {
-    		return;
+    	// handle technical tags
+    	if (TagFieldKey.ENCODER.equals(key) && !values.isEmpty()) {
+    		setEncoder(values.iterator().next());
     	}
-
-    	tagFields.put(key, values);
+    	else {
+    		tagFields.put(key, values);
+    	}
     }
     
     // TODO add String.intern() support
@@ -548,6 +550,14 @@ public class TrackData implements Cloneable {
 
     public void setCodec(String codec) {
         this.codec = codec.intern();
+    }
+
+    public String getEncoder() {
+        return encoder;
+    }
+
+    public void setEncoder(String encoder) {
+        this.encoder= encoder.intern();
     }
 
     public String getDirectory() {
