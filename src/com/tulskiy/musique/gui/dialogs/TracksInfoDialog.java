@@ -501,6 +501,85 @@ public class TracksInfoDialog extends JDialog {
     	}
 
     }
+    
+    private class TrackInfoItemComparator implements Comparator<TrackInfoItem> {
+
+    	// TODO move keys to enum with human readable name and priority props
+    	// TODO add TRACK/DISC TOTAL keys
+    	private TagFieldKey[] sortedKeys = {
+    			TagFieldKey.ARTIST,
+    			TagFieldKey.ALBUM_ARTIST,
+    			TagFieldKey.TITLE,
+    			TagFieldKey.ALBUM,
+    			TagFieldKey.YEAR,
+    			TagFieldKey.DATE,
+    			TagFieldKey.COMMENT,
+    			TagFieldKey.GENRE,
+    			TagFieldKey.TRACK,
+    			TagFieldKey.DISC_NO,
+    			TagFieldKey.IS_COMPILATION,
+    			TagFieldKey.RECORD_LABEL,
+    			TagFieldKey.CATALOG_NO,
+    			TagFieldKey.LYRICS,
+    			TagFieldKey.ARTIST_SORT,
+    			TagFieldKey.ALBUM_ARTIST_SORT,
+    			TagFieldKey.ALBUM_SORT,
+    			TagFieldKey.TITLE_SORT,
+    			TagFieldKey.COMPOSER_SORT,
+    			TagFieldKey.COMPOSER,
+    			TagFieldKey.GROUPING,
+    			TagFieldKey.COVER_ART,
+    			TagFieldKey.BPM,
+    			TagFieldKey.MUSICBRAINZ_ARTISTID,
+    			TagFieldKey.MUSICBRAINZ_RELEASEID,
+    			TagFieldKey.MUSICBRAINZ_RELEASEARTISTID,
+    			TagFieldKey.MUSICBRAINZ_TRACK_ID,
+    			TagFieldKey.MUSICBRAINZ_DISC_ID,
+    			TagFieldKey.MUSICIP_ID,
+    			TagFieldKey.AMAZON_ID,
+    			TagFieldKey.MUSICBRAINZ_RELEASE_STATUS,
+    			TagFieldKey.MUSICBRAINZ_RELEASE_TYPE,
+    			TagFieldKey.MUSICBRAINZ_RELEASE_COUNTRY,
+    			TagFieldKey.ENCODER,
+    			TagFieldKey.ISRC,
+    			TagFieldKey.BARCODE,
+    			TagFieldKey.LYRICIST,
+    			TagFieldKey.CONDUCTOR,
+    			TagFieldKey.REMIXER,
+    			TagFieldKey.MOOD,
+    			TagFieldKey.MEDIA,
+    			TagFieldKey.URL_OFFICIAL_RELEASE_SITE,
+    			TagFieldKey.URL_DISCOGS_RELEASE_SITE,
+    			TagFieldKey.URL_WIKIPEDIA_RELEASE_SITE,
+    			TagFieldKey.URL_OFFICIAL_ARTIST_SITE,
+    			TagFieldKey.URL_DISCOGS_ARTIST_SITE,
+    			TagFieldKey.URL_WIKIPEDIA_ARTIST_SITE,
+    			TagFieldKey.LANGUAGE,
+    			TagFieldKey.KEY
+    	};
+
+		@Override
+		public int compare(TrackInfoItem o1, TrackInfoItem o2) {
+			int index1;
+			int index2;
+
+			for (index1 = 0; index1 < sortedKeys.length; index1++) {
+				if (sortedKeys[index1].equals(o1.getKey())) {
+					break;
+				}
+			}
+
+			for (index2 = 0; index2 < sortedKeys.length; index2++) {
+				if (sortedKeys[index2].equals(o2.getKey())) {
+					break;
+				}
+			}
+
+			return index1 - index2;
+		}
+
+   	
+    }
 
     private class MetadataModel extends AbstractTableModel {
     	
@@ -526,7 +605,7 @@ public class TracksInfoDialog extends JDialog {
             		}
             	}
             }
-            // TODO comparator to sort tag fields in user friendly way (ARTIST, then ALBUM, then YEAR, etc.)
+            Collections.sort(trackInfoItems, new TrackInfoItemComparator());
         }
 
         @Override
