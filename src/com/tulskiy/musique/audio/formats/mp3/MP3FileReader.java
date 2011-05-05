@@ -60,9 +60,10 @@ public class MP3FileReader extends AudioFileReader {
             System.out.println("Couldn't read file: " + trackData.getFile());
         }
 
+        ID3v24Tag v24Tag = null;
         if (mp3File != null) {
             try {
-                ID3v24Tag v24Tag = mp3File.getID3v2TagAsv24();
+                v24Tag = mp3File.getID3v2TagAsv24();
                 if (v24Tag != null) {
                     copyCommonTagFields(v24Tag, track);
                     copySpecificTagFields(v24Tag, track);
@@ -98,9 +99,15 @@ public class MP3FileReader extends AudioFileReader {
             trackData.setTotalSamples(totalSamples);
         }
 
-        try {
-            apeTagProcessor.readAPEv2Tag(track);
-        } catch (Exception ignored) {
+        // TODO review correctness of reading APETag only in case ID3 is missed
+        // for example, maybe useful to read and set those fields
+        // that are missed in ID3 but presented in APE
+        if (v24Tag == null) {
+	        try {
+	            apeTagProcessor.readAPEv2Tag(track);
+	        }
+	        catch (Exception ignored) {
+	        }
         }
 
         return track;
