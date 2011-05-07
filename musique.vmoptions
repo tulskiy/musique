@@ -1,4 +1,4 @@
--server
+-client
 -Xms30m
 -Xmx40m
 -XX:+AggressiveOpts
