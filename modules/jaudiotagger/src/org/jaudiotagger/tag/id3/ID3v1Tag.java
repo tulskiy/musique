@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: ID3v1Tag.java,v 1.28 2008/12/10 13:14:27 paultaylor Exp $
+ *  Version @version:$Id: ID3v1Tag.java 910 2010-08-04 18:50:13Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -46,20 +46,21 @@ import java.util.regex.Matcher;
  * @author : Paul Taylor
  */
 public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
-    static EnumMap<TagFieldKey, ID3v1FieldKey> tagFieldToID3v1Field = new EnumMap<TagFieldKey, ID3v1FieldKey>(TagFieldKey.class);
+    static EnumMap<FieldKey, ID3v1FieldKey> tagFieldToID3v1Field = new EnumMap<FieldKey, ID3v1FieldKey>(FieldKey.class);
 
     static {
-        tagFieldToID3v1Field.put(TagFieldKey.ARTIST, ID3v1FieldKey.ARTIST);
-        tagFieldToID3v1Field.put(TagFieldKey.ALBUM, ID3v1FieldKey.ALBUM);
-        tagFieldToID3v1Field.put(TagFieldKey.TITLE, ID3v1FieldKey.TITLE);
-        tagFieldToID3v1Field.put(TagFieldKey.TRACK, ID3v1FieldKey.TRACK);
-        tagFieldToID3v1Field.put(TagFieldKey.YEAR, ID3v1FieldKey.YEAR);
-        tagFieldToID3v1Field.put(TagFieldKey.GENRE, ID3v1FieldKey.GENRE);
-        tagFieldToID3v1Field.put(TagFieldKey.COMMENT, ID3v1FieldKey.COMMENT);
+        tagFieldToID3v1Field.put(FieldKey.ARTIST, ID3v1FieldKey.ARTIST);
+        tagFieldToID3v1Field.put(FieldKey.ALBUM, ID3v1FieldKey.ALBUM);
+        tagFieldToID3v1Field.put(FieldKey.TITLE, ID3v1FieldKey.TITLE);
+        tagFieldToID3v1Field.put(FieldKey.TRACK, ID3v1FieldKey.TRACK);
+        tagFieldToID3v1Field.put(FieldKey.YEAR, ID3v1FieldKey.YEAR);
+        tagFieldToID3v1Field.put(FieldKey.GENRE, ID3v1FieldKey.GENRE);
+        tagFieldToID3v1Field.put(FieldKey.COMMENT, ID3v1FieldKey.COMMENT);
     }
 
     //For writing output
     protected static final String TYPE_COMMENT = "comment";
+
 
     protected static final int FIELD_COMMENT_LENGTH = 30;
     protected static final int FIELD_COMMENT_POS = 97;
@@ -97,6 +98,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      */
     protected byte genre = (byte) -1;
 
+
     private static final byte RELEASE = 1;
     private static final byte MAJOR_VERSION = 0;
     private static final byte REVISION = 0;
@@ -132,11 +134,11 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
     public ID3v1Tag(ID3v1Tag copyObject) {
         super(copyObject);
 
-        this.album = new String(copyObject.album);
-        this.artist = new String(copyObject.artist);
-        this.comment = new String(copyObject.comment);
-        this.title = new String(copyObject.title);
-        this.year = new String(copyObject.year);
+        this.album = copyObject.album;
+        this.artist = copyObject.artist;
+        this.comment = copyObject.comment;
+        this.title = copyObject.title;
+        this.year = copyObject.year;
         this.genre = copyObject.genre;
     }
 
@@ -152,11 +154,11 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
             } else {
                 convertedTag = new ID3v11Tag(mp3tag);
             }
-            this.album = new String(convertedTag.album);
-            this.artist = new String(convertedTag.artist);
-            this.comment = new String(convertedTag.comment);
-            this.title = new String(convertedTag.title);
-            this.year = new String(convertedTag.year);
+            this.album = convertedTag.album;
+            this.artist = convertedTag.artist;
+            this.comment = convertedTag.comment;
+            this.title = convertedTag.title;
+            this.year = convertedTag.year;
             this.genre = convertedTag.genre;
         }
     }
@@ -188,29 +190,29 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      * @param file
      * @throws TagNotFoundException
      * @throws IOException
-     * @deprecated use {@link #ID3v1Tag(RandomAccessFile,String)} instead
+     * @deprecated use {@link #ID3v1Tag(RandomAccessFile, String)} instead
      */
     public ID3v1Tag(RandomAccessFile file) throws TagNotFoundException, IOException {
         this(file, "");
     }
 
-    public void add(TagField field) {
+    public void addField(TagField field) {
         //TODO
     }
 
-    public List<TagField> get(String id) {
+    public List<TagField> getFields(String id) {
 
-        if (TagFieldKey.ARTIST.name().equals(id)) {
+        if (FieldKey.ARTIST.name().equals(id)) {
             return getArtist();
-        } else if (TagFieldKey.ALBUM.name().equals(id)) {
+        } else if (FieldKey.ALBUM.name().equals(id)) {
             return getAlbum();
-        } else if (TagFieldKey.TITLE.name().equals(id)) {
+        } else if (FieldKey.TITLE.name().equals(id)) {
             return getTitle();
-        } else if (TagFieldKey.GENRE.name().equals(id)) {
+        } else if (FieldKey.GENRE.name().equals(id)) {
             return getGenre();
-        } else if (TagFieldKey.YEAR.name().equals(id)) {
+        } else if (FieldKey.YEAR.name().equals(id)) {
             return getYear();
-        } else if (TagFieldKey.COMMENT.name().equals(id)) {
+        } else if (FieldKey.COMMENT.name().equals(id)) {
             return getComment();
         }
         return new ArrayList<TagField>();
@@ -220,21 +222,14 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         return 6;
     }
 
+    public int getFieldCountIncludingSubValues() {
+        return getFieldCount();
+    }
+
     protected List<TagField> returnFieldToList(ID3v1TagField field) {
         List<TagField> fields = new ArrayList<TagField>();
         fields.add(field);
         return fields;
-    }
-
-    /**
-     * Add Album
-     * <p/>
-     * <p>Only one album can be added so if one already exists it will be replaced.
-     *
-     * @param album
-     */
-    public void addAlbum(String album) {
-        setAlbum(album);
     }
 
     /**
@@ -246,7 +241,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         if (album == null) {
             throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
         }
-        this.album = ID3Tags.truncate(album, this.FIELD_ALBUM_LENGTH);
+        this.album = ID3Tags.truncate(album, FIELD_ALBUM_LENGTH);
     }
 
     /**
@@ -254,7 +249,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      *
      * @return album
      */
-    public String getFirstAlbum() {
+    protected String getFirstAlbum() {
         return album;
     }
 
@@ -270,16 +265,6 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         }
     }
 
-    /**
-     * Add Artist
-     * <p/>
-     * <p>Only one artist can be added so if one already exists it will be replaced.
-     *
-     * @param artist
-     */
-    public void addArtist(String artist) {
-        setArtist(album);
-    }
 
     /**
      * Set Artist
@@ -290,7 +275,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         if (artist == null) {
             throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
         }
-        this.artist = ID3Tags.truncate(artist, this.FIELD_ARTIST_LENGTH);
+        this.artist = ID3Tags.truncate(artist, FIELD_ARTIST_LENGTH);
     }
 
     /**
@@ -298,7 +283,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      *
      * @return artist
      */
-    public String getFirstArtist() {
+    protected String getFirstArtist() {
         return artist;
     }
 
@@ -315,17 +300,6 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
     }
 
     /**
-     * Add Comment
-     * <p/>
-     * <p>Only one comment can be added so if one already exists it will be replaced.
-     *
-     * @param comment
-     */
-    public void addComment(String comment) {
-        setComment(comment);
-    }
-
-    /**
      * Set Comment
      *
      * @param comment
@@ -335,7 +309,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         if (comment == null) {
             throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
         }
-        this.comment = ID3Tags.truncate(comment, this.FIELD_COMMENT_LENGTH);
+        this.comment = ID3Tags.truncate(comment, FIELD_COMMENT_LENGTH);
     }
 
     /**
@@ -357,17 +331,6 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      */
     public String getFirstComment() {
         return comment;
-    }
-
-    /**
-     * Add Genre
-     * <p/>
-     * <p>Only one Genre can be added so if one already exists it will be replaced.
-     *
-     * @param genre
-     */
-    public void addGenre(String genre) {
-        setGenre(genre);
     }
 
     /**
@@ -397,7 +360,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      * @return genre or empty string if not valid
      */
     public String getFirstGenre() {
-        Integer genreId = genre & this.BYTE_TO_UNSIGNED;
+        Integer genreId = genre & BYTE_TO_UNSIGNED;
         String genreValue = GenreTypes.getInstanceOf().getValueForId(genreId);
         if (genreValue == null) {
             return "";
@@ -414,23 +377,12 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      * @return
      */
     public List<TagField> getGenre() {
-        if (getFirstGenre().length() > 0) {
-            ID3v1TagField field = new ID3v1TagField(ID3v1FieldKey.GENRE.name(), getFirstGenre());
+        if (getFirst(FieldKey.GENRE).length() > 0) {
+            ID3v1TagField field = new ID3v1TagField(ID3v1FieldKey.GENRE.name(), getFirst(FieldKey.GENRE));
             return returnFieldToList(field);
         } else {
             return new ArrayList<TagField>();
         }
-    }
-
-    /**
-     * Add Title
-     * <p/>
-     * <p>Only one title can be added so if one already exists it will be replaced.
-     *
-     * @param title
-     */
-    public void addTitle(String title) {
-        setTitle(title);
     }
 
     /**
@@ -442,7 +394,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         if (title == null) {
             throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
         }
-        this.title = ID3Tags.truncate(title, this.FIELD_TITLE_LENGTH);
+        this.title = ID3Tags.truncate(title, FIELD_TITLE_LENGTH);
     }
 
     /**
@@ -462,23 +414,12 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      * @return
      */
     public List<TagField> getTitle() {
-        if (getFirstTitle().length() > 0) {
-            ID3v1TagField field = new ID3v1TagField(ID3v1FieldKey.TITLE.name(), getFirstTitle());
+        if (getFirst(FieldKey.TITLE).length() > 0) {
+            ID3v1TagField field = new ID3v1TagField(ID3v1FieldKey.TITLE.name(), getFirst(FieldKey.TITLE));
             return returnFieldToList(field);
         } else {
             return new ArrayList<TagField>();
         }
-    }
-
-    /**
-     * Add Year
-     * <p/>
-     * <p>Only one year can be added so if one already exists it will be replaced.
-     *
-     * @param year
-     */
-    public void addYear(String year) {
-        setYear(year);
     }
 
     /**
@@ -487,7 +428,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      * @param year
      */
     public void setYear(String year) {
-        this.year = ID3Tags.truncate(year, this.FIELD_YEAR_LENGTH);
+        this.year = ID3Tags.truncate(year, FIELD_YEAR_LENGTH);
     }
 
     /**
@@ -507,23 +448,15 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      * @return
      */
     public List<TagField> getYear() {
-        if (getFirstYear().length() > 0) {
-            ID3v1TagField field = new ID3v1TagField(ID3v1FieldKey.YEAR.name(), getFirstYear());
+        if (getFirst(FieldKey.YEAR).length() > 0) {
+            ID3v1TagField field = new ID3v1TagField(ID3v1FieldKey.YEAR.name(), getFirst(FieldKey.YEAR));
             return returnFieldToList(field);
         } else {
             return new ArrayList<TagField>();
         }
     }
 
-    public void addTrack(String track) {
-        throw new UnsupportedOperationException("ID3v10 cannot store track numbers");
-    }
-
     public String getFirstTrack() {
-        throw new UnsupportedOperationException("ID3v10 cannot store track numbers");
-    }
-
-    public void setTrack(String track) {
         throw new UnsupportedOperationException("ID3v10 cannot store track numbers");
     }
 
@@ -534,17 +467,17 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
     public TagField getFirstField(String id) {
         List<TagField> results = null;
 
-        if (TagFieldKey.ARTIST.name().equals(id)) {
+        if (FieldKey.ARTIST.name().equals(id)) {
             results = getArtist();
-        } else if (TagFieldKey.ALBUM.name().equals(id)) {
+        } else if (FieldKey.ALBUM.name().equals(id)) {
             results = getAlbum();
-        } else if (TagFieldKey.TITLE.name().equals(id)) {
+        } else if (FieldKey.TITLE.name().equals(id)) {
             results = getTitle();
-        } else if (TagFieldKey.GENRE.name().equals(id)) {
+        } else if (FieldKey.GENRE.name().equals(id)) {
             results = getGenre();
-        } else if (TagFieldKey.YEAR.name().equals(id)) {
+        } else if (FieldKey.YEAR.name().equals(id)) {
             results = getYear();
-        } else if (TagFieldKey.COMMENT.name().equals(id)) {
+        } else if (FieldKey.COMMENT.name().equals(id)) {
             results = getComment();
         }
 
@@ -571,14 +504,21 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
     }
 
     public boolean isEmpty() {
-        if (getFirstTitle().length() > 0 || getFirstArtist().length() > 0 || getFirstAlbum().length() > 0 || getFirstGenre().length() > 0 || getFirstYear().length() > 0 || getFirstComment().length() > 0) {
-            return false;
-        }
-        return true;
+        return !(getFirst(FieldKey.TITLE).length() > 0 || getFirstArtist().length() > 0 || getFirstAlbum().length() > 0 || getFirst(FieldKey.GENRE).length() > 0 || getFirst(FieldKey.YEAR).length() > 0 || getFirstComment().length() > 0);
     }
 
-    public void set(TagField field) {
-        TagFieldKey genericKey = TagFieldKey.valueOf(field.getId());
+
+    public void setField(FieldKey genericKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        TagField tagfield = createField(genericKey, value);
+        setField(tagfield);
+    }
+
+    public void addField(FieldKey genericKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        setField(genericKey, value);
+    }
+
+    public void setField(TagField field) {
+        FieldKey genericKey = FieldKey.valueOf(field.getId());
         switch (genericKey) {
             case ARTIST:
                 setArtist(field.toString());
@@ -617,7 +557,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
     /**
      * Create Tag Field using generic key
      */
-    public TagField createTagField(TagFieldKey genericKey, String value) {
+    public TagField createField(FieldKey genericKey, String value) {
         return new ID3v1TagField(tagFieldToID3v1Field.get(genericKey).name(), value);
     }
 
@@ -625,8 +565,8 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         return "ISO-8859-1";
     }
 
-    public TagField getFirstField(TagFieldKey genericKey) {
-        List<TagField> l = get(genericKey);
+    public TagField getFirstField(FieldKey genericKey) {
+        List<TagField> l = getFields(genericKey);
         return (l.size() != 0) ? l.get(0) : null;
     }
 
@@ -637,7 +577,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      * @param genericKey The generic field key
      * @return A list of {@link TagField} objects with the given &quot;id&quot;.
      */
-    public List<TagField> get(TagFieldKey genericKey) {
+    public List<TagField> getFields(FieldKey genericKey) {
         switch (genericKey) {
             case ARTIST:
                 return getArtist();
@@ -662,6 +602,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         }
     }
 
+
     /**
      * Retrieve the first value that exists for this key id
      *
@@ -669,7 +610,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
      * @return
      */
     public String getFirst(String genericKey) {
-        TagFieldKey matchingKey = TagFieldKey.valueOf(genericKey);
+        FieldKey matchingKey = FieldKey.valueOf(genericKey);
         if (matchingKey != null) {
             return getFirst(matchingKey);
         } else {
@@ -677,13 +618,14 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         }
     }
 
+
     /**
      * Retrieve the first value that exists for this generic key
      *
      * @param genericKey
      * @return
      */
-    public String getFirst(TagFieldKey genericKey) {
+    public String getFirst(FieldKey genericKey) {
         switch (genericKey) {
             case ARTIST:
                 return getFirstArtist();
@@ -700,9 +642,6 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
             case YEAR:
                 return getFirstYear();
 
-            case TRACK:
-                return getFirstTrack();
-
             case COMMENT:
                 return getFirstComment();
 
@@ -712,11 +651,27 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
     }
 
     /**
+     * The m parameter is effectively ignored
+     *
+     * @param id
+     * @param n
+     * @param m
+     * @return
+     */
+    public String getSubValue(FieldKey id, int n, int m) {
+        return getValue(id, n);
+    }
+
+    public String getValue(FieldKey genericKey, int index) {
+        return getFirst(genericKey);
+    }
+
+    /**
      * Delete any instance of tag fields with this key
      *
      * @param genericKey
      */
-    public void deleteTagField(TagFieldKey genericKey) {
+    public void deleteField(FieldKey genericKey) {
         switch (genericKey) {
             case ARTIST:
                 setArtist("");
@@ -744,34 +699,38 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         }
     }
 
+    public void deleteField(String id) {
+        FieldKey key = FieldKey.valueOf(id);
+        if (key != null) {
+            deleteField(key);
+        }
+    }
+
     /**
      * @param obj
      * @return true if this and obj are equivalent
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof ID3v1Tag) == false) {
+        if (!(obj instanceof ID3v1Tag)) {
             return false;
         }
         ID3v1Tag object = (ID3v1Tag) obj;
-        if (this.album.equals(object.album) == false) {
+        if (!this.album.equals(object.album)) {
             return false;
         }
-        if (this.artist.equals(object.artist) == false) {
+        if (!this.artist.equals(object.artist)) {
             return false;
         }
-        if (this.comment.equals(object.comment) == false) {
+        if (!this.comment.equals(object.comment)) {
             return false;
         }
         if (this.genre != object.genre) {
             return false;
         }
-        if (this.title.equals(object.title) == false) {
+        if (!this.title.equals(object.title)) {
             return false;
         }
-        if (this.year.equals(object.year) == false) {
-            return false;
-        }
-        return super.equals(obj);
+        return this.year.equals(object.year) && super.equals(obj);
     }
 
     /**
@@ -781,12 +740,13 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         return new ID3v1Iterator(this);
     }
 
+
     /**
      * @param byteBuffer
      * @throws TagNotFoundException
      */
     public void read(ByteBuffer byteBuffer) throws TagNotFoundException {
-        if (seek(byteBuffer) == false) {
+        if (!seek(byteBuffer)) {
             throw new TagNotFoundException(getLoggingFilename() + ":" + "ID3v1 tag not found");
         }
         //logger.finer(getLoggingFilename() + ":" + "Reading v1 tag");
@@ -797,30 +757,30 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         String encoding = Charset.defaultCharset().displayName();
         title = Utils.getString(dataBuffer, FIELD_TITLE_POS, this.FIELD_TITLE_LENGTH, encoding).trim();
         Matcher m = endofStringPattern.matcher(title);
-        if (m.find() == true) {
+        if (m.find()) {
             title = title.substring(0, m.start());
         }
         artist = Utils.getString(dataBuffer, FIELD_ARTIST_POS, this.FIELD_ARTIST_LENGTH, encoding).trim();
         m = endofStringPattern.matcher(artist);
-        if (m.find() == true) {
+        if (m.find()) {
             artist = artist.substring(0, m.start());
         }
         album = Utils.getString(dataBuffer, FIELD_ALBUM_POS, this.FIELD_ALBUM_LENGTH, encoding).trim();
         m = endofStringPattern.matcher(album);
         //logger.finest(getLoggingFilename() + ":" + "Orig Album is:" + comment + ":");
-        if (m.find() == true) {
+        if (m.find()) {
             album = album.substring(0, m.start());
             //logger.finest(getLoggingFilename() + ":" + "Album is:" + album + ":");
         }
         year = Utils.getString(dataBuffer, FIELD_YEAR_POS, this.FIELD_YEAR_LENGTH, encoding).trim();
         m = endofStringPattern.matcher(year);
-        if (m.find() == true) {
+        if (m.find()) {
             year = year.substring(0, m.start());
         }
         comment = Utils.getString(dataBuffer, FIELD_COMMENT_POS, this.FIELD_COMMENT_LENGTH, encoding).trim();
         m = endofStringPattern.matcher(comment);
         //logger.finest(getLoggingFilename() + ":" + "Orig Comment is:" + comment + ":");
-        if (m.find() == true) {
+        if (m.find()) {
             comment = comment.substring(0, m.start());
             //logger.finest(getLoggingFilename() + ":" + "Comment is:" + comment + ":");
         }
@@ -890,7 +850,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
     }
 
     /**
-     * Create strcutured representation of this item.
+     * Create structured representation of this item.
      */
     public void createStructure() {
         MP3File.getStructureFormatter().openHeadingElement(TYPE_TAG, getIdentifier());
@@ -912,11 +872,24 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         return null;
     }
 
-    public TagField createArtworkField(Artwork artwork) throws FieldDataInvalidException {
-        throw new UnsupportedOperationException("Not implemented for this format");
+    public TagField createField(Artwork artwork) throws FieldDataInvalidException {
+        throw new UnsupportedOperationException(ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg());
     }
 
-    public void createAndSetArtworkField(Artwork artwork) throws FieldDataInvalidException {
-        throw new UnsupportedOperationException("Not implemented for this format");
+    public void setField(Artwork artwork) throws FieldDataInvalidException {
+        throw new UnsupportedOperationException(ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg());
+    }
+
+    public void addField(Artwork artwork) throws FieldDataInvalidException {
+        throw new UnsupportedOperationException(ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg());
+    }
+
+    /**
+     * Delete all instance of artwork Field
+     *
+     * @throws KeyNotFoundException
+     */
+    public void deleteArtworkField() throws KeyNotFoundException {
+        throw new UnsupportedOperationException(ErrorMessage.GENERIC_NOT_SUPPORTED.getMsg());
     }
 }

@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 /**
  * Represents the audio header of an MP3 File
@@ -78,7 +79,7 @@ public class MP3AudioHeader extends GenericAudioHeader {
     private static final int CONVERTS_BYTE_TO_BITS = 8;
 
     //Logger
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.mp3");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.mp3");
 
     /**
      * After testing the average location of the first MP3Header bit was at 5000 bytes so this is
@@ -193,8 +194,7 @@ public class MP3AudioHeader extends GenericAudioHeader {
                             try {
                                 //Parses Xing frame without modifying position of main buffer
                                 mp3XingFrame = XingFrame.parseXingFrame();
-                            }
-                            catch (InvalidAudioFrameException ex) {
+                            } catch (InvalidAudioFrameException ex) {
                                 // We Ignore because even if Xing Header is corrupted
                                 //doesn't mean file is corrupted
                             }
@@ -207,8 +207,7 @@ public class MP3AudioHeader extends GenericAudioHeader {
                             try {
                                 //Parses Vbri frame without modifying position of main buffer
                                 mp3VbriFrame = VbriFrame.parseVBRIFrame();
-                            }
-                            catch (InvalidAudioFrameException ex) {
+                            } catch (InvalidAudioFrameException ex) {
                                 // We Ignore because even if Vbri Header is corrupted
                                 //doesn't mean file is corrupted
                             }
@@ -229,8 +228,7 @@ public class MP3AudioHeader extends GenericAudioHeader {
                             }
                         }
 
-                    }
-                    catch (InvalidAudioFrameException ex) {
+                    } catch (InvalidAudioFrameException ex) {
                         // We Ignore because likely to be incorrect sync bits ,
                         // will just continue in loop
                     }
@@ -239,17 +237,14 @@ public class MP3AudioHeader extends GenericAudioHeader {
                 filePointerCount++;
             }
             while (!syncFound);
-        }
-        catch (EOFException ex) {
+        } catch (EOFException ex) {
 //            MP3AudioHeader.//logger.log(Level.WARNING, "Reached end of file without finding sync match", ex);
             syncFound = false;
-        }
-        catch (IOException iox) {
+        } catch (IOException iox) {
 //            MP3AudioHeader.//logger.log(Level.SEVERE, "IOException occurred whilst trying to find sync", iox);
             syncFound = false;
             throw iox;
-        }
-        finally {
+        } finally {
             if (fc != null) {
                 fc.close();
             }
@@ -327,8 +322,7 @@ public class MP3AudioHeader extends GenericAudioHeader {
                 MPEGFrameHeader.parseMPEGHeader(bb);
 //                MP3AudioHeader.//logger.finer("Check next frame confirms is an audio header ");
                 result = true;
-            }
-            catch (InvalidAudioFrameException ex) {
+            } catch (InvalidAudioFrameException ex) {
 //                MP3AudioHeader.//logger.finer("Check next frame has identified this is not an audio header");
                 result = false;
             }
@@ -474,9 +468,8 @@ public class MP3AudioHeader extends GenericAudioHeader {
                     return timeOutOverAnHourFormat.format(timeIn);
                 }
             }
-        }
-        catch (ParseException pe) {
-//            //logger.warning("Unable to parse:"+getPreciseTrackLength() +" failed with ParseException:"+pe.getMessage());
+        } catch (ParseException pe) {
+            //logger.warning("Unable to parse:" + getPreciseLength() + " failed with ParseException:" + pe.getMessage());
             return "";
         }
     }

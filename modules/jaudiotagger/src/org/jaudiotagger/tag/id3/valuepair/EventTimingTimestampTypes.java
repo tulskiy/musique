@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: EventTimingTimestampTypes.java,v 1.5 2008/01/01 15:14:25 paultaylor Exp $
+ * Version @version:$Id: EventTimingTimestampTypes.java 867 2010-01-28 16:27:11Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>
@@ -24,6 +24,7 @@ package org.jaudiotagger.tag.id3.valuepair;
 import org.jaudiotagger.tag.datatype.AbstractIntStringValuePair;
 
 public class EventTimingTimestampTypes extends AbstractIntStringValuePair {
+
     private static EventTimingTimestampTypes eventTimingTimestampTypes;
 
     public static EventTimingTimestampTypes getInstanceOf() {

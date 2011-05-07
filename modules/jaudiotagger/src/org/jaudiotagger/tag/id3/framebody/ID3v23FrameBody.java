@@ -19,7 +19,7 @@ package org.jaudiotagger.tag.id3.framebody;
  * Indicates that this is a framebody used in ID3v23Tags.
  *
  * @author Paul Taylor
- * @version $Id: ID3v23FrameBody.java,v 1.4 2008/01/01 15:14:21 paultaylor Exp $
+ * @version $Id: ID3v23FrameBody.java 520 2008-01-01 15:16:38Z paultaylor $
  */
 public interface ID3v23FrameBody {
 

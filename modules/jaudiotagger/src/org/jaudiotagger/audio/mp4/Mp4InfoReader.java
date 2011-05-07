@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@ import org.jaudiotagger.logging.ErrorMessage;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 /**
  * Read audio info from file.
@@ -53,7 +54,7 @@ import java.nio.ByteBuffer;
  */
 public class Mp4InfoReader {
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.mp4.atom");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.mp4.atom");
 
     public GenericAudioHeader read(RandomAccessFile raf) throws CannotReadException, IOException {
         Mp4AudioHeader info = new Mp4AudioHeader();
@@ -238,7 +239,7 @@ public class Mp4InfoReader {
         }
         info.setTotalSamples((long) (mvhd.getLength() * info.getSampleRateAsNumber()));
 
-//        //logger.info(info.toString());
+        //logger.info(info.toString());
 
         //Level 2-Searching for another "trak" within "moov", if more than one track exists then probably
         //video so reject it, unless it fits into certain encoding patterns
@@ -249,8 +250,8 @@ public class Mp4InfoReader {
             //are marked as being audio only and if track contains a nmhd atom rather than smhd.
             //TODO this probably too restrictive but it fixes the test cases we have
             if (ftyp.getMajorBrand().equals(Mp4FtypBox.Brand.ISO14496_1_VERSION_2.getId())
-                || ftyp.getMajorBrand().equals(Mp4FtypBox.Brand.APPLE_AUDIO_ONLY.getId())
-                || ftyp.getMajorBrand().equals(Mp4FtypBox.Brand.APPLE_AUDIO.getId())) {
+                    || ftyp.getMajorBrand().equals(Mp4FtypBox.Brand.APPLE_AUDIO_ONLY.getId())
+                    || ftyp.getMajorBrand().equals(Mp4FtypBox.Brand.APPLE_AUDIO.getId())) {
                 //Ok, need to do further checks on this track to ensure it is a scene descriptor
                 //Level 3-Searching for "mdia" within "trak"
                 boxHeader = Mp4BoxHeader.seekWithinLevel(mvhdBuffer, Mp4NotMetaFieldKey.MDIA.getFieldName());
@@ -276,7 +277,7 @@ public class Mp4InfoReader {
                     throw new CannotReadVideoException(ErrorMessage.MP4_FILE_IS_VIDEO.getMsg());
                 }
             } else {
-//                //logger.info(ErrorMessage.MP4_FILE_IS_VIDEO.getMsg() + ":" + ftyp.getMajorBrand());
+                //logger.info(ErrorMessage.MP4_FILE_IS_VIDEO.getMsg() + ":" + ftyp.getMajorBrand());
                 throw new CannotReadVideoException(ErrorMessage.MP4_FILE_IS_VIDEO.getMsg());
             }
         }
@@ -286,5 +287,6 @@ public class Mp4InfoReader {
 
         return info;
     }
+
 
 }

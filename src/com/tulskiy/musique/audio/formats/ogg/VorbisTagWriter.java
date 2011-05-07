@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,10 +18,10 @@
 package com.tulskiy.musique.audio.formats.ogg;
 
 import com.tulskiy.musique.audio.AudioTagWriter;
+import com.tulskiy.musique.audio.TagWriteException;
 import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTagField;
 
 /**
  * @Author: Denis Tulskiy
@@ -29,21 +29,14 @@ import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTagField;
  */
 public class VorbisTagWriter extends AudioTagWriter {
     @Override
-    public void write(Track track) {
+    public void write(Track track) throws TagWriteException {
         try {
             org.jaudiotagger.audio.AudioFile af1 = AudioFileIO.read(track.getFile());
             Tag abstractTag = af1.getTag();
             copyCommonFields(abstractTag, track);
-
-            abstractTag.set(new VorbisCommentTagField("ALBUM ARTIST", track.getMeta("albumArtist")));
-            abstractTag.set(new VorbisCommentTagField("TOTALTRACKS", track.getMeta("totalTracks")));
-            abstractTag.set(new VorbisCommentTagField("DISCNUMBER", track.getMeta("discNumber")));
-            abstractTag.set(new VorbisCommentTagField("TOTALDISCS", track.getMeta("totalDiscs")));
-            abstractTag.set(new VorbisCommentTagField("TRACKNUMBER", track.getMeta("trackNumber")));
-
             AudioFileIO.write(af1);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new TagWriteException(e);
         }
     }
 

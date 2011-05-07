@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,10 +22,10 @@ import org.jaudiotagger.audio.generic.AbstractTagCreator;
 import org.jaudiotagger.audio.generic.Utils;
 import org.jaudiotagger.audio.mp4.Mp4NotMetaFieldKey;
 import org.jaudiotagger.audio.mp4.atom.Mp4BoxHeader;
+import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.TagFieldKey;
 import org.jaudiotagger.tag.mp4.field.Mp4TagCoverField;
 
 import java.io.ByteArrayOutputStream;
@@ -37,7 +37,7 @@ import java.util.Iterator;
 /**
  * Create raw content of mp4 tag data, concerns itself with atoms upto the ilst atom
  * <p/>
- * <p>This level is was selected because the ilst atom canbe recreated without reference to existing mp4 fields
+ * <p>This level is was selected because the ilst atom can be recreated without reference to existing mp4 fields
  * but fields above this level are dependent upon other information that is not held in the tag.
  * <p/>
  * <pre>
@@ -97,11 +97,10 @@ public class Mp4TagCreator extends AbstractTagCreator {
                         ByteArrayOutputStream covrDataBaos = new ByteArrayOutputStream();
 
                         try {
-                            for (TagField artwork : tag.get(TagFieldKey.COVER_ART)) {
+                            for (TagField artwork : tag.getFields(FieldKey.COVER_ART)) {
                                 covrDataBaos.write(((Mp4TagField) artwork).getRawContentDataOnly());
                             }
-                        }
-                        catch (KeyNotFoundException knfe) {
+                        } catch (KeyNotFoundException knfe) {
                             //This cannot happen
                             throw new RuntimeException("Unable to find COVERART Key");
                         }
@@ -127,8 +126,7 @@ public class Mp4TagCreator extends AbstractTagCreator {
             ByteBuffer buf = ByteBuffer.wrap(ilst.toByteArray());
             buf.rewind();
             return buf;
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //Should never happen as not writing to file at this point
             throw new RuntimeException(ioe);
         }

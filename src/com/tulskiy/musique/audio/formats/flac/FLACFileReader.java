@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -41,7 +41,7 @@ import java.util.HashMap;
 public class FLACFileReader extends AudioFileReader {
     public Track readSingle(Track track) {
         try {
-            if (Util.getFileExt(track.getFile()).equalsIgnoreCase("oga")) {
+            /*if (Util.getFileExt(track.getFile()).equalsIgnoreCase("oga")) {
                 OggFlacDecoder dec = new OggFlacDecoder();
                 dec.open(new RandomAccessFile(track.getFile(), "r"));
                 StreamInfo streamInfo = dec.getStreamInfo();
@@ -66,14 +66,11 @@ public class FLACFileReader extends AudioFileReader {
                         copyTagFields(vorbisTag, track);
                     }
                 }
-            } else {
+            } else*/ {
                 FlacFileReader reader = new FlacFileReader();
                 AudioFile af1 = reader.read(track.getFile());
                 Tag tag = af1.getTag();
                 copyTagFields(tag, track);
-                track.setTotalTracks(tag.getFirst("TOTALTRACKS"));
-                track.setDiscNumber(tag.getFirst("DISCNUMBER"));
-                track.setTotalDiscs(tag.getFirst("TOTALDISCS"));
                 GenericAudioHeader audioHeader = (GenericAudioHeader) af1.getAudioHeader();
                 copyHeaderFields(audioHeader, track);
             }

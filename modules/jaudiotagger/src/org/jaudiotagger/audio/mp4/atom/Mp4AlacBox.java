@@ -1,7 +1,7 @@
 package org.jaudiotagger.audio.mp4.atom;
 
-import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.generic.Utils;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
 
 import java.nio.ByteBuffer;
 
@@ -25,6 +25,7 @@ public class Mp4AlacBox extends AbstractMp4Box {
     private int maxCodedFrameSize; // 32bit
     private int bitRate; // 32bit
     private int sampleRate; // 32bit
+
 
     /**
      * DataBuffer must start from from the start of the body
@@ -100,16 +101,16 @@ public class Mp4AlacBox extends AbstractMp4Box {
 
     public String toString() {
         String s = "maxSamplePerFrame:" + maxSamplePerFrame
-                   + "unknown1:" + unknown1
-                   + "sampleSize:" + sampleSize
-                   + "historyMult:" + historyMult
-                   + "initialHistory:" + initialHistory
-                   + "kModifier:" + kModifier
-                   + "channels:" + channels
-                   + "unknown2 :" + unknown2
-                   + "maxCodedFrameSize:" + maxCodedFrameSize
-                   + "bitRate:" + bitRate
-                   + "sampleRate:" + sampleRate;
+                + "unknown1:" + unknown1
+                + "sampleSize:" + sampleSize
+                + "historyMult:" + historyMult
+                + "initialHistory:" + initialHistory
+                + "kModifier:" + kModifier
+                + "channels:" + channels
+                + "unknown2 :" + unknown2
+                + "maxCodedFrameSize:" + maxCodedFrameSize
+                + "bitRate:" + bitRate
+                + "sampleRate:" + sampleRate;
         return s;
     }
 }

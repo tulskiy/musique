@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractTagItem.java,v 1.5 2008/07/21 10:45:47 paultaylor Exp $
+ *  Version @version:$Id: AbstractTagItem.java 857 2009-12-03 11:21:11Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -27,8 +27,11 @@
 package org.jaudiotagger.tag.id3;
 
 import org.jaudiotagger.tag.TagException;
+import org.jaudiotagger.utils.EqualsUtil;
 
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
+
 
 /**
  * This specifies a series of methods that have to be implemented by all structural subclasses,
@@ -39,7 +42,8 @@ import java.nio.ByteBuffer;
 public abstract class AbstractTagItem {
 
     //Logger
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.tag.id3");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.tag.id3");
+
 
     public AbstractTagItem() {
     }
@@ -79,10 +83,7 @@ public abstract class AbstractTagItem {
      *         subset of the argument.
      */
     public boolean isSubsetOf(Object obj) {
-        if ((obj instanceof AbstractTagItem) == false) {
-            return false;
-        }
-        return true;
+        return obj instanceof AbstractTagItem;
     }
 
     /**
@@ -93,6 +94,7 @@ public abstract class AbstractTagItem {
      * @return true if this datatype and its body are equal
      */
     public boolean equals(Object obj) {
+        if (this == obj) return true;
         return obj instanceof AbstractTagItem;
     }
 }

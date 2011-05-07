@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodySIGN.java,v 1.11 2008/07/21 10:45:43 paultaylor Exp $
+ *  Version @version:$Id: FrameBodySIGN.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -31,6 +31,7 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+
 public class FrameBodySIGN extends AbstractID3v2FrameBody implements ID3v24FrameBody {
     /**
      * Creates a new FrameBodySIGN datatype.
@@ -58,6 +59,8 @@ public class FrameBodySIGN extends AbstractID3v2FrameBody implements ID3v24Frame
     /**
      * Creates a new FrameBodySIGN datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodySIGN(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -81,6 +84,7 @@ public class FrameBodySIGN extends AbstractID3v2FrameBody implements ID3v24Frame
             return (byte) 0;
         }
     }
+
 
     /**
      * The ID3v2 frame identifier

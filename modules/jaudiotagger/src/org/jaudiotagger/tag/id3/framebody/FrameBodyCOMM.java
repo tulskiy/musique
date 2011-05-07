@@ -30,13 +30,11 @@ import java.nio.ByteBuffer;
  * Comments frame.
  * <p/>
  * <p/>
- * This frame is indended for any kind of full text information that
- * does not fit in any other frame. It consists of a frame header
- * followed by encoding, language and content descriptors and is ended
- * with the actual comment as a text string. Newline characters are
- * allowed in the comment text string. There may be more than one
- * comment frame in each tag, but only one with the same language and
- * content descriptor.
+ * This frame is intended for any kind of full text information that does not fit in any other frame. It consists of a
+ * frame header followed by encoding, language and content descriptors and is ended with the actual comment as a
+ * text string. Newline characters are allowed in the comment text string. There may be more than one comment frame
+ * in each tag, but only one with the same language and* content descriptor.
+ * <p/>
  * </p><p><table border=0 width="70%">
  * <tr><td colspan=2>&lt;Header for 'Comment', ID: "COMM"&gt;</td></tr>
  * <tr><td>Text encoding   </td><td width="80%">$xx          </td></tr>
@@ -52,9 +50,47 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyCOMM.java,v 1.23 2008/07/21 10:45:42 paultaylor Exp $
+ * @version $Id: FrameBodyCOMM.java 926 2010-10-21 15:49:06Z paultaylor $
  */
 public class FrameBodyCOMM extends AbstractID3v2FrameBody implements ID3v24FrameBody, ID3v23FrameBody {
+    //Most players only read comment with description of blank
+    public static final String DEFAULT = "";
+
+    //used by iTunes for volume normalization, although uses the COMMENT field not usually displayed as a comment
+    public static final String ITUNES_NORMALIZATION = "iTunNORM";
+
+    //Various descriptions used by MediaMonkey, (note Media Monkey uses non-standard language field XXX)
+    private static final String MM_PREFIX = "Songs-DB";
+    public static final String MM_CUSTOM1 = "Songs-DB_Custom1";
+    public static final String MM_CUSTOM2 = "Songs-DB_Custom2";
+    public static final String MM_CUSTOM3 = "Songs-DB_Custom3";
+    public static final String MM_CUSTOM4 = "Songs-DB_Custom4";
+    public static final String MM_CUSTOM5 = "Songs-DB_Custom5";
+    public static final String MM_OCCASION = "Songs-DB_Occasion";
+    public static final String MM_QUALITY = "Songs-DB_Preference";
+    public static final String MM_TEMPO = "Songs-DB_Tempo";
+
+    public boolean isMediaMonkeyFrame() {
+        String desc = getDescription();
+        if (desc != null && !(desc.length() == 0)) {
+            if (desc.startsWith(MM_PREFIX)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isItunesFrame() {
+        String desc = getDescription();
+        if (desc != null && !(desc.length() == 0)) {
+            if (desc.equals(ITUNES_NORMALIZATION)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     /**
      * Creates a new FrameBodyCOMM datatype.
      */
@@ -94,6 +130,7 @@ public class FrameBodyCOMM extends AbstractID3v2FrameBody implements ID3v24Frame
     public FrameBodyCOMM(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
     }
+
 
     /**
      * Set the description field, which describes the type of comment
@@ -169,6 +206,11 @@ public class FrameBodyCOMM extends AbstractID3v2FrameBody implements ID3v24Frame
         return text.getValueAtIndex(0);
     }
 
+    public String getUserFriendlyValue() {
+        return getText();
+    }
+
+
     /**
      *
      */
@@ -189,10 +231,10 @@ public class FrameBodyCOMM extends AbstractID3v2FrameBody implements ID3v24Frame
         setTextEncoding(ID3TextEncodingConversion.getTextEncoding(getHeader(), getTextEncoding()));
 
         //Ensure valid for data
-        if (((AbstractString) getObject(DataTypes.OBJ_TEXT)).canBeEncoded() == false) {
+        if (!((AbstractString) getObject(DataTypes.OBJ_TEXT)).canBeEncoded()) {
             this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(getHeader()));
         }
-        if (((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded() == false) {
+        if (!((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded()) {
             this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(getHeader()));
         }
         super.write(tagBuffer);

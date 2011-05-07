@@ -13,7 +13,6 @@
  *  you can get a copy from http://www.opensource.org/licenses/lgpl-license.php or write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 package org.jaudiotagger.tag.id3.framebody;
 
 import org.jaudiotagger.tag.InvalidTagException;
@@ -21,9 +20,23 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Encoded by Text information frame.
+ * <p>The 'Encoded by' frame contains the name of the person or organisation that encoded the audio file.
+ * This field may contain a copyright message, if the audio file also is copyrighted by the encoder.
+ * <p/>
+ * <p>For more details, please refer to the ID3 specifications:
+ * <ul>
+ * <li><a href="http://www.id3.org/id3v2.3.0.txt">ID3 v2.3.0 Spec</a>
+ * </ul>
+ *
+ * @author : Paul Taylor
+ * @author : Eric Farng
+ * @version $Id: FrameBodyTENC.java 905 2010-05-14 19:37:31Z paultaylor $
+ */
 public class FrameBodyTENC extends AbstractFrameBodyTextInfo implements ID3v24FrameBody, ID3v23FrameBody {
     /**
-     * Creates a new FrameBodyTENC datatype.
+     * Creates a new FrameBodyTENC dataType.
      */
     public FrameBodyTENC() {
     }
@@ -33,7 +46,7 @@ public class FrameBodyTENC extends AbstractFrameBodyTextInfo implements ID3v24Fr
     }
 
     /**
-     * Creates a new FrameBodyTENC datatype.
+     * Creates a new FrameBodyTENC dataType.
      *
      * @param textEncoding
      * @param text
@@ -43,8 +56,10 @@ public class FrameBodyTENC extends AbstractFrameBodyTextInfo implements ID3v24Fr
     }
 
     /**
-     * Creates a new FrameBodyTENC datatype.
+     * Creates a new FrameBodyTENC dataType.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws java.io.IOException
      * @throws InvalidTagException
      */

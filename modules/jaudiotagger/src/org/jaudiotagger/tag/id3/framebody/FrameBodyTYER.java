@@ -34,7 +34,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyTYER.java,v 1.15 2008/07/21 10:45:46 paultaylor Exp $
+ * @version $Id: FrameBodyTYER.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodyTYER extends AbstractFrameBodyTextInfo implements ID3v23FrameBody {
     /**
@@ -49,6 +49,8 @@ public class FrameBodyTYER extends AbstractFrameBodyTextInfo implements ID3v23Fr
 
     /**
      * When converting v4 TDRC frame to v3 TYER
+     *
+     * @param body
      */
     public FrameBodyTYER(FrameBodyTDRC body) {
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
@@ -68,6 +70,8 @@ public class FrameBodyTYER extends AbstractFrameBodyTextInfo implements ID3v23Fr
     /**
      * Creates a new FrameBodyTYER datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTYER(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {

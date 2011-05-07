@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: Languages.java,v 1.2 2008/07/21 10:45:50 paultaylor Exp $
+ * Version @version:$Id: Languages.java 921 2010-10-14 11:04:46Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>
@@ -26,12 +26,16 @@ import org.jaudiotagger.tag.datatype.AbstractStringStringValuePair;
 
 public class Languages extends AbstractStringStringValuePair {
     public static final String DEFAULT_ID = "eng";
+    public static final String MEDIA_MONKEY_ID = "XXX";
+    public static final String WINAMP_ID = "\0\0\0";
+
     public static final String DEFAULT_VALUE = "English";
 
     //The number of bytes used to hold the language field size
     public static final int LANGUAGE_FIELD_SIZE = 3;
 
     private static Languages languageTypes;
+
 
     public static Languages getInstanceOf() {
         if (languageTypes == null) {
@@ -201,7 +205,7 @@ public class Languages extends AbstractStringStringValuePair {
         idToValue.put("gre", "Greek, Modern (1453-)");
         idToValue.put("grn", "Guarani");
         idToValue.put("guj", "Gujarati");
-        idToValue.put("gwi", "Gwichin");
+        idToValue.put("gwi", "Gwich´in");
         idToValue.put("hai", "Haida");
         idToValue.put("hau", "Hausa");
         idToValue.put("haw", "Hawaiian");
@@ -342,7 +346,7 @@ public class Languages extends AbstractStringStringValuePair {
         idToValue.put("niu", "Niuean");
         idToValue.put("nld", "Dutch");
         idToValue.put("nno", "Norwegian Nynorsk");
-        idToValue.put("nob", "Norwegian Bokmal");
+        idToValue.put("nob", "Norwegian Bokmål");
         idToValue.put("non", "Norse, Old");
         idToValue.put("nor", "Norwegian");
         idToValue.put("nso", "Sotho, Northern");
@@ -352,7 +356,7 @@ public class Languages extends AbstractStringStringValuePair {
         idToValue.put("nyn", "Nyankole");
         idToValue.put("nyo", "Nyoro");
         idToValue.put("nzi", "Nzima");
-        idToValue.put("oci", "Occitan (post 1500); Provencal");
+        idToValue.put("oci", "Occitan (post 1500); Provençal");
         idToValue.put("oji", "Ojibwa");
         idToValue.put("ori", "Oriya");
         idToValue.put("orm", "Oromo");
@@ -377,7 +381,7 @@ public class Languages extends AbstractStringStringValuePair {
         idToValue.put("pon", "Pohnpeian");
         idToValue.put("por", "Portuguese");
         idToValue.put("pra", "Prakrit languages");
-        idToValue.put("pro", "Provencal, Old (to 1500)");
+        idToValue.put("pro", "Provençal, Old (to 1500)");
         idToValue.put("pus", "Pushto");
         idToValue.put("que", "Quechua");
         idToValue.put("raj", "Rajasthani");
@@ -482,7 +486,7 @@ public class Languages extends AbstractStringStringValuePair {
         idToValue.put("vai", "Vai");
         idToValue.put("ven", "Venda");
         idToValue.put("vie", "Vietnamese");
-        idToValue.put("vol", "Volapuk");
+        idToValue.put("vol", "Volapük");
         idToValue.put("vot", "Votic");
         idToValue.put("wak", "Wakashan languages");
         idToValue.put("wal", "Walamo");
@@ -505,6 +509,9 @@ public class Languages extends AbstractStringStringValuePair {
         idToValue.put("znd", "Zande");
         idToValue.put("zul", "Zulu");
         idToValue.put("zun", "Zuni");
+        idToValue.put("\0\0\0", "Winamp Format");                 //Not Part of Spec but commonly used by some applications
+        idToValue.put("XXX", "Media Monkey Format");              //Not Part of Spec but commonly used by some applications
+
 
         createMaps();
     }

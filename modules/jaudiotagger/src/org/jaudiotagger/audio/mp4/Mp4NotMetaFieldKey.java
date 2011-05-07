@@ -29,7 +29,8 @@ public enum Mp4NotMetaFieldKey {
     STCO("stco", "Offsets into Audio Data"),
     DRMS("drms", "DRM protected File"),
     ALAC("alac", "Apple Lossless File"),
-    HDLR("hdlr", "Metadata Handler");
+    HDLR("hdlr", "Metadata Handler"),
+    TAGS("tags", "Nero Encoder Tags");
     private String fieldName;
     private String description;
 

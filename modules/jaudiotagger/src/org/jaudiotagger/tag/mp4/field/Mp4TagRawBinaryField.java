@@ -21,6 +21,7 @@ public class Mp4TagRawBinaryField extends Mp4TagField {
     protected int dataSize;
     protected byte[] dataBytes;
 
+
     /**
      * Construct binary field from rawdata of audio file
      *
@@ -36,7 +37,7 @@ public class Mp4TagRawBinaryField extends Mp4TagField {
     }
 
     public Mp4FieldType getFieldType() {
-        return Mp4FieldType.NUMERIC;
+        return Mp4FieldType.IMPLICIT;
     }
 
     /**
@@ -49,6 +50,7 @@ public class Mp4TagRawBinaryField extends Mp4TagField {
     protected byte[] getDataBytes() throws UnsupportedEncodingException {
         return dataBytes;
     }
+
 
     /**
      * Build from data
@@ -99,8 +101,7 @@ public class Mp4TagRawBinaryField extends Mp4TagField {
             outerbaos.write(dataBytes);
             System.out.println("SIZE" + outerbaos.size());
             return outerbaos.toByteArray();
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //This should never happen as were not actually writing to/from a file
             throw new RuntimeException(ioe);
         }

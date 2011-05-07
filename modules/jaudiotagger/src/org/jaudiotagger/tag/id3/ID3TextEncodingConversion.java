@@ -3,12 +3,15 @@ package org.jaudiotagger.tag.id3;
 import org.jaudiotagger.tag.TagOptionSingleton;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
+import java.util.logging.Logger;
+
 /**
  * Functions to encode text according to encodingoptions and ID3 version
  */
 public class ID3TextEncodingConversion {
     //Logger
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.tag.id3");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.tag.id3");
+
 
     /**
      * Check the text encoding is valid for this header type and is appropriate for
@@ -24,7 +27,7 @@ public class ID3TextEncodingConversion {
 
         //Should not happen, assume v23 and provide a warning
         if (header == null) {
-//            //logger.warning("Header has not yet been set for this framebody");
+            //logger.warning("Header has not yet been set for this framebody");
 
             if (TagOptionSingleton.getInstance().isResetTextEncodingForExistingFrames()) {
                 return TagOptionSingleton.getInstance().getId3v23DefaultTextEncoding();
@@ -58,7 +61,7 @@ public class ID3TextEncodingConversion {
      */
     public static byte getUnicodeTextEncoding(AbstractTagFrame header) {
         if (header == null) {
-//            //logger.warning("Header has not yet been set for this framebody");
+            //logger.warning("Header has not yet been set for this framebody");
             return TextEncoding.UTF_16;
         } else if (header instanceof ID3v24Frame) {
             return TagOptionSingleton.getInstance().getId3v24UnicodeTextEncoding();
@@ -74,11 +77,18 @@ public class ID3TextEncodingConversion {
      * @return valid encoding
      */
     private static byte convertV24textEncodingToV23textEncoding(byte textEncoding) {
-        if ((textEncoding == TextEncoding.UTF_16BE) || (textEncoding == TextEncoding.UTF_8)) {
+        //Convert to equivalent UTF16 format
+        if (textEncoding == TextEncoding.UTF_16BE) {
             return TextEncoding.UTF_16;
+        }
+        //UTF-8 is not supported in ID3v23 and UTF-16 Format can be problematic on ID3v23 so change
+        //to ISO-8859-1, a check before writing data will check the format is capable of writing the data 
+        else if (textEncoding == TextEncoding.UTF_8) {
+            return TextEncoding.ISO_8859_1;
         } else {
             return textEncoding;
         }
     }
+
 
 }

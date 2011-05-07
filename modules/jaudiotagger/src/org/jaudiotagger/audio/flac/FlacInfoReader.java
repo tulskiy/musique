@@ -27,13 +27,14 @@ import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.logging.Logger;
 
 /**
  * Read info from Flac file
  */
 public class FlacInfoReader {
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.flac");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.flac");
 
     private static final int NO_OF_BITS_IN_BYTE = 8;
     private static final int KILOBYTES_TO_BYTES_MULTIPLIER = 1000;
@@ -68,7 +69,7 @@ public class FlacInfoReader {
         }
 
         GenericAudioHeader info = new GenericAudioHeader();
-        info.setLength(mbdsi.getLength());
+        info.setLength(mbdsi.getSongLength());
         info.setPreciseLength(mbdsi.getPreciseLength());
         info.setChannelNumber(mbdsi.getChannelNumber());
         info.setSamplingRate(mbdsi.getSamplingRate());

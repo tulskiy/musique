@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractFrameBodyUrlLink.java,v 1.13 2008/07/21 10:45:42 paultaylor Exp $
+ *  Version @version:$Id: AbstractFrameBodyUrlLink.java 895 2010-04-15 15:21:45Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -37,7 +37,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 /**
- * Abstract superclass of all URL Frames
+ * Abstract super class of all URL Frames
  */
 public abstract class AbstractFrameBodyUrlLink extends AbstractID3v2FrameBody {
 
@@ -50,6 +50,8 @@ public abstract class AbstractFrameBodyUrlLink extends AbstractID3v2FrameBody {
 
     /**
      * Copy Constructor
+     *
+     * @param body
      */
     protected AbstractFrameBodyUrlLink(AbstractFrameBodyUrlLink body) {
         super(body);
@@ -67,10 +69,16 @@ public abstract class AbstractFrameBodyUrlLink extends AbstractID3v2FrameBody {
     /**
      * Creates a new FrameBodyUrlLink datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     protected AbstractFrameBodyUrlLink(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
+    }
+
+    public String getUserFriendlyValue() {
+        return getUrlLink();
     }
 
     /**
@@ -139,8 +147,7 @@ public abstract class AbstractFrameBodyUrlLink extends AbstractID3v2FrameBody {
                 sb.append("/").append(URLEncoder.encode(splitURL[i], "utf-8"));
             }
             return sb.toString();
-        }
-        catch (UnsupportedEncodingException uee) {
+        } catch (UnsupportedEncodingException uee) {
             //Should never happen as utf-8 is always availablebut in case it does we just return the utl
             //unmodified
             //logger.warning("Uable to url encode because utf-8 charset not available:" + uee.getMessage());

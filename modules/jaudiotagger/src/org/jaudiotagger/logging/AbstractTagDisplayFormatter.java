@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractTagDisplayFormatter.java,v 1.5 2008/07/21 10:46:14 paultaylor Exp $
+ *  Version @version:$Id: AbstractTagDisplayFormatter.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -41,6 +41,7 @@ public abstract class AbstractTagDisplayFormatter {
 
     public abstract void openHeadingElement(String type, int value);
 
+
     public abstract void closeHeadingElement(String type);
 
     public abstract void addElement(String type, String value);
@@ -53,6 +54,9 @@ public abstract class AbstractTagDisplayFormatter {
 
     /**
      * Use to display headers as their binary representation
+     *
+     * @param buffer
+     * @return
      */
     public static String displayAsBinary(byte buffer) {
         //Convert buffer to hex representation
@@ -70,8 +74,7 @@ public abstract class AbstractTagDisplayFormatter {
                 char1 = "0";
                 char2 = hexValue.substring(0, 1);
             }
-        }
-        catch (StringIndexOutOfBoundsException se) {
+        } catch (StringIndexOutOfBoundsException se) {
             return "";
         }
         return hexBinaryMap.get(char1) + hexBinaryMap.get(char2);

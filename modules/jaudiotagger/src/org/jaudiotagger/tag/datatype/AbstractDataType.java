@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractDataType.java,v 1.15 2008/11/12 16:41:38 paultaylor Exp $
+ *  Version @version:$Id: AbstractDataType.java 923 2010-10-16 21:59:49Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -27,16 +27,17 @@ import org.jaudiotagger.tag.InvalidDataTypeException;
 import org.jaudiotagger.tag.id3.AbstractTagFrameBody;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 /**
  * Represents a field/data type that can be held within a frames body, these map loosely onto
  * Section 4. ID3v2 frame overview at http://www.id3.org/id3v2.4.0-structure.txt
  */
-public abstract class AbstractDataType extends java.lang.Object {
+public abstract class AbstractDataType {
     protected static final String TYPE_ELEMENT = "element";
 
     //Logger
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.tag.datatype");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.tag.datatype");
 
     /**
      * Holds the data
@@ -89,14 +90,16 @@ public abstract class AbstractDataType extends java.lang.Object {
      * This is used by subclasses, to clone the data within the copyObject
      * <p/>
      * TODO:It seems to be missing some of the more complex value types.
+     *
+     * @param copyObject
      */
     public AbstractDataType(AbstractDataType copyObject) {
         // no copy constructor in super class
-        this.identifier = new String(copyObject.identifier);
+        this.identifier = copyObject.identifier;
         if (copyObject.value == null) {
             this.value = null;
         } else if (copyObject.value instanceof String) {
-            this.value = new String((String) copyObject.value);
+            this.value = copyObject.value;
         } else if (copyObject.value instanceof Boolean) {
             this.value = copyObject.value;
         } else if (copyObject.value instanceof Byte) {
@@ -114,7 +117,11 @@ public abstract class AbstractDataType extends java.lang.Object {
         } else if (copyObject.value instanceof Short) {
             this.value = copyObject.value;
         } else if (copyObject.value instanceof MultipleTextEncodedStringNullTerminated.Values) {
-            this.value = ((MultipleTextEncodedStringNullTerminated.Values) copyObject.value);
+            this.value = copyObject.value;
+        } else if (copyObject.value instanceof PairedTextEncodedStringNullTerminated.ValuePairs) {
+            this.value = copyObject.value;
+        } else if (copyObject.value instanceof PartOfSet.PartOfSetValue) {
+            this.value = copyObject.value;
         } else if (copyObject.value instanceof boolean[]) {
             this.value = ((boolean[]) copyObject.value).clone();
         } else if (copyObject.value instanceof byte[]) {
@@ -186,10 +193,12 @@ public abstract class AbstractDataType extends java.lang.Object {
 
     /**
      * Simplified wrapper for reading bytes from file into Object.
-     * Used for reading Util, this class should be overridden
+     * Used for reading Strings, this class should be overridden
      * for non String Objects
      *
      * @param arr
+     * @throws org.jaudiotagger.tag.InvalidDataTypeException
+     *
      */
     final public void readByteArray(byte[] arr) throws InvalidDataTypeException {
         readByteArray(arr, 0);
@@ -208,11 +217,15 @@ public abstract class AbstractDataType extends java.lang.Object {
      * @return whether this and obj are deemed equivalent
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof AbstractDataType) == false) {
+        if (this == obj) {
+            return true;
+        }
+
+        if (!(obj instanceof AbstractDataType)) {
             return false;
         }
         AbstractDataType object = (AbstractDataType) obj;
-        if (this.identifier.equals(object.identifier) == false) {
+        if (!this.identifier.equals(object.identifier)) {
             return false;
         }
         if ((this.value == null) && (object.value == null)) {
@@ -222,50 +235,50 @@ public abstract class AbstractDataType extends java.lang.Object {
         }
         // boolean[]
         if (this.value instanceof boolean[] && object.value instanceof boolean[]) {
-            if (Arrays.equals((boolean[]) this.value, (boolean[]) object.value) == false) {
+            if (!Arrays.equals((boolean[]) this.value, (boolean[]) object.value)) {
                 return false;
             }
             // byte[]
         } else if (this.value instanceof byte[] && object.value instanceof byte[]) {
-            if (Arrays.equals((byte[]) this.value, (byte[]) object.value) == false) {
+            if (!Arrays.equals((byte[]) this.value, (byte[]) object.value)) {
                 return false;
             }
             // char[]
         } else if (this.value instanceof char[] && object.value instanceof char[]) {
-            if (Arrays.equals((char[]) this.value, (char[]) object.value) == false) {
+            if (!Arrays.equals((char[]) this.value, (char[]) object.value)) {
                 return false;
             }
             // double[]
         } else if (this.value instanceof double[] && object.value instanceof double[]) {
-            if (Arrays.equals((double[]) this.value, (double[]) object.value) == false) {
+            if (!Arrays.equals((double[]) this.value, (double[]) object.value)) {
                 return false;
             }
             // float[]
         } else if (this.value instanceof float[] && object.value instanceof float[]) {
-            if (Arrays.equals((float[]) this.value, (float[]) object.value) == false) {
+            if (!Arrays.equals((float[]) this.value, (float[]) object.value)) {
                 return false;
             }
             // int[]
         } else if (this.value instanceof int[] && object.value instanceof int[]) {
-            if (Arrays.equals((int[]) this.value, (int[]) object.value) == false) {
+            if (!Arrays.equals((int[]) this.value, (int[]) object.value)) {
                 return false;
             }
             // long[]
         } else if (this.value instanceof long[] && object.value instanceof long[]) {
-            if (Arrays.equals((long[]) this.value, (long[]) object.value) == false) {
+            if (!Arrays.equals((long[]) this.value, (long[]) object.value)) {
                 return false;
             }
             // Object[]
         } else if (this.value instanceof Object[] && object.value instanceof Object[]) {
-            if (Arrays.equals((Object[]) this.value, (Object[]) object.value) == false) {
+            if (!Arrays.equals((Object[]) this.value, (Object[]) object.value)) {
                 return false;
             }
             // short[]
         } else if (this.value instanceof short[] && object.value instanceof short[]) {
-            if (Arrays.equals((short[]) this.value, (short[]) object.value) == false) {
+            if (!Arrays.equals((short[]) this.value, (short[]) object.value)) {
                 return false;
             }
-        } else if (this.value.equals(object.value) == false) {
+        } else if (!this.value.equals(object.value)) {
             return false;
         }
         return true;
@@ -278,8 +291,11 @@ public abstract class AbstractDataType extends java.lang.Object {
      *
      * @param arr
      * @param offset
+     * @throws org.jaudiotagger.tag.InvalidDataTypeException
+     *
      */
     public abstract void readByteArray(byte[] arr, int offset) throws InvalidDataTypeException;
+
 
     /**
      * Starting point write ID3 Datatype back to array of bytes.

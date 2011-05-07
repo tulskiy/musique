@@ -32,9 +32,11 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyTDAT.java,v 1.13 2008/07/21 10:45:44 paultaylor Exp $
+ * @version $Id: FrameBodyTDAT.java 932 2010-11-26 13:13:15Z paultaylor $
  */
 public class FrameBodyTDAT extends AbstractFrameBodyTextInfo implements ID3v23FrameBody {
+    private boolean monthOnly;
+
     /**
      * Creates a new FrameBodyTDAT datatype.
      */
@@ -58,6 +60,8 @@ public class FrameBodyTDAT extends AbstractFrameBodyTextInfo implements ID3v23Fr
     /**
      * Creates a new FrameBodyTDAT datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTDAT(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -71,5 +75,13 @@ public class FrameBodyTDAT extends AbstractFrameBodyTextInfo implements ID3v23Fr
      */
     public String getIdentifier() {
         return ID3v23Frames.FRAME_ID_V3_TDAT;
+    }
+
+    public boolean isMonthOnly() {
+        return monthOnly;
+    }
+
+    public void setMonthOnly(boolean monthOnly) {
+        this.monthOnly = monthOnly;
     }
 }

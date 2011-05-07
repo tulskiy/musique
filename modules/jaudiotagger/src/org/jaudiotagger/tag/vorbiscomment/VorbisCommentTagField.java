@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@ import org.jaudiotagger.audio.generic.Utils;
 import org.jaudiotagger.audio.ogg.util.VorbisHeader;
 import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.TagTextField;
+
 import static org.jaudiotagger.tag.vorbiscomment.VorbisCommentFieldKey.*;
 
 import java.io.UnsupportedEncodingException;
@@ -55,6 +56,11 @@ public class VorbisCommentTagField implements TagTextField {
     private String id;
 
     /**
+     * If id is invalid
+     */
+    private static final String ERRONEOUS_ID = "ERRONEOUS";
+
+    /**
      * Creates an instance.
      *
      * @param raw Raw byte data of the tagfield.
@@ -62,11 +68,10 @@ public class VorbisCommentTagField implements TagTextField {
      */
     public VorbisCommentTagField(byte[] raw) throws UnsupportedEncodingException {
         String field = new String(raw, "UTF-8");
-
         int i = field.indexOf("=");
         if (i == -1) {
             //Beware that ogg ID, must be capitalized and contain no space..
-            this.id = "ERRONEOUS";
+            this.id = ERRONEOUS_ID;
             this.content = field;
         } else {
             this.id = field.substring(0, i).toUpperCase();
@@ -98,7 +103,9 @@ public class VorbisCommentTagField implements TagTextField {
      * <br>
      */
     private void checkCommon() {
-        this.common = id.equals(TITLE.name()) || id.equals(ALBUM.name()) || id.equals(ARTIST.name()) || id.equals(GENRE.name()) || id.equals(TRACKNUMBER.name()) || id.equals(DATE.name()) || id.equals(DESCRIPTION.name()) || id.equals(COMMENT.name());
+        this.common = id.equals(TITLE.getFieldName()) || id.equals(ALBUM.getFieldName()) || id.equals(ARTIST.getFieldName())
+                || id.equals(GENRE.getFieldName()) || id.equals(TRACKNUMBER.getFieldName()) || id.equals(DATE.getFieldName())
+                || id.equals(DESCRIPTION.getFieldName()) || id.equals(COMMENT.getFieldName());
 
     }
 

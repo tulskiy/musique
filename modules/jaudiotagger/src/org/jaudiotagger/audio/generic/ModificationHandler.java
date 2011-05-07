@@ -61,8 +61,7 @@ public class ModificationHandler implements AudioFileModificationListener {
             AudioFileModificationListener current = enumer.nextElement();
             try {
                 current.fileModified(original, temporary);
-            }
-            catch (ModifyVetoException e) {
+            } catch (ModifyVetoException e) {
                 vetoThrown(current, original, e);
                 throw e;
             }
@@ -94,8 +93,7 @@ public class ModificationHandler implements AudioFileModificationListener {
             AudioFileModificationListener current = enumer.nextElement();
             try {
                 current.fileWillBeModified(file, delete);
-            }
-            catch (ModifyVetoException e) {
+            } catch (ModifyVetoException e) {
                 vetoThrown(current, file, e);
                 throw e;
             }

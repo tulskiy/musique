@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: FileConstants.java,v 1.5 2008/01/01 15:14:26 paultaylor Exp $
+ * Version @version:$Id: FileConstants.java 520 2008-01-01 15:16:38Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>

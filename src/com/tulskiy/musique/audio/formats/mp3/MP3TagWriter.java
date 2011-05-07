@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,13 +19,11 @@ package com.tulskiy.musique.audio.formats.mp3;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.AudioTagWriter;
+import com.tulskiy.musique.audio.TagWriteException;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
 import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.mp3.MP3File;
-import org.jaudiotagger.tag.TagFieldKey;
-import org.jaudiotagger.tag.id3.AbstractTag;
 import org.jaudiotagger.tag.id3.ID3v11Tag;
-import org.jaudiotagger.tag.id3.ID3v23Tag;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
@@ -40,7 +38,7 @@ public class MP3TagWriter extends AudioTagWriter {
     private APETagProcessor apeTagProcessor = new APETagProcessor();
 
     @Override
-    public void write(Track track) {
+    public void write(Track track) throws TagWriteException {
         File file = track.getFile();
         TextEncoding.getInstanceOf().setDefaultNonUnicode(AudioFileReader.getDefaultCharset().name());
 
@@ -61,17 +59,13 @@ public class MP3TagWriter extends AudioTagWriter {
                 }
                 copyCommonFields(id3v2tag, track);
 
-                id3v2tag.setTrack(track.getTrack());
-                id3v2tag.set(id3v2tag.createTagField(TagFieldKey.DISC_NO, track.getDisc()));
-                id3v2tag.set(id3v2tag.createTagField(TagFieldKey.ALBUM_ARTIST, track.getMeta("albumArtist")));
-
                 ID3v11Tag id3v1Tag = new ID3v11Tag(id3v2tag);
                 mp3File.setID3v1Tag(id3v1Tag);
                 mp3File.setID3v2Tag(id3v2tag);
 
                 mp3File.commit();
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new TagWriteException(e);
             }
         }
     }

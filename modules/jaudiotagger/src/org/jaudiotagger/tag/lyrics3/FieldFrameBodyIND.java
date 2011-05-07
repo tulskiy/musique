@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FieldFrameBodyIND.java,v 1.9 2008/07/21 10:45:49 paultaylor Exp $
+ *  Version @version:$Id: FieldFrameBodyIND.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -27,6 +27,7 @@ import org.jaudiotagger.tag.InvalidTagException;
 import org.jaudiotagger.tag.datatype.BooleanString;
 
 import java.nio.ByteBuffer;
+
 
 public class FieldFrameBodyIND extends AbstractLyrics3v2FieldFrameBody {
     /**
@@ -55,6 +56,7 @@ public class FieldFrameBodyIND extends AbstractLyrics3v2FieldFrameBody {
     /**
      * Creates a new FieldBodyIND datatype.
      *
+     * @param byteBuffer
      * @throws InvalidTagException
      */
     public FieldFrameBodyIND(ByteBuffer byteBuffer) throws InvalidTagException {

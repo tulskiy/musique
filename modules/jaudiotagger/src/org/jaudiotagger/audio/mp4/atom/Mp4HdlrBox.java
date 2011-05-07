@@ -31,13 +31,14 @@ public class Mp4HdlrBox extends AbstractMp4Box {
     //Size used by iTunes, but other application could use different size because name field is variable
     public static final int ITUNES_META_HDLR_DAT_LENGTH =
             VERSION_FLAG_LENGTH +
-            OTHER_FLAG_LENGTH +
-            RESERVED_FLAG_LENGTH +
-            HANDLER_LENGTH +
-            RESERVED1_LENGTH +
-            RESERVED2_LENGTH +
-            RESERVED3_LENGTH +
-            NAME_LENGTH;
+                    OTHER_FLAG_LENGTH +
+                    RESERVED_FLAG_LENGTH +
+                    HANDLER_LENGTH +
+                    RESERVED1_LENGTH +
+                    RESERVED2_LENGTH +
+                    RESERVED3_LENGTH +
+                    NAME_LENGTH;
+
 
     private int reserved;        // 32 bit
     private String handlerType;     // 4 bytes;
@@ -69,16 +70,16 @@ public class Mp4HdlrBox extends AbstractMp4Box {
         //Skip other flags
         dataBuffer.position(dataBuffer.position() + VERSION_FLAG_LENGTH + OTHER_FLAG_LENGTH + RESERVED_FLAG_LENGTH);
 
+
         CharsetDecoder decoder = Charset.forName("ISO-8859-1").newDecoder();
         try {
             handlerType = decoder.decode((ByteBuffer) dataBuffer.slice().limit(HANDLER_LENGTH)).toString();
-        }
-        catch (CharacterCodingException cee) {
+        } catch (CharacterCodingException cee) {
             //Ignore
 
         }
 
-        //To get human readable name
+        //To getFields human readable name
         mediaDataType = mediaDataTypeMap.get(handlerType);
     }
 
@@ -114,6 +115,7 @@ public class Mp4HdlrBox extends AbstractMp4Box {
 
         private String id;
         private String description;
+
 
         MediaDataType(String id, String description) {
             this.id = id;

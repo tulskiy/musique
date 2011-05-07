@@ -1,5 +1,7 @@
 package org.jaudiotagger.audio.mp4.atom;
 
+import java.nio.ByteBuffer;
+
 /**
  * Some mp4s contain null padding at the end of the file, possibly do with gapless playback. This is not really
  * allowable but seeing as seems to cccur in files encoded with iTunes 6 and players such as Winamp and iTunes deal

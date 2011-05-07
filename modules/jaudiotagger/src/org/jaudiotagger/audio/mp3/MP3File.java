@@ -25,10 +25,7 @@ import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.exceptions.CannotWriteException;
 import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
 import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.logging.AbstractTagDisplayFormatter;
-import org.jaudiotagger.logging.ErrorMessage;
-import org.jaudiotagger.logging.PlainTextTagDisplayFormatter;
-import org.jaudiotagger.logging.XMLTagDisplayFormatter;
+import org.jaudiotagger.logging.*;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.TagNotFoundException;
@@ -125,8 +122,7 @@ public class MP3File extends AudioFile {
 //            //logger.finer("Attempting to read id3v1tags");
             try {
                 id3v1tag = new ID3v11Tag(newFile, file.getName());
-            }
-            catch (TagNotFoundException ex) {
+            } catch (TagNotFoundException ex) {
 //                //logger.info("No ids3v11 tag found");
             }
 
@@ -134,8 +130,7 @@ public class MP3File extends AudioFile {
                 if (id3v1tag == null) {
                     id3v1tag = new ID3v1Tag(newFile, file.getName());
                 }
-            }
-            catch (TagNotFoundException ex) {
+            } catch (TagNotFoundException ex) {
 //                //logger.info("No id3v1 tag found");
             }
         }
@@ -166,8 +161,7 @@ public class MP3File extends AudioFile {
                 //Read into Byte Buffer
                 bb = ByteBuffer.allocate(startByte);
                 fc.read(bb);
-            }
-            finally {
+            } finally {
                 if (fc != null) {
                     fc.close();
                 }
@@ -183,8 +177,7 @@ public class MP3File extends AudioFile {
 //                //logger.info("Attempting to read id3v2tags");
                 try {
                     this.setID3v2Tag(new ID3v24Tag(bb, file.getName()));
-                }
-                catch (TagNotFoundException ex) {
+                } catch (TagNotFoundException ex) {
 //                    //logger.info("No id3v24 tag found");
                 }
 
@@ -192,8 +185,7 @@ public class MP3File extends AudioFile {
                     if (id3v2tag == null) {
                         this.setID3v2Tag(new ID3v23Tag(bb, file.getName()));
                     }
-                }
-                catch (TagNotFoundException ex) {
+                } catch (TagNotFoundException ex) {
 //                    //logger.info("No id3v23 tag found");
                 }
 
@@ -201,8 +193,7 @@ public class MP3File extends AudioFile {
                     if (id3v2tag == null) {
                         this.setID3v2Tag(new ID3v22Tag(bb, file.getName()));
                     }
-                }
-                catch (TagNotFoundException ex) {
+                } catch (TagNotFoundException ex) {
 //                    //logger.info("No id3v22 tag found");
                 }
             }
@@ -259,7 +250,7 @@ public class MP3File extends AudioFile {
         MP3AudioHeader newAudioHeader;
         MP3AudioHeader nextAudioHeader;
 
-//        //logger.warning(ErrorMessage.MP3_ID3TAG_LENGTH_INCORRECT.getMsg(file.getPath(), Hex.asHex(startByte), Hex.asHex(currentHeader.getMp3StartByte())));
+        //logger.warning(ErrorMessage.MP3_ID3TAG_LENGTH_INCORRECT.getMsg(file.getPath(), Hex.asHex(startByte), Hex.asHex(currentHeader.getMp3StartByte())));
 
         //because we cant agree on start location we reread the audioheader from the start of the file, at least
         //this way we cant overwrite the audio although we might overwrite part of the tag if we write this file
@@ -286,23 +277,23 @@ public class MP3File extends AudioFile {
                 //It matches the header we found when doing the original search from after the ID3Tag therefore it
                 //seems that newAudioHeader was a false match and the original header was correct
                 if (nextAudioHeader.getMp3StartByte() == currentHeader.getMp3StartByte()) {
-//                    //logger.warning((ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(file.getPath(), Hex.asHex(currentHeader.getMp3StartByte()))));
+                    //logger.warning((ErrorMessage.MP3_START_OF_AUDIO_CONFIRMED.getMsg(file.getPath(), Hex.asHex(currentHeader.getMp3StartByte()))));
                     return currentHeader;
                 }
                 //it matches the header we just found so lends weight to the fact that the audio does indeed start at new header
                 else if (nextAudioHeader.getNumberOfFrames() == newAudioHeader.getNumberOfFrames()) {
-//                    //logger.warning((ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(file.getPath(), Hex.asHex(newAudioHeader.getMp3StartByte()))));
+                    //logger.warning((ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(file.getPath(), Hex.asHex(newAudioHeader.getMp3StartByte()))));
                     return newAudioHeader;
                 }
                 ///Not sure but safer to return earlier audio beause stops jaudiotagger overwriting when writing tag
                 else {
-//                    //logger.warning((ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(file.getPath(), Hex.asHex(newAudioHeader.getMp3StartByte()))));
+                    //logger.warning((ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(file.getPath(), Hex.asHex(newAudioHeader.getMp3StartByte()))));
                     return newAudioHeader;
                 }
             }
             //Same frame count so probably both audio headers with newAudioHeader being the firt one
             else {
-//                //logger.warning((ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(file.getPath(), Hex.asHex(newAudioHeader.getMp3StartByte()))));
+                //logger.warning((ErrorMessage.MP3_RECALCULATED_START_OF_MP3_AUDIO.getMsg(file.getPath(), Hex.asHex(newAudioHeader.getMp3StartByte()))));
                 return newAudioHeader;
             }
         }
@@ -355,8 +346,7 @@ public class MP3File extends AudioFile {
 
             //Read Lyrics 3
             //readLyrics3Tag(File file,RandomAccessFile  newFile,int loadOptions)
-        }
-        finally {
+        } finally {
             if (newFile != null) {
                 newFile.close();
             }
@@ -379,11 +369,9 @@ public class MP3File extends AudioFile {
                 audioHeader = checkAudioStart(startByte, audioHeader);
             }
             return audioHeader.getMp3StartByte();
-        }
-        catch (InvalidAudioFrameException iafe) {
+        } catch (InvalidAudioFrameException iafe) {
             throw iafe;
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             throw ioe;
         }
     }
@@ -630,11 +618,9 @@ public class MP3File extends AudioFile {
     public void commit() throws CannotWriteException {
         try {
             save();
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             throw new CannotWriteException(ioe);
-        }
-        catch (TagException te) {
+        } catch (TagException te) {
             throw new CannotWriteException(te);
         }
     }
@@ -711,20 +697,16 @@ public class MP3File extends AudioFile {
                     id3v1tag.write(rfile);
                 }
             }
-        }
-        catch (FileNotFoundException ex) {
+        } catch (FileNotFoundException ex) {
 //            //logger.log(Level.SEVERE, ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE_FILE_NOT_FOUND.getMsg(file.getName()), ex);
             throw ex;
-        }
-        catch (IOException iex) {
+        } catch (IOException iex) {
 //            //logger.log(Level.SEVERE, ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE.getMsg(file.getName(), iex.getMessage()), iex);
             throw iex;
-        }
-        catch (RuntimeException re) {
+        } catch (RuntimeException re) {
 //            //logger.log(Level.SEVERE, ErrorMessage.GENERAL_WRITE_FAILED_BECAUSE.getMsg(file.getName(), re.getMessage()), re);
             throw re;
-        }
-        finally {
+        } finally {
             if (rfile != null) {
                 rfile.close();
             }

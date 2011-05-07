@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,7 @@ public class VorbisCommentCreator extends AbstractTagCreator {
             Iterator<TagField> it = tag.getFields();
             while (it.hasNext()) {
                 TagField frame = it.next();
-                if (frame.getId().equals(VorbisCommentFieldKey.VENDOR.name())) {
+                if (frame.getId().equals(VorbisCommentFieldKey.VENDOR.getFieldName())) {
                     //this is always stored above so ignore                    
                 } else {
                     baos.write(frame.getRawContent());
@@ -71,8 +71,7 @@ public class VorbisCommentCreator extends AbstractTagCreator {
             ByteBuffer buf = ByteBuffer.wrap(baos.toByteArray());
             buf.rewind();
             return buf;
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //Should never happen as not writing to file at this point
             throw new RuntimeException(ioe);
         }

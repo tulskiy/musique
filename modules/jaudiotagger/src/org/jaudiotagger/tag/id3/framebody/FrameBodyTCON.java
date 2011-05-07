@@ -62,7 +62,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyTCON.java,v 1.14 2008/07/21 10:45:43 paultaylor Exp $
+ * @version $Id: FrameBodyTCON.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodyTCON extends AbstractFrameBodyTextInfo implements ID3v24FrameBody, ID3v23FrameBody {
     /**
@@ -88,11 +88,14 @@ public class FrameBodyTCON extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTCON datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTCON(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
     }
+
 
     /**
      * The ID3v2 frame identifier

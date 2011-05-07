@@ -13,7 +13,6 @@
  *  you can get a copy from http://www.opensource.org/licenses/lgpl-license.php or write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 package org.jaudiotagger.tag.id3.framebody;
 
 import org.jaudiotagger.tag.InvalidTagException;
@@ -21,6 +20,19 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Copyright/Legal information URL link frames.
+ * <p>The 'Copyright/Legal information' frame is a URL pointing at a webpage where the terms of use and ownership of the file is described.
+ * <p/>
+ * <p>For more details, please refer to the ID3 specifications:
+ * <ul>
+ * <li><a href="http://www.id3.org/id3v2.3.0.txt">ID3 v2.3.0 Spec</a>
+ * </ul>
+ *
+ * @author : Paul Taylor
+ * @author : Eric Farng
+ * @version $Id: FrameBodyWCOP.java 832 2009-11-12 13:25:38Z paultaylor $
+ */
 public class FrameBodyWCOP extends AbstractFrameBodyUrlLink implements ID3v24FrameBody, ID3v23FrameBody {
     /**
      * Creates a new FrameBodyWCOP datatype.
@@ -44,6 +56,8 @@ public class FrameBodyWCOP extends AbstractFrameBodyUrlLink implements ID3v24Fra
     /**
      * Creates a new FrameBodyWCOP datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws java.io.IOException
      * @throws InvalidTagException
      */

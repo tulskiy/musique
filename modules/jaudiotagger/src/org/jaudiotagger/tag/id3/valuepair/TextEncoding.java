@@ -1,7 +1,7 @@
 /**
  *  @author : Paul Taylor
  *
- *  Version @version:$Id: TextEncoding.java,v 1.8 2008/07/21 10:45:52 paultaylor Exp $
+ *  Version @version:$Id: TextEncoding.java 895 2010-04-15 15:21:45Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -33,7 +33,7 @@ import java.nio.charset.Charset;
  * <p/>
  * Note in ID3 UTF_16 can be implemented as either UTF16BE or UTF16LE with byte ordering
  * marks, in JAudioTagger we always implement it as UTF16LE because only this order
- * is understood in Windows, OSX seesm to understand both.
+ * is understood in Windows, OSX seem to understand both.
  */
 public class TextEncoding extends AbstractIntStringValuePair {
 

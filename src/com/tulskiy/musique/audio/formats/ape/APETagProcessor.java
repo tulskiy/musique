@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -63,7 +63,7 @@ public class APETagProcessor {
         return false;
     }
 
-    public boolean writeAPEv2Tag(Track track) throws IOException {
+    public void writeAPEv2Tag(Track track) throws IOException {
         RandomAccessFile ras = null;
         try {
             ras = new RandomAccessFile(track.getFile(), "rw");
@@ -80,12 +80,9 @@ public class APETagProcessor {
             tag.SetFieldString("CUESHEET", track.getCueSheet());
 
             tag.Save();
-        } catch (IOException e) {
-            e.printStackTrace();
         } finally {
             if (ras != null)
                 ras.close();
         }
-        return false;
     }
 }

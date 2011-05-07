@@ -29,7 +29,7 @@ public class V2GenreTypes {
      */
     public List<String> getAlphabeticalValueList() {
         List<String> genres = GenreTypes.getInstanceOf().getAlphabeticalValueList();
-        genres.add(ID3V2ExtendedGenreTypes.CV.getDescription());
+        genres.add(ID3V2ExtendedGenreTypes.CR.getDescription());
         genres.add(ID3V2ExtendedGenreTypes.RX.getDescription());
 
         //Sort

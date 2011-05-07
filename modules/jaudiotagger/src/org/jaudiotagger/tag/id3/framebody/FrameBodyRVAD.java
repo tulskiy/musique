@@ -29,7 +29,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyRVAD.java,v 1.17 2008/07/21 10:45:43 paultaylor Exp $
+ * @version $Id: FrameBodyRVAD.java 857 2009-12-03 11:21:11Z paultaylor $
  */
 public class FrameBodyRVAD extends AbstractID3v2FrameBody implements ID3v23FrameBody {
 
@@ -45,8 +45,11 @@ public class FrameBodyRVAD extends AbstractID3v2FrameBody implements ID3v23Frame
 
     }
 
+
     /**
      * Convert from V4 to V3 Frame
+     *
+     * @param body
      */
     public FrameBodyRVAD(FrameBodyRVA2 body) {
         setObjectValue(DataTypes.OBJ_DATA, body.getObjectValue(DataTypes.OBJ_DATA));
@@ -55,6 +58,8 @@ public class FrameBodyRVAD extends AbstractID3v2FrameBody implements ID3v23Frame
     /**
      * Creates a new FrameBodyRVAD datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodyRVAD(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -68,18 +73,6 @@ public class FrameBodyRVAD extends AbstractID3v2FrameBody implements ID3v23Frame
      */
     public String getIdentifier() {
         return ID3v23Frames.FRAME_ID_V3_RELATIVE_VOLUME_ADJUSTMENT;
-    }
-
-    /**
-     * This method is not yet supported.
-     *
-     * @throws java.lang.UnsupportedOperationException
-     *          This method is not yet
-     *          supported
-     * @todo Implement this java.lang.Object method
-     */
-    public boolean equals(Object obj) {
-        throw new java.lang.UnsupportedOperationException("Method equals() not yet implemented.");
     }
 
     /**

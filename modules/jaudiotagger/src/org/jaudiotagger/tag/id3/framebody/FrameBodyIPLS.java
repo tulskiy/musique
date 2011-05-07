@@ -18,12 +18,14 @@ package org.jaudiotagger.tag.id3.framebody;
 import org.jaudiotagger.tag.InvalidTagException;
 import org.jaudiotagger.tag.datatype.DataTypes;
 import org.jaudiotagger.tag.datatype.NumberHashMap;
+import org.jaudiotagger.tag.datatype.Pair;
 import org.jaudiotagger.tag.datatype.PairedTextEncodedStringNullTerminated;
 import org.jaudiotagger.tag.id3.ID3v23Frames;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 /**
@@ -46,8 +48,7 @@ import java.util.StringTokenizer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyIPLS.java,v 1.16 2008/11/12 16:41:38 paultaylor Exp $
- * @TODO currently just allows any number of values, should only really support pairs of values
+ * @version $Id: FrameBodyIPLS.java 923 2010-10-16 21:59:49Z paultaylor $
  */
 public class FrameBodyIPLS extends AbstractID3v2FrameBody implements ID3v23FrameBody {
     /**
@@ -76,19 +77,50 @@ public class FrameBodyIPLS extends AbstractID3v2FrameBody implements ID3v23Frame
     }
 
     /**
+     * Creates a new FrameBodyIPLS data type.
+     *
+     * @param textEncoding
+     * @param text
+     */
+    public FrameBodyIPLS(byte textEncoding, String text) {
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding);
+        setText(text);
+    }
+
+    /**
      * Convert from V4 to V3 Frame
+     *
+     * @param body
      */
     public FrameBodyIPLS(FrameBodyTIPL body) {
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body.getTextEncoding());
+        setText(body.getText());
+    }
 
-        String valueAsCommaSeperatedString = (String) body.getObjectValue(DataTypes.OBJ_TEXT);
-
+    /**
+     * Set the text, decoded as pairs of involvee - involvement
+     *
+     * @param text
+     */
+    public void setText(String text) {
         PairedTextEncodedStringNullTerminated.ValuePairs value = new PairedTextEncodedStringNullTerminated.ValuePairs();
-        StringTokenizer stz = new StringTokenizer(valueAsCommaSeperatedString, ",");
+        StringTokenizer stz = new StringTokenizer(text, "\0");
         while (stz.hasMoreTokens()) {
-            value.add(stz.nextToken());
+            String key = stz.nextToken();
+            if (stz.hasMoreTokens()) {
+                value.add(key, stz.nextToken());
+            }
+
         }
         setObjectValue(DataTypes.OBJ_TEXT, value);
+    }
+
+    public void addPair(String text) {
+        PairedTextEncodedStringNullTerminated.ValuePairs value = ((PairedTextEncodedStringNullTerminated) getObject(DataTypes.OBJ_TEXT)).getValue();
+        StringTokenizer stz = new StringTokenizer(text, "\0");
+        if (stz.hasMoreTokens()) {
+            value.add(stz.nextToken(), stz.nextToken());
+        }
     }
 
     /**
@@ -96,19 +128,34 @@ public class FrameBodyIPLS extends AbstractID3v2FrameBody implements ID3v23Frame
      * current encoding before we write data. If they do change the encoding.
      */
     public void write(ByteArrayOutputStream tagBuffer) {
-        if (((PairedTextEncodedStringNullTerminated) getObject(DataTypes.OBJ_TEXT)).canBeEncoded() == false) {
+        if (!((PairedTextEncodedStringNullTerminated) getObject(DataTypes.OBJ_TEXT)).canBeEncoded()) {
             this.setTextEncoding(TextEncoding.UTF_16);
         }
         super.write(tagBuffer);
     }
 
     /**
-     * Consists of a text encoding , and then a series of null terminated Util, there should be an even number
-     * of Util as they are paired as involvement/involvee
+     * Consists of a text encoding , and then a series of null terminated Strings, there should be an even number
+     * of Strings as they are paired as involvement/involvee
      */
     protected void setupObjectList() {
         objectList.add(new NumberHashMap(DataTypes.OBJ_TEXT_ENCODING, this, TextEncoding.TEXT_ENCODING_FIELD_SIZE));
         objectList.add(new PairedTextEncodedStringNullTerminated(DataTypes.OBJ_TEXT, this));
+    }
+
+    public PairedTextEncodedStringNullTerminated.ValuePairs getPairing() {
+        return (PairedTextEncodedStringNullTerminated.ValuePairs) getObject(DataTypes.OBJ_TEXT).getValue();
+    }
+
+    /**
+     * Get key at index
+     *
+     * @param index
+     * @return value at index
+     */
+    public String getKeyAtIndex(int index) {
+        PairedTextEncodedStringNullTerminated text = (PairedTextEncodedStringNullTerminated) getObject(DataTypes.OBJ_TEXT);
+        return text.getValue().getMapping().get(index).getKey();
     }
 
     /**
@@ -119,15 +166,7 @@ public class FrameBodyIPLS extends AbstractID3v2FrameBody implements ID3v23Frame
      */
     public String getValueAtIndex(int index) {
         PairedTextEncodedStringNullTerminated text = (PairedTextEncodedStringNullTerminated) getObject(DataTypes.OBJ_TEXT);
-        return text.getValue().getList().get(index);
-    }
-
-    /**
-     * @return number of text values, shopuld be an even number because should make up pairs of values
-     */
-    public int getNumberOfValues() {
-        PairedTextEncodedStringNullTerminated text = (PairedTextEncodedStringNullTerminated) getObject(DataTypes.OBJ_TEXT);
-        return text.getValue().getNumberOfValues();
+        return text.getValue().getMapping().get(index).getValue();
     }
 
     /**
@@ -136,5 +175,23 @@ public class FrameBodyIPLS extends AbstractID3v2FrameBody implements ID3v23Frame
     public int getNumberOfPairs() {
         PairedTextEncodedStringNullTerminated text = (PairedTextEncodedStringNullTerminated) getObject(DataTypes.OBJ_TEXT);
         return text.getValue().getNumberOfPairs();
+    }
+
+    public String getText() {
+        PairedTextEncodedStringNullTerminated text = (PairedTextEncodedStringNullTerminated) getObject(DataTypes.OBJ_TEXT);
+        StringBuilder sb = new StringBuilder();
+        int count = 1;
+        for (Pair entry : text.getValue().getMapping()) {
+            sb.append(entry.getKey() + '\0' + entry.getValue());
+            if (count != getNumberOfPairs()) {
+                sb.append('\0');
+            }
+            count++;
+        }
+        return sb.toString();
+    }
+
+    public String getUserFriendlyValue() {
+        return getText();
     }
 }

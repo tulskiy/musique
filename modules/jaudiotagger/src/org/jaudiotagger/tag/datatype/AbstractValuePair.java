@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: AbstractValuePair.java,v 1.8 2008/07/21 10:45:40 paultaylor Exp $
+ * Version @version:$Id: AbstractValuePair.java 836 2009-11-12 15:44:07Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>
@@ -37,6 +37,8 @@ public abstract class AbstractValuePair<I, V> {
 
     /**
      * Get list in alphabetical order
+     *
+     * @return
      */
     public List<V> getAlphabeticalValueList() {
         return valueList;

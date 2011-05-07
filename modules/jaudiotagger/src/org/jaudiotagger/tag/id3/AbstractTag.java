@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractTag.java,v 1.2 2008/01/01 15:14:21 paultaylor Exp $
+ *  Version @version:$Id: AbstractTag.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -34,6 +34,7 @@ import java.util.Iterator;
 public abstract class AbstractTag extends AbstractTagItem {
     protected static final String TYPE_TAG = "tag";
 
+
     public AbstractTag() {
     }
 
@@ -57,6 +58,7 @@ public abstract class AbstractTag extends AbstractTagItem {
      */
     public abstract void write(RandomAccessFile file) throws IOException;
 
+
     /**
      * Removes the specific tag from the file
      *
@@ -64,6 +66,7 @@ public abstract class AbstractTag extends AbstractTagItem {
      * @throws IOException on any I/O error
      */
     abstract public void delete(RandomAccessFile file) throws IOException;
+
 
     /**
      * Determines whether another datatype is equal to this tag. It just compares
@@ -73,11 +76,8 @@ public abstract class AbstractTag extends AbstractTagItem {
      * @return if they are equal
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof AbstractTag) == false) {
-            return false;
-        }
+        return (obj instanceof AbstractTag) && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**

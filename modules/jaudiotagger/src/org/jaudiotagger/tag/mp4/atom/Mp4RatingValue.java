@@ -14,6 +14,7 @@ public enum Mp4RatingValue {
     private String description;
     private int id;
 
+
     /**
      * @param description of value
      * @param id          used internally
@@ -40,5 +41,6 @@ public enum Mp4RatingValue {
     public String getDescription() {
         return description;
     }
+
 
 }

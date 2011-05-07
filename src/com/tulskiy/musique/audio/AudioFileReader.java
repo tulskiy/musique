@@ -20,6 +20,7 @@ package com.tulskiy.musique.audio;
 import com.tulskiy.musique.audio.formats.cue.CUEParser;
 import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
+import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
 
 import java.io.File;
@@ -73,15 +74,18 @@ public abstract class AudioFileReader {
 
     protected void copyTagFields(Tag abstractTag, Track track) throws IOException {
         if (abstractTag != null && track != null) {
-            track.addMeta("album", abstractTag.getFirstAlbum());
-            track.addMeta("artist", abstractTag.getFirstArtist());
-            track.addMeta("comment", abstractTag.getFirstComment());
-            track.addMeta("title", abstractTag.getFirstTitle());
-            track.addMeta("year", abstractTag.getFirstYear());
+            track.addMeta("album", abstractTag.getFirst(FieldKey.ALBUM));
+            track.addMeta("artist", abstractTag.getFirst(FieldKey.ARTIST));
+            track.addMeta("comment", abstractTag.getFirst(FieldKey.COMMENT));
+            track.addMeta("title", abstractTag.getFirst(FieldKey.TITLE));
+            track.addMeta("year", abstractTag.getFirst(FieldKey.YEAR));
             track.setCueSheet(abstractTag.getFirst("CUESHEET"));
-            track.addMeta("genre", abstractTag.getFirstGenre());
-            track.addMeta("albumArtist", abstractTag.getFirst("ALBUM ARTIST"));
-            track.setTrackNumber(abstractTag.getFirstTrack());
+            track.addMeta("genre", abstractTag.getFirst(FieldKey.GENRE));
+            track.addMeta("albumArtist", abstractTag.getFirst(FieldKey.ALBUM_ARTIST));
+            track.setTrackNumber(abstractTag.getFirst(FieldKey.TRACK));
+            track.setTotalTracks(abstractTag.getFirst(FieldKey.TRACK_TOTAL));
+            track.setDiscNumber(abstractTag.getFirst(FieldKey.DISC_NO));
+            track.setTotalDiscs(abstractTag.getFirst(FieldKey.DISC_TOTAL));
         }
     }
 

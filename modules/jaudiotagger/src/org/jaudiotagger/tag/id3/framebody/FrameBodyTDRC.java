@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyTDRC.java,v 1.18 2008/10/30 15:58:38 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyTDRC.java 932 2010-11-26 13:13:15Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -36,20 +36,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Level;
+
 
 public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24FrameBody {
     /**
-     * Used when converting from v3 tags
+     * Used when converting from v3 tags , these fields should ALWAYS hold the v23 value
      */
     private String originalID;
     private String year = "";
     private String time = "";
     private String date = "";
-    private String reco = "";
+    private boolean monthOnly = false;
+    private boolean hoursOnly = false;
 
     private static SimpleDateFormat formatYearIn, formatYearOut;
-    private static SimpleDateFormat formatDateIn, formatDateOut;
-    private static SimpleDateFormat formatTimeIn, formatTimeOut;
+    private static SimpleDateFormat formatDateIn, formatDateOut, formatMonthOut;
+    private static SimpleDateFormat formatTimeIn, formatTimeOut, formatHoursOut;
 
     private static final List<SimpleDateFormat> formatters = new ArrayList<SimpleDateFormat>();
 
@@ -63,7 +66,7 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
     static {
         //This is allowable v24 format , we use UK Locale not because we are restricting to UK
         //but because these formats are fixed in ID3 spec, and could possibly get unexpected results if library
-        //used with a default locale that has Date Format Symbols that intefere with the pattern  
+        //used with a default locale that has Date Format Symbols that interfere with the pattern
         formatters.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.UK));
         formatters.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.UK));
         formatters.add(new SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.UK));
@@ -73,11 +76,15 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
 
         //These are formats used by v23 Frames
         formatYearIn = new SimpleDateFormat("yyyy", Locale.UK);
-        formatYearOut = new SimpleDateFormat("yyyy", Locale.UK);
         formatDateIn = new SimpleDateFormat("ddMM", Locale.UK);
-        formatDateOut = new SimpleDateFormat("-MM-dd", Locale.UK);
         formatTimeIn = new SimpleDateFormat("HHmm", Locale.UK);
+
+        //These are the separate components of the v24 format that the v23 formats map to
+        formatYearOut = new SimpleDateFormat("yyyy", Locale.UK);
+        formatDateOut = new SimpleDateFormat("-MM-dd", Locale.UK);
+        formatMonthOut = new SimpleDateFormat("-MM", Locale.UK);
         formatTimeOut = new SimpleDateFormat("'T'HH:mm", Locale.UK);
+        formatHoursOut = new SimpleDateFormat("'T'HH", Locale.UK);
 
     }
 
@@ -94,6 +101,8 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
 
     /**
      * Retrieve the original identifier
+     *
+     * @return
      */
     public String getOriginalID() {
         return originalID;
@@ -108,18 +117,19 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
      */
 
     /**
-     * Synchronized because SimpleDatFormst arent thread safe
+     * Synchronized because SimpleDatFormat aren't thread safe
      *
      * @param formatDate
      * @param parseDate
      * @param text
      * @return
      */
-    private synchronized String formatAndParse(SimpleDateFormat formatDate, SimpleDateFormat parseDate, String text) {
+    private static synchronized String formatAndParse(SimpleDateFormat formatDate, SimpleDateFormat parseDate, String text) {
         try {
-            return formatDate.format(parseDate.parse(text));
-        }
-        catch (ParseException e) {
+            Date date = parseDate.parse(text);
+            String result = formatDate.format(date);
+            return result;
+        } catch (ParseException e) {
             //logger.warning("Unable to parse:" + text);
         }
         return "";
@@ -134,10 +144,19 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
                 sb.append(formatAndParse(formatYearOut, formatYearIn, year));
             }
             if (!date.equals("")) {
-                sb.append(formatAndParse(formatDateOut, formatDateIn, date));
+                if (isMonthOnly()) {
+                    sb.append(formatAndParse(formatMonthOut, formatDateIn, date));
+                } else {
+                    sb.append(formatAndParse(formatDateOut, formatDateIn, date));
+                }
             }
             if (!time.equals("")) {
-                sb.append(formatAndParse(formatTimeOut, formatTimeIn, time));
+                if (isHoursOnly()) {
+                    sb.append(formatAndParse(formatHoursOut, formatTimeIn, time));
+                } else {
+                    sb.append(formatAndParse(formatTimeOut, formatTimeIn, time));
+                }
+
             }
             return sb.toString();
         }
@@ -153,14 +172,10 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
         this.time = time;
     }
 
+
     public void setDate(String date) {
         //logger.finest("Setting date to:" + date);
-
         this.date = date;
-    }
-
-    public void setReco(String reco) {
-        this.reco = reco;
     }
 
     public String getYear() {
@@ -175,58 +190,70 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
         return date;
     }
 
-    public String getReco() {
-        return reco;
-    }
-
     /**
-     * When converting v3 YEAR to v4 TDRC frame
+     * When converting v3 TYER to v4 TDRC frame
+     *
+     * @param body
      */
     public FrameBodyTDRC(FrameBodyTYER body) {
         originalID = ID3v23Frames.FRAME_ID_V3_TYER;
         year = body.getText();
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
-        setObjectValue(DataTypes.OBJ_TEXT, body.getText());
+        setObjectValue(DataTypes.OBJ_TEXT, getFormattedText());
     }
 
     /**
      * When converting v3 TIME to v4 TDRC frame
+     *
+     * @param body
      */
     public FrameBodyTDRC(FrameBodyTIME body) {
         originalID = ID3v23Frames.FRAME_ID_V3_TIME;
         time = body.getText();
+        setHoursOnly(body.isHoursOnly());
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
-        setObjectValue(DataTypes.OBJ_TEXT, body.getText());
+        setObjectValue(DataTypes.OBJ_TEXT, getFormattedText());
     }
 
     /**
      * When converting v3 TDAT to v4 TDRC frame
+     *
+     * @param body
      */
     public FrameBodyTDRC(FrameBodyTDAT body) {
         originalID = ID3v23Frames.FRAME_ID_V3_TDAT;
         date = body.getText();
+        setMonthOnly(body.isMonthOnly());
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
-        setObjectValue(DataTypes.OBJ_TEXT, body.getText());
+        setObjectValue(DataTypes.OBJ_TEXT, getFormattedText());
     }
 
     /**
-     * When converting v3 TRDA to v4 TDRC frame
-     */
-    public FrameBodyTDRC(FrameBodyTRDA body) {
-        originalID = ID3v23Frames.FRAME_ID_V3_TRDA;
-        reco = body.getText();
-        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
-        setObjectValue(DataTypes.OBJ_TEXT, body.getText());
-    }
-
-    /**
-     * Creates a new FrameBodyTDRC datatype.
+     * Creates a new FrameBodyTDRC dataType.
+     * <p/>
+     * Tries to decode the text to find the v24 date mask being used, and store the v3 components of the mask
      *
      * @param textEncoding
      * @param text
      */
     public FrameBodyTDRC(byte textEncoding, String text) {
         super(textEncoding, text);
+        findMatchingMaskAndExtractV3Values();
+    }
+
+    /**
+     * Creates a new FrameBodyTDRC datatype from File
+     *
+     * @param byteBuffer
+     * @param frameSize
+     * @throws InvalidTagException
+     */
+    public FrameBodyTDRC(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
+        super(byteBuffer, frameSize);
+        findMatchingMaskAndExtractV3Values();
+    }
+
+    private void findMatchingMaskAndExtractV3Values() {
         //Find the date format of the text
         for (int i = 0; i < formatters.size(); i++) {
             try {
@@ -243,85 +270,95 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
             //Dont display will occur for each failed format
             catch (ParseException e) {
                 //Do nothing;
-            }
-            catch (NumberFormatException nfe) {
+            } catch (NumberFormatException nfe) {
                 //Do nothing except log warning because not really expecting this to happen
-                //logger.log(Level.WARNING,"Date Formatter:"+formatters.get(i).toPattern() + "failed to parse:"+getText()+ "with "+nfe.getMessage(),nfe);
+                logger.log(Level.WARNING, "Date Formatter:" + formatters.get(i).toPattern() + "failed to parse:" + getText() + "with " + nfe.getMessage(), nfe);
             }
         }
     }
 
     /**
-     * Creates a new FrameBodyTDRC datatype from File
+     * Format Date
+     * <p/>
+     * Synchronized because SimpleDateFormat is invalid
      *
-     * @throws InvalidTagException
+     * @param d
+     * @return
      */
-    public FrameBodyTDRC(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
-        super(byteBuffer, frameSize);
-        //Store the equivalent ID3v23 values in case convert
-
-        //Find the date format of the v24Frame
-        for (int i = 0; i < formatters.size(); i++) {
-            try {
-                Date d;
-                synchronized (formatters.get(i)) {
-                    d = formatters.get(i).parse(getText());
-                }
-                if (d != null) {
-                    extractID3v23Formats(d, i);
-                    break;
-                }
-            }
-            //Dont display will occur for each failed format
-            catch (ParseException e) {
-                //Do nothing;
-            }
-            catch (NumberFormatException nfe) {
-                //Do nothing except log warning because not really expecting this to happen (but it does !)
-                //logger.log(Level.WARNING,"Date Formatter:"+formatters.get(i).toPattern() + "failed to parse:"+getText()+ "with "+nfe.getMessage(),nfe);
-            }
-        }
+    private static synchronized String formatDateAsYear(Date d) {
+        return formatYearIn.format(d);
     }
 
     /**
-     * Extract Format
+     * Format Date
+     * <p/>
+     * Synchronized because SimpleDateFormat is invalid
+     *
+     * @param d
+     * @return
+     */
+    private static synchronized String formatDateAsDate(Date d) {
+        return formatDateIn.format(d);
+    }
+
+    /**
+     * Format Date
+     * <p/>
+     * Synchronized because SimpleDateFormat is invalid
+     *
+     * @param d
+     * @return
+     */
+    private static synchronized String formatDateAsTime(Date d) {
+        return formatTimeIn.format(d);
+    }
+
+    /**
+     * Extract the components ans store the v23 version of the various values
      *
      * @param dateRecord
      * @param precision
      */
-    private synchronized void extractID3v23Formats(final Date dateRecord, final int precision) {
+    //TODO currently if user has entered Year and Month, we only store in v23, should we store month with 
+    //first day
+    private void extractID3v23Formats(final Date dateRecord, final int precision) {
+        //logger.fine("Precision is:" + precision + "for date:" + dateRecord.toString());
         Date d = dateRecord;
 
         //Precision Year
         if (precision == PRECISION_YEAR) {
-            setYear(formatYearOut.format(d));
+            setYear(formatDateAsYear(d));
         }
         //Precision Month
         else if (precision == PRECISION_MONTH) {
-            setYear(formatYearOut.format(d));
+            setYear(formatDateAsYear(d));
+            setDate(formatDateAsDate(d));
+            monthOnly = true;
         }
         //Precision Day
         else if (precision == PRECISION_DAY) {
-            setYear(formatYearOut.format(d));
-            setDate(formatDateOut.format(d));
+            setYear(formatDateAsYear(d));
+            setDate(formatDateAsDate(d));
         }
         //Precision Hour
         else if (precision == PRECISION_HOUR) {
-            setYear(formatYearOut.format(d));
-            setDate(formatDateOut.format(d));
+            setYear(formatDateAsYear(d));
+            setDate(formatDateAsDate(d));
+            setTime(formatDateAsTime(d));
+            hoursOnly = true;
 
         }
         //Precision Minute
         else if (precision == PRECISION_MINUTE) {
-            setYear(formatYearOut.format(d));
-            setDate(formatDateOut.format(d));
-            setTime(formatTimeOut.format(d));
+            setYear(formatDateAsYear(d));
+            setDate(formatDateAsDate(d));
+            setTime(formatDateAsTime(d));
         }
         //Precision Minute
         else if (precision == PRECISION_SECOND) {
-            setYear(formatYearOut.format(d));
-            setDate(formatDateOut.format(d));
-            setTime(formatTimeOut.format(d));
+            setYear(formatDateAsYear(d));
+            setDate(formatDateAsDate(d));
+            setTime(formatDateAsTime(d));
         }
     }
 
@@ -332,5 +369,21 @@ public class FrameBodyTDRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
      */
     public String getIdentifier() {
         return ID3v24Frames.FRAME_ID_YEAR;
+    }
+
+    public boolean isMonthOnly() {
+        return monthOnly;
+    }
+
+    public void setMonthOnly(boolean monthOnly) {
+        this.monthOnly = monthOnly;
+    }
+
+    public boolean isHoursOnly() {
+        return hoursOnly;
+    }
+
+    public void setHoursOnly(boolean hoursOnly) {
+        this.hoursOnly = hoursOnly;
     }
 }

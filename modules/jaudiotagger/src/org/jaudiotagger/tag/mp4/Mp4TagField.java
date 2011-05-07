@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -10,7 +10,7 @@
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
+ * Lesser General Public License for more details. 
  * 
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the Free Software
@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 /**
  * This abstract class represents a link between piece of data, and how it is stored as an mp4 atom
@@ -41,7 +42,8 @@ import java.nio.ByteBuffer;
  */
 public abstract class Mp4TagField implements TagField {
     // Logger Object
-//    public static Logger logger = logger.getLogger("org.jaudiotagger.tag.mp4");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.tag.mp4");
+
 
     protected String id;
 
@@ -107,6 +109,7 @@ public abstract class Mp4TagField implements TagField {
      */
     protected abstract byte[] getDataBytes() throws UnsupportedEncodingException;
 
+
     /**
      * @return the field type of this field
      */
@@ -139,8 +142,7 @@ public abstract class Mp4TagField implements TagField {
             outerbaos.write(Utils.getDefaultBytes(getId(), "ISO-8859-1"));
             outerbaos.write(databox);
             return outerbaos.toByteArray();
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //This should never happen as were not actually writing to/from a file
             throw new RuntimeException(ioe);
         }
@@ -165,8 +167,7 @@ public abstract class Mp4TagField implements TagField {
             baos.write(new byte[]{0, 0, 0, 0});
             baos.write(data);
             return baos.toByteArray();
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //This should never happen as were not actually writing to/from a file
             throw new RuntimeException(ioe);
         }

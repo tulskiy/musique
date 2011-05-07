@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: Lyrics3v1Iterator.java,v 1.5 2008/05/12 15:42:51 paultaylor Exp $
+ *  Version @version:$Id: Lyrics3v1Iterator.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -66,7 +66,7 @@ public class Lyrics3v1Iterator implements Iterator<String> {
 
         removeIndex = lastIndex;
 
-        String line = null;
+        String line;
 
         if (lastIndex >= 0) {
             if (nextIndex >= 0) {

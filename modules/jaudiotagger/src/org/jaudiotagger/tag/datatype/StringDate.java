@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: StringDate.java,v 1.8 2008/01/01 15:12:55 paultaylor Exp $
+ *  Version @version:$Id: StringDate.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -34,6 +34,7 @@ public class StringDate extends StringFixedLength {
      * Creates a new ObjectStringDate datatype.
      *
      * @param identifier
+     * @param frameBody
      */
     public StringDate(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody, 8);
@@ -64,10 +65,7 @@ public class StringDate extends StringFixedLength {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof StringDate == false) {
-            return false;
-        }
+        return obj instanceof StringDate && super.equals(obj);
 
-        return super.equals(obj);
     }
 }

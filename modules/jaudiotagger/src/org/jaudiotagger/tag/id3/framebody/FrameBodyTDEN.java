@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyTDEN.java,v 1.9 2008/07/21 10:45:44 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyTDEN.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -28,6 +28,7 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+
 public class FrameBodyTDEN extends AbstractFrameBodyTextInfo implements ID3v24FrameBody {
     /**
      * Creates a new FrameBodyTDEN datatype.
@@ -52,11 +53,14 @@ public class FrameBodyTDEN extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTDEN datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTDEN(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
     }
+
 
     /**
      * The ID3v2 frame identifier

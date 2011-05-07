@@ -1,8 +1,8 @@
 package org.jaudiotagger.tag.id3;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
 
 /**
  * Orders frame Ids so that the most important frames are writtne first
@@ -29,6 +29,7 @@ public class ID3v23PreferredFrameOrderComparator implements Comparator<String> {
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_BPM);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_ISRC);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_TORY);
+        frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_ACCOMPANIMENT);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_TITLE_REFINEMENT);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_UNSYNC_LYRICS);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_USER_DEFINED_INFO);
@@ -63,8 +64,8 @@ public class ID3v23PreferredFrameOrderComparator implements Comparator<String> {
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_COMPOSER_SORT_ORDER_ITUNES);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_COMMENT);
 
+
         //Not so bothered about these
-        frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_ACCOMPANIMENT);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_TRDA);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_COMMERCIAL_FRAME);
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_COPYRIGHTINFO);
@@ -107,6 +108,7 @@ public class ID3v23PreferredFrameOrderComparator implements Comparator<String> {
         frameIdsInPreferredOrder.add(ID3v23Frames.FRAME_ID_V3_GENERAL_ENCAPS_OBJECT);
     }
 
+
     private ID3v23PreferredFrameOrderComparator() {
 
     }
@@ -130,10 +132,7 @@ public class ID3v23PreferredFrameOrderComparator implements Comparator<String> {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof ID3v23PreferredFrameOrderComparator) {
-            return true;
-        }
-        return false;
+        return obj instanceof ID3v23PreferredFrameOrderComparator;
     }
 
 }

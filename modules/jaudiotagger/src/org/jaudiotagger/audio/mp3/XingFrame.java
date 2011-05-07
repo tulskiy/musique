@@ -55,7 +55,6 @@ public class XingFrame {
     private static final byte[] XING_CBR_ID = {'I', 'n', 'f', 'o'};
 
     private static ByteBuffer header;
-    private static XingFrame xingFrame = null;
 
     private boolean vbr = false;
     private boolean isFrameCountEnabled = false;
@@ -108,10 +107,6 @@ public class XingFrame {
             header.reset();
             lameFrame = LameFrame.parseLameFrame(header);
         }
-//        if (header.limit() >= XING_HEADER_BUFFER_SIZE + LameFrame.LAME_HEADER_BUFFER_SIZE) {
-//            header.position(XING_HEADER_BUFFER_SIZE);
-//            lameFrame = LameFrame.parseLameFrame(header);
-//        }
     }
 
     public LameFrame getLameFrame() {
@@ -187,13 +182,15 @@ public class XingFrame {
      * @throws InvalidAudioFrameException
      */
     public static XingFrame parseXingFrame() throws InvalidAudioFrameException {
-        xingFrame = new XingFrame();
+        XingFrame xingFrame = new XingFrame();
         return xingFrame;
     }
 
     /**
      * IS this a Xing frame
      *
+     * @param bb
+     * @param mpegFrameHeader
      * @return true if this is a Xing frame
      */
     public static boolean isXingFrame(ByteBuffer bb, MPEGFrameHeader mpegFrameHeader) {
@@ -240,14 +237,6 @@ public class XingFrame {
      */
     public final boolean isVbr() {
         return vbr;
-    }
-
-    public byte[] getToc() {
-        return toc;
-    }
-
-    public int getVbr_quality() {
-        return vbr_quality;
     }
 
     /**

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: BooleanString.java,v 1.8 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: BooleanString.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -31,6 +31,7 @@ public class BooleanString extends AbstractDataType {
      * Creates a new ObjectBooleanString datatype.
      *
      * @param identifier
+     * @param frameBody
      */
     public BooleanString(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody);
@@ -48,11 +49,8 @@ public class BooleanString extends AbstractDataType {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof BooleanString == false) {
-            return false;
-        }
+        return obj instanceof BooleanString && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**
@@ -80,7 +78,7 @@ public class BooleanString extends AbstractDataType {
         if (value == null) {
             booleanValue[0] = '0';
         } else {
-            if ((Boolean) value == true) {
+            if ((Boolean) value) {
                 booleanValue[0] = '0';
             } else {
                 booleanValue[0] = '1';

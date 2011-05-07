@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: StringSizeTerminated.java,v 1.9 2008/01/01 15:12:56 paultaylor Exp $
+ *  Version @version:$Id: StringSizeTerminated.java 899 2010-04-19 14:32:20Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -34,7 +34,7 @@ import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
  * Represents a String which is not delimited by null character with fixed text encoding.
  * <p/>
  * This type of String will usually only be used when it is the last field within a frame, when reading the remainder of the byte array will
- * be read, when writing the frame will accomodate the required size for the String. The String will be encoded
+ * be read, when writing the frame will accommodate the required size for the String. The String will be encoded
  * using the default encoding regardless of what encoding may be specified in the framebody
  */
 public class StringSizeTerminated extends TextEncodedStringSizeTerminated {
@@ -43,6 +43,7 @@ public class StringSizeTerminated extends TextEncodedStringSizeTerminated {
      * Creates a new ObjectStringSizeTerminated datatype.
      *
      * @param identifier identifies the frame type
+     * @param frameBody
      */
     public StringSizeTerminated(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody);
@@ -53,10 +54,7 @@ public class StringSizeTerminated extends TextEncodedStringSizeTerminated {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof StringSizeTerminated == false) {
-            return false;
-        }
-        return super.equals(obj);
+        return obj instanceof StringSizeTerminated && super.equals(obj);
     }
 
     protected String getTextEncodingCharSet() {

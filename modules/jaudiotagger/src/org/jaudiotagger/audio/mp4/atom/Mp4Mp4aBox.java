@@ -58,6 +58,7 @@ public class Mp4Mp4aBox extends AbstractMp4Box {
 
     public static final int TOTAL_LENGTH = RESERVED_LENGTH + REFERENCE_INDEX_LENGTH + AUDIO_ENCODING_LENGTH + AUDIO_REVISION_LENGTH + AUDIO_ENCODING_VENDOR_LENGTH + CHANNELS_LENGTH + AUDIO_SAMPLE_SIZE_LENGTH + AUDIO_COMPRESSION_ID_LENGTH + AUDIO_PACKET_SIZE_LENGTH + AUDIO_SAMPLE_RATE_LENGTH;
 
+
     /**
      * @param header     header info
      * @param dataBuffer data of box (doesnt include header data)
@@ -66,6 +67,7 @@ public class Mp4Mp4aBox extends AbstractMp4Box {
         this.header = header;
         this.dataBuffer = dataBuffer;
     }
+
 
     public void processData() throws CannotReadException {
         dataBuffer.position(dataBuffer.position() + TOTAL_LENGTH);

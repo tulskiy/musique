@@ -44,7 +44,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyPCNT.java,v 1.14 2008/07/21 10:45:42 paultaylor Exp $
+ * @version $Id: FrameBodyPCNT.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodyPCNT extends AbstractID3v2FrameBody implements ID3v24FrameBody, ID3v23FrameBody {
     private static final int COUNTER_MINIMUM_FIELD_SIZE = 4;
@@ -72,6 +72,8 @@ public class FrameBodyPCNT extends AbstractID3v2FrameBody implements ID3v24Frame
     /**
      * Creates a new FrameBodyPCNT datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodyPCNT(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {

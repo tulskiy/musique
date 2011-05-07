@@ -25,6 +25,7 @@ import org.jaudiotagger.tag.Tag;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.logging.Logger;
 
 /**
  * Write tag data to Ogg File
@@ -33,7 +34,7 @@ import java.io.RandomAccessFile;
  */
 public class OggFileWriter extends AudioFileWriter {
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.ogg");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.ogg");
 
     private OggVorbisTagWriter vtw = new OggVorbisTagWriter();
 

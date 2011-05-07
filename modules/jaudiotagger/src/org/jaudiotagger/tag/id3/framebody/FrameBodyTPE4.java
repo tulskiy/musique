@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyTPE4.java,v 1.11 2008/07/21 10:45:45 paultaylor Exp $
+ * @version $Id: FrameBodyTPE4.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodyTPE4 extends AbstractFrameBodyTextInfo implements ID3v24FrameBody, ID3v23FrameBody {
     /**
@@ -57,6 +57,8 @@ public class FrameBodyTPE4 extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTPE4 datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws java.io.IOException
      * @throws InvalidTagException
      */

@@ -29,14 +29,12 @@ import java.nio.ByteBuffer;
  * Unsychronised lyrics/text transcription frame.
  * <p/>
  * <p/>
- * This frame contains the lyrics of the song or a text transcription of
- * other vocal activities. The head includes an encoding descriptor and
- * a content descriptor. The body consists of the actual text. The
- * 'Content descriptor' is a terminated string. If no descriptor is
- * entered, 'Content descriptor' is $00 (00) only. Newline characters
- * are allowed in the text. There may be more than one 'Unsynchronised
- * lyrics/text transcription' frame in each tag, but only one with the
- * same language and content descriptor.
+ * This frame contains the lyrics of the song or a text transcription of other vocal activities. The head includes an
+ * encoding descriptor and a content descriptor. The body consists of the actual text. The 'Content descriptor' is a
+ * terminated string. If no descriptor is entered, 'Content descriptor' is $00 (00) only. Newline characters are
+ * allowed in the text. There may be more than one 'Unsynchronised lyrics/text transcription' frame in each tag, but
+ * only one with the same language and content descriptor.
+ * <p/>
  * </p><p><table border=0 width="70%">
  * <tr><td colspan=2>&lt;Header for 'Unsynchronised lyrics/text transcription', ID: "USLT"&gt;</td></tr>
  * <tr><td>Text encoding     </td><td width="80%">$xx</td></tr>
@@ -54,17 +52,17 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyUSLT.java,v 1.23 2008/07/21 10:45:46 paultaylor Exp $
+ * @version $Id: FrameBodyUSLT.java 908 2010-08-04 18:43:30Z paultaylor $
  */
 public class FrameBodyUSLT extends AbstractID3v2FrameBody implements ID3v23FrameBody, ID3v24FrameBody {
     /**
-     * Creates a new FrameBodyUSLT datatype.
+     * Creates a new FrameBodyUSLT dataType.
      */
     public FrameBodyUSLT() {
-        //        setObject("Text Encoding", new Byte((byte) 0));
-        //        setObject("Language", "");
-        //        setObject(ObjectTypes.OBJ_DESCRIPTION, "");
-        //        setObject("Lyrics/Text", "");
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
+        setObjectValue(DataTypes.OBJ_LANGUAGE, "");
+        setObjectValue(DataTypes.OBJ_DESCRIPTION, "");
+        setObjectValue(DataTypes.OBJ_LYRICS, "");
     }
 
     /**
@@ -95,12 +93,18 @@ public class FrameBodyUSLT extends AbstractID3v2FrameBody implements ID3v23Frame
      * Creates a new FrameBodyUSLT datatype, populated from buffer
      *
      * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      * @throws InvalidTagException
      */
     public FrameBodyUSLT(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
     }
+
+    public String getUserFriendlyValue() {
+        return getFirstTextValue();
+    }
+
 
     /**
      * Set a description field
@@ -182,7 +186,6 @@ public class FrameBodyUSLT extends AbstractID3v2FrameBody implements ID3v23Frame
      */
     public void addLyric(String text) {
         setLyric(getLyric() + text);
-        ;
     }
 
     /**
@@ -192,16 +195,17 @@ public class FrameBodyUSLT extends AbstractID3v2FrameBody implements ID3v23Frame
         setLyric(getLyric() + line.writeString());
     }
 
+
     public void write(ByteArrayOutputStream tagBuffer) {
 
         //Ensure valid for type
-        this.setTextEncoding(ID3TextEncodingConversion.getTextEncoding(getHeader(), TextEncoding.ISO_8859_1));
+        this.setTextEncoding(ID3TextEncodingConversion.getTextEncoding(getHeader(), getTextEncoding()));
 
         //Ensure valid for data                    
-        if (((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded() == false) {
+        if (!((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded()) {
             this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(getHeader()));
         }
-        if (((AbstractString) getObject(DataTypes.OBJ_LYRICS)).canBeEncoded() == false) {
+        if (!((AbstractString) getObject(DataTypes.OBJ_LYRICS)).canBeEncoded()) {
             this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(getHeader()));
         }
         super.write(tagBuffer);

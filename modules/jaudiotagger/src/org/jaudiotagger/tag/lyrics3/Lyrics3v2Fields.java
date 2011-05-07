@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: Lyrics3v2Fields.java,v 1.4 2008/01/01 15:14:24 paultaylor Exp $
+ * Version @version:$Id: Lyrics3v2Fields.java 832 2009-11-12 13:25:38Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>
@@ -52,6 +52,7 @@ public class Lyrics3v2Fields extends AbstractStringStringValuePair {
     public static final String FIELD_V2_TRACK = "ETT";
     public static final String FIELD_V2_IMAGE = "IMG";
 
+
     private Lyrics3v2Fields() {
         idToValue.put(FIELD_V2_INDICATIONS, "Indications field");
         idToValue.put(FIELD_V2_LYRICS_MULTI_LINE_TEXT, "Lyrics multi line text");
@@ -71,9 +72,6 @@ public class Lyrics3v2Fields extends AbstractStringStringValuePair {
      * @return true if the identifier is a valid Lyrics3v2 frame identifier
      */
     public static boolean isLyrics3v2FieldIdentifier(String identifier) {
-        if (identifier.length() < 3) {
-            return false;
-        }
-        return getInstanceOf().getIdToValueMap().containsKey(identifier.substring(0, 3));
+        return identifier.length() >= 3 && getInstanceOf().getIdToValueMap().containsKey(identifier.substring(0, 3));
     }
 }

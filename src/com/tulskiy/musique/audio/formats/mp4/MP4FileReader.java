@@ -35,9 +35,6 @@ public class MP4FileReader extends AudioFileReader {
             copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), track);
             org.jaudiotagger.tag.Tag tag = audioFile.getTag();
             copyTagFields(tag, track);
-            track.setTrackNumber(tag.getFirstTrack());
-            track.setDiscNumber(tag.getFirst("disk"));
-            track.setMeta("albumArtist", tag.getFirst("aART"));
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("Couldn't read file: " + track.getFile());

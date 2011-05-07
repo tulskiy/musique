@@ -8,6 +8,8 @@ import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 import org.jaudiotagger.tag.reference.PictureTypes;
 import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
+import org.jaudiotagger.tag.vorbiscomment.VorbisCommentFieldKey;
+import org.jaudiotagger.logging.ErrorMessage;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -47,233 +49,33 @@ public class FlacTag implements Tag {
         return tag;
     }
 
-    /**
-     * Adds a tagfield to the structure.<br>
-     * <p/>
-     * <p>It is not recommended to use this method for normal use of the
-     * audiolibrary. The developer will circumvent the underlying
-     * implementation. For example, if one adds a field with the field id
-     * &quot;TALB&quot; for an mp3 file, and the given {@link org.jaudiotagger.tag.TagField}
-     * implementation does not return a text field compliant data with
-     * {@link org.jaudiotagger.tag.TagField#getRawContent()} other software and the audio library
-     * won't read the file correctly, if they do read it at all. <br>
-     * So for short:<br>
-     * <uil>
-     * <li>The field is stored without validation</li>
-     * <li>No conversion of data is perfomed</li>
-     * </ul>
-     *
-     * @param field The field to add.
-     */
-    public void add(TagField field) throws FieldDataInvalidException {
+    public void addField(TagField field) throws FieldDataInvalidException {
         if (field instanceof MetadataBlockDataPicture) {
             images.add((MetadataBlockDataPicture) field);
         } else {
-            tag.add(field);
+            tag.addField(field);
         }
     }
 
-    /**
-     * Adds an album to the tag.<br>
-     *
-     * @param album Album description
-     */
-    public void addAlbum(String album) throws FieldDataInvalidException {
-        tag.addAlbum(album);
-    }
-
-    /**
-     * Adds an artist to the tag.<br>
-     *
-     * @param artist Artist's name
-     */
-    public void addArtist(String artist) throws FieldDataInvalidException {
-        tag.addArtist(artist);
-    }
-
-    /**
-     * Adds a comment to the tag.<br>
-     *
-     * @param comment Comment.
-     */
-    public void addComment(String comment) throws FieldDataInvalidException {
-        tag.addComment(comment);
-    }
-
-    /**
-     * Adds a genre to the tag.<br>
-     *
-     * @param genre Genre
-     */
-    public void addGenre(String genre) throws FieldDataInvalidException {
-        tag.addGenre(genre);
-    }
-
-    /**
-     * Adds a title to the tag.<br>
-     *
-     * @param title Title
-     */
-    public void addTitle(String title) throws FieldDataInvalidException {
-        tag.addTitle(title);
-    }
-
-    /**
-     * Adds a track to the tag.<br>
-     *
-     * @param track Track
-     */
-    public void addTrack(String track) throws FieldDataInvalidException {
-        tag.addTrack(track);
-    }
-
-    /**
-     * Adds a year to the Tag.<br>
-     *
-     * @param year Year
-     */
-    public void addYear(String year) throws FieldDataInvalidException {
-        tag.addYear(year);
-    }
-
-    /**
-     * Returns a {@linkplain List list} of {@link TagField} objects whose &quot;{@linkplain TagField#getId() id}&quot;
-     * is the specified one.<br>
-     *
-     * @param id The field id.
-     * @return A list of {@link TagField} objects with the given &quot;id&quot;.
-     */
-    public List<TagField> get(String id) {
-        if (id.equals(TagFieldKey.COVER_ART.name())) {
+    public List<TagField> getFields(String id) {
+        if (id.equals(FieldKey.COVER_ART.name())) {
             List<TagField> castImages = new ArrayList<TagField>();
             for (MetadataBlockDataPicture image : images) {
                 castImages.add(image);
             }
             return castImages;
         } else {
-            return tag.get(id);
+            return tag.getFields(id);
         }
     }
 
-    /**
-     * @return
-     */
-    public List<TagField> getAlbum() {
-        return tag.getAlbum();
-    }
 
-    /**
-     * @return
-     */
-    public List<TagField> getArtist() {
-        return tag.getArtist();
-    }
-
-    /**
-     * @return
-     */
-    public List<TagField> getComment() {
-        return tag.getComment();
-    }
-
-    /**
-     * @return
-     */
-    public List<TagField> getGenre() {
-        return tag.getGenre();
-    }
-
-    /**
-     * @return
-     */
-    public List<TagField> getTitle() {
-        return tag.getTitle();
-    }
-
-    /**
-     * @return
-     */
-    public List<TagField> getTrack() {
-        return tag.getTrack();
-    }
-
-    /**
-     * @return
-     */
-    public List<TagField> getYear() {
-        return tag.getYear();
-    }
-
-    /**
-     * @return
-     */
-    public String getFirstAlbum() {
-        return tag.getFirstAlbum();
-    }
-
-    /**
-     * @return
-     */
-    public String getFirstArtist() {
-        return tag.getFirstArtist();
-    }
-
-    /**
-     * @return
-     */
-    public String getFirstComment() {
-        return tag.getFirstComment();
-    }
-
-    /**
-     * @return
-     */
-    public String getFirstGenre() {
-        return tag.getFirstGenre();
-    }
-
-    /**
-     * @return
-     */
-    public String getFirstTitle() {
-        return tag.getFirstTitle();
-    }
-
-    /**
-     * @return
-     */
-    public String getFirstTrack() {
-        return tag.getFirstTrack();
-    }
-
-    /**
-     * @return
-     */
-    public String getFirstYear() {
-        return tag.getFirstYear();
-    }
-
-    /**
-     * Returns <code>true</code>, if at least one of the contained
-     * {@linkplain TagField fields} is a common field ({@link TagField#isCommon()}).
-     *
-     * @return <code>true</code> if a {@linkplain TagField#isCommon() common}
-     *         field is present.
-     */
     public boolean hasCommonFields() {
         return tag.hasCommonFields();
     }
 
-    /**
-     * Determines whether the tag has at least one field with the specified
-     * &quot;id&quot;.
-     *
-     * @param id The field id to look for.
-     * @return <code>true</code> if tag contains a {@link TagField} with the
-     *         given {@linkplain TagField#getId() id}.
-     */
     public boolean hasField(String id) {
-        if (id.equals(TagFieldKey.COVER_ART.name())) {
+        if (id.equals(FieldKey.COVER_ART.name())) {
             return images.size() > 0;
         } else {
             return tag.hasField(id);
@@ -292,11 +94,47 @@ public class FlacTag implements Tag {
         return (tag == null || tag.isEmpty()) && images.size() == 0;
     }
 
+    public void setField(FieldKey genericKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        TagField tagfield = createField(genericKey, value);
+        setField(tagfield);
+    }
+
+    public void addField(FieldKey genericKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        TagField tagfield = createField(genericKey, value);
+        addField(tagfield);
+    }
+
+    /**
+     * Create and set field with name of vorbisCommentkey
+     *
+     * @param vorbisCommentKey
+     * @param value
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    public void setField(String vorbisCommentKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        TagField tagfield = createField(vorbisCommentKey, value);
+        setField(tagfield);
+    }
+
+    /**
+     * Create and add field with name of vorbisCommentkey
+     *
+     * @param vorbisCommentKey
+     * @param value
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    public void addField(String vorbisCommentKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        TagField tagfield = createField(vorbisCommentKey, value);
+        addField(tagfield);
+    }
+
     /**
      * @param field
      * @throws FieldDataInvalidException
      */
-    public void set(TagField field) throws FieldDataInvalidException {
+    public void setField(TagField field) throws FieldDataInvalidException {
         if (field instanceof MetadataBlockDataPicture) {
             if (images.size() == 0) {
                 images.add(0, (MetadataBlockDataPicture) field);
@@ -304,124 +142,87 @@ public class FlacTag implements Tag {
                 images.set(0, (MetadataBlockDataPicture) field);
             }
         } else {
-            tag.set(field);
+            tag.setField(field);
         }
     }
 
-    /**
-     * @param s
-     * @throws FieldDataInvalidException
-     */
-    public void setAlbum(String s) throws FieldDataInvalidException {
-        tag.setAlbum(s);
-    }
-
-    /**
-     * @param s
-     * @throws FieldDataInvalidException
-     */
-    public void setArtist(String s) throws FieldDataInvalidException {
-        tag.setArtist(s);
-    }
-
-    /**
-     * @param s
-     * @throws FieldDataInvalidException
-     */
-    public void setComment(String s) throws FieldDataInvalidException {
-        tag.setComment(s);
-    }
-
-    /**
-     * @param s
-     * @throws FieldDataInvalidException
-     */
-    public void setGenre(String s) throws FieldDataInvalidException {
-        tag.setGenre(s);
-    }
-
-    /**
-     * @param s
-     * @throws FieldDataInvalidException
-     */
-    public void setTitle(String s) throws FieldDataInvalidException {
-        tag.setTitle(s);
-    }
-
-    /**
-     * @param s
-     * @throws FieldDataInvalidException
-     */
-    public void setTrack(String s) throws FieldDataInvalidException {
-        tag.setTrack(s);
-    }
-
-    /**
-     * @param s
-     * @throws FieldDataInvalidException
-     */
-    public void setYear(String s) throws FieldDataInvalidException {
-        tag.setYear(s);
-    }
-
-    /**
-     * Create a new TagField based on generic key
-     * <p/>
-     * <p>Only textual data supported at the moment. The genericKey will be mapped
-     * to the correct implementation key and return a TagField.
-     *
-     * @param genericKey is the generic key
-     * @param value      to store
-     * @return
-     */
-    public TagField createTagField(TagFieldKey genericKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
-        if (genericKey.equals(TagFieldKey.COVER_ART)) {
-            throw new UnsupportedOperationException("Please use the createArtworkField methods to create coverart ");
+    public TagField createField(FieldKey genericKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        if (genericKey.equals(FieldKey.COVER_ART)) {
+            throw new UnsupportedOperationException(ErrorMessage.ARTWORK_CANNOT_BE_CREATED_WITH_THIS_METHOD.getMsg());
         } else {
-            return tag.createTagField(genericKey, value);
+            return tag.createField(genericKey, value);
         }
     }
 
     /**
-     * Retrieve the first value that exists for this key
+     * Create Tag Field using ogg key
      *
-     * @param id
+     * @param vorbisCommentFieldKey
+     * @param value
+     * @return
+     * @throws org.jaudiotagger.tag.KeyNotFoundException
+     *
+     * @throws org.jaudiotagger.tag.FieldDataInvalidException
+     *
+     */
+    public TagField createField(VorbisCommentFieldKey vorbisCommentFieldKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        if (vorbisCommentFieldKey.equals(VorbisCommentFieldKey.COVERART)) {
+            throw new UnsupportedOperationException(ErrorMessage.ARTWORK_CANNOT_BE_CREATED_WITH_THIS_METHOD.getMsg());
+        }
+        return tag.createField(vorbisCommentFieldKey, value);
+    }
+
+    /**
+     * Create Tag Field using ogg key
+     * <p/>
+     * This method is provided to allow you to create key of any value because VorbisComment allows
+     * arbitary keys.
+     *
+     * @param vorbisCommentFieldKey
+     * @param value
      * @return
      */
+    public TagField createField(String vorbisCommentFieldKey, String value) {
+        if (vorbisCommentFieldKey.equals(VorbisCommentFieldKey.COVERART.getFieldName())) {
+            throw new UnsupportedOperationException(ErrorMessage.ARTWORK_CANNOT_BE_CREATED_WITH_THIS_METHOD.getMsg());
+        }
+        return tag.createField(vorbisCommentFieldKey, value);
+    }
+
     public String getFirst(String id) {
-        if (id.equals(TagFieldKey.COVER_ART.name())) {
-            throw new UnsupportedOperationException("Please use the createArtworkField methods to create coverart ");
+        if (id.equals(FieldKey.COVER_ART.name())) {
+            throw new UnsupportedOperationException(ErrorMessage.ARTWORK_CANNOT_BE_CREATED_WITH_THIS_METHOD.getMsg());
         } else {
             return tag.getFirst(id);
         }
     }
 
     /**
-     * Retrieve String value of first tagfield that exists for this key
+     * The m parameter is effectively ignored
      *
      * @param id
-     * @return String value or empty string
+     * @param n
+     * @param m
+     * @return
      */
-    public String getFirst(TagFieldKey id) throws KeyNotFoundException {
-        if (id.equals(TagFieldKey.COVER_ART)) {
-            throw new UnsupportedOperationException("Please use the createArtworkField methods to create coverart ");
-        } else {
-            return tag.getFirst(id);
-        }
-
+    public String getSubValue(FieldKey id, int n, int m) {
+        return getValue(id, n);
     }
 
-    /**
-     * Retrieve the first tagfield that exists for this key
-     * <p/>
-     * <p>Can be used to retrieve fields with any identifier, useful if the identifier is not within  the
-     * jaudiotagger enum
-     *
-     * @param id audio specific key
-     * @return tag field or null if doesnt exist
-     */
+    public String getValue(FieldKey id, int index) throws KeyNotFoundException {
+        if (id.equals(FieldKey.COVER_ART)) {
+            throw new UnsupportedOperationException(ErrorMessage.ARTWORK_CANNOT_BE_RETRIEVED_WITH_THIS_METHOD.getMsg());
+        } else {
+            return tag.getValue(id, index);
+        }
+    }
+
+    public String getFirst(FieldKey id) throws KeyNotFoundException {
+        return getValue(id, 0);
+    }
+
     public TagField getFirstField(String id) {
-        if (id.equals(TagFieldKey.COVER_ART)) {
+        if (id.equals(FieldKey.COVER_ART.name())) {
             if (images.size() > 0) {
                 return images.get(0);
             } else {
@@ -432,13 +233,13 @@ public class FlacTag implements Tag {
         }
     }
 
-    public TagField getFirstField(TagFieldKey genericKey) throws KeyNotFoundException {
+    public TagField getFirstField(FieldKey genericKey) throws KeyNotFoundException {
         if (genericKey == null) {
             throw new KeyNotFoundException();
         }
 
-        if (genericKey == TagFieldKey.COVER_ART) {
-            return getFirstField(TagFieldKey.COVER_ART.name());
+        if (genericKey == FieldKey.COVER_ART) {
+            return getFirstField(FieldKey.COVER_ART.name());
         } else {
             return tag.getFirstField(genericKey);
         }
@@ -447,76 +248,54 @@ public class FlacTag implements Tag {
     /**
      * Delete any instance of tag fields with this key
      *
-     * @param tagFieldKey
+     * @param fieldKey
      */
-    public void deleteTagField(TagFieldKey tagFieldKey) throws KeyNotFoundException {
-        if (tagFieldKey.equals(TagFieldKey.COVER_ART)) {
+    public void deleteField(FieldKey fieldKey) throws KeyNotFoundException {
+        if (fieldKey.equals(FieldKey.COVER_ART)) {
             images.clear();
         } else {
-            tag.deleteTagField(tagFieldKey);
+            tag.deleteField(fieldKey);
         }
     }
 
-    /**
-     * Iterator over all the fields within the tag, handle multiple fields with the same id
-     *
-     * @return iterator over whole list
-     */
-    //TODO add images to iterator
+    public void deleteField(String id) throws KeyNotFoundException {
+        if (id.equals(FieldKey.COVER_ART.name())) {
+            images.clear();
+        } else {
+            tag.deleteField(id);
+        }
+    }
+
+
+    //TODO addField images to iterator
     public Iterator<TagField> getFields() {
         return tag.getFields();
     }
 
-    /**
-     * Return the number of fields
-     * <p/>
-     * <p>Fields with the same identifiers are counted seperately
-     * i.e two title fields would contribute two to the count
-     *
-     * @return total number of fields
-     */
     public int getFieldCount() {
         return tag.getFieldCount() + images.size();
+    }
+
+    public int getFieldCountIncludingSubValues() {
+        return getFieldCount();
     }
 
     public boolean setEncoding(String enc) throws FieldDataInvalidException {
         return tag.setEncoding(enc);
     }
 
-    /**
-     * Returns a {@linkplain List list} of {@link TagField} objects whose &quot;{@linkplain TagField#getId() id}&quot;
-     * is the specified one.<br>
-     *
-     * @param id The field id.
-     * @return A list of {@link TagField} objects with the given &quot;id&quot;.
-     */
-    public List<TagField> get(TagFieldKey id) throws KeyNotFoundException {
-        if (id.equals(TagFieldKey.COVER_ART)) {
+    public List<TagField> getFields(FieldKey id) throws KeyNotFoundException {
+        if (id.equals(FieldKey.COVER_ART)) {
             List<TagField> castImages = new ArrayList<TagField>();
             for (MetadataBlockDataPicture image : images) {
                 castImages.add(image);
             }
             return castImages;
         } else {
-            return tag.get(id);
+            return tag.getFields(id);
         }
-
     }
 
-    /**
-     * Create Artwork when have the raw image data
-     *
-     * @param imageData
-     * @param pictureType
-     * @param mimeType
-     * @param description
-     * @param width
-     * @param height
-     * @param colourDepth
-     * @param indexedColouredCount
-     * @return
-     * @throws FieldDataInvalidException
-     */
     public TagField createArtworkField(byte[] imageData, int pictureType, String mimeType, String description, int width, int height, int colourDepth, int indexedColouredCount) throws FieldDataInvalidException {
         return new MetadataBlockDataPicture(imageData, pictureType, mimeType, description, width, height, colourDepth, indexedColouredCount);
     }
@@ -524,6 +303,7 @@ public class FlacTag implements Tag {
     /**
      * Create Artwork when  have the bufferedimage
      *
+     * @param bi
      * @param pictureType
      * @param mimeType
      * @param description
@@ -540,8 +320,7 @@ public class FlacTag implements Tag {
 
             //Add to image list
             return new MetadataBlockDataPicture(output.toByteArray(), pictureType, mimeType, description, bi.getWidth(), bi.getHeight(), colourDepth, indexedColouredCount);
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             throw new FieldDataInvalidException("Unable to convert image to bytearray, check mimetype parameter");
         }
     }
@@ -549,6 +328,9 @@ public class FlacTag implements Tag {
     /**
      * Create Link to Image File, not recommended because if either flac or image file is moved link
      * will be broken.
+     *
+     * @param url
+     * @return
      */
     public TagField createLinkedArtworkField(String url) {
         //Add to image list
@@ -560,7 +342,7 @@ public class FlacTag implements Tag {
      *
      * @return
      */
-    public TagField createArtworkField(Artwork artwork) throws FieldDataInvalidException {
+    public TagField createField(Artwork artwork) throws FieldDataInvalidException {
         if (artwork.isLinked()) {
             return new MetadataBlockDataPicture(
                     Utils.getDefaultBytes(artwork.getImageUrl(), TextEncoding.CHARSET_ISO_8859_1),
@@ -575,46 +357,34 @@ public class FlacTag implements Tag {
             BufferedImage image;
             try {
                 image = artwork.getImage();
-            }
-            catch (IOException ioe) {
-                throw new FieldDataInvalidException("Unable to create bufferd image from the image");
+            } catch (IOException ioe) {
+                throw new FieldDataInvalidException("Unable to createField bufferd image from the image");
             }
 
             return new MetadataBlockDataPicture(artwork.getBinaryData(),
-                                                artwork.getPictureType(),
-                                                artwork.getMimeType(),
-                                                artwork.getDescription(),
-                                                image.getWidth(),
-                                                image.getHeight(),
-                                                0,
-                                                0);
+                    artwork.getPictureType(),
+                    artwork.getMimeType(),
+                    artwork.getDescription(),
+                    image.getWidth(),
+                    image.getHeight(),
+                    0,
+                    0);
         }
     }
 
-    /**
-     * Create field and then set within tag itself
-     *
-     * @param artwork
-     * @throws FieldDataInvalidException
-     */
-    public void createAndSetArtworkField(Artwork artwork) throws FieldDataInvalidException {
-        this.set(createArtworkField(artwork));
+    public void setField(Artwork artwork) throws FieldDataInvalidException {
+        this.setField(createField(artwork));
+    }
+
+    public void addField(Artwork artwork) throws FieldDataInvalidException {
+        this.addField(createField(artwork));
     }
 
     public List<Artwork> getArtworkList() {
         List<Artwork> artworkList = new ArrayList<Artwork>(images.size());
 
         for (MetadataBlockDataPicture coverArt : images) {
-            Artwork artwork = new Artwork();
-            artwork.setMimeType(coverArt.getMimeType());
-            artwork.setDescription(coverArt.getDescription());
-            artwork.setPictureType(coverArt.getPictureType());
-            if (coverArt.isImageUrl()) {
-                artwork.setLinked(coverArt.isImageUrl());
-                artwork.setImageUrl(coverArt.getImageUrl());
-            } else {
-                artwork.setBinaryData(coverArt.getImageData());
-            }
+            Artwork artwork = Artwork.createArtworkFromMetadataBlockDataPicture(coverArt);
             artworkList.add(artwork);
         }
         return artworkList;
@@ -626,5 +396,14 @@ public class FlacTag implements Tag {
             return artwork.get(0);
         }
         return null;
+    }
+
+    /**
+     * Delete all instance of artwork Field
+     *
+     * @throws KeyNotFoundException
+     */
+    public void deleteArtworkField() throws KeyNotFoundException {
+        this.deleteField(FieldKey.COVER_ART);
     }
 }

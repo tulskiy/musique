@@ -95,6 +95,7 @@ public class Mp4StcoBox extends AbstractMp4Box {
      *
      * @param header             header info
      * @param originalDataBuffer data of box (doesnt include header data)
+     * @param adjustment
      */
     public Mp4StcoBox(Mp4BoxHeader header, ByteBuffer originalDataBuffer, int adjustment) {
         this.header = header;
@@ -146,7 +147,7 @@ public class Mp4StcoBox extends AbstractMp4Box {
         moovBuffer.rewind();
 
         //Level 2-Searching for "mvhd" somewhere within "moov", we make a slice after finding header
-        //so all get() methods will be relative to mvdh positions
+        //so all getFields() methods will be relative to mvdh positions
         Mp4BoxHeader boxHeader = Mp4BoxHeader.seekWithinLevel(moovBuffer, Mp4NotMetaFieldKey.MVHD.getFieldName());
         if (boxHeader == null) {
             throw new CannotReadException("This file does not appear to be an audio file");

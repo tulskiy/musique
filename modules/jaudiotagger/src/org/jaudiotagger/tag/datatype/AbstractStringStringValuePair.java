@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: AbstractStringStringValuePair.java,v 1.4 2008/07/21 10:45:40 paultaylor Exp $
+ * Version @version:$Id: AbstractStringStringValuePair.java 836 2009-11-12 15:44:07Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>
@@ -28,6 +28,9 @@ public class AbstractStringStringValuePair extends AbstractValuePair<String, Str
 
     /**
      * Get Id for Value
+     *
+     * @param value
+     * @return
      */
     public String getIdForValue(String value) {
         return valueToId.get(value);
@@ -35,6 +38,9 @@ public class AbstractStringStringValuePair extends AbstractValuePair<String, Str
 
     /**
      * Get value for Id
+     *
+     * @param id
+     * @return
      */
     public String getValueForId(String id) {
         return idToValue.get(id);

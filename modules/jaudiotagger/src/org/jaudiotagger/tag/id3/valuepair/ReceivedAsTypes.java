@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: ReceivedAsTypes.java,v 1.3 2007/08/06 16:04:36 paultaylor Exp $
+ * Version @version:$Id: ReceivedAsTypes.java 867 2010-01-28 16:27:11Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>
@@ -24,7 +24,13 @@ package org.jaudiotagger.tag.id3.valuepair;
 
 import org.jaudiotagger.tag.datatype.AbstractIntStringValuePair;
 
+/**
+ * Defines how song was purchased used by the COMR frame
+ */
 public class ReceivedAsTypes extends AbstractIntStringValuePair {
+    //The number of bytes used to hold the text encoding field size
+    public static final int RECEIVED_AS_FIELD_SIZE = 1;
+
     private static ReceivedAsTypes receivedAsTypes;
 
     public static ReceivedAsTypes getInstanceOf() {

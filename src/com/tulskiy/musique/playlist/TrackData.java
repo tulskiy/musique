@@ -242,7 +242,7 @@ public class TrackData implements Cloneable {
     }
 
     public void setTrackNumber(String trackNumber) {
-        if (trackNumber != null) {
+        if (!Util.isEmpty(trackNumber)) {
             String[] s = trackNumber.split("/");
             if (s.length > 0) {
                 try {
@@ -261,6 +261,9 @@ public class TrackData implements Cloneable {
 
             if (s.length > 1)
                 this.totalTracks = s[1];
+        } else {
+            this.trackNumber = null;
+            this.track = null;
         }
     }
 
@@ -269,11 +272,17 @@ public class TrackData implements Cloneable {
     }
 
     public void setTotalTracks(String totalTracks) {
-        this.totalTracks = totalTracks.intern();
+        if (!Util.isEmpty(totalTracks))
+            this.totalTracks = totalTracks.intern();
+        else
+            this.totalTracks = null;
     }
 
     public void setTotalDiscs(String totalDiscs) {
-        this.totalDiscs = totalDiscs.intern();
+        if (!Util.isEmpty(totalDiscs))
+            this.totalDiscs = totalDiscs.intern();
+        else
+            this.totalDiscs = null;
     }
 
     public String getDiscNumber() {
@@ -281,13 +290,16 @@ public class TrackData implements Cloneable {
     }
 
     public void setDiscNumber(String discNumber) {
-        if (discNumber != null && discNumber.length() > 0) {
+        if (!Util.isEmpty(discNumber)) {
             String[] s = discNumber.split("/");
             if (s.length > 0)
                 this.discNumber = s[0];
             if (s.length > 1)
                 this.totalDiscs = s[1];
+        } else {
+            this.discNumber = null;
         }
+
     }
 
     public String getTotalDiscs() {

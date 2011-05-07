@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyWXXX.java,v 1.17 2008/07/21 10:45:47 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyWXXX.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -42,6 +42,7 @@ public class FrameBodyWXXX extends AbstractFrameBodyUrlLink implements ID3v24Fra
     public static final String URL_OFFICIAL_RELEASE_SITE = "OFFICIAL_RELEASE";
     public static final String URL_DISCOGS_ARTIST_SITE = "DISCOGS_ARTIST";
     public static final String URL_WIKIPEDIA_ARTIST_SITE = "WIKIPEDIA_ARTIST";
+    public static final String URL_LYRICS_SITE = "LYRICS_SITE";
 
     /**
      * Creates a new FrameBodyWXXX datatype.
@@ -72,6 +73,8 @@ public class FrameBodyWXXX extends AbstractFrameBodyUrlLink implements ID3v24Fra
     /**
      * Creates a new FrameBodyWXXX datatype by reading from file.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyWXXX(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -107,7 +110,7 @@ public class FrameBodyWXXX extends AbstractFrameBodyUrlLink implements ID3v24Fra
      * If the description cannot be encoded using the current encoding change the encoder
      */
     public void write(ByteArrayOutputStream tagBuffer) {
-        if (((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded() == false) {
+        if (!((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded()) {
             this.setTextEncoding(TextEncoding.UTF_16);
         }
         super.write(tagBuffer);

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: StringDateTime.java,v 1.7 2008/01/01 15:12:56 paultaylor Exp $
+ *  Version @version:$Id: StringDateTime.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -25,6 +25,7 @@ package org.jaudiotagger.tag.datatype;
 
 import org.jaudiotagger.tag.id3.AbstractTagFrameBody;
 
+
 /**
  * Represents a timestamp field
  */
@@ -33,6 +34,7 @@ public class StringDateTime extends StringSizeTerminated {
      * Creates a new ObjectStringDateTime datatype.
      *
      * @param identifier
+     * @param frameBody
      */
     public StringDateTime(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody);
@@ -63,10 +65,7 @@ public class StringDateTime extends StringSizeTerminated {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof StringDateTime == false) {
-            return false;
-        }
+        return obj instanceof StringDateTime && super.equals(obj);
 
-        return super.equals(obj);
     }
 }

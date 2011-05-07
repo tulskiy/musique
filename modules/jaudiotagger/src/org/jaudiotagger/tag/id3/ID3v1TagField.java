@@ -5,7 +5,6 @@ import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.TagTextField;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 
 /**
  * This class encapsulates the name and content of a tag entry in id3 fields
@@ -42,7 +41,7 @@ public class ID3v1TagField implements TagTextField {
      * @throws UnsupportedEncodingException If the data doesn't conform "UTF-8" specification.
      */
     public ID3v1TagField(byte[] raw) throws UnsupportedEncodingException {
-        String field = new String(raw, Charset.defaultCharset());
+        String field = new String(raw, "ISO-8859-1");
 
         int i = field.indexOf("=");
         if (i == -1) {
@@ -121,7 +120,7 @@ public class ID3v1TagField implements TagTextField {
      * @see TagTextField#getEncoding()
      */
     public String getEncoding() {
-        return Charset.defaultCharset().displayName();
+        return "ISO-8859-1";
     }
 
     /**
@@ -137,7 +136,7 @@ public class ID3v1TagField implements TagTextField {
     public byte[] getRawContent() throws UnsupportedEncodingException {
         byte[] size = new byte[4];
         byte[] idBytes = this.id.getBytes("ISO-8859-1");
-        byte[] contentBytes = Utils.getDefaultBytes(this.content, Charset.defaultCharset().displayName());
+        byte[] contentBytes = Utils.getDefaultBytes(this.content, "ISO-8859-1");
         byte[] b = new byte[4 + idBytes.length + 1 + contentBytes.length];
 
         int length = idBytes.length + 1 + contentBytes.length;

@@ -6,6 +6,7 @@ import java.text.MessageFormat;
  * Defines Error Messages
  */
 public enum ErrorMessage {
+    GENERAL_READ("File {0} being read"),
     MP4_FILE_NOT_CONTAINER("This file does not appear to be an Mp4  file"),
     MP4_FILE_NOT_AUDIO("This file does not appear to be an Mp4 Audio file, could be corrupted or video "),
     MP4_FILE_IS_VIDEO("This file appears to be an Mp4 Video file, video files are not supported "),
@@ -16,6 +17,7 @@ public enum ErrorMessage {
     MP4_CHANGES_TO_FILE_FAILED_DATA_CORRUPT("Unable to make changes to Mp4 file, invalid data length has been written"),
     MP4_CHANGES_TO_FILE_FAILED_NO_TAG_DATA("Unable to make changes to Mp4 file, no tag data has been written"),
     MP4_CHANGES_TO_FILE_FAILED_INCORRECT_OFFSETS("Unable to make changes to Mp4 file, incorrect offsets written difference was {0}"),
+    MP4_CHANGES_TO_FILE_FAILED_CANNOT_FIND_AUDIO("Unable to make changes to Mp4 file, unable to determine start of audio"),
     FLAC_NO_FLAC_HEADER_FOUND("Flac Header not found, not a flac file"),
     OGG_VORBIS_NO_VORBIS_HEADER_FOUND("Cannot find vorbis setup parentHeader"),
     MP4_REVERSE_DNS_FIELD_HAS_NO_DATA("Reverse dns field:{0} has no data"),
@@ -70,7 +72,42 @@ public enum ErrorMessage {
     MP3_FRAME_IS_UNSYNCHRONISED("Filename {0}:{1} is unsynchronised"),
     MP3_FRAME_IS_DATA_LENGTH_INDICATOR("Filename {0}:{1} has a data length indicator"),
     MP4_FILE_HAS_NO_METADATA("This file does not currently contain any metadata"),
-    MP4_FILE_META_ATOM_CHILD_DATA_NOT_NULL("Expect data in meta box to be null"),;
+    MP4_FILE_META_ATOM_CHILD_DATA_NOT_NULL("Expect data in meta box to be null"),
+    WMA_INVALID_FIELD_NAME("The field name {0} is not allowed for {1}"),
+    WMA_INVALID_LANGUAGE_USE("The use of language {0} ist not allowed for {1} (only {2} allowed)"),
+    WMA_INVALID_STREAM_REFERNCE("The stream number {0} is invalid. Only {1} allowed for {2}."),
+    WMA_INVALID_GUID_USE("The use of GUID ist not allowed for {0}"),
+    WMA_LENGTH_OF_DATA_IS_TOO_LARGE("Trying to create field with {0} bytes of data but the maximum data allowed in WMA files is {1} for {2}."),
+    WMA_LENGTH_OF_LANGUAGE_IS_TOO_LARGE("Trying to create language entry, but UTF-16LE representation is {0} and exceeds maximum allowed of 255."),
+    WMA_LENGTH_OF_STRING_IS_TOO_LARGE("Trying to create field but UTF-16LE representation is {0} and exceeds maximum allowed of 65535."),
+    WMA_ONLY_STRING_IN_CD("Only Strings are allowed in content description objects"),
+    ID3_EXTENDED_HEADER_SIZE_INVALID("{0} Invalid Extended Header Size of {0} assuming no extended header after all"),
+    ID3_EXTENDED_HEADER_SIZE_TOO_SMALL("{0} Invalid Extended Header Size of {0} is too smal to be valid"),
+    ID3_INVALID_OR_UNKNOWN_FLAG_SET("{0} Invalid or unknown bit flag 0x{1} set in ID3 tag header"),
+    ID3_TAG_UNSYNCHRONIZED("{0} the ID3 Tag is unsynchronized"),
+    ID3_TAG_EXPERIMENTAL("{0} the ID3 Tag is experimental"),
+    ID3_TAG_FOOTER("{0} the ID3 Tag is has a footer"),
+    ID3_TAG_EXTENDED("{0} the ID3 Tag is extended"),
+    ID3_TAG_CRC("{0} the ID3 Tag has crc check"),
+    ID3_TAG_COMPRESSED("{0} the ID3 Tag is compressed"),
+    ID3_TAG_CRC_SIZE("{0} According to Extended Header the ID3 Tag has crc32 of {1}"),
+    ID3_TAG_PADDING_SIZE("{0} According to Extended Header the ID3 Tag has padding size of {1}"),
+    ID_TAG_SIZE("{0} Tag size is {1} according to header (does not include header size, add 10)"),
+    ID3_TAG_CRC_FLAG_SET_INCORRECTLY("{0} CRC Data flag not set correctly."),
+    MP4_CANNOT_FIND_AUDIO("Unable to determine start of audio in file"),
+    VORBIS_COMMENT_LENGTH_TOO_LARGE("Comment field length is very large {0} , assuming comment is corrupt"),
+    VORBIS_COMMENT_LENGTH_LARGE_THAN_HEADER("Comment field length {0} is larger than total comment header {1} "),
+    ARTWORK_CANNOT_BE_CREATED_WITH_THIS_METHOD("Cover Art cannot be created using this method"),
+    ARTWORK_CANNOT_BE_RETRIEVED_WITH_THIS_METHOD("Cover Art cannot be retrieved using this method"),
+    GENERIC_NOT_SUPPORTED("Not implemented for this format"),
+    ID3_UNABLE_TO_DECOMPRESS_FRAME("Unable to decompress frame {0} in file {1} because {2}"),
+    NO_WRITER_FOR_THIS_FORMAT("No Writer associated with this extension:{0}"),
+    NO_READER_FOR_THIS_FORMAT("No Reader associated with this extension:{0}"),
+    NO_DELETER_FOR_THIS_FORMAT("No Deleter associated with this extension:{0}"),
+    UNABLE_TO_FIND_FILE("Unable to find:{0}"),
+    NO_PERMISSIONS_TO_WRITE_TO_FILE("Unable to write to:{0}"),
+    DO_NOT_KNOW_HOW_TO_CREATE_THIS_ATOM_TYPE("DO not know how to create this atom type {0}"),;
+
 
     String msg;
 

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: ID3v11Tag.java,v 1.25 2008/07/24 13:47:06 paultaylor Exp $
+ *  Version @version:$Id: ID3v11Tag.java 910 2010-08-04 18:50:13Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -124,16 +124,14 @@ public class ID3v11Tag extends ID3v1Tag {
                 if (mp3tag instanceof ID3v11Tag) {
                     throw new UnsupportedOperationException("Copy Constructor not called. Please type cast the argument");
                 }
-                if (mp3tag instanceof ID3v1Tag) {
-                    // id3v1_1 objects are also id3v1 objects
-                    ID3v1Tag id3old = (ID3v1Tag) mp3tag;
-                    this.title = id3old.title;
-                    this.artist = id3old.artist;
-                    this.album = id3old.album;
-                    this.comment = id3old.comment;
-                    this.year = id3old.year;
-                    this.genre = id3old.genre;
-                }
+                // id3v1_1 objects are also id3v1 objects
+                ID3v1Tag id3old = (ID3v1Tag) mp3tag;
+                this.title = id3old.title;
+                this.artist = id3old.artist;
+                this.album = id3old.album;
+                this.comment = id3old.comment;
+                this.year = id3old.year;
+                this.genre = id3old.genre;
             } else {
                 ID3v24Tag id3tag;
                 // first change the tag to ID3v2_4 tag if not one already
@@ -181,8 +179,7 @@ public class ID3v11Tag extends ID3v1Tag {
                     frame = (ID3v24Frame) id3tag.getFrame(ID3v24Frames.FRAME_ID_GENRE);
                     text = ((FrameBodyTCON) frame.getBody()).getText();
                     try {
-                        if (text != null && text.length() > 0)
-                            this.genre = (byte) ID3Tags.findNumber(text);
+                        this.genre = (byte) ID3Tags.findNumber(text);
                     } catch (Exception ex) {
                         //logger.log(Level.WARNING, getLoggingFilename() + ":" + "Unable to convert TCON frame to format suitable for v11 tag", ex);
                         this.genre = (byte) ID3v1Tag.GENRE_UNDEFINED;
@@ -190,21 +187,14 @@ public class ID3v11Tag extends ID3v1Tag {
                 }
                 if (id3tag.hasFrame(ID3v24Frames.FRAME_ID_TRACK)) {
                     frame = (ID3v24Frame) id3tag.getFrame(ID3v24Frames.FRAME_ID_TRACK);
-                    text = ((FrameBodyTRCK) frame.getBody()).getText();
-                    try {
-                        if (text != null && text.length() > 0)
-                            this.track = (byte) ID3Tags.findNumber(text);
-                    } catch (Exception ex) {
-                        //logger.log(Level.WARNING, getLoggingFilename() + ":" + "Unable to convert TRCK frame to format suitable for v11 tag", ex);
-                        this.track = (byte) TRACK_UNDEFINED;
-                    }
+                    this.track = (byte) ((FrameBodyTRCK) frame.getBody()).getTrackNo().intValue();
                 }
             }
         }
     }
 
     /**
-     * Creates a new ID3v1_1 datatype.
+     * Creates a new ID3v11 datatype.
      *
      * @param file
      * @param loggingFilename
@@ -214,11 +204,11 @@ public class ID3v11Tag extends ID3v1Tag {
     public ID3v11Tag(RandomAccessFile file, String loggingFilename) throws TagNotFoundException, IOException {
         setLoggingFilename(loggingFilename);
         FileChannel fc;
-        ByteBuffer byteBuffer;
+        ByteBuffer byteBuffer = ByteBuffer.allocate(TAG_LENGTH);
 
         fc = file.getChannel();
         fc.position(file.length() - TAG_LENGTH);
-        byteBuffer = ByteBuffer.allocate(TAG_LENGTH);
+
         fc.read(byteBuffer);
         byteBuffer.flip();
         read(byteBuffer);
@@ -226,7 +216,7 @@ public class ID3v11Tag extends ID3v1Tag {
     }
 
     /**
-     * Creates a new ID3v1_1 datatype.
+     * Creates a new ID3v11 datatype.
      *
      * @param file
      * @throws TagNotFoundException
@@ -265,7 +255,7 @@ public class ID3v11Tag extends ID3v1Tag {
      *
      * @param trackValue
      */
-    @Override
+
     public void setTrack(String trackValue) {
         int trackAsInt;
         //Try and convert String representation of track into an integer
@@ -288,47 +278,73 @@ public class ID3v11Tag extends ID3v1Tag {
      *
      * @return track
      */
-    @Override
+
     public String getFirstTrack() {
         return String.valueOf(track & BYTE_TO_UNSIGNED);
     }
 
-    @Override
     public void addTrack(String track) {
         setTrack(track);
     }
 
-    @Override
     public List<TagField> getTrack() {
-        if (getFirstTrack().length() > 0) {
-            ID3v1TagField field = new ID3v1TagField(ID3v1FieldKey.TRACK.name(), getFirstTrack());
+        if (getFirst(FieldKey.TRACK).length() > 0) {
+            ID3v1TagField field = new ID3v1TagField(ID3v1FieldKey.TRACK.name(), getFirst(FieldKey.TRACK));
             return returnFieldToList(field);
         } else {
             return new ArrayList<TagField>();
         }
     }
 
-    public void set(TagField field) {
-        TagFieldKey genericKey = TagFieldKey.valueOf(field.getId());
-        if (genericKey == TagFieldKey.TRACK) {
+    public void setField(TagField field) {
+        FieldKey genericKey = FieldKey.valueOf(field.getId());
+        if (genericKey == FieldKey.TRACK) {
             setTrack(field.toString());
         } else {
-            super.set(field);
+            super.setField(field);
         }
     }
 
-    public List<TagField> get(TagFieldKey genericKey) {
-        if (genericKey == TagFieldKey.TRACK) {
+    public List<TagField> getFields(FieldKey genericKey) {
+        if (genericKey == FieldKey.TRACK) {
             return getTrack();
         } else {
-            return super.get(genericKey);
+            return super.getFields(genericKey);
+        }
+    }
+
+    public String getFirst(FieldKey genericKey) {
+        switch (genericKey) {
+            case ARTIST:
+                return getFirstArtist();
+
+            case ALBUM:
+                return getFirstAlbum();
+
+            case TITLE:
+                return getFirstTitle();
+
+            case GENRE:
+                return getFirstGenre();
+
+            case YEAR:
+                return getFirstYear();
+
+            case TRACK:
+                return getFirstTrack();
+
+            case COMMENT:
+                return getFirstComment();
+
+            default:
+                return "";
         }
     }
 
     public TagField getFirstField(String id) {
         List<TagField> results;
 
-        if (TagFieldKey.TRACK.name().equals(id)) {
+        if (FieldKey.TRACK.name().equals(id)) {
             results = getTrack();
             if (results != null) {
                 if (results.size() > 0) {
@@ -350,11 +366,11 @@ public class ID3v11Tag extends ID3v1Tag {
      *
      * @param genericKey
      */
-    public void deleteTagField(TagFieldKey genericKey) {
-        if (genericKey == TagFieldKey.TRACK) {
+    public void deleteField(FieldKey genericKey) {
+        if (genericKey == FieldKey.TRACK) {
             track = 0;
         } else {
-            super.deleteTagField(genericKey);
+            super.deleteField(genericKey);
         }
     }
 
@@ -374,7 +390,7 @@ public class ID3v11Tag extends ID3v1Tag {
     }
 
     /**
-     * Find identifer within byteBuffer to indicate that a v11 tag exists within the buffer
+     * Find identifier within byteBuffer to indicate that a v11 tag exists within the buffer
      *
      * @param byteBuffer
      * @return true if find header for v11 tag within buffer
@@ -393,7 +409,7 @@ public class ID3v11Tag extends ID3v1Tag {
             return false;
         }
         //Now check for TRACK if the next byte is also null byte then not v1.1
-        //tag, however this means cannot have v1_1 tag with track set to zero/undefined
+        //tag, however this means cannot have v1_1 tag with track setField to zero/undefined
         //because on next read will be v1 tag.
         return byteBuffer.get() != END_OF_FIELD;
     }
@@ -416,27 +432,27 @@ public class ID3v11Tag extends ID3v1Tag {
         byteBuffer.get(dataBuffer, 0, TAG_LENGTH);
         String encoding = Charset.defaultCharset().displayName();
         title = Utils.getString(dataBuffer, FIELD_TITLE_POS, FIELD_TITLE_LENGTH, encoding).trim();
-        Matcher m = endofStringPattern.matcher(title);
+        Matcher m = AbstractID3v1Tag.endofStringPattern.matcher(title);
         if (m.find()) {
             title = title.substring(0, m.start());
         }
         artist = Utils.getString(dataBuffer, FIELD_ARTIST_POS, FIELD_ARTIST_LENGTH, encoding).trim();
-        m = endofStringPattern.matcher(artist);
+        m = AbstractID3v1Tag.endofStringPattern.matcher(artist);
         if (m.find()) {
             artist = artist.substring(0, m.start());
         }
         album = Utils.getString(dataBuffer, FIELD_ALBUM_POS, FIELD_ALBUM_LENGTH, encoding).trim();
-        m = endofStringPattern.matcher(album);
+        m = AbstractID3v1Tag.endofStringPattern.matcher(album);
         if (m.find()) {
             album = album.substring(0, m.start());
         }
         year = Utils.getString(dataBuffer, FIELD_YEAR_POS, FIELD_YEAR_LENGTH, encoding).trim();
-        m = endofStringPattern.matcher(year);
+        m = AbstractID3v1Tag.endofStringPattern.matcher(year);
         if (m.find()) {
             year = year.substring(0, m.start());
         }
         comment = Utils.getString(dataBuffer, FIELD_COMMENT_POS, FIELD_COMMENT_LENGTH, encoding).trim();
-        m = endofStringPattern.matcher(comment);
+        m = AbstractID3v1Tag.endofStringPattern.matcher(comment);
         if (m.find()) {
             comment = comment.substring(0, m.start());
         }

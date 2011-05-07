@@ -18,18 +18,21 @@
  */
 package org.jaudiotagger.audio;
 
-import org.jaudiotagger.audio.exceptions.CannotWriteException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
-import org.jaudiotagger.audio.flac.metadatablock.MetadataBlockDataPicture;
-import org.jaudiotagger.audio.wav.WavTag;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.flac.FlacTag;
-import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.RandomAccessFile;
+import java.util.logging.Logger;
 import java.util.ArrayList;
+
+import org.jaudiotagger.audio.exceptions.CannotWriteException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.audio.flac.metadatablock.MetadataBlockDataPicture;
+import org.jaudiotagger.logging.ErrorMessage;
+import org.jaudiotagger.audio.wav.WavTag;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.mp4.Mp4Tag;
+import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
+import org.jaudiotagger.tag.flac.FlacTag;
 
 /**
  * <p>This is the main object manipulated by the user representing an audiofile, its properties and its tag.</p>
@@ -38,14 +41,14 @@ import java.util.ArrayList;
  * <p>To get the meta-data contained in this file you have to get the <code>Tag</code> of this <code>AudioFile</code></p>
  *
  * @author Raphael Slinckx
- * @version $Id: AudioFile.java,v 1.12 2008/12/10 13:14:30 paultaylor Exp $
+ * @version $Id: AudioFile.java 904 2010-05-14 13:46:39Z paultaylor $
  * @see AudioFileIO
  * @see Tag
  * @since v0.01
  */
 public class AudioFile {
     //Logger
-//    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio");
 
     /**
      * The physical file that this instance represents.
@@ -68,9 +71,9 @@ public class AudioFile {
 
     /**
      * <p>These constructors are used by the different readers, users should not use them, but use the <code>AudioFileIO.read(File)</code> method instead !.</p>
-     * <p>Create the AudioFile representing file f, the encodingaudioHeaders and containing the tag</p>
+     * <p>Create the AudioFile representing file f, the encoding audio headers and containing the tag</p>
      *
-     * @param f           The file of the audiofile
+     * @param f           The file of the audio file
      * @param audioHeader the encoding audioHeaders over this file
      * @param tag         the tag contained in this file or null if no tag exists
      */
@@ -80,11 +83,12 @@ public class AudioFile {
         this.tag = tag;
     }
 
+
     /**
      * <p>These constructors are used by the different readers, users should not use them, but use the <code>AudioFileIO.read(File)</code> method instead !.</p>
-     * <p>Create the AudioFile representing file denoted by pathname s, the encodingaudioHeaders and containing the tag</p>
+     * <p>Create the AudioFile representing file denoted by pathnames, the encoding audio Headers and containing the tag</p>
      *
-     * @param s           The pathname of the audiofile
+     * @param s           The pathname of the audio file
      * @param audioHeader the encoding audioHeaders over this file
      * @param tag         the tag contained in this file
      */
@@ -128,6 +132,8 @@ public class AudioFile {
 
     /**
      * Return audio header
+     *
+     * @return
      */
     public AudioHeader getAudioHeader() {
         return audioHeader;
@@ -146,14 +152,28 @@ public class AudioFile {
     }
 
     /**
-     * <p>Returns a multi-line string with the file path, the encoding audioHeaderrmations, and the tag contents.</p>
+     * <p>Returns a multi-line string with the file path, the encoding audioHeader, and the tag contents.</p>
      *
-     * @return A multi-line string with the file path, the encoding audioHeaderrmations, and the tag contents.
+     * @return A multi-line string with the file path, the encoding audioHeader, and the tag contents.
      *         TODO Maybe this can be changed ?
      */
     public String toString() {
         return "AudioFile " + getFile().getAbsolutePath()
-               + "  --------\n" + audioHeader.toString() + "\n" + ((tag == null) ? "" : tag.toString()) + "\n-------------------";
+                + "  --------\n" + audioHeader.toString() + "\n" + ((tag == null) ? "" : tag.toString()) + "\n-------------------";
+    }
+
+    /**
+     * Check does file exist
+     *
+     * @param file
+     * @throws FileNotFoundException
+     */
+    public void checkFileExists(File file) throws FileNotFoundException {
+//        logger.info("Reading file:" + "path" + file.getPath() + ":abs:" + file.getAbsolutePath());
+        if (!file.exists()) {
+//            logger.severe("Unable to find:" + file.getPath());
+            throw new FileNotFoundException(ErrorMessage.UNABLE_TO_FIND_FILE.getMsg(file.getPath()));
+        }
     }
 
     /**
@@ -161,27 +181,24 @@ public class AudioFile {
      *
      * @param file
      * @param readOnly
+     * @return
      * @throws ReadOnlyFileException
      * @throws FileNotFoundException
      */
     protected RandomAccessFile checkFilePermissions(File file, boolean readOnly) throws ReadOnlyFileException, FileNotFoundException {
         RandomAccessFile newFile;
 
-//        //logger.info("Reading file:" + "path" + file.getPath() + ":abs:" + file.getAbsolutePath());
-        if (file.exists() == false) {
-//            //logger.severe("Unable to find:" + file.getPath());
-            throw new FileNotFoundException("Unable to find:" + file.getPath());
-        }
+        checkFileExists(file);
 
         // Unless opened as readonly the file must be writable
         if (readOnly) {
             newFile = new RandomAccessFile(file, "r");
         } else {
-            if (file.canWrite() == false) {
+            if (!file.canWrite()) {
 //                //logger.severe("Unable to write:" + file.getPath());
-                throw new ReadOnlyFileException("Unable to write to:" + file.getPath());
+                throw new ReadOnlyFileException(ErrorMessage.NO_PERMISSIONS_TO_WRITE_TO_FILE.getMsg(file.getPath()));
             }
-            newFile = new RandomAccessFile(file, "rw");
+            newFile = new RandomAccessFile(file, "rws");
         }
         return newFile;
     }
@@ -216,6 +233,12 @@ public class AudioFile {
             return new FlacTag(VorbisCommentTag.createNewTag(), new ArrayList<MetadataBlockDataPicture>());
         } else if (SupportedFileFormat.OGG.getFilesuffix().equals(file.getName().substring(file.getName().lastIndexOf('.')))) {
             return VorbisCommentTag.createNewTag();
+        } else if (SupportedFileFormat.MP4.getFilesuffix().equals(file.getName().substring(file.getName().lastIndexOf('.')))) {
+            return new Mp4Tag();
+        } else if (SupportedFileFormat.M4A.getFilesuffix().equals(file.getName().substring(file.getName().lastIndexOf('.')))) {
+            return new Mp4Tag();
+        } else if (SupportedFileFormat.M4P.getFilesuffix().equals(file.getName().substring(file.getName().lastIndexOf('.')))) {
+            return new Mp4Tag();
         } else if (SupportedFileFormat.WAV.getFilesuffix().equals(file.getName().substring(file.getName().lastIndexOf('.')))) {
             return new WavTag();
         } else {
@@ -225,7 +248,7 @@ public class AudioFile {
     }
 
     /**
-     * Get the tag or if the file doesnt have one at all, create a default tag  and return
+     * Get the tag or if the file doesn't have one at all, create a default tag  and return
      *
      * @return
      */
@@ -238,7 +261,7 @@ public class AudioFile {
     }
 
     /**
-     * Get the tag or if the file doesnt have one at all, create a default tag  and set it
+     * Get the tag or if the file doesn't have one at all, create a default tag  and set it
      *
      * @return
      */
@@ -254,7 +277,7 @@ public class AudioFile {
 
     /**
      * @param file
-     * @return filename with audioformat seperator stripped of.
+     * @return filename with audioFormat separator stripped of.
      */
     public static String getBaseFilename(File file) {
         int index = file.getName().toLowerCase().lastIndexOf(".");

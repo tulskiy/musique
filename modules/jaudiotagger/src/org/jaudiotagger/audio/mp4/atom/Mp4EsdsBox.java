@@ -100,6 +100,7 @@ public class Mp4EsdsBox extends AbstractMp4Box {
     private static Map<Integer, Kind> kindMap;
     private static Map<Integer, AudioProfile> audioProfileMap;
 
+
     static {
         //Create maps to speed up lookup from raw value to enum
         kindMap = new HashMap<Integer, Kind>();
@@ -139,7 +140,7 @@ public class Mp4EsdsBox extends AbstractMp4Box {
             dataBuffer.position(dataBuffer.position() + ES_ID_LENGTH + STREAM_PRIORITY_LENGTH);
         }
 
-        //Process Section 4 (to get type and bitrate)
+        //Process Section 4 (to getFields type and bitrate)
         if (dataBuffer.get() == SECTION_FOUR) {
             sectionFourLength = processSectionHeader(dataBuffer);
 
@@ -156,8 +157,9 @@ public class Mp4EsdsBox extends AbstractMp4Box {
             this.avgBitrate = Utils.getIntBE(dataBuffer, dataBuffer.position(), (dataBuffer.position() + AVERAGE_BITRATE_LENGTH - 1));
             dataBuffer.position(dataBuffer.position() + AVERAGE_BITRATE_LENGTH);
 
+
         }
-        //Process Section 5,(to get no of channels and audioprofile(profile in itunes))
+        //Process Section 5,(to getFields no of channels and audioprofile(profile in itunes))
         if (dataBuffer.get() == SECTION_FIVE) {
             sectionFiveLength = processSectionHeader(dataBuffer);
 
@@ -170,6 +172,7 @@ public class Mp4EsdsBox extends AbstractMp4Box {
         }
 
         //Process Section 6, not needed ...
+
 
     }
 
@@ -194,10 +197,11 @@ public class Mp4EsdsBox extends AbstractMp4Box {
     /**
      * Process header, skipping filler bytes and calculating size
      *
+     * @param dataBuffer
      * @return section header
      */
     public int processSectionHeader(ByteBuffer dataBuffer) {
-        int datalength = 0;
+        int datalength;
         byte nextByte = dataBuffer.get();
         if (((nextByte & 0xFF) == FILLER_START) || ((nextByte & 0xFF) == FILLER_OTHER) || ((nextByte & 0xFF) == FILLER_END)) {
             dataBuffer.get();

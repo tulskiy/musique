@@ -1,24 +1,9 @@
-/*
- * Copyright (c) 2008, 2009 Denis Tulskiy
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package org.jaudiotagger.tag.mp4;
 
 import org.jaudiotagger.tag.mp4.field.Mp4FieldType;
+
 import static org.jaudiotagger.tag.mp4.field.Mp4FieldType.*;
+
 import org.jaudiotagger.tag.mp4.field.Mp4TagReverseDnsField;
 import org.jaudiotagger.tag.reference.Tagger;
 
@@ -26,6 +11,7 @@ import org.jaudiotagger.tag.reference.Tagger;
  * Starting list of known mp4 metadata fields that follow the Parent,Data or ---,issuer,name,data
  * convention. Atoms that contain metadata in other formats are not listed here because they need to be processed
  * specially.
+ * <p/>
  * <p/>
  * <p>Simple metaitems use the parent atom id as their identifier whereas reverse dns (----) atoms use
  * the reversedns,issuer and name fields as their identifier. When the atom is non-0standard but follws the rules
@@ -37,95 +23,99 @@ import org.jaudiotagger.tag.reference.Tagger;
  * http://atomicparsley.sourceforge.net/mpeg-4files.html
  * <p/>
  * <p/>
- */          
+ */
 public enum Mp4FieldKey {
-    ARTIST("\u00A9ART", TEXT),
-    ALBUM("\u00A9alb", TEXT),
-    ALBUM_ARTIST("aART", TEXT),
-    GENRE_CUSTOM("\u00A9gen", TEXT),
-    GENRE("gnre", NUMERIC),
-    TITLE("\u00A9nam", TEXT),
-    TRACK("trkn", NUMERIC),
-    BPM("tmpo", BYTE, 2),
-    DAY("\u00A9day", TEXT),
-    COMMENT("\u00A9cmt", TEXT),
-    COMPOSER("\u00A9wrt", TEXT),
-    GROUPING("\u00A9grp", TEXT),
-    DISCNUMBER("disk", NUMERIC),
-    LYRICS("\u00A9lyr", TEXT),
-    RATING("rtng", BYTE),   //AFAIK Cant be set in itunes, but if set to explicit itunes will show as explicit
-    ENCODER("\u00A9too", TEXT),
-    COMPILATION("cpil", BYTE, 1),
-    COPYRIGHT("cprt", TEXT),
-    CATEGORY("catg", TEXT),
-    KEYWORD("keyw", TEXT),
-    DESCRIPTION("desc", TEXT),
-    ARTIST_SORT("soar", TEXT),
-    ALBUM_ARTIST_SORT("soaa", TEXT),
-    ALBUM_SORT("soal", TEXT),
-    TITLE_SORT("sonm", TEXT),
-    COMPOSER_SORT("soco", TEXT),
-    SHOW_SORT("sosn", TEXT),
-    SHOW("tvsh", TEXT),      //tv show but also used just as show
-    ARTWORK("covr", COVERART_JPEG),
-    PURCHASE_DATE("purd", TEXT),
+    ARTIST("©ART", Mp4TagFieldSubType.TEXT, TEXT),
+    ALBUM("©alb", Mp4TagFieldSubType.TEXT, TEXT),
+    ALBUM_ARTIST("aART", Mp4TagFieldSubType.TEXT, TEXT),
+    GENRE_CUSTOM("©gen", Mp4TagFieldSubType.TEXT, TEXT),
+    GENRE("gnre", Mp4TagFieldSubType.GENRE, IMPLICIT),
+    TITLE("©nam", Mp4TagFieldSubType.TEXT, TEXT),
+    TRACK("trkn", Mp4TagFieldSubType.TRACK_NO, IMPLICIT),
+    BPM("tmpo", Mp4TagFieldSubType.BYTE, INTEGER, 2),
+    DAY("©day", Mp4TagFieldSubType.TEXT, TEXT),
+    COMMENT("©cmt", Mp4TagFieldSubType.TEXT, TEXT),
+    COMPOSER("©wrt", Mp4TagFieldSubType.TEXT, TEXT),
+    GROUPING("©grp", Mp4TagFieldSubType.TEXT, TEXT),
+    DISCNUMBER("disk", Mp4TagFieldSubType.DISC_NO, IMPLICIT),
+    LYRICS("©lyr", Mp4TagFieldSubType.TEXT, TEXT),
+    RATING("rtng", Mp4TagFieldSubType.BYTE, INTEGER, 1),   //AFAIK Cant be setField in itunes, but if setField to explicit itunes will show as explicit
+    ENCODER("©too", Mp4TagFieldSubType.TEXT, TEXT),
+    COMPILATION("cpil", Mp4TagFieldSubType.BYTE, INTEGER, 1),
+    COPYRIGHT("cprt", Mp4TagFieldSubType.TEXT, TEXT),
+    CATEGORY("catg", Mp4TagFieldSubType.TEXT, TEXT),
+    KEYWORD("keyw", Mp4TagFieldSubType.TEXT, TEXT),
+    DESCRIPTION("desc", Mp4TagFieldSubType.TEXT, TEXT),
+    ARTIST_SORT("soar", Mp4TagFieldSubType.TEXT, TEXT),
+    ALBUM_ARTIST_SORT("soaa", Mp4TagFieldSubType.TEXT, TEXT),
+    ALBUM_SORT("soal", Mp4TagFieldSubType.TEXT, TEXT),
+    TITLE_SORT("sonm", Mp4TagFieldSubType.TEXT, TEXT),
+    COMPOSER_SORT("soco", Mp4TagFieldSubType.TEXT, TEXT),
+    SHOW_SORT("sosn", Mp4TagFieldSubType.TEXT, TEXT),
+    SHOW("tvsh", Mp4TagFieldSubType.TEXT, TEXT),      //tv show but also used just as show
+    ARTWORK("covr", Mp4TagFieldSubType.ARTWORK, COVERART_JPEG),
+    PURCHASE_DATE("purd", Mp4TagFieldSubType.TEXT, TEXT),
     MUSICBRAINZ_ARTISTID("com.apple.iTunes", "MusicBrainz Artist Id", TEXT, Tagger.PICARD),
     MUSICBRAINZ_ALBUMID("com.apple.iTunes", "MusicBrainz Album Id", TEXT, Tagger.PICARD),
     MUSICBRAINZ_ALBUMARTISTID("com.apple.iTunes", "MusicBrainz Album Artist Id", TEXT, Tagger.PICARD),
+    MUSICBRAINZ_RELEASE_GROUPID("com.apple.iTunes", "MusicBrainz Release Group Id", TEXT, Tagger.PICARD),
     MUSICBRAINZ_TRACKID("com.apple.iTunes", "MusicBrainz Track Id", TEXT, Tagger.PICARD),
+    MUSICBRAINZ_WORKID("com.apple.iTunes", "MusicBrainz Work Id", TEXT, Tagger.PICARD),
     MUSICBRAINZ_DISCID("com.apple.iTunes", "MusicBrainz Disc Id", TEXT, Tagger.PICARD),
     MUSICIP_PUID("com.apple.iTunes", "MusicIP PUID", TEXT, Tagger.PICARD),
     ASIN("com.apple.iTunes", "ASIN", TEXT, Tagger.PICARD),
     MUSICBRAINZ_ALBUM_STATUS("com.apple.iTunes", "MusicBrainz Album Status", TEXT, Tagger.PICARD),
     MUSICBRAINZ_ALBUM_TYPE("com.apple.iTunes", "MusicBrainz Album Type", TEXT, Tagger.PICARD),
     RELEASECOUNTRY("com.apple.iTunes", "MusicBrainz Album Release Country", TEXT, Tagger.PICARD),
-    PART_OF_GAPLESS_ALBUM("pgap", BYTE),
+    PART_OF_GAPLESS_ALBUM("pgap", Mp4TagFieldSubType.BYTE, INTEGER),
     ITUNES_SMPB("com.apple.iTunes", "iTunSMPB", TEXT),
     ITUNES_NORM("com.apple.iTunes", "iTunNORM", TEXT),
     CDDB_1("com.apple.iTunes", "iTunes_CDDB_1", TEXT),
     CDDB_TRACKNUMBER("com.apple.iTunes", "iTunes_CDDB_TrackNumber", TEXT),
     CDDB_IDS("com.apple.iTunes", "iTunes_CDDB_IDs", TEXT),
-    LANGUAGE("com.apple.iTunes", "Language", TEXT, Tagger.JAIKOZ),
-    KEY("com.apple.iTunes", "key", TEXT, Tagger.JAIKOZ),
+    LANGUAGE("com.apple.iTunes", "LANGUAGE", TEXT, Tagger.JAIKOZ),
+    KEY("com.apple.iTunes", "KEY", TEXT, Tagger.JAIKOZ),
+    FBPM("com.apple.iTunes", "fBPM", TEXT, Tagger.JAIKOZ),
 
     //AFAIK These arent actually used by Audio Only files, but there is nothing to prevent them being used
-    CONTENT_TYPE("stik", BYTE, 1),
-    PODCAST_KEYWORD("keyw", TEXT),
-    PODCAST_URL("purl", NUMERIC),   //TODO Actually seems to store text but is marked as numeric!
-    EPISODE_GLOBAL_ID("egid", NUMERIC),   //TODO Actually seems to store text but is marked as numeric!
-    TV_NETWORK("tvnn", TEXT),
-    TV_EPISODE_NUMBER("tven", TEXT),
-    TV_SEASON("tvsn", BYTE, 1),
-    TV_EPISODE("tves", BYTE, 1),
+    CONTENT_TYPE("stik", Mp4TagFieldSubType.BYTE, INTEGER, 1),
+    TOOL("tool", Mp4TagFieldSubType.BYTE, INTEGER, 4),
+    PODCAST_KEYWORD("keyw", Mp4TagFieldSubType.TEXT, TEXT),
+    PODCAST_URL("purl", Mp4TagFieldSubType.NUMBER, IMPLICIT),   //TODO Actually seems to store text but is marked as numeric!
+    EPISODE_GLOBAL_ID("egid", Mp4TagFieldSubType.NUMBER, IMPLICIT),   //TODO Actually seems to store text but is marked as numeric!
+    TV_NETWORK("tvnn", Mp4TagFieldSubType.TEXT, TEXT),
+    TV_EPISODE_NUMBER("tven", Mp4TagFieldSubType.TEXT, TEXT),
+    TV_SEASON("tvsn", Mp4TagFieldSubType.BYTE, INTEGER, 1),
+    TV_EPISODE("tves", Mp4TagFieldSubType.BYTE, INTEGER, 1),
 
     //These seem to be used in DRM Files, of type byte , we need to know the byte length to allow them to be written
     //back correctly on saving them, we don't provides options to modify them as may break drm
-    AP_ID("apID", TEXT),
-    AT_ID("atID", BYTE, 4),
-    CN_ID("cnID", BYTE, 4),
-    PL_ID("plID", BYTE, 8),
-    GE_ID("geID", BYTE, 4),
-    SF_ID("sfID", BYTE, 4),
-    AK_ID("akID", BYTE, 1),
+    AP_ID("apID", Mp4TagFieldSubType.UNKNOWN, TEXT),
+    AT_ID("atID", Mp4TagFieldSubType.UNKNOWN, INTEGER, 4),
+    CN_ID("cnID", Mp4TagFieldSubType.UNKNOWN, INTEGER, 4),
+    PL_ID("plID", Mp4TagFieldSubType.UNKNOWN, INTEGER, 8),
+    GE_ID("geID", Mp4TagFieldSubType.UNKNOWN, INTEGER, 4),
+    SF_ID("sfID", Mp4TagFieldSubType.UNKNOWN, INTEGER, 4),
+    AK_ID("akID", Mp4TagFieldSubType.UNKNOWN, INTEGER, 1),
 
     //Media Monkey3 beta
-    LYRICIST_MM3BETA("lyrc", TEXT, Tagger.MEDIA_MONKEY),
-    CONDUCTOR_MM3BETA("cond", TEXT, Tagger.MEDIA_MONKEY),
-    ISRC_MMBETA("isrc", TEXT, Tagger.MEDIA_MONKEY),
-    MOOD_MM3BETA("mood", TEXT, Tagger.MEDIA_MONKEY),
-    SCORE("rate", TEXT, Tagger.MEDIA_MONKEY),    //As in mark out of 100
-    ORIGINAL_ARTIST("oart", TEXT, Tagger.MEDIA_MONKEY),
-    ORIGINAL_ALBUM_TITLE("otit", TEXT, Tagger.MEDIA_MONKEY),
-    ORIGINAL_LYRICIST("olyr", TEXT, Tagger.MEDIA_MONKEY),
-    INVOLVED_PEOPLE("peop", TEXT, Tagger.MEDIA_MONKEY),
-    TEMPO("empo", TEXT, Tagger.MEDIA_MONKEY),
-    OCCASION("occa", TEXT, Tagger.MEDIA_MONKEY),
-    QUALITY("qual", TEXT, Tagger.MEDIA_MONKEY),
-    CUSTOM_1("cus1", TEXT, Tagger.MEDIA_MONKEY),
-    CUSTOM_2("cus2", TEXT, Tagger.MEDIA_MONKEY),
-    CUSTOM_3("cus3", TEXT, Tagger.MEDIA_MONKEY),
-    CUSTOM_4("cus4", TEXT, Tagger.MEDIA_MONKEY),
-    CUSTOM_5("cus5", TEXT, Tagger.MEDIA_MONKEY),
+    LYRICIST_MM3BETA("lyrc", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    CONDUCTOR_MM3BETA("cond", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    ISRC_MMBETA("isrc", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    MOOD_MM3BETA("mood", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    SCORE("rate", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),    //As in mark out of 100
+    ORIGINAL_ARTIST("oart", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    ORIGINAL_ALBUM_TITLE("otit", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    ORIGINAL_LYRICIST("olyr", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    INVOLVED_PEOPLE("peop", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    TEMPO("empo", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    OCCASION("occa", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    QUALITY("qual", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    CUSTOM_1("cus1", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    CUSTOM_2("cus2", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    CUSTOM_3("cus3", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    CUSTOM_4("cus4", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
+    CUSTOM_5("cus5", Mp4TagFieldSubType.TEXT, TEXT, Tagger.MEDIA_MONKEY),
 
     //Media Monkey 3.0.6 Onwards
     MM_PUBLISHER("com.apple.iTunes", "ORGANIZATION", TEXT, Tagger.MEDIA_MONKEY),
@@ -151,6 +141,7 @@ public enum Mp4FieldKey {
     PRODUCER("com.apple.iTunes", "PRODUCER", TEXT, Tagger.PICARD),
     DJMIXER("com.apple.iTunes", "DJMIXER", TEXT, Tagger.PICARD),
     MIXER("com.apple.iTunes", "MIXER", TEXT, Tagger.PICARD),
+    ARRANGER("com.apple.iTunes", "ARRANGER", TEXT, Tagger.PICARD),
     MOOD("com.apple.iTunes", "MOOD", TEXT, Tagger.PICARD),
     ISRC("com.apple.iTunes", "ISRC", TEXT, Tagger.PICARD),
     MEDIA("com.apple.iTunes", "MEDIA", TEXT, Tagger.PICARD),
@@ -159,20 +150,24 @@ public enum Mp4FieldKey {
     BARCODE("com.apple.iTunes", "BARCODE", TEXT, Tagger.PICARD),
 
     //Jaikoz
+    URL_LYRICS_SITE("com.apple.iTunes", "URL_LYRICS_SITE", TEXT, Tagger.JAIKOZ),
     URL_OFFICIAL_RELEASE_SITE("com.apple.iTunes", "URL_OFFICIAL_RELEASE_SITE", TEXT, Tagger.JAIKOZ),
     URL_DISCOGS_RELEASE_SITE("com.apple.iTunes", "URL_DISCOGS_RELEASE_SITE", TEXT, Tagger.JAIKOZ),
     URL_WIKIPEDIA_RELEASE_SITE("com.apple.iTunes", "URL_WIKIPEDIA_RELEASE_SITE", TEXT, Tagger.JAIKOZ),
     URL_OFFICIAL_ARTIST_SITE("com.apple.iTunes", "URL_OFFICIAL_ARTIST_SITE", TEXT, Tagger.JAIKOZ),
     URL_DISCOGS_ARTIST_SITE("com.apple.iTunes", "URL_DISCOGS_ARTIST_SITE", TEXT, Tagger.JAIKOZ),
     URL_WIKIPEDIA_ARTIST_SITE("com.apple.iTunes", "URL_WIKIPEDIA_ARTIST_SITE", TEXT, Tagger.JAIKOZ),
+    SCRIPT("com.apple.iTunes", "SCRIPT", TEXT, Tagger.JAIKOZ),
+    TAGS("com.apple.iTunes", "TAGS", TEXT, Tagger.JAIKOZ),
 
     //Winamp
     WINAMP_PUBLISHER("com.nullsoft.winamp", "publisher", TEXT, Tagger.WINAMP),
 
     //Unknown
-    KEYS("keys", TEXT),;
+    KEYS("keys", Mp4TagFieldSubType.TEXT, TEXT),;
     private Tagger tagger;
     private String fieldName;
+    private Mp4TagFieldSubType subclassType;
     private String issuer;
     private String identifier;
     private Mp4FieldType fieldType;
@@ -184,8 +179,9 @@ public enum Mp4FieldKey {
      * @param fieldName
      * @param fieldType of data atom
      */
-    Mp4FieldKey(String fieldName, Mp4FieldType fieldType) {
+    Mp4FieldKey(String fieldName, Mp4TagFieldSubType subclassType, Mp4FieldType fieldType) {
         this.fieldName = fieldName;
+        this.subclassType = subclassType;
         this.fieldType = fieldType;
     }
 
@@ -194,9 +190,11 @@ public enum Mp4FieldKey {
      *
      * @param fieldName
      * @param fieldType of data atom
+     * @param tagger
      */
-    Mp4FieldKey(String fieldName, Mp4FieldType fieldType, Tagger tagger) {
+    Mp4FieldKey(String fieldName, Mp4TagFieldSubType subclassType, Mp4FieldType fieldType, Tagger tagger) {
         this.fieldName = fieldName;
+        this.subclassType = subclassType;
         this.fieldType = fieldType;
         this.tagger = tagger;
     }
@@ -209,8 +207,9 @@ public enum Mp4FieldKey {
      * @param fieldType
      * @param fieldLength
      */
-    Mp4FieldKey(String fieldName, Mp4FieldType fieldType, int fieldLength) {
+    Mp4FieldKey(String fieldName, Mp4TagFieldSubType subclassType, Mp4FieldType fieldType, int fieldLength) {
         this.fieldName = fieldName;
+        this.subclassType = subclassType;
         this.fieldType = fieldType;
         this.fieldLength = fieldLength;
     }
@@ -219,6 +218,7 @@ public enum Mp4FieldKey {
      * For reverse dns fields that use an internal fieldname of '----' and have  additional issuer
      * and identifier fields, we use all three seperated by a ':' ) to give us a unique key
      *
+     * @param issuer
      * @param identifier
      * @param fieldType  of data atom
      */
@@ -227,6 +227,7 @@ public enum Mp4FieldKey {
         this.issuer = issuer;
         this.identifier = identifier;
         this.fieldName = Mp4TagReverseDnsField.IDENTIFIER + ":" + issuer + ":" + identifier;
+        this.subclassType = Mp4TagFieldSubType.REVERSE_DNS;
         this.fieldType = fieldType;
     }
 
@@ -235,14 +236,17 @@ public enum Mp4FieldKey {
      * and identifier fields, we use all three seperated by a ':' ) to give us a unique key
      * For non-standard fields
      *
+     * @param issuer
      * @param identifier
      * @param fieldType  of data atom
+     * @param tagger
      */
     Mp4FieldKey(String issuer, String identifier, Mp4FieldType fieldType, Tagger tagger) {
 
         this.issuer = issuer;
         this.identifier = identifier;
         this.fieldName = Mp4TagReverseDnsField.IDENTIFIER + ":" + issuer + ":" + identifier;
+        this.subclassType = Mp4TagFieldSubType.REVERSE_DNS;
         this.fieldType = fieldType;
         this.tagger = tagger;
     }
@@ -261,6 +265,13 @@ public enum Mp4FieldKey {
      */
     public Mp4FieldType getFieldType() {
         return fieldType;
+    }
+
+    /**
+     * @return subclassType
+     */
+    public Mp4TagFieldSubType getSubClassFieldType() {
+        return subclassType;
     }
 
     /**

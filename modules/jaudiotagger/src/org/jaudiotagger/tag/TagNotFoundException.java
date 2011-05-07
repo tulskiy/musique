@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: TagNotFoundException.java,v 1.4 2008/01/01 15:12:57 paultaylor Exp $
+ *  Version @version:$Id: TagNotFoundException.java 520 2008-01-01 15:16:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -30,7 +30,7 @@ package org.jaudiotagger.tag;
  * <code>InvalidTagException</code>.
  *
  * @author Eric Farng
- * @version $Revision: 1.4 $
+ * @version $Revision: 520 $
  */
 public class TagNotFoundException extends TagException {
     /**

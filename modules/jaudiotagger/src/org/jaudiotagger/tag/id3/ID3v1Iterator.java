@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: ID3v1Iterator.java,v 1.6 2008/01/01 15:14:22 paultaylor Exp $
+ *  Version @version:$Id: ID3v1Iterator.java 520 2008-01-01 15:16:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -25,6 +25,7 @@ package org.jaudiotagger.tag.id3;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
 
 public class ID3v1Iterator implements Iterator {
     /**

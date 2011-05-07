@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: BooleanByte.java,v 1.9 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: BooleanByte.java 920 2010-10-04 13:47:19Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -39,6 +39,7 @@ public class BooleanByte extends AbstractDataType {
      * Creates a new ObjectBooleanByte datatype.
      *
      * @param identifier
+     * @param frameBody
      * @param bitPosition
      * @throws IndexOutOfBoundsException
      */
@@ -75,17 +76,14 @@ public class BooleanByte extends AbstractDataType {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof BooleanByte) == false) {
+        if (!(obj instanceof BooleanByte)) {
             return false;
         }
 
         BooleanByte object = (BooleanByte) obj;
 
-        if (this.bitPosition != object.bitPosition) {
-            return false;
-        }
+        return this.bitPosition == object.bitPosition && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**
@@ -126,7 +124,7 @@ public class BooleanByte extends AbstractDataType {
         retValue = new byte[1];
 
         if (value != null) {
-            retValue[0] = (byte) (((Boolean) value).booleanValue() ? 1 : 0);
+            retValue[0] = (byte) ((Boolean) value ? 1 : 0);
             retValue[0] <<= bitPosition;
         }
 

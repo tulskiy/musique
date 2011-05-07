@@ -29,6 +29,7 @@ import java.io.IOException;
 import static com.tulskiy.musique.system.TrackIO.getAudioFileReader;
 import static com.tulskiy.musique.system.TrackIO.getAudioFileWriter;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @Author: Denis Tulskiy
@@ -40,37 +41,59 @@ public class TagTest {
     public void testMP3() {
         testRead("testfiles/mp3/sample.mp3");
         testWrite("testfiles/mp3/sample_notag.mp3");
+        testEmptyWrite("testfiles/mp3/sample_notag.mp3");
     }
 
     @Test
     public void testFLAC() {
         testRead("testfiles/flac/sample.flac");
         testWrite("testfiles/flac/sample_notag.flac");
+        testEmptyWrite("testfiles/flac/sample_notag.flac");
     }
 
     @Test
     public void testAPE() {
         testRead("testfiles/ape/sample.ape");
         testWrite("testfiles/ape/sample_notag.ape");
+        testEmptyWrite("testfiles/ape/sample_notag.ape");
     }
 
     @Test
     public void testWavPack() {
         testRead("testfiles/wavpack/sample.wv");
         testWrite("testfiles/wavpack/sample_notag.wv");
+        testEmptyWrite("testfiles/wavpack/sample_notag.wv");
     }
 
     @Test
     public void testOGG() {
         testRead("testfiles/ogg/sample.ogg");
         testWrite("testfiles/ogg/sample_notag.ogg");
+        testEmptyWrite("testfiles/ogg/sample_notag.ogg");
     }
 
-//    @Test
-//    public void testMP4() {
-//        testRead("testfiles/aac/sample.mp4");
-//        testWrite("testfiles/aac/sample_notag.mp4");
-//    }
+    @Test
+    public void testMP4() {
+        testRead("testfiles/aac/sample.mp4");
+        testWrite("testfiles/aac/sample_notag.mp4");
+        testEmptyWrite("testfiles/aac/sample_notag.mp4");
+    }
+
+    private void testEmptyWrite(String name) {
+        try {
+            Track track = new Track();
+            File file = new File(name);
+            File fo = new File("testfiles/temp." + Util.getFileExt(name));
+            copy(file, fo);
+            track.setLocation(fo.toURI().toString());
+            getAudioFileWriter(fo.getName()).write(track);
+
+            fo.delete();
+        } catch (Exception e) {
+            e.printStackTrace();
+            fail("Failed to write empty tag");
+        }
+    }
 
 
     private void testRead(String file) {
@@ -87,6 +110,9 @@ public class TagTest {
         assertEquals("3", track.getDiscNumber());
         assertEquals("4", track.getTotalDiscs());
         assertEquals("comment", track.getComment());
+//        assertEquals(29400, track.getTotalSamples());
+        assertEquals(2, track.getChannels());
+        assertEquals(44100, track.getSampleRate());
     }
 
     private void testWrite(String name) {
@@ -106,7 +132,11 @@ public class TagTest {
         File fo = new File("testfiles/temp." + Util.getFileExt(name));
         copy(file, fo);
         track.setLocation(fo.toURI().toString());
-        getAudioFileWriter(fo.getName()).write(track);
+        try {
+            getAudioFileWriter(fo.getName()).write(track);
+        } catch (TagWriteException e) {
+            e.printStackTrace();
+        }
 
         testRead(fo.getPath());
         fo.delete();

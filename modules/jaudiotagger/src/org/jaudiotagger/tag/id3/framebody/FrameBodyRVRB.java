@@ -64,7 +64,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyRVRB.java,v 1.13 2008/07/21 10:45:43 paultaylor Exp $
+ * @version $Id: FrameBodyRVRB.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodyRVRB extends AbstractID3v2FrameBody implements ID3v24FrameBody, ID3v23FrameBody {
     /**
@@ -117,6 +117,8 @@ public class FrameBodyRVRB extends AbstractID3v2FrameBody implements ID3v24Frame
     /**
      * Creates a new FrameBodyRVRB datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodyRVRB(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -131,6 +133,7 @@ public class FrameBodyRVRB extends AbstractID3v2FrameBody implements ID3v24Frame
     public String getIdentifier() {
         return ID3v24Frames.FRAME_ID_REVERB;
     }
+
 
     /**
      *

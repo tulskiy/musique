@@ -27,14 +27,22 @@ import org.jaudiotagger.audio.flac.FlacFileWriter;
 import org.jaudiotagger.audio.generic.*;
 import org.jaudiotagger.audio.mp3.MP3FileReader;
 import org.jaudiotagger.audio.mp3.MP3FileWriter;
+import org.jaudiotagger.audio.mp4.Mp4FileReader;
+import org.jaudiotagger.audio.mp4.Mp4FileWriter;
 import org.jaudiotagger.audio.ogg.OggFileReader;
 import org.jaudiotagger.audio.ogg.OggFileWriter;
+import org.jaudiotagger.audio.wav.WavFileReader;
+import org.jaudiotagger.audio.wav.WavFileWriter;
+import org.jaudiotagger.logging.ErrorMessage;
 import org.jaudiotagger.tag.TagException;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * <p/>
@@ -52,7 +60,7 @@ import java.util.Map;
  * <code>
  * AudioFile audioFile = AudioFileIO.read(new File("audiofile.mp3")); //Reads the given file.<br/>
  * int bitrate = audioFile.getBitrate(); //Retreives the bitrate of the file.<br/>
- * String artist = audioFile.getTag().getFirstArtist(); //Retreive the artist name.<br/>
+ * String artist = audioFile.getTag().getFirst(TagFieldKey.ARTIST); //Retreive the artist name.<br/>
  * audioFile.getTag().setGenre("Progressive Rock"); //Sets the genre to Prog. Rock, note the file on disk is still unmodified.<br/>
  * AudioFileIO.write(audioFile); //Write the modifications in the file on disk.
  * </code>
@@ -71,7 +79,7 @@ import java.util.Map;
  * </p>
  *
  * @author Raphael Slinckx
- * @version $Id: AudioFileIO.java,v 1.14 2008/10/28 10:26:24 paultaylor Exp $
+ * @version $Id: AudioFileIO.java 904 2010-05-14 13:46:39Z paultaylor $
  * @see AudioFile
  * @see org.jaudiotagger.tag.Tag
  * @since v0.01
@@ -79,7 +87,7 @@ import java.util.Map;
 public class AudioFileIO {
 
     //Logger
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio");
 
     // !! Do not forget to also add new supported extensions to AudioFileFilter
     // !!
@@ -96,14 +104,16 @@ public class AudioFileIO {
      *
      * @param f The file where the tag will be deleted
      * @throws CannotWriteException If the file could not be written/accessed, the extension
-     *                              wasn't recognized, or other IO error occured.
+     *                              wasn't recognized, or other IO error occurred.
+     * @throws org.jaudiotagger.audio.exceptions.CannotReadException
+     *
      */
     public static void delete(AudioFile f) throws CannotReadException, CannotWriteException {
         getDefaultAudioFileIO().deleteTag(f);
     }
 
     /**
-     * This method returns the default isntance for static use.<br>
+     * This method returns the default instance for static use.<br>
      *
      * @return The default instance.
      */
@@ -120,9 +130,16 @@ public class AudioFileIO {
      * </p>
      *
      * @param f The file to read.
-     * @return The AudioFile with the file tag and the file encoding infos.
+     * @return The AudioFile with the file tag and the file encoding info.
      * @throws CannotReadException If the file could not be read, the extension wasn't
-     *                             recognized, or an IO error occured during the read.
+     *                             recognized, or an IO error occurred during the read.
+     * @throws org.jaudiotagger.tag.TagException
+     *
+     * @throws org.jaudiotagger.audio.exceptions.ReadOnlyFileException
+     *
+     * @throws java.io.IOException
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     public static AudioFile read(File f)
             throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
@@ -131,12 +148,12 @@ public class AudioFileIO {
 
     /**
      * <p/>
-     * Write the tag contained in the audiofile in the actual file on the disk.
+     * Write the tag contained in the audioFile in the actual file on the disk.
      * </p>
      *
      * @param f The AudioFile to be written
      * @throws CannotWriteException If the file could not be written/accessed, the extension
-     *                              wasn't recognized, or other IO error occured.
+     *                              wasn't recognized, or other IO error occurred.
      */
     public static void write(AudioFile f) throws CannotWriteException {
         getDefaultAudioFileIO().writeFile(f);
@@ -177,15 +194,16 @@ public class AudioFileIO {
      *
      * @param f The file where the tag will be deleted
      * @throws CannotWriteException If the file could not be written/accessed, the extension
-     *                              wasn't recognized, or other IO error occured.
+     *                              wasn't recognized, or other IO error occurred.
+     * @throws org.jaudiotagger.audio.exceptions.CannotReadException
+     *
      */
     public void deleteTag(AudioFile f) throws CannotReadException, CannotWriteException {
         String ext = Utils.getExtension(f.getFile());
 
         Object afw = writers.get(ext);
         if (afw == null) {
-            throw new CannotWriteException(
-                    "No Deleter associated to this extension: " + ext);
+            throw new CannotWriteException(ErrorMessage.NO_DELETER_FOR_THIS_FORMAT.getMsg(ext));
         }
 
         ((AudioFileWriter) afw).delete(f);
@@ -200,16 +218,25 @@ public class AudioFileIO {
         readers.put(SupportedFileFormat.OGG.getFilesuffix(), new OggFileReader());
         readers.put(SupportedFileFormat.FLAC.getFilesuffix(), new FlacFileReader());
         readers.put(SupportedFileFormat.MP3.getFilesuffix(), new MP3FileReader());
+        readers.put(SupportedFileFormat.MP4.getFilesuffix(), new Mp4FileReader());
+        readers.put(SupportedFileFormat.M4A.getFilesuffix(), new Mp4FileReader());
+        readers.put(SupportedFileFormat.M4P.getFilesuffix(), new Mp4FileReader());
+        readers.put(SupportedFileFormat.M4B.getFilesuffix(), new Mp4FileReader());
+        readers.put(SupportedFileFormat.WAV.getFilesuffix(), new WavFileReader());
 
         // Tag Writers
         writers.put(SupportedFileFormat.OGG.getFilesuffix(), new OggFileWriter());
         writers.put(SupportedFileFormat.FLAC.getFilesuffix(), new FlacFileWriter());
         writers.put(SupportedFileFormat.MP3.getFilesuffix(), new MP3FileWriter());
-
+        writers.put(SupportedFileFormat.MP4.getFilesuffix(), new Mp4FileWriter());
+        writers.put(SupportedFileFormat.M4A.getFilesuffix(), new Mp4FileWriter());
+        writers.put(SupportedFileFormat.M4P.getFilesuffix(), new Mp4FileWriter());
+        writers.put(SupportedFileFormat.M4B.getFilesuffix(), new Mp4FileWriter());
+        writers.put(SupportedFileFormat.WAV.getFilesuffix(), new WavFileWriter());
 
         // Register modificationHandler
-        for (AudioFileWriter audioFileWriter : writers.values()) {
-            audioFileWriter.setAudioFileModificationListener(this.modificationHandler);
+        for (AudioFileWriter curr : writers.values()) {
+            curr.setAudioFileModificationListener(this.modificationHandler);
         }
     }
 
@@ -219,29 +246,42 @@ public class AudioFileIO {
      * </p>
      *
      * @param f The file to read.
-     * @return The AudioFile with the file tag and the file encoding infos.
+     * @return The AudioFile with the file tag and the file encoding info.
      * @throws CannotReadException If the file could not be read, the extension wasn't
-     *                             recognized, or an IO error occured during the read.
+     *                             recognized, or an IO error occurred during the read.
+     * @throws org.jaudiotagger.tag.TagException
+     *
+     * @throws org.jaudiotagger.audio.exceptions.ReadOnlyFileException
+     *
+     * @throws java.io.IOException
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     public AudioFile readFile(File f)
             throws CannotReadException, IOException, TagException, ReadOnlyFileException, InvalidAudioFrameException {
+        checkFileExists(f);
         String ext = Utils.getExtension(f);
 
         AudioFileReader afr = readers.get(ext);
         if (afr == null) {
-            throw new CannotReadException(
-                    "No Reader associated to this extension: " + ext);
+            throw new CannotReadException(ErrorMessage.NO_READER_FOR_THIS_FORMAT.getMsg(ext));
         }
 
         return afr.read(f);
     }
 
-    public void addFileReader(String ext, AudioFileReader reader) {
-        readers.put(ext, reader);
-    }
-
-    public void addFileWriter(String ext, AudioFileWriter writer) {
-        writers.put(ext, writer);
+    /**
+     * Check does file exist
+     *
+     * @param file
+     * @throws java.io.FileNotFoundException
+     */
+    public void checkFileExists(File file) throws FileNotFoundException {
+//        logger.info("Reading file:" + "path" + file.getPath() + ":abs:" + file.getAbsolutePath());
+        if (!file.exists()) {
+//            logger.severe("Unable to find:" + file.getPath());
+            throw new FileNotFoundException(ErrorMessage.UNABLE_TO_FIND_FILE.getMsg(file.getPath()));
+        }
     }
 
     /**
@@ -256,19 +296,19 @@ public class AudioFileIO {
 
     /**
      * <p/>
-     * Write the tag contained in the audiofile in the actual file on the disk.
+     * Write the tag contained in the audioFile in the actual file on the disk.
      * </p>
      *
      * @param f The AudioFile to be written
      * @throws CannotWriteException If the file could not be written/accessed, the extension
-     *                              wasn't recognized, or other IO error occured.
+     *                              wasn't recognized, or other IO error occurred.
      */
     public void writeFile(AudioFile f) throws CannotWriteException {
         String ext = Utils.getExtension(f.getFile());
 
         AudioFileWriter afw = writers.get(ext);
         if (afw == null) {
-            throw new CannotWriteException("No Writer associated to this extension: " + ext);
+            throw new CannotWriteException(ErrorMessage.NO_WRITER_FOR_THIS_FORMAT.getMsg(ext));
         }
 
         afw.write(f);

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyTPRO.java,v 1.9 2008/07/21 10:45:45 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyTPRO.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -28,6 +28,7 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+
 public class FrameBodyTPRO extends AbstractFrameBodyTextInfo implements ID3v24FrameBody {
     /**
      * Creates a new FrameBodyTPRO datatype.
@@ -52,6 +53,8 @@ public class FrameBodyTPRO extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTPRO datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws java.io.IOException
      * @throws InvalidTagException
      */

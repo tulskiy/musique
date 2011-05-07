@@ -13,7 +13,6 @@
  *  you can get a copy from http://www.opensource.org/licenses/lgpl-license.php or write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 package org.jaudiotagger.tag.id3.framebody;
 
 import org.jaudiotagger.tag.InvalidTagException;
@@ -112,7 +111,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodySYLT.java,v 1.17 2008/07/21 10:45:43 paultaylor Exp $
+ * @version $Id: FrameBodySYLT.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodySYLT extends AbstractID3v2FrameBody implements ID3v24FrameBody, ID3v23FrameBody {
     /**
@@ -139,6 +138,7 @@ public class FrameBodySYLT extends AbstractID3v2FrameBody implements ID3v24Frame
      * @param timeStampFormat
      * @param contentType
      * @param description
+     * @param lyrics
      */
     public FrameBodySYLT(int textEncoding, String language, int timeStampFormat, int contentType, String description, byte[] lyrics) {
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding);
@@ -152,6 +152,8 @@ public class FrameBodySYLT extends AbstractID3v2FrameBody implements ID3v24Frame
     /**
      * Creates a new FrameBodySYLT datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodySYLT(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -192,6 +194,7 @@ public class FrameBodySYLT extends AbstractID3v2FrameBody implements ID3v24Frame
     public String getIdentifier() {
         return ID3v24Frames.FRAME_ID_SYNC_LYRIC;
     }
+
 
     /**
      * Set lyrics

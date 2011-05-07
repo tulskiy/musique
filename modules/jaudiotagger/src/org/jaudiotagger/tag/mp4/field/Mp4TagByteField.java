@@ -15,6 +15,8 @@ import java.nio.ByteBuffer;
  * <p>Usually single byte fields are used as a boolean field, but not always so we dont do this conversion
  */
 public class Mp4TagByteField extends Mp4TagTextField {
+    public static String TRUE_VALUE = "1";  //when using this field to hold a boolean
+
     //Holds the actual size of the data content as held in the databoxitem, this is required when creating new
     //items because we cant accurately work out the size by looking at the content because sometimes field must be longer
     //than is actually required to hold the value
@@ -32,6 +34,8 @@ public class Mp4TagByteField extends Mp4TagTextField {
      *
      * @param id
      * @param value is a String representation of a number
+     * @throws org.jaudiotagger.tag.FieldDataInvalidException
+     *
      */
     public Mp4TagByteField(Mp4FieldKey id, String value) throws FieldDataInvalidException {
         this(id, value, 1);
@@ -41,17 +45,19 @@ public class Mp4TagByteField extends Mp4TagTextField {
      * Create new field with known length
      *
      * @param id
-     * @param value is a String representation of a number
+     * @param value          is a String representation of a number
+     * @param realDataLength
+     * @throws org.jaudiotagger.tag.FieldDataInvalidException
+     *
      */
     public Mp4TagByteField(Mp4FieldKey id, String value, int realDataLength) throws FieldDataInvalidException {
         super(id.getFieldName(), value);
         this.realDataLength = realDataLength;
-        //Check that can actually be store dnumercially, otherwise will have big problems
+        //Check that can actually be stored numercially, otherwise will have big problems
         //when try and save the field
         try {
             Long.parseLong(value);
-        }
-        catch (NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) {
             throw new FieldDataInvalidException("Value of:" + value + " is invalid for field:" + id);
         }
     }
@@ -68,7 +74,7 @@ public class Mp4TagByteField extends Mp4TagTextField {
     }
 
     public Mp4FieldType getFieldType() {
-        return Mp4FieldType.BYTE;
+        return Mp4FieldType.INTEGER;
     }
 
     /**

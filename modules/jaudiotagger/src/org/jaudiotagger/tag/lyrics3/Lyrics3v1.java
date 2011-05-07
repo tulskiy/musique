@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: Lyrics3v1.java,v 1.9 2008/07/21 10:45:49 paultaylor Exp $
+ *  Version @version:$Id: Lyrics3v1.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -48,7 +48,7 @@ public class Lyrics3v1 extends AbstractLyrics3 {
 
     public Lyrics3v1(Lyrics3v1 copyObject) {
         super(copyObject);
-        this.lyric = new String(copyObject.lyric);
+        this.lyric = copyObject.lyric;
     }
 
     public Lyrics3v1(AbstractTag mp3Tag) {
@@ -65,7 +65,7 @@ public class Lyrics3v1 extends AbstractLyrics3 {
 
             FieldFrameBodyLYR lyricField;
             lyricField = (FieldFrameBodyLYR) lyricTag.getField("LYR").getBody();
-            this.lyric = new String(lyricField.getLyric());
+            this.lyric = lyricField.getLyric();
         }
     }
 
@@ -73,14 +73,14 @@ public class Lyrics3v1 extends AbstractLyrics3 {
      * Creates a new Lyrics3v1 datatype.
      *
      * @param file
+     * @param byteBuffer
      * @throws TagNotFoundException
      * @throws java.io.IOException
      */
     public Lyrics3v1(ByteBuffer byteBuffer) throws TagNotFoundException, java.io.IOException {
         try {
             this.read(byteBuffer);
-        }
-        catch (TagException e) {
+        } catch (TagException e) {
             e.printStackTrace();
         }
     }
@@ -118,11 +118,8 @@ public class Lyrics3v1 extends AbstractLyrics3 {
      * @return
      */
     public boolean isSubsetOf(Object obj) {
-        if ((obj instanceof Lyrics3v1) == false) {
-            return false;
-        }
+        return (obj instanceof Lyrics3v1) && (((Lyrics3v1) obj).lyric.contains(this.lyric));
 
-        return (((Lyrics3v1) obj).lyric.contains(this.lyric));
     }
 
     /**
@@ -130,17 +127,14 @@ public class Lyrics3v1 extends AbstractLyrics3 {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof Lyrics3v1) == false) {
+        if (!(obj instanceof Lyrics3v1)) {
             return false;
         }
 
         Lyrics3v1 object = (Lyrics3v1) obj;
 
-        if (this.lyric.equals(object.lyric) == false) {
-            return false;
-        }
+        return this.lyric.equals(object.lyric) && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**
@@ -175,7 +169,7 @@ public class Lyrics3v1 extends AbstractLyrics3 {
         byte[] buffer = new byte[5100 + 9 + 11];
         String lyricBuffer;
 
-        if (seek(byteBuffer) == false) {
+        if (!seek(byteBuffer)) {
             throw new TagNotFoundException("ID3v1 tag not found");
         }
 
@@ -192,9 +186,9 @@ public class Lyrics3v1 extends AbstractLyrics3 {
      */
     public boolean seek(RandomAccessFile file) throws IOException {
         byte[] buffer = new byte[5100 + 9 + 11];
-        String lyricsEnd = "";
-        String lyricsStart = "";
-        long offset = 0;
+        String lyricsEnd;
+        String lyricsStart;
+        long offset;
 
         // check right before the ID3 1.0 tag for the lyrics tag
         file.seek(file.length() - 128 - 9);
@@ -249,10 +243,10 @@ public class Lyrics3v1 extends AbstractLyrics3 {
      * @throws IOException
      */
     public void write(RandomAccessFile file) throws IOException {
-        String str = "";
-        int offset = 0;
+        String str;
+        int offset;
         byte[] buffer;
-        ID3v1Tag id3v1tag = null;
+        ID3v1Tag id3v1tag;
 
         id3v1tag = null;
 

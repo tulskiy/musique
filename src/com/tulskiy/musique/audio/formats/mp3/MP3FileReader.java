@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -25,7 +25,6 @@ import org.jaudiotagger.audio.mp3.LameFrame;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.audio.mp3.XingFrame;
-import org.jaudiotagger.tag.TagFieldKey;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
@@ -55,9 +54,6 @@ public class MP3FileReader extends AudioFileReader {
                 ID3v24Tag v24Tag = mp3File.getID3v2TagAsv24();
                 if (v24Tag != null) {
                     copyTagFields(v24Tag, track);
-                    track.addMeta("year", v24Tag.getFirst(TagFieldKey.DATE).trim());
-                    track.addMeta("albumArtist", v24Tag.getFirst(TagFieldKey.ALBUM_ARTIST).trim());
-                    track.setDiscNumber(v24Tag.getFirst(TagFieldKey.DISC_NO));
                 }
             } catch (IOException e) {
                 e.printStackTrace();

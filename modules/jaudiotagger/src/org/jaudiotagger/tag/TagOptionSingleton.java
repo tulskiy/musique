@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: TagOptionSingleton.java,v 1.16 2008/07/21 10:45:52 paultaylor Exp $
+ *  Version @version:$Id: TagOptionSingleton.java 893 2010-04-15 12:27:47Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -74,11 +74,13 @@ public class TagOptionSingleton {
      */
     private HashMap<String, String> replaceWordMap = new HashMap<String, String>();
 
+
     /**
      * default language for any ID3v2 tags frameswhich require it. This string
      * is in the [ISO-639-2] ISO/FDIS 639-2 definition
      */
     private String language = "eng";
+
 
     /**
      *
@@ -132,6 +134,7 @@ public class TagOptionSingleton {
      */
     private boolean id3v1SaveYear = true;
 
+
     /**
      * When adjusting the ID3v2 padding, if should we copy the current ID3v2
      * tag to the new MP3 file. Defaults to true.
@@ -148,6 +151,7 @@ public class TagOptionSingleton {
      * if we should save any fields of the ID3v2 tag or not. Defaults to true.
      */
     private boolean id3v2Save = true;
+
 
     /**
      * if we should keep an empty Lyrics3 field while we're reading. This is
@@ -172,6 +176,7 @@ public class TagOptionSingleton {
      *
      */
     private boolean originalSavedAfterAdjustingID3v2Padding = true;
+
 
     /**
      * default time stamp format for any ID3v2 tag frames which require it.
@@ -207,20 +212,39 @@ public class TagOptionSingleton {
      * This is the default text encoding to use for new v24 frames, it defaults to simple ISO8859
      * but by changing this value you could always used UTF8 for example whether you needed to or not
      */
-    private byte id3v24DefaultTextEncoding = TextEncoding.UTF_8;
+    private byte id3v24DefaultTextEncoding = TextEncoding.ISO_8859_1;
 
     /**
      * This is text encoding to use for new v24 frames when unicode is required, it defaults to UTF16 just
      * because this encoding is understand by all ID3 versions
      */
-    private byte id3v24UnicodeTextEncoding = TextEncoding.UTF_8;
+    private byte id3v24UnicodeTextEncoding = TextEncoding.UTF_16;
+
 
     /**
      * When writing frames if this is set to true then the frame will be written
-     * using the defaults disregarding the text e ncoding originally used to create
+     * using the defaults disregarding the text encoding originally used to create
      * the frame.
      */
-    private boolean resetTextEncodingForExistingFrames = true;
+    private boolean resetTextEncodingForExistingFrames = false;
+
+    /**
+     * Some formats impose maxmimum lengths for fields , if the text provided is longer
+     * than the formats allows it will truncate and write a warning, if this is not set
+     * it will throw an exception
+     */
+    private boolean truncateTextWithoutErrors = false;
+
+    /**
+     * Frames such as TRCK and TPOS sometimes pad single digit numbers to aid sorting
+     */
+    private boolean padNumbers = false;
+
+    /**
+     * There are a couple of problems with the Java implemenatation ono Google Android, enabling this value
+     * switches on Google workarounds
+     */
+    private boolean isAndroid = false;
 
     /**
      * Creates a new TagOptions datatype. All Options are set to their default
@@ -229,6 +253,7 @@ public class TagOptionSingleton {
     private TagOptionSingleton() {
         setToDefault();
     }
+
 
     /**
      * @return
@@ -266,6 +291,7 @@ public class TagOptionSingleton {
         return filenameTagSave;
     }
 
+
     /**
      * @param instanceKey
      */
@@ -279,6 +305,7 @@ public class TagOptionSingleton {
     public static String getInstanceKey() {
         return defaultOptions;
     }
+
 
     /**
      * @param id3v1Save
@@ -392,6 +419,7 @@ public class TagOptionSingleton {
         return id3v1SaveYear;
     }
 
+
     /**
      * @param id3v2PaddingCopyTag
      */
@@ -405,6 +433,7 @@ public class TagOptionSingleton {
     public boolean isId3v2PaddingCopyTag() {
         return id3v2PaddingCopyTag;
     }
+
 
     /**
      * @param id3v2PaddingWillShorten
@@ -433,6 +462,7 @@ public class TagOptionSingleton {
     public boolean isId3v2Save() {
         return id3v2Save;
     }
+
 
     /**
      * @return
@@ -610,6 +640,7 @@ public class TagOptionSingleton {
         return originalSavedAfterAdjustingID3v2Padding;
     }
 
+
     /**
      * Sets the default time stamp format for ID3v2 tags which require it.
      * While the value will already exist when reading from a file, this value
@@ -671,9 +702,12 @@ public class TagOptionSingleton {
         unsyncTags = false;
         removeTrailingTerminatorOnWrite = true;
         id3v23DefaultTextEncoding = TextEncoding.ISO_8859_1;
-        id3v24DefaultTextEncoding = TextEncoding.UTF_8;
-        id3v24UnicodeTextEncoding = TextEncoding.UTF_8;
-        resetTextEncodingForExistingFrames = true;
+        id3v24DefaultTextEncoding = TextEncoding.ISO_8859_1;
+        id3v24UnicodeTextEncoding = TextEncoding.UTF_16;
+        resetTextEncodingForExistingFrames = false;
+        truncateTextWithoutErrors = false;
+        padNumbers = false;
+        isAndroid = false;
 
         //default all lyrics3 fields to save. id3v1 fields are individual
         // settings. id3v2 fields are always looked at to save.
@@ -729,11 +763,11 @@ public class TagOptionSingleton {
             while (iterator.hasNext()) {
                 addKeyword(FrameBodyCOMM.class, iterator.next());
             }
-        }
-        catch (TagException ex) {
+        } catch (TagException ex) {
             // this shouldn't happen, indicates coding error
             throw new RuntimeException(ex);
         }
+
 
         addReplaceWord("v.", "vs.");
         addReplaceWord("vs.", "vs.");
@@ -746,7 +780,9 @@ public class TagOptionSingleton {
         addReplaceWord("ft.", "feat.");
         addReplaceWord("ft", "feat.");
 
+
         iterator = this.getKeywordListIterator(FrameBodyTIPL.class);
+
 
         addParenthesis("(", ")");
         addParenthesis("[", "]");
@@ -754,20 +790,21 @@ public class TagOptionSingleton {
         addParenthesis("<", ">");
     }
 
+
     /**
      * @param id3v2FrameBodyClass
      * @param keyword
      * @throws TagException
      */
     public void addKeyword(Class<? extends ID3v24FrameBody> id3v2FrameBodyClass, String keyword) throws TagException {
-        if (AbstractID3v2FrameBody.class.isAssignableFrom(id3v2FrameBodyClass) == false) {
+        if (!AbstractID3v2FrameBody.class.isAssignableFrom(id3v2FrameBodyClass)) {
             throw new TagException("Invalid class type. Must be AbstractId3v2FrameBody " + id3v2FrameBodyClass);
         }
 
         if ((keyword != null) && (keyword.length() > 0)) {
             LinkedList<String> keywordList;
 
-            if (keywordMap.containsKey(id3v2FrameBodyClass) == false) {
+            if (!keywordMap.containsKey(id3v2FrameBodyClass)) {
                 keywordList = new LinkedList<String>();
                 keywordMap.put(id3v2FrameBodyClass, keywordList);
             } else {
@@ -812,16 +849,16 @@ public class TagOptionSingleton {
     }
 
     /**
-     * Do we remove unneccessary trailing null characters on write
+     * Do we remove unnecessary trailing null characters on write
      *
-     * @return true if we remove unneccessary trailing null characters on write
+     * @return true if we remove unnecessary trailing null characters on write
      */
     public boolean isRemoveTrailingTerminatorOnWrite() {
         return removeTrailingTerminatorOnWrite;
     }
 
     /**
-     * Remove unneccessary trailing null characters on write
+     * Remove unnecessary trailing null characters on write
      *
      * @param removeTrailingTerminatorOnWrite
      *
@@ -918,5 +955,37 @@ public class TagOptionSingleton {
      */
     public void setResetTextEncodingForExistingFrames(boolean resetTextEncodingForExistingFrames) {
         this.resetTextEncodingForExistingFrames = resetTextEncodingForExistingFrames;
+    }
+
+    /**
+     * @return truncate without errors
+     */
+    public boolean isTruncateTextWithoutErrors() {
+        return truncateTextWithoutErrors;
+    }
+
+    /**
+     * Set truncate without errors
+     *
+     * @param truncateTextWithoutErrors
+     */
+    public void setTruncateTextWithoutErrors(boolean truncateTextWithoutErrors) {
+        this.truncateTextWithoutErrors = truncateTextWithoutErrors;
+    }
+
+    public boolean isPadNumbers() {
+        return padNumbers;
+    }
+
+    public void setPadNumbers(boolean padNumbers) {
+        this.padNumbers = padNumbers;
+    }
+
+    public boolean isAndroid() {
+        return isAndroid;
+    }
+
+    public void setAndroid(boolean android) {
+        isAndroid = android;
     }
 }

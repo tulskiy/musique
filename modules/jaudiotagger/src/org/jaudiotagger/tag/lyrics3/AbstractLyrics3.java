@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractLyrics3.java,v 1.9 2008/07/21 10:45:49 paultaylor Exp $
+ *  Version @version:$Id: AbstractLyrics3.java 625 2008-07-21 10:49:58Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -28,6 +28,7 @@ import org.jaudiotagger.tag.id3.ID3v1Tag;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+
 public abstract class AbstractLyrics3 extends AbstractTag {
     public AbstractLyrics3() {
     }
@@ -43,6 +44,7 @@ public abstract class AbstractLyrics3 extends AbstractTag {
     public void delete(RandomAccessFile file) throws IOException {
         long filePointer;
         ID3v1Tag id3v1tag = new ID3v1Tag();
+
 
     }
 }

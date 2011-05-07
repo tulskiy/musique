@@ -19,7 +19,7 @@ package org.jaudiotagger.tag.id3.framebody;
  * Indicates that this is a frame used in ID3v2 Chapter Tags.
  *
  * @author Marc Gimpel, Horizon Wimba S.A.
- * @version $Id: ID3v2ChapterFrameBody.java,v 1.1 2006/08/21 10:37:27 mgimpel Exp $
+ * @version $Id: ID3v2ChapterFrameBody.java 177 2006-08-21 10:37:28Z mgimpel $
  */
 public interface ID3v2ChapterFrameBody {
 

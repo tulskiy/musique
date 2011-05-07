@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyUFID.java,v 1.13 2008/07/21 10:45:46 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyUFID.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -32,6 +32,7 @@ import org.jaudiotagger.tag.datatype.StringNullTerminated;
 import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
+
 
 /**
  * A UFID Framebody consists of an owner that identifies the server hosting the
@@ -68,6 +69,8 @@ public class FrameBodyUFID extends AbstractID3v2FrameBody implements ID3v24Frame
     /**
      * Creates FrameBodyUFID datatype from buffer
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyUFID(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
