@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: ReadOnlyFileException.java,v 1.1 2007/08/07 16:09:42 paultaylor Exp $
+ *  Version @version:$Id: ReadOnlyFileException.java 345 2007-08-07 16:14:03Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *

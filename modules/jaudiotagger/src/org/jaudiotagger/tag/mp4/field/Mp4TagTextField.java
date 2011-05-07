@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -103,6 +103,7 @@ public class Mp4TagTextField extends Mp4TagField implements TagTextField {
     public String getEncoding() {
         return Mp4BoxHeader.CHARSET_UTF_8;
     }
+
 
     public boolean isBinary() {
         return false;

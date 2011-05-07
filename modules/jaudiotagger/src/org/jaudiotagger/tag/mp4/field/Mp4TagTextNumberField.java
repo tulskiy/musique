@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * Represents simple text field that contains an array of number,
  * <p/>
- * <p>But reads the data content as an arry of 16 bit unsigned numbers
+ * <p>But reads the data content as an array of 16 bit unsigned numbers
  */
 public class Mp4TagTextNumberField extends Mp4TagTextField {
     public static final int NUMBER_LENGTH = 2;
@@ -64,8 +64,7 @@ public class Mp4TagTextNumberField extends Mp4TagTextField {
         for (Short number : numbers) {
             try {
                 baos.write(Utils.getSizeBEInt16(number));
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 //This should never happen because we are not writing to file at this point.
                 throw new RuntimeException(e);
             }
@@ -84,7 +83,7 @@ public class Mp4TagTextNumberField extends Mp4TagTextField {
      * @return type numeric
      */
     public Mp4FieldType getFieldType() {
-        return Mp4FieldType.NUMERIC;
+        return Mp4FieldType.IMPLICIT;
     }
 
     protected void build(ByteBuffer data) throws UnsupportedEncodingException {

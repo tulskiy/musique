@@ -46,7 +46,7 @@ public class ID3SyncSafeInteger {
     /**
      * Read syncsafe value from buffer in format specified in spec and convert to int.
      * <p/>
-     * The buffers position is moved to just after the location of the syscsafe integer
+     * The buffers position is moved to just after the location of the syncsafe integer
      *
      * @param buffer syncsafe integer
      * @return decoded int

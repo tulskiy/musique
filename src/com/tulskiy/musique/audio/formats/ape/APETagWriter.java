@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,6 +18,7 @@
 package com.tulskiy.musique.audio.formats.ape;
 
 import com.tulskiy.musique.audio.AudioTagWriter;
+import com.tulskiy.musique.audio.TagWriteException;
 import com.tulskiy.musique.playlist.Track;
 
 import java.io.IOException;
@@ -30,11 +31,11 @@ public class APETagWriter extends AudioTagWriter {
     private APETagProcessor tagProcessor = new APETagProcessor();
 
     @Override
-    public void write(Track track) {
+    public void write(Track track) throws TagWriteException {
         try {
             tagProcessor.writeAPEv2Tag(track);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new TagWriteException(e);
         }
     }
 

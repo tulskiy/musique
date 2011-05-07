@@ -1,7 +1,7 @@
 /**
  *  @author : Paul Taylor
  *
- *  Version @version:$Id: PlainTextTagDisplayFormatter.java,v 1.6 2007/12/10 09:13:50 paultaylor Exp $
+ *  Version @version:$Id: PlainTextTagDisplayFormatter.java 792 2009-05-05 15:59:19Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -18,6 +18,7 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jaudiotagger.logging;
+
 
 /*
  * For Formatting metadata contents of a file as simple text
@@ -60,7 +61,7 @@ public class PlainTextTagDisplayFormatter extends AbstractTagDisplayFormatter {
     }
 
     public void addElement(String type, String value) {
-        sb.append(indent + type + ":" + value + '\n');
+        sb.append(indent).append(type).append(":").append(value).append('\n');
     }
 
     public void addElement(String type, int value) {

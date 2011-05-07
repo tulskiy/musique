@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -55,7 +55,6 @@ public class Mp4MvhdBox extends AbstractMp4Box {
 
     private int timeScale;
     private long timeLength;
-    private byte version;
 
     /**
      * @param header     header info
@@ -63,7 +62,7 @@ public class Mp4MvhdBox extends AbstractMp4Box {
      */
     public Mp4MvhdBox(Mp4BoxHeader header, ByteBuffer dataBuffer) {
         this.header = header;
-        this.version = dataBuffer.get(VERSION_FLAG_POS);
+        byte version = dataBuffer.get(VERSION_FLAG_POS);
 
         if (version == LONG_FORMAT) {
             this.timeScale = Utils.getIntBE(dataBuffer, TIMESCALE_LONG_POS, (TIMESCALE_LONG_POS + TIMESCALE_LENGTH - 1));

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractTagFrameBody.java,v 1.4 2008/07/21 10:45:47 paultaylor Exp $
+ *  Version @version:$Id: AbstractTagFrameBody.java 895 2010-04-15 15:21:45Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -85,6 +85,7 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
         setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding);
     }
 
+
     /**
      * Creates a new framebody, at this point the bodys
      * ObjectList is setup which defines what datatypes are expected in body
@@ -96,6 +97,8 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
     /**
      * Copy Constructor for fragment body. Copies all objects in the
      * Object Iterator with data.
+     *
+     * @param copyObject
      */
     protected AbstractTagFrameBody(AbstractTagFrameBody copyObject) {
         AbstractDataType newObject;
@@ -104,6 +107,15 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
             newObject.setBody(this);
             this.objectList.add(newObject);
         }
+    }
+
+
+    /**
+     * @return the text value that the user would expect to see for this framebody type, this should be overrridden
+     *         for all framebodies
+     */
+    public String getUserFriendlyValue() {
+        return toString();
     }
 
     /**
@@ -121,6 +133,7 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
         }
         return str;
     }
+
 
     /**
      * This method calls <code>toString</code> for all it's objects and appends
@@ -177,7 +190,7 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
      *         <code>identifier</code>
      */
     public final AbstractDataType getObject(String identifier) {
-        AbstractDataType object = null;
+        AbstractDataType object;
         Iterator<AbstractDataType> iterator = objectList.listIterator();
         while (iterator.hasNext()) {
             object = iterator.next();
@@ -214,13 +227,13 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
      *         subset of the argument.
      */
     public boolean isSubsetOf(Object obj) {
-        if ((obj instanceof AbstractTagFrameBody) == false) {
+        if (!(obj instanceof AbstractTagFrameBody)) {
             return false;
         }
         ArrayList<AbstractDataType> superset = ((AbstractTagFrameBody) obj).objectList;
-        for (Object anObjectList : objectList) {
-            if (((AbstractDataType) anObjectList).getValue() != null) {
-                if (superset.contains(anObjectList) == false) {
+        for (AbstractDataType anObjectList : objectList) {
+            if (anObjectList.getValue() != null) {
+                if (!superset.contains(anObjectList)) {
                     return false;
                 }
             }
@@ -238,14 +251,12 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
      *         list equals the argument.
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof AbstractTagFrameBody) == false) {
+        if (!(obj instanceof AbstractTagFrameBody)) {
             return false;
         }
         AbstractTagFrameBody object = (AbstractTagFrameBody) obj;
-        if (this.objectList.equals(object.objectList) == false) {
-            return false;
-        }
-        return super.equals(obj);
+        boolean check = this.objectList.equals(object.objectList) && super.equals(obj);
+        return check;
     }
 
     /**
@@ -257,6 +268,7 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
         return objectList.iterator();
     }
 
+
     /**
      * Return brief description of FrameBody
      *
@@ -265,6 +277,7 @@ public abstract class AbstractTagFrameBody extends AbstractTagItem {
     public String toString() {
         return getBriefDescription();
     }
+
 
     /**
      * Create the list of Datatypes that this body

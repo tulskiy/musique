@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyTSRC.java,v 1.11 2008/07/21 10:45:46 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyTSRC.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -28,6 +28,7 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+
 public class FrameBodyTSRC extends AbstractFrameBodyTextInfo implements ID3v24FrameBody, ID3v23FrameBody {
     /**
      * Creates a new FrameBodyTSRC datatype.
@@ -52,6 +53,8 @@ public class FrameBodyTSRC extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTSRC datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTSRC(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {

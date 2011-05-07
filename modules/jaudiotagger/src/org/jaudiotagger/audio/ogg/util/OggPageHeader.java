@@ -20,24 +20,29 @@ package org.jaudiotagger.audio.ogg.util;
 
 import org.jaudiotagger.audio.exceptions.CannotReadException;
 import org.jaudiotagger.audio.generic.Utils;
+import org.jaudiotagger.logging.ErrorMessage;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import java.nio.ByteBuffer;
+
 
 /**
- * $Id: OggPageHeader.java,v 1.15 2008/12/10 13:14:34 paultaylor Exp $
+ * $Id: OggPageHeader.java 822 2009-10-27 08:52:55Z paultaylor $
  * <p/>
  * reference:http://xiph.org/ogg/doc/framing.html
  *
  * @author Raphael Slinckx (KiKiDonK)
- * @version 16 decembre 2003
+ * @version 16 d�cembre 2003
  */
 public class OggPageHeader {
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.ogg.atom");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.ogg.atom");
 
     //Capture pattern at start of header
     public static final byte[] CAPTURE_PATTERN = {'O', 'g', 'g', 'S'};
@@ -94,14 +99,53 @@ public class OggPageHeader {
     private List<PacketStartAndLength> packetList = new ArrayList<PacketStartAndLength>();
     private boolean lastPacketIncomplete = false;
 
+    /**
+     * Read next PageHeader from Buffer
+     *
+     * @param byteBuffer
+     * @return
+     * @throws IOException
+     * @throws CannotReadException
+     */
+    public static OggPageHeader read(ByteBuffer byteBuffer) throws IOException, CannotReadException {
+        //byteBuffer
+        int start = byteBuffer.position();
+//        logger.fine("Trying to read OggPage at:" + start);
+
+        byte[] b = new byte[OggPageHeader.CAPTURE_PATTERN.length];
+        byteBuffer.get(b);
+        if (!(Arrays.equals(b, OggPageHeader.CAPTURE_PATTERN))) {
+            throw new CannotReadException(ErrorMessage.OGG_HEADER_CANNOT_BE_FOUND.getMsg(new String(b)));
+        }
+
+        byteBuffer.position(start + OggPageHeader.FIELD_PAGE_SEGMENTS_POS);
+        int pageSegments = byteBuffer.get() & 0xFF; //unsigned
+        byteBuffer.position(start);
+
+        b = new byte[OggPageHeader.OGG_PAGE_HEADER_FIXED_LENGTH + pageSegments];
+        byteBuffer.get(b);
+        OggPageHeader pageHeader = new OggPageHeader(b);
+
+        //Now just after PageHeader, ready for Packet Data
+        return pageHeader;
+    }
+
+    /**
+     * Read next PageHeader from file
+     *
+     * @param raf
+     * @return
+     * @throws IOException
+     * @throws CannotReadException
+     */
     public static OggPageHeader read(RandomAccessFile raf) throws IOException, CannotReadException {
         long start = raf.getFilePointer();
-//        //logger.info("Trying to read OggPage at:" + start);
+//        logger.fine("Trying to read OggPage at:" + start);
 
         byte[] b = new byte[OggPageHeader.CAPTURE_PATTERN.length];
         raf.read(b);
         if (!(Arrays.equals(b, OggPageHeader.CAPTURE_PATTERN))) {
-            throw new CannotReadException("OggS Header could not be found, not an ogg stream:" + new String(b));
+            throw new CannotReadException(ErrorMessage.OGG_HEADER_CANNOT_BE_FOUND.getMsg(new String(b)));
         }
 
         raf.seek(start + OggPageHeader.FIELD_PAGE_SEGMENTS_POS);
@@ -110,6 +154,7 @@ public class OggPageHeader {
 
         b = new byte[OggPageHeader.OGG_PAGE_HEADER_FIXED_LENGTH + pageSegments];
         raf.read(b);
+
 
         OggPageHeader pageHeader = new OggPageHeader(b);
 
@@ -149,14 +194,18 @@ public class OggPageHeader {
 
             //If last segment value is 255 this packet continues onto next page
             //and will not have been added to the packetStartAndEnd list yet
-            if (segmentLength == MAXIMUM_SEGMENT_SIZE) {
-                packetList.add(new PacketStartAndLength(pageLength - packetLength, packetLength));
-                lastPacketIncomplete = true;
+            if (segmentLength != null) {
+                if (segmentLength == MAXIMUM_SEGMENT_SIZE) {
+                    packetList.add(new PacketStartAndLength(pageLength - packetLength, packetLength));
+                    lastPacketIncomplete = true;
+                }
             }
             isValid = true;
         }
 
-//        //logger.info("Constructed OggPage:" + this.toString());
+//        if (logger.isLoggable(Level.CONFIG)) {
+//            logger.config("Constructed OggPage:" + this.toString());
+//        }
     }
 
     private int u(int i) {
@@ -171,20 +220,23 @@ public class OggPageHeader {
     }
 
     public double getAbsoluteGranulePosition() {
-//        //logger.fine("Number Of Samples: " + absoluteGranulePosition);
+//        logger.fine("Number Of Samples: " + absoluteGranulePosition);
         return this.absoluteGranulePosition;
     }
+
 
     public int getCheckSum() {
         return checksum;
     }
 
+
     public byte getHeaderType() {
         return headerTypeFlag;
     }
 
+
     public int getPageLength() {
-//        //logger.fine("This page length: " + pageLength);
+//        logger.fine("This page length: " + pageLength);
         return this.pageLength;
     }
 

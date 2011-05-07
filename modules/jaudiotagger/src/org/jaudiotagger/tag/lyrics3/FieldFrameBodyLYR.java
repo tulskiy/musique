@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FieldFrameBodyLYR.java,v 1.11 2008/07/21 10:45:49 paultaylor Exp $
+ *  Version @version:$Id: FieldFrameBodyLYR.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -35,6 +35,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+
 
 public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
     /**
@@ -88,6 +89,10 @@ public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
 
     /**
      * Creates a new FieldBodyLYR datatype.
+     *
+     * @param byteBuffer
+     * @throws org.jaudiotagger.tag.InvalidTagException
+     *
      */
     public FieldFrameBodyLYR(ByteBuffer byteBuffer) throws InvalidTagException {
 
@@ -138,14 +143,14 @@ public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     public boolean isSubsetOf(Object obj) {
-        if ((obj instanceof FieldFrameBodyLYR) == false) {
+        if (!(obj instanceof FieldFrameBodyLYR)) {
             return false;
         }
 
         ArrayList<Lyrics3Line> superset = ((FieldFrameBodyLYR) obj).lines;
 
         for (Object line : lines) {
-            if (superset.contains(line) == false) {
+            if (!superset.contains(line)) {
                 return false;
             }
         }
@@ -167,7 +172,7 @@ public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
         while (iterator.hasNext()) {
             currentLine = iterator.next();
 
-            // create copy to use in new tag
+            // createField copy to use in new tag
             currentLine = new ID3v2LyricLine(currentLine);
             timeStamp = new Lyrics3TimeStamp("Time Stamp", this);
             timeStamp.setTimeStamp(currentLine.getTimeStamp(), (byte) sync.getTimeStampFormat());
@@ -191,7 +196,7 @@ public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
     public void addLyric(FrameBodyUSLT unsync) {
         // USLT frames are just long text string;
         Lyrics3Line line = new Lyrics3Line("Lyric Line", this);
-        line.setLyric(new String(unsync.getLyric()));
+        line.setLyric(unsync.getLyric());
         lines.add(line);
     }
 
@@ -200,17 +205,14 @@ public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof FieldFrameBodyLYR) == false) {
+        if (!(obj instanceof FieldFrameBodyLYR)) {
             return false;
         }
 
         FieldFrameBodyLYR object = (FieldFrameBodyLYR) obj;
 
-        if (this.lines.equals(object.lines) == false) {
-            return false;
-        }
+        return this.lines.equals(object.lines) && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**
@@ -250,7 +252,7 @@ public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
 
         int size = Integer.parseInt(new String(buffer, 0, 5));
 
-        if ((size == 0) && (TagOptionSingleton.getInstance().isLyrics3KeepEmptyFieldIfRead() == false)) {
+        if ((size == 0) && (!TagOptionSingleton.getInstance().isLyrics3KeepEmptyFieldIfRead())) {
             throw new InvalidTagException("Lyircs3v2 Field has size of zero.");
         }
 
@@ -280,10 +282,10 @@ public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
      * @throws java.io.IOException
      */
     public void write(RandomAccessFile file) throws java.io.IOException {
-        int size = 0;
+        int size;
         int offset = 0;
         byte[] buffer = new byte[5];
-        String str = "";
+        String str;
 
         size = getSize();
         str = Integer.toString(size);
@@ -318,7 +320,7 @@ public class FieldFrameBodyLYR extends AbstractLyrics3v2FieldFrameBody {
      */
     private void readString(String lineString) {
         // now readString each line and put in the vector;
-        String token = "";
+        String token;
         int offset = 0;
         int delim = lineString.indexOf(Lyrics3v2Fields.CRLF);
         lines = new ArrayList<Lyrics3Line>();

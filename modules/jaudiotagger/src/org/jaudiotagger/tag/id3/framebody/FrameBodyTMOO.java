@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyTMOO.java,v 1.9 2008/07/21 10:45:45 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyTMOO.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -24,9 +24,12 @@
 package org.jaudiotagger.tag.id3.framebody;
 
 import org.jaudiotagger.tag.InvalidTagException;
+import org.jaudiotagger.tag.datatype.DataTypes;
 import org.jaudiotagger.tag.id3.ID3v24Frames;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import java.nio.ByteBuffer;
+
 
 public class FrameBodyTMOO extends AbstractFrameBodyTextInfo implements ID3v24FrameBody {
     /**
@@ -49,9 +52,17 @@ public class FrameBodyTMOO extends AbstractFrameBodyTextInfo implements ID3v24Fr
         super(textEncoding, text);
     }
 
+    public FrameBodyTMOO(FrameBodyTXXX body) {
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body.getTextEncoding());
+        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
+        this.setObjectValue(DataTypes.OBJ_TEXT, body.getText());
+    }
+
     /**
      * Creates a new FrameBodyTMOO datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws java.io.IOException
      * @throws InvalidTagException
      */

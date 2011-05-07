@@ -33,8 +33,7 @@ public class Mp4FreeBox extends AbstractMp4Box {
                 freeBaos.write(0x0);
             }
             dataBuffer = ByteBuffer.wrap(freeBaos.toByteArray());
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //This should never happen as were not actually writing to/from a file
             throw new RuntimeException(ioe);
         }

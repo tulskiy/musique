@@ -56,13 +56,14 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyPOPM.java,v 1.15 2008/07/21 10:45:43 paultaylor Exp $
+ * @version $Id: FrameBodyPOPM.java 938 2010-12-10 13:17:22Z paultaylor $
  * @todo : Counter should be optional, whereas we always expect it although allow a size of zero
  * needs testing.
  */
 public class FrameBodyPOPM extends AbstractID3v2FrameBody implements ID3v24FrameBody, ID3v23FrameBody {
     private static final int RATING_FIELD_SIZE = 1;
     private static final int COUNTER_MINIMUM_FIELD_SIZE = 0;
+    public static final String MEDIA_MONKEY_NO_EMAIL = "no@email";
 
     /**
      * Creates a new FrameBodyPOPM datatype.
@@ -93,6 +94,8 @@ public class FrameBodyPOPM extends AbstractID3v2FrameBody implements ID3v24Frame
     /**
      * Creates a new FrameBodyPOPM datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodyPOPM(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -152,6 +155,20 @@ public class FrameBodyPOPM extends AbstractID3v2FrameBody implements ID3v24Frame
      */
     public String getIdentifier() {
         return ID3v24Frames.FRAME_ID_POPULARIMETER;
+    }
+
+    public String getUserFriendlyValue() {
+        return getEmailToUser() + ":" + getRating() + ":" + getCounter();
+    }
+
+    public void parseString(String data) {
+        try {
+            int value = Integer.parseInt(data);
+            setRating(value);
+            setEmailToUser(MEDIA_MONKEY_NO_EMAIL);
+        } catch (NumberFormatException nfe) {
+
+        }
     }
 
     /**

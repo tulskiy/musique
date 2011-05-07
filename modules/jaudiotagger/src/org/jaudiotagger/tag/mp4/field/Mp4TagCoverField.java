@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,10 +19,12 @@
 package org.jaudiotagger.tag.mp4.field;
 
 import org.jaudiotagger.audio.mp4.atom.Mp4BoxHeader;
-import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
 import org.jaudiotagger.tag.mp4.Mp4FieldKey;
 import org.jaudiotagger.tag.mp4.atom.Mp4DataBox;
 import org.jaudiotagger.tag.mp4.atom.Mp4NameBox;
+import org.jaudiotagger.tag.reference.PictureTypes;
+import org.jaudiotagger.tag.id3.valuepair.ImageFormats;
+import org.jaudiotagger.logging.ErrorMessage;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -99,6 +101,7 @@ public class Mp4TagCoverField extends Mp4TagBinaryField {
         }
     }
 
+
     /**
      * Return field type, for artwork this also identifies the imagetype
      *
@@ -111,6 +114,7 @@ public class Mp4TagCoverField extends Mp4TagBinaryField {
     public boolean isBinary() {
         return true;
     }
+
 
     public String toString() {
         return imageType + ":" + dataBytes.length + "bytes";
@@ -126,9 +130,7 @@ public class Mp4TagCoverField extends Mp4TagBinaryField {
 
         //Read the raw data into byte array
         this.dataBytes = new byte[dataSize - Mp4DataBox.PRE_DATA_LENGTH];
-        for (int i = 0; i < dataBytes.length; i++) {
-            this.dataBytes[i] = raw.get();
-        }
+        raw.get(dataBytes, 0, dataBytes.length);
 
         //Is there room for another atom (remember actually passed all the data so unless Covr is last atom
         //there will be room even though more likely to be for the text top level atom)

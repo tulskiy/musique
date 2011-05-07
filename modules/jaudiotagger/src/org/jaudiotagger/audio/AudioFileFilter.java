@@ -20,8 +20,8 @@ package org.jaudiotagger.audio;
 
 import org.jaudiotagger.audio.generic.Utils;
 
-import java.io.File;
 import java.io.FileFilter;
+import java.io.File;
 
 /**
  * <p>This is a simple FileFilter that will only allow the file supported by this library.</p>
@@ -29,10 +29,23 @@ import java.io.FileFilter;
  * are not hidden (dot files, or hidden files)</p>
  *
  * @author Raphael Slinckx
- * @version $Id: AudioFileFilter.java,v 1.3 2008/02/11 14:35:51 paultaylor Exp $
+ * @version $Id: AudioFileFilter.java 836 2009-11-12 15:44:07Z paultaylor $
  * @since v0.01
  */
 public class AudioFileFilter implements FileFilter {
+    /**
+     * allows Directories
+     */
+    private final boolean allowDirectories;
+
+    public AudioFileFilter(boolean allowDirectories) {
+        this.allowDirectories = allowDirectories;
+    }
+
+    public AudioFileFilter() {
+        this(true);
+    }
+
     /**
      * <p>Check whether the given file meet the required conditions (supported by the library OR directory).
      * The File must also be readable and not hidden.</p>
@@ -46,7 +59,7 @@ public class AudioFileFilter implements FileFilter {
         }
 
         if (f.isDirectory()) {
-            return true;
+            return allowDirectories;
         }
 
         String ext = Utils.getExtension(f);
@@ -55,8 +68,7 @@ public class AudioFileFilter implements FileFilter {
             if (SupportedFileFormat.valueOf(ext.toUpperCase()) != null) {
                 return true;
             }
-        }
-        catch (IllegalArgumentException iae) {
+        } catch (IllegalArgumentException iae) {
             //Not known enum value
             return false;
         }

@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -50,6 +50,10 @@ public class MetadataBlockHeader {
         return new MetadataBlockHeader(rawdata);
     }
 
+    public String toString() {
+        return "BlockType:" + blockType + " DataLength:" + dataLength + " isLastBlock:" + isLastBlock;
+    }
+
     /**
      * Construct header by reading bytes
      *
@@ -63,13 +67,13 @@ public class MetadataBlockHeader {
             blockType = BlockType.values()[type];
         }
 
+
         dataLength = (u(rawdata.get(1)) << 16) + (u(rawdata.get(2)) << 8) + (u(rawdata.get(3)));
 
         bytes = new byte[HEADER_LENGTH];
         for (int i = 0; i < HEADER_LENGTH; i++) {
             bytes[i] = rawdata.get(i);
         }
-        ;
     }
 
     /**

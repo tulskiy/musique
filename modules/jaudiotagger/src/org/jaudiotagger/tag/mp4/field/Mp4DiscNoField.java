@@ -12,7 +12,12 @@ import java.util.ArrayList;
 /**
  * Represents the Disc No field
  * <p/>
- * <p>For some reason uses an array of three numbers, but only the last two are of use for display purposes
+ * <p>Contains some reserved fields that we currently ignore
+ * <p/>
+ * Reserved:2 bytes
+ * Disc Number:2 bytes
+ * Total no of Discs:2 bytes
+ * </p>
  */
 public class Mp4DiscNoField extends Mp4TagTextNumberField {
     private static final int NONE_VALUE_INDEX = 0;
@@ -20,9 +25,11 @@ public class Mp4DiscNoField extends Mp4TagTextNumberField {
     private static final int DISC_TOTAL_INDEX = 2;
 
     /**
-     * Create new Track Field parsing the String for the trackno/total
+     * Create new Disc Field parsing the String for the discno/total
      *
      * @param discValue
+     * @throws org.jaudiotagger.tag.FieldDataInvalidException
+     *
      */
     public Mp4DiscNoField(String discValue) throws FieldDataInvalidException {
         super(Mp4FieldKey.DISCNUMBER.getFieldName(), discValue);
@@ -36,8 +43,7 @@ public class Mp4DiscNoField extends Mp4TagTextNumberField {
 
                 try {
                     numbers.add(Short.parseShort(values[0]));
-                }
-                catch (NumberFormatException nfe) {
+                } catch (NumberFormatException nfe) {
                     throw new FieldDataInvalidException("Value of:" + values[0] + " is invalid for field:" + id);
                 }
                 numbers.add(new Short("0"));
@@ -46,14 +52,12 @@ public class Mp4DiscNoField extends Mp4TagTextNumberField {
             case 2:
                 try {
                     numbers.add(Short.parseShort(values[0]));
-                }
-                catch (NumberFormatException nfe) {
+                } catch (NumberFormatException nfe) {
                     throw new FieldDataInvalidException("Value of:" + values[0] + " is invalid for field:" + id);
                 }
                 try {
                     numbers.add(Short.parseShort(values[1]));
-                }
-                catch (NumberFormatException nfe) {
+                } catch (NumberFormatException nfe) {
                     throw new FieldDataInvalidException("Value of:" + values[1] + " is invalid for field:" + id);
                 }
                 break;
@@ -63,8 +67,9 @@ public class Mp4DiscNoField extends Mp4TagTextNumberField {
         }
     }
 
+
     /**
-     * Create new Disc no  Field with only discNo
+     * Create new Disc No field with only discNo
      *
      * @param discNo
      */
@@ -77,7 +82,7 @@ public class Mp4DiscNoField extends Mp4TagTextNumberField {
     }
 
     /**
-     * Create new Disc No Field with disc No and total tracks
+     * Create new Disc No Field with Disc No and total number of discs
      *
      * @param discNo
      * @param total
@@ -106,7 +111,7 @@ public class Mp4DiscNoField extends Mp4TagTextNumberField {
         StringBuffer sb = new StringBuffer();
         sb.append(numbers.get(DISC_NO_INDEX));
         if (numbers.get(DISC_TOTAL_INDEX) > 0) {
-            sb.append("/" + numbers.get(DISC_TOTAL_INDEX));
+            sb.append("/").append(numbers.get(DISC_TOTAL_INDEX));
         }
         content = sb.toString();
     }
@@ -119,9 +124,27 @@ public class Mp4DiscNoField extends Mp4TagTextNumberField {
     }
 
     /**
+     * Set Disc No
+     *
+     * @param discNo
+     */
+    public void setDiscNo(int discNo) {
+        numbers.set(DISC_NO_INDEX, (short) discNo);
+    }
+
+    /**
      * @return
      */
     public Short getDiscTotal() {
         return numbers.get(DISC_TOTAL_INDEX);
+    }
+
+    /**
+     * Set total number of discs
+     *
+     * @param discTotal
+     */
+    public void setDiscTotal(int discTotal) {
+        numbers.set(DISC_TOTAL_INDEX, (short) discTotal);
     }
 }

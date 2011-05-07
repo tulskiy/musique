@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: Lyrics3Line.java,v 1.10 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: Lyrics3Line.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -45,6 +45,7 @@ public class Lyrics3Line extends AbstractDataType {
      * Creates a new ObjectLyrics3Line datatype.
      *
      * @param identifier
+     * @param frameBody
      */
     public Lyrics3Line(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody);
@@ -52,7 +53,7 @@ public class Lyrics3Line extends AbstractDataType {
 
     public Lyrics3Line(Lyrics3Line copy) {
         super(copy);
-        this.lyric = new String(copy.lyric);
+        this.lyric = copy.lyric;
         Lyrics3TimeStamp newTimeStamp;
         for (int i = 0; i < copy.timeStamp.size(); i++) {
             newTimeStamp = new Lyrics3TimeStamp(copy.timeStamp.get(i));
@@ -121,27 +122,21 @@ public class Lyrics3Line extends AbstractDataType {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof Lyrics3Line) == false) {
+        if (!(obj instanceof Lyrics3Line)) {
             return false;
         }
         Lyrics3Line object = (Lyrics3Line) obj;
-        if (this.lyric.equals(object.lyric) == false) {
+        if (!this.lyric.equals(object.lyric)) {
             return false;
         }
-        if (this.timeStamp.equals(object.timeStamp) == false) {
-            return false;
-        }
-        return super.equals(obj);
+        return this.timeStamp.equals(object.timeStamp) && super.equals(obj);
     }
 
     /**
      * @return
      */
     public boolean hasTimeStamp() {
-        if (timeStamp.isEmpty()) {
-            return false;
-        }
-        return true;
+        return !timeStamp.isEmpty();
     }
 
     /**
@@ -157,7 +152,7 @@ public class Lyrics3Line extends AbstractDataType {
         if ((offset < 0) || (offset >= lineString.length())) {
             throw new IndexOutOfBoundsException("Offset to line is out of bounds: offset = " + offset + ", line.length()" + lineString.length());
         }
-        int delim = 0;
+        int delim;
         Lyrics3TimeStamp time;
         timeStamp = new LinkedList<Lyrics3TimeStamp>();
         delim = lineString.indexOf("[", offset);

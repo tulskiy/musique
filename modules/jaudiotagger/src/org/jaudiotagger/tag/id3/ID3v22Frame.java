@@ -17,17 +17,18 @@ package org.jaudiotagger.tag.id3;
 
 import org.jaudiotagger.audio.generic.Utils;
 import org.jaudiotagger.audio.mp3.MP3File;
-import org.jaudiotagger.tag.EmptyFrameException;
-import org.jaudiotagger.tag.InvalidFrameException;
-import org.jaudiotagger.tag.InvalidFrameIdentifierException;
+import org.jaudiotagger.tag.*;
 import org.jaudiotagger.tag.id3.framebody.AbstractID3v2FrameBody;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyDeprecated;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyUnsupported;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
+import org.jaudiotagger.utils.EqualsUtil;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,10 +37,10 @@ import java.util.regex.Pattern;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: ID3v22Frame.java,v 1.30 2008/07/21 10:45:48 paultaylor Exp $
+ * @version $Id: ID3v22Frame.java 925 2010-10-21 15:22:41Z paultaylor $
  */
 public class ID3v22Frame extends AbstractID3v2Frame {
-    Pattern validFrameIdentifier = Pattern.compile("[A-Z][0-9A-Z]{2}");
+    private static Pattern validFrameIdentifier = Pattern.compile("[A-Z][0-9A-Z]{2}");
 
     protected static final int FRAME_ID_SIZE = 3;
     protected static final int FRAME_SIZE_SIZE = 3;
@@ -47,6 +48,18 @@ public class ID3v22Frame extends AbstractID3v2Frame {
 
     public ID3v22Frame() {
 
+    }
+
+    protected int getFrameIdSize() {
+        return FRAME_ID_SIZE;
+    }
+
+    protected int getFrameSizeSize() {
+        return FRAME_SIZE_SIZE;
+    }
+
+    protected int getFrameHeaderSize() {
+        return FRAME_HEADER_SIZE;
     }
 
     /**
@@ -59,10 +72,38 @@ public class ID3v22Frame extends AbstractID3v2Frame {
     }
 
     /**
+     * Compare for equality
+     * To be deemed equal obj must be a IDv23Frame with the same identifier
+     * and the same flags.
+     * containing the same body,datatype list ectera.
+     * equals() method is made up from all the various components
+     *
+     * @param obj
+     * @return if true if this object is equivalent to obj
+     */
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        if (!(obj instanceof ID3v22Frame)) {
+            return false;
+        }
+        ID3v22Frame that = (ID3v22Frame) obj;
+
+
+        return
+                EqualsUtil.areEqual(this.statusFlags, that.statusFlags) &&
+                        EqualsUtil.areEqual(this.encodingFlags, that.encodingFlags) &&
+                        super.equals(that);
+
+    }
+
+    /**
      * Creates a new ID3v22 Frame of type identifier.
      * <p/>
      * An empty body of the correct type will be automatically created. This constructor should be used when wish to
      * create a new frame from scratch using user values
+     *
+     * @param identifier
      */
     @SuppressWarnings("unchecked")
     public ID3v22Frame(String identifier) {
@@ -76,6 +117,9 @@ public class ID3v22Frame extends AbstractID3v2Frame {
             //Does it have its own framebody (PIC,CRM) or are we using v23/v24 body (the normal case)
             if (ID3Tags.forceFrameID22To23(bodyIdentifier) != null) {
                 //Do not convert
+            } else if (bodyIdentifier.equals("CRM")) {
+                //Do not convert.
+                //TODO we don't have a way of converting this to v23 which is why its not in the ForceMap
             }
             //TODO Improve messy fix for datetime
             //TODO need to check in case v22 body does exist before using V23 body(e.g PIC)
@@ -95,19 +139,18 @@ public class ID3v22Frame extends AbstractID3v2Frame {
         try {
             Class<AbstractID3v2FrameBody> c = (Class<AbstractID3v2FrameBody>) Class.forName("org.jaudiotagger.tag.id3.framebody.FrameBody" + bodyIdentifier);
             frameBody = c.newInstance();
-        }
-        catch (ClassNotFoundException cnfe) {
-            //logger.log(Level.SEVERE, cnfe.getMessage(), cnfe);
+        } catch (ClassNotFoundException cnfe) {
+            logger.log(Level.SEVERE, cnfe.getMessage(), cnfe);
             frameBody = new FrameBodyUnsupported(identifier);
         }
         //Instantiate Interface/Abstract should not happen
         catch (InstantiationException ie) {
-            //logger.log(Level.SEVERE, ie.getMessage(), ie);
+            logger.log(Level.SEVERE, ie.getMessage(), ie);
             throw new RuntimeException(ie);
         }
         //Private Constructor shouild not happen
         catch (IllegalAccessException iae) {
-            //logger.log(Level.SEVERE, iae.getMessage(), iae);
+            logger.log(Level.SEVERE, iae.getMessage(), iae);
             throw new RuntimeException(iae);
         }
         frameBody.setHeader(this);
@@ -119,6 +162,8 @@ public class ID3v22Frame extends AbstractID3v2Frame {
      * Copy Constructor
      * <p/>
      * Creates a new v22 frame based on another v22 frame
+     *
+     * @param frame
      */
     public ID3v22Frame(ID3v22Frame frame) {
         super(frame);
@@ -130,15 +175,13 @@ public class ID3v22Frame extends AbstractID3v2Frame {
         if (identifier != null) {
             //logger.info("V2:Orig id is:" + frame.getIdentifier() + ":New id is:" + identifier);
             this.frameBody = (AbstractID3v2FrameBody) ID3Tags.copyObject(frame.getBody());
-            return;
         }
         // Is it a known v3 frame which needs forcing to v2 frame e.g. APIC - PIC
-        else if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier()) == true) {
+        else if (ID3Tags.isID3v23FrameIdentifier(frame.getIdentifier())) {
             identifier = ID3Tags.forceFrameID23To22(frame.getIdentifier());
             if (identifier != null) {
                 //logger.info("V2:Force:Orig id is:" + frame.getIdentifier() + ":New id is:" + identifier);
                 this.frameBody = this.readBody(identifier, (AbstractID3v2FrameBody) frame.getBody());
-                return;
             }
             // No mechanism exists to convert it to a v22 frame
             else {
@@ -158,7 +201,6 @@ public class ID3v22Frame extends AbstractID3v2Frame {
                 this.frameBody = new FrameBodyDeprecated((FrameBodyDeprecated) frame.getBody());
                 identifier = frame.getIdentifier();
                 //logger.info("DEPRECATED:Orig id is:" + frame.getIdentifier() + ":New id is:" + identifier);
-                return;
             }
         }
         // Unknown Frame e.g NCON
@@ -166,7 +208,6 @@ public class ID3v22Frame extends AbstractID3v2Frame {
             this.frameBody = new FrameBodyUnsupported((FrameBodyUnsupported) frame.getBody());
             identifier = frame.getIdentifier();
             //logger.info("v2:UNKNOWN:Orig id is:" + frame.getIdentifier() + ":New id is:" + identifier);
-            return;
         }
     }
 
@@ -174,10 +215,12 @@ public class ID3v22Frame extends AbstractID3v2Frame {
      * Creates a new ID3v22 Frame from another frame of a different tag version
      *
      * @param frame to construct the new frame from
+     * @throws org.jaudiotagger.tag.InvalidFrameException
+     *
      */
     public ID3v22Frame(AbstractID3v2Frame frame) throws InvalidFrameException {
         //logger.info("Creating frame from a frame of a different version");
-        if ((frame instanceof ID3v22Frame == true) && (frame instanceof ID3v23Frame == false)) {
+        if (frame instanceof ID3v22Frame) {
             throw new UnsupportedOperationException("Copy Constructor not called. Please type cast the argument");
         }
 
@@ -197,9 +240,12 @@ public class ID3v22Frame extends AbstractID3v2Frame {
     /**
      * Creates a new ID3v22Frame datatype by reading from byteBuffer.
      *
-     * @param byteBuffer to read from
+     * @param byteBuffer      to read from
+     * @param loggingFilename
+     * @throws org.jaudiotagger.tag.InvalidFrameException
+     *
      */
-    public ID3v22Frame(ByteBuffer byteBuffer, String loggingFilename) throws InvalidFrameException {
+    public ID3v22Frame(ByteBuffer byteBuffer, String loggingFilename) throws InvalidFrameException, InvalidDataTypeException {
         setLoggingFilename(loggingFilename);
         read(byteBuffer);
     }
@@ -208,9 +254,11 @@ public class ID3v22Frame extends AbstractID3v2Frame {
      * Creates a new ID3v23Frame datatype by reading from byteBuffer.
      *
      * @param byteBuffer to read from
-     * @deprecated use {@link #ID3v22Frame(ByteBuffer,String)} instead
+     * @throws org.jaudiotagger.tag.InvalidFrameException
+     *
+     * @deprecated use {@link #ID3v22Frame(ByteBuffer, String)} instead
      */
-    public ID3v22Frame(ByteBuffer byteBuffer) throws InvalidFrameException {
+    public ID3v22Frame(ByteBuffer byteBuffer) throws InvalidFrameException, InvalidDataTypeException {
         this(byteBuffer, "");
     }
 
@@ -220,7 +268,19 @@ public class ID3v22Frame extends AbstractID3v2Frame {
      * @return int size of frame
      */
     public int getSize() {
-        return frameBody.getSize() + FRAME_HEADER_SIZE;
+        return frameBody.getSize() + getFrameHeaderSize();
+    }
+
+    @Override
+    protected boolean isPadding(byte[] buffer) {
+        if (
+                (buffer[0] == '\0') &&
+                        (buffer[1] == '\0') &&
+                        (buffer[2] == '\0')
+                ) {
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -229,27 +289,19 @@ public class ID3v22Frame extends AbstractID3v2Frame {
      *
      * @param byteBuffer
      */
-    public void read(ByteBuffer byteBuffer) throws InvalidFrameException {
-        byte[] buffer = new byte[FRAME_ID_SIZE];
+    public void read(ByteBuffer byteBuffer) throws InvalidFrameException, InvalidDataTypeException {
+        String identifier = readIdentifier(byteBuffer);
 
-        if (byteBuffer.position() + FRAME_HEADER_SIZE >= byteBuffer.limit()) {
-            //logger.warning("No space to find another frame:");
-            throw new InvalidFrameException(" No space to find another frame");
-        }
-
-        // Read the FrameID Identifier
-        byteBuffer.get(buffer, 0, FRAME_ID_SIZE);
-        identifier = new String(buffer);
-        //logger.info("Read Frame from file identifier is:" + identifier);
+        byte[] buffer = new byte[getFrameSizeSize()];
 
         // Is this a valid identifier?
-        if (isValidID3v2FrameIdentifier(identifier) == false) {
+        if (!isValidID3v2FrameIdentifier(identifier)) {
             //logger.info("Invalid identifier:" + identifier);
-            byteBuffer.position(byteBuffer.position() - (FRAME_ID_SIZE - 1));
-            throw new InvalidFrameIdentifierException(identifier + " is not a valid ID3v2.20 frame");
+            byteBuffer.position(byteBuffer.position() - (getFrameIdSize() - 1));
+            throw new InvalidFrameIdentifierException(getLoggingFilename() + ":" + identifier + ":is not a valid ID3v2.20 frame");
         }
         //Read Frame Size (same size as Frame Id so reuse buffer)
-        byteBuffer.get(buffer, 0, FRAME_SIZE_SIZE);
+        byteBuffer.get(buffer, 0, getFrameSizeSize());
         frameSize = decodeSize(buffer);
         if (frameSize < 0) {
             throw new InvalidFrameException(identifier + " has invalid size of:" + frameSize);
@@ -270,7 +322,7 @@ public class ID3v22Frame extends AbstractID3v2Frame {
                 if (id == null) {
                     // Is it a valid v22 identifier so should be able to find a
                     // frame body for it.
-                    if (ID3Tags.isID3v22FrameIdentifier(identifier) == true) {
+                    if (ID3Tags.isID3v22FrameIdentifier(identifier)) {
                         id = identifier;
                     }
                     // Unknown so will be created as FrameBodyUnsupported
@@ -287,8 +339,7 @@ public class ID3v22Frame extends AbstractID3v2Frame {
 
             try {
                 frameBody = readBody(id, frameBodyBuffer, frameSize);
-            }
-            finally {
+            } finally {
                 //Update position of main buffer, so no attempt is made to reread these bytes
                 byteBuffer.position(byteBuffer.position() + frameSize);
             }
@@ -297,6 +348,9 @@ public class ID3v22Frame extends AbstractID3v2Frame {
 
     /**
      * Read Frame Size, which has to be decoded
+     *
+     * @param buffer
+     * @return
      */
     private int decodeSize(byte[] buffer) {
         BigInteger bi = new BigInteger(buffer);
@@ -307,6 +361,7 @@ public class ID3v22Frame extends AbstractID3v2Frame {
         return tmpSize;
     }
 
+
     /**
      * Write Frame raw data
      *
@@ -316,7 +371,7 @@ public class ID3v22Frame extends AbstractID3v2Frame {
         //logger.info("Write Frame to Buffer" + getIdentifier());
         //This is where we will write header, move position to where we can
         //write body
-        ByteBuffer headerBuffer = ByteBuffer.allocate(FRAME_HEADER_SIZE);
+        ByteBuffer headerBuffer = ByteBuffer.allocate(getFrameHeaderSize());
 
         //Write Frame Body Data
         ByteArrayOutputStream bodyOutputStream = new ByteArrayOutputStream();
@@ -324,7 +379,7 @@ public class ID3v22Frame extends AbstractID3v2Frame {
 
         //Write Frame Header
         //Write Frame ID must adjust can only be 3 bytes long
-        headerBuffer.put(Utils.getDefaultBytes(getIdentifier(), "ISO-8859-1"), 0, FRAME_ID_SIZE);
+        headerBuffer.put(Utils.getDefaultBytes(getIdentifier(), "ISO-8859-1"), 0, getFrameIdSize());
         encodeSize(headerBuffer, frameBody.getSize());
 
         //Add header to the Byte Array Output Stream
@@ -333,8 +388,7 @@ public class ID3v22Frame extends AbstractID3v2Frame {
 
             //Add body to the Byte Array Output Stream
             tagBuffer.write(bodyOutputStream.toByteArray());
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //This could never happen coz not writing to file, so convert to RuntimeException
             throw new RuntimeException(ioe);
         }
@@ -343,6 +397,9 @@ public class ID3v22Frame extends AbstractID3v2Frame {
     /**
      * Write Frame Size (can now be accurately calculated, have to convert 4 byte int
      * to 3 byte format.
+     *
+     * @param headerBuffer
+     * @param size
      */
     private void encodeSize(ByteBuffer headerBuffer, int size) {
         headerBuffer.put((byte) ((size & 0x00FF0000) >> 16));
@@ -359,7 +416,7 @@ public class ID3v22Frame extends AbstractID3v2Frame {
      * @return
      */
     public boolean isValidID3v2FrameIdentifier(String identifier) {
-        Matcher m = validFrameIdentifier.matcher(identifier);
+        Matcher m = ID3v22Frame.validFrameIdentifier.matcher(identifier);
         return m.matches();
     }
 
@@ -385,5 +442,19 @@ public class ID3v22Frame extends AbstractID3v2Frame {
      */
     public boolean isBinary() {
         return ID3v22Frames.getInstanceOf().isBinary(getId());
+    }
+
+    /**
+     * Sets the charset encoding used by the field.
+     *
+     * @param encoding charset.
+     */
+    public void setEncoding(String encoding) {
+        Integer encodingId = TextEncoding.getInstanceOf().getIdForValue(encoding);
+        if (encoding != null) {
+            if (encodingId < 2) {
+                this.getBody().setTextEncoding(encodingId.byteValue());
+            }
+        }
     }
 }

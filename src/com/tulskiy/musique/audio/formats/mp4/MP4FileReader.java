@@ -19,8 +19,6 @@ package com.tulskiy.musique.audio.formats.mp4;
 
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.mp4.Mp4FileReader;
-import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.mp4.Mp4Tag;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.playlist.Track;
@@ -52,13 +50,9 @@ public class MP4FileReader extends AudioFileReader {
         return (ext.equalsIgnoreCase("mp4") || ext.equalsIgnoreCase("m4a"));
     }
 
-    @Override
-    protected void copySpecificTagFields(Tag tag, Track track) {
-    	Mp4Tag mp4Tag = (Mp4Tag) tag;
-        // TODO implement when trunk jaudiotagger come
-//      track.setTrackNumber(tag.getFirstTrack());
-//      track.setDiscNumber(tag.getFirst("disk"));
-//      track.setMeta("albumArtist", tag.getFirst("aART"));
-    }
+//    @Override
+//    protected void copySpecificTagFields(Tag tag, Track track) {
+//    	Mp4Tag mp4Tag = (Mp4Tag) tag;
+//    }
 
 }

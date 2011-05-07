@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: Lyrics3TimeStamp.java,v 1.8 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: Lyrics3TimeStamp.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -40,6 +40,8 @@ public class Lyrics3TimeStamp extends AbstractDataType {
 
     /**
      * Todo this is wrong
+     *
+     * @param s
      */
     public void readString(String s) {
     }
@@ -48,6 +50,7 @@ public class Lyrics3TimeStamp extends AbstractDataType {
      * Creates a new ObjectLyrics3TimeStamp datatype.
      *
      * @param identifier
+     * @param frameBody
      */
     public Lyrics3TimeStamp(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody);
@@ -112,7 +115,7 @@ public class Lyrics3TimeStamp extends AbstractDataType {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof Lyrics3TimeStamp) == false) {
+        if (!(obj instanceof Lyrics3TimeStamp)) {
             return false;
         }
 
@@ -122,11 +125,8 @@ public class Lyrics3TimeStamp extends AbstractDataType {
             return false;
         }
 
-        if (this.second != object.second) {
-            return false;
-        }
+        return this.second == object.second && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: Lyrics3Image.java,v 1.8 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: Lyrics3Image.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -47,6 +47,7 @@ public class Lyrics3Image extends AbstractDataType {
      * Creates a new ObjectLyrics3Image datatype.
      *
      * @param identifier
+     * @param frameBody
      */
     public Lyrics3Image(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody);
@@ -55,8 +56,8 @@ public class Lyrics3Image extends AbstractDataType {
     public Lyrics3Image(Lyrics3Image copy) {
         super(copy);
         this.time = new Lyrics3TimeStamp(copy.time);
-        this.description = new String(copy.description);
-        this.filename = new String(copy.filename);
+        this.description = copy.description;
+        this.filename = copy.filename;
     }
 
     /**
@@ -121,17 +122,17 @@ public class Lyrics3Image extends AbstractDataType {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof Lyrics3Image) == false) {
+        if (!(obj instanceof Lyrics3Image)) {
             return false;
         }
 
         Lyrics3Image object = (Lyrics3Image) obj;
 
-        if (this.description.equals(object.description) == false) {
+        if (!this.description.equals(object.description)) {
             return false;
         }
 
-        if (this.filename.equals(object.filename) == false) {
+        if (!this.filename.equals(object.filename)) {
             return false;
         }
 
@@ -140,7 +141,7 @@ public class Lyrics3Image extends AbstractDataType {
                 return false;
             }
         } else {
-            if (this.time.equals(object.time) == false) {
+            if (!this.time.equals(object.time)) {
                 return false;
             }
         }
@@ -202,7 +203,7 @@ public class Lyrics3Image extends AbstractDataType {
      * @return
      */
     public String writeString() {
-        String str = "";
+        String str;
 
         if (filename == null) {
             str = "||";

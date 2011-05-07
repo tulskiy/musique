@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 /**
  * Reads metadata from mp4,
@@ -71,7 +72,7 @@ import java.nio.ByteBuffer;
 public class Mp4TagReader {
 
     // Logger Object
-//    public static Logger logger = logger.getLogger("org.jaudiotagger.tag.mp4");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.tag.mp4");
 
     /*
      * The metadata is stored in the box under the hierachy moov.udta.meta.ilst
@@ -79,7 +80,6 @@ public class Mp4TagReader {
      * There are gaps between these boxes
 
      */
-
     public Mp4Tag read(RandomAccessFile raf) throws CannotReadException, IOException {
         Mp4Tag tag = new Mp4Tag();
 
@@ -122,6 +122,7 @@ public class Mp4TagReader {
             Mp4MetaBox meta = new Mp4MetaBox(boxHeader, moovBuffer);
             meta.processData();
 
+
             //Level 3- Search for "ilst" within meta
             boxHeader = Mp4BoxHeader.seekWithinLevel(moovBuffer, Mp4NotMetaFieldKey.ILST.getFieldName());
             //This file does not actually contain a tag
@@ -159,7 +160,7 @@ public class Mp4TagReader {
      * Process the field and add to the tag
      * <p/>
      * Note:In the case of coverart MP4 holds all the coverart within individual dataitems all within
-     * a single covr atom, we will add seperate mp4field for each image.
+     * a single covr atom, we will add separate mp4field for each image.
      *
      * @param tag
      * @param header
@@ -173,12 +174,11 @@ public class Mp4TagReader {
             //
             try {
                 TagField field = new Mp4TagReverseDnsField(header, raw);
-                tag.add(field);
-            }
-            catch (Exception e) {
+                tag.addField(field);
+            } catch (Exception e) {
                 //logger.warning(ErrorMessage.MP4_UNABLE_READ_REVERSE_DNS_FIELD.getMsg(e.getMessage()));
                 TagField field = new Mp4TagRawBinaryField(header, raw);
-                tag.add(field);
+                tag.addField(field);
             }
         }
         //Normal Parent with Data atom
@@ -195,13 +195,13 @@ public class Mp4TagReader {
                 //Special handling for some specific identifiers otherwise just base on class id
                 if (header.getId().equals(Mp4FieldKey.TRACK.getFieldName())) {
                     TagField field = new Mp4TrackField(header.getId(), raw);
-                    tag.add(field);
+                    tag.addField(field);
                 } else if (header.getId().equals(Mp4FieldKey.DISCNUMBER.getFieldName())) {
                     TagField field = new Mp4DiscNoField(header.getId(), raw);
-                    tag.add(field);
+                    tag.addField(field);
                 } else if (header.getId().equals(Mp4FieldKey.GENRE.getFieldName())) {
                     TagField field = new Mp4GenreField(header.getId(), raw);
-                    tag.add(field);
+                    tag.addField(field);
                 } else if (header.getId().equals(Mp4FieldKey.ARTWORK.getFieldName()) || Mp4FieldType.isCoverArtType(fieldType)) {
                     int processedDataSize = 0;
                     int imageCount = 0;
@@ -210,23 +210,24 @@ public class Mp4TagReader {
                         //There maybe a mixture of PNG and JPEG images so have to check type
                         //for each subimage (if there are more than one image)
                         if (imageCount > 0) {
-                            type = Utils.getIntBE(raw, processedDataSize + Mp4DataBox.TYPE_POS_INCLUDING_HEADER, processedDataSize + Mp4DataBox.TYPE_POS_INCLUDING_HEADER + Mp4DataBox.TYPE_LENGTH - 1);
+                            type = Utils.getIntBE(raw, processedDataSize + Mp4DataBox.TYPE_POS_INCLUDING_HEADER,
+                                    processedDataSize + Mp4DataBox.TYPE_POS_INCLUDING_HEADER + Mp4DataBox.TYPE_LENGTH - 1);
                             fieldType = Mp4FieldType.getFieldType(type);
                         }
                         Mp4TagCoverField field = new Mp4TagCoverField(raw, fieldType);
-                        tag.add(field);
+                        tag.addField(field);
                         processedDataSize += field.getDataAndHeaderSize();
                         imageCount++;
                     }
                 } else if (fieldType == Mp4FieldType.TEXT) {
                     TagField field = new Mp4TagTextField(header.getId(), raw);
-                    tag.add(field);
-                } else if (fieldType == Mp4FieldType.NUMERIC) {
+                    tag.addField(field);
+                } else if (fieldType == Mp4FieldType.IMPLICIT) {
                     TagField field = new Mp4TagTextNumberField(header.getId(), raw);
-                    tag.add(field);
-                } else if (fieldType == Mp4FieldType.BYTE) {
+                    tag.addField(field);
+                } else if (fieldType == Mp4FieldType.INTEGER) {
                     TagField field = new Mp4TagByteField(header.getId(), raw);
-                    tag.add(field);
+                    tag.addField(field);
                 } else {
                     boolean existingId = false;
                     for (Mp4FieldKey key : Mp4FieldKey.values()) {
@@ -245,7 +246,7 @@ public class Mp4TagReader {
                     if (!existingId) {
                         //logger.warning("UnKnown Field:" + header.getId() + " with invalid field type of:" + type + " created as binary");
                         TagField field = new Mp4TagBinaryField(header.getId(), raw);
-                        tag.add(field);
+                        tag.addField(field);
                     }
                 }
             }
@@ -255,12 +256,12 @@ public class Mp4TagReader {
                 //copy parent and child as is without modification
                 if (header.getId().equals(Mp4NonStandardFieldKey.AAPR.getFieldName())) {
                     TagField field = new Mp4TagRawBinaryField(header, raw);
-                    tag.add(field);
+                    tag.addField(field);
                 }
                 //Default case
                 else {
                     TagField field = new Mp4TagRawBinaryField(header, raw);
-                    tag.add(field);
+                    tag.addField(field);
                 }
             }
         }

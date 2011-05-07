@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyTXXX.java,v 1.18 2008/07/21 10:45:46 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyTXXX.java 921 2010-10-14 11:04:46Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -35,6 +35,7 @@ import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 
+
 /**
  * User defined text information frame
  * <p/>
@@ -50,18 +51,28 @@ import java.nio.ByteBuffer;
  * Value             <text string according to encoding>
  */
 public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24FrameBody, ID3v23FrameBody {
-    public static final String MUSIC_BRAINZ_ARTISTID = "MusicBrainz Artist Id";
-    public static final String MUSIC_BRAINZ_ALBUM_ARTISTID = "MusicBrainz Album Artist Id";
-    public static final String MUSIC_BRAINZ_ALBUMID = "MusicBrainz Album Id";
-    public static final String MUSIC_BRAINZ_DISCID = "MusicBrainz Disc Id";
+    //Used by Picard and Jaikoz
+    public static final String MUSICBRAINZ_ARTISTID = "MusicBrainz Artist Id";
+    public static final String MUSICBRAINZ_ALBUM_ARTISTID = "MusicBrainz Album Artist Id";
+    public static final String MUSICBRAINZ_ALBUMID = "MusicBrainz Album Id";
+    public static final String MUSICBRAINZ_RELEASE_GROUPID = "MusicBrainz Release Group Id";
+    public static final String MUSICBRAINZ_DISCID = "MusicBrainz Disc Id";
     public static final String MUSICBRAINZ_ALBUM_TYPE = "MusicBrainz Album Type";
     public static final String MUSICBRAINZ_ALBUM_STATUS = "MusicBrainz Album Status";
     public static final String MUSICBRAINZ_ALBUM_COUNTRY = "MusicBrainz Album Release Country";
+    public static final String MUSICBRAINZ_WORKID = "MusicBrainz Work Id";
     public static final String AMAZON_ASIN = "ASIN";
     public static final String MUSICIP_ID = "MusicIP PUID";
     public static final String BARCODE = "BARCODE";
     public static final String CATALOG_NO = "CATALOGNUMBER";
-    public static final String PERFORMER = "Performer";
+    public static final String MOOD = "MOOD";          //ID3 v23 only
+    public static final String TAGS = "TAGS";
+    public static final String FBPM = "FBPM";
+    public static final String SCRIPT = "SCRIPT";
+
+    //used by Foobar 20000
+    public static final String ALBUM_ARTIST = "ALBUM ARTIST";
+    public static final String PERFORMER = "PERFORMER";
 
     /**
      * Creates a new FrameBodyTXXX datatype.
@@ -71,6 +82,18 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
         this.setObjectValue(DataTypes.OBJ_DESCRIPTION, "");
         this.setObjectValue(DataTypes.OBJ_TEXT, "");
 
+    }
+
+    /**
+     * Convert from V4 TMOO Frame to V3 Frame
+     *
+     * @param body
+     */
+    public FrameBodyTXXX(FrameBodyTMOO body) {
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body.getTextEncoding());
+        this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
+        this.setObjectValue(DataTypes.OBJ_DESCRIPTION, MOOD);
+        this.setObjectValue(DataTypes.OBJ_TEXT, body.getText());
     }
 
     public FrameBodyTXXX(FrameBodyTXXX body) {
@@ -93,6 +116,8 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTXXX datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTXXX(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -100,7 +125,7 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
     }
 
     /**
-     * Set the desciption field
+     * Set the description field
      *
      * @param description
      */
@@ -132,7 +157,7 @@ public class FrameBodyTXXX extends AbstractFrameBodyTextInfo implements ID3v24Fr
         setTextEncoding(ID3TextEncodingConversion.getTextEncoding(getHeader(), getTextEncoding()));
 
         //Ensure valid for description
-        if (((TextEncodedStringNullTerminated) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded() == false) {
+        if (!((TextEncodedStringNullTerminated) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded()) {
             this.setTextEncoding(ID3TextEncodingConversion.getUnicodeTextEncoding(getHeader()));
         }
         super.write(tagBuffer);

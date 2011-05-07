@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -24,13 +24,15 @@ import org.jaudiotagger.audio.mp3.LameFrame;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.audio.mp3.XingFrame;
+import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.TagFieldKey;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.framebody.AbstractFrameBodyTextInfo;
+import org.jaudiotagger.tag.id3.framebody.FrameBodyTPOS;
+import org.jaudiotagger.tag.id3.framebody.FrameBodyTRCK;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import com.tulskiy.musique.audio.AudioFileReader;
@@ -120,13 +122,9 @@ public class MP3FileReader extends AudioFileReader {
 	@Override
 	protected void copyCommonTagFields(Tag tag, Track track) throws IOException {
 		ID3v24Tag v24Tag = (ID3v24Tag) tag;
-		for (TagFieldKey key : TagFieldKey.values()) {
+		for (FieldKey key : FieldKey.values()) {
 			setMusiqueTagFieldValues(track, key, v24Tag);
 		}
-		// TODO review below stuff later
-//      track.addMeta("year", v24Tag.getFirst(TagFieldKey.DATE).trim());
-//      track.addMeta("albumArtist", v24Tag.getFirst(TagFieldKey.ALBUM_ARTIST).trim());
-//      track.setDiscNumber(v24Tag.getFirst(TagFieldKey.DISC_NO));
 	}
 
 //	@Override
@@ -135,11 +133,11 @@ public class MP3FileReader extends AudioFileReader {
 //	}
 
 	// TODO review (T?? [but not TXXX] are only supported at the moment)
-	private void setMusiqueTagFieldValues(Track track, TagFieldKey key, ID3v24Tag tag) {
+	private void setMusiqueTagFieldValues(Track track, FieldKey key, ID3v24Tag tag) {
 		List<TagField> fields;
 
 		try {
-			fields = tag.get(key);
+			fields = tag.getFields(key);
 		}
 		catch (KeyNotFoundException ignored) {
 			return;
@@ -147,7 +145,17 @@ public class MP3FileReader extends AudioFileReader {
 
 		for (TagField field : fields) {
 			ID3v24Frame frame = (ID3v24Frame) field;
-			if (frame.getBody() instanceof AbstractFrameBodyTextInfo) {
+			if (frame.getBody() instanceof FrameBodyTRCK) {
+				FrameBodyTRCK body = (FrameBodyTRCK) frame.getBody();
+				track.getTrackData().addTrack(body.getTrackNo());
+				track.getTrackData().addTrackTotal(body.getTrackTotal());
+			}
+			else if (frame.getBody() instanceof FrameBodyTPOS) {
+				FrameBodyTPOS body = (FrameBodyTPOS) frame.getBody();
+				track.getTrackData().addDisc(body.getDiscNo());
+				track.getTrackData().addDiscTotal(body.getDiscTotal());
+			}
+			else if (frame.getBody() instanceof AbstractFrameBodyTextInfo) {
 				AbstractFrameBodyTextInfo body = (AbstractFrameBodyTextInfo) frame.getBody();
 				// TODO not sure about body.getFirstTextValue()
 				track.getTrackData().addTagFieldValues(key, body.getFirstTextValue());

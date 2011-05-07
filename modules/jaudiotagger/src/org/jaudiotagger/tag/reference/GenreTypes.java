@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: GenreTypes.java,v 1.4 2008/07/21 10:45:50 paultaylor Exp $
+ * Version @version:$Id: GenreTypes.java 848 2009-11-14 07:46:43Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>
@@ -37,7 +37,7 @@ public class GenreTypes extends AbstractIntStringValuePair {
 
     /**
      * @return the maximum genreId that is part of the official Standard, genres above this were added by
-     *         winamp later.
+     *         Winamp later.
      */
     public static int getMaxStandardGenreId() {
         return MAX_STANDARD_GENRE_ID;
@@ -54,6 +54,7 @@ public class GenreTypes extends AbstractIntStringValuePair {
 
     //This maps the lowercase version to the id, so applications can map from the lowercase value to the id
     private Map<String, Integer> nameToIdMap;
+
 
     private GenreTypes() {
         idToValue.put(0, "Blues");
@@ -216,6 +217,9 @@ public class GenreTypes extends AbstractIntStringValuePair {
 
     /**
      * Get Id for name, match is not case sensitive
+     *
+     * @param name
+     * @return
      */
     public Integer getIdForName(String name) {
         return nameToIdMap.get(name.toLowerCase());

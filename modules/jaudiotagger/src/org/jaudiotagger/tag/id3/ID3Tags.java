@@ -18,6 +18,7 @@ package org.jaudiotagger.tag.id3;
 import org.jaudiotagger.tag.TagException;
 
 import java.lang.reflect.Constructor;
+import java.util.logging.Logger;
 
 /**
  * This contains static methods that can be performed on tags
@@ -25,11 +26,12 @@ import java.lang.reflect.Constructor;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: ID3Tags.java,v 1.20 2008/11/12 16:41:39 paultaylor Exp $
+ * @version $Id: ID3Tags.java 919 2010-10-04 13:46:39Z paultaylor $
  */
 public class ID3Tags {
     //Logger
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.tag.id3");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.tag.id3");
+
 
     private ID3Tags() {
     }
@@ -46,11 +48,7 @@ public class ID3Tags {
             return false;
         }
         //If 3 is it a known identifier
-        else if (identifier.length() == 3) {
-            return ID3v22Frames.getInstanceOf().getIdToValueMap().containsKey(identifier);
-        } else {
-            return false;
-        }
+        else return identifier.length() == 3 && ID3v22Frames.getInstanceOf().getIdToValueMap().containsKey(identifier);
     }
 
     /**
@@ -60,10 +58,7 @@ public class ID3Tags {
      * @return true if the identifier is a valid ID3v2.3 frame identifier
      */
     public static boolean isID3v23FrameIdentifier(String identifier) {
-        if (identifier.length() < 4) {
-            return false;
-        }
-        return ID3v23Frames.getInstanceOf().getIdToValueMap().containsKey(identifier.substring(0, 4));
+        return identifier.length() >= 4 && ID3v23Frames.getInstanceOf().getIdToValueMap().containsKey(identifier.substring(0, 4));
     }
 
     /**
@@ -73,10 +68,7 @@ public class ID3Tags {
      * @return true if the identifier is a valid ID3v2.4 frame identifier
      */
     public static boolean isID3v24FrameIdentifier(String identifier) {
-        if (identifier.length() < 4) {
-            return false;
-        }
-        return ID3v24Frames.getInstanceOf().getIdToValueMap().containsKey(identifier.substring(0, 4));
+        return identifier.length() >= 4 && ID3v24Frames.getInstanceOf().getIdToValueMap().containsKey(identifier.substring(0, 4));
     }
 
     /**
@@ -94,11 +86,11 @@ public class ID3Tags {
         if (value instanceof String) {
             number = Long.parseLong((String) value);
         } else if (value instanceof Byte) {
-            number = ((Byte) value).byteValue();
+            number = (Byte) value;
         } else if (value instanceof Short) {
-            number = ((Short) value).shortValue();
+            number = (Short) value;
         } else if (value instanceof Integer) {
-            number = ((Integer) value).intValue();
+            number = (Integer) value;
         } else if (value instanceof Long) {
             number = (Long) value;
         } else {
@@ -109,16 +101,22 @@ public class ID3Tags {
 
     /**
      * Convert from ID3v22 FrameIdentifier to ID3v23
+     *
+     * @param identifier
+     * @return
      */
     public static String convertFrameID22To23(String identifier) {
         if (identifier.length() < 3) {
             return null;
         }
-        return ID3Frames.convertv22Tov23.get(identifier.subSequence(0, 3));
+        return ID3Frames.convertv22Tov23.get((String) identifier.subSequence(0, 3));
     }
 
     /**
      * Convert from ID3v22 FrameIdentifier to ID3v24
+     *
+     * @param identifier
+     * @return
      */
     public static String convertFrameID22To24(String identifier) {
         //Idv22 identifiers are only of length 3 times
@@ -148,6 +146,9 @@ public class ID3Tags {
 
     /**
      * Convert from ID3v23 FrameIdentifier to ID3v22
+     *
+     * @param identifier
+     * @return
      */
     public static String convertFrameID23To22(String identifier) {
         if (identifier.length() < 4) {
@@ -164,6 +165,9 @@ public class ID3Tags {
 
     /**
      * Convert from ID3v23 FrameIdentifier to ID3v24
+     *
+     * @param identifier
+     * @return
      */
     public static String convertFrameID23To24(String identifier) {
         if (identifier.length() < 4) {
@@ -173,7 +177,7 @@ public class ID3Tags {
         //If it is a ID3v23 identifier
         if (ID3v23Frames.getInstanceOf().getIdToValueMap().containsKey(identifier)) {
             //If no change between ID3v23 and ID3v24 should be in ID3v24 list.
-            if (ID3v24Frames.getInstanceOf().getIdToValueMap().containsKey(identifier) == true) {
+            if (ID3v24Frames.getInstanceOf().getIdToValueMap().containsKey(identifier)) {
                 return identifier;
             }
             //If only name has changed  ID3v23 and modified in ID3v24 return result of.
@@ -187,6 +191,9 @@ public class ID3Tags {
     /**
      * Force from ID3v22 FrameIdentifier to ID3v23, this is where the frame and structure
      * has changed from v2 to v3 but we can still do some kind of conversion.
+     *
+     * @param identifier
+     * @return
      */
     public static String forceFrameID22To23(String identifier) {
         return ID3Frames.forcev22Tov23.get(identifier);
@@ -195,6 +202,9 @@ public class ID3Tags {
     /**
      * Force from ID3v22 FrameIdentifier to ID3v23, this is where the frame and structure
      * has changed from v2 to v3 but we can still do some kind of conversion.
+     *
+     * @param identifier
+     * @return
      */
     public static String forceFrameID23To22(String identifier) {
         return ID3Frames.forcev23Tov22.get(identifier);
@@ -203,6 +213,9 @@ public class ID3Tags {
     /**
      * Force from ID3v2.30 FrameIdentifier to ID3v2.40, this is where the frame and structure
      * has changed from v3 to v4 but we can still do some kind of conversion.
+     *
+     * @param identifier
+     * @return
      */
     public static String forceFrameID23To24(String identifier) {
         return ID3Frames.forcev23Tov24.get(identifier);
@@ -211,6 +224,9 @@ public class ID3Tags {
     /**
      * Force from ID3v2.40 FrameIdentifier to ID3v2.30, this is where the frame and structure
      * has changed between v4 to v3 but we can still do some kind of conversion.
+     *
+     * @param identifier
+     * @return
      */
     public static String forceFrameID24To23(String identifier) {
         return ID3Frames.forcev24Tov23.get(identifier);
@@ -218,6 +234,9 @@ public class ID3Tags {
 
     /**
      * Convert from ID3v24 FrameIdentifier to ID3v23
+     *
+     * @param identifier
+     * @return
      */
     public static String convertFrameID24To23(String identifier) {
         String id;
@@ -226,7 +245,7 @@ public class ID3Tags {
         }
         id = ID3Frames.convertv24Tov23.get(identifier);
         if (id == null) {
-            if (ID3v23Frames.getInstanceOf().getIdToValueMap().containsKey(identifier) == true) {
+            if (ID3v23Frames.getInstanceOf().getIdToValueMap().containsKey(identifier)) {
                 id = identifier;
             }
         }
@@ -237,7 +256,7 @@ public class ID3Tags {
      * Unable to instantiate abstract classes, so can't call the copy
      * constructor. So find out the instantiated class name and call the copy
      * constructor through reflection (e.g for a a FrameBody would have to have a constructor
-     * that takes another framebody as the same type as a parameter)
+     * that takes another frameBody as the same type as a parameter)
      *
      * @param copyObject
      * @return
@@ -257,17 +276,13 @@ public class ID3Tags {
             parameterArray = new Object[1];
             parameterArray[0] = copyObject;
             return constructor.newInstance(parameterArray);
-        }
-        catch (NoSuchMethodException ex) {
+        } catch (NoSuchMethodException ex) {
             throw new IllegalArgumentException("NoSuchMethodException: Error finding constructor to create copy:" + copyObject.getClass().getName());
-        }
-        catch (IllegalAccessException ex) {
+        } catch (IllegalAccessException ex) {
             throw new IllegalArgumentException("IllegalAccessException: No access to run constructor to create copy" + copyObject.getClass().getName());
-        }
-        catch (InstantiationException ex) {
+        } catch (InstantiationException ex) {
             throw new IllegalArgumentException("InstantiationException: Unable to instantiate constructor to copy" + copyObject.getClass().getName());
-        }
-        catch (java.lang.reflect.InvocationTargetException ex) {
+        } catch (java.lang.reflect.InvocationTargetException ex) {
             if (ex.getCause() instanceof Error) {
                 throw (Error) ex.getCause();
             } else if (ex.getCause() instanceof RuntimeException) {

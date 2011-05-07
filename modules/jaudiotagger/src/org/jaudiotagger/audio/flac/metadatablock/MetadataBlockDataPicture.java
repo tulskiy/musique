@@ -1,9 +1,9 @@
 package org.jaudiotagger.audio.flac.metadatablock;
 
 import org.jaudiotagger.audio.generic.Utils;
+import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.InvalidFrameException;
 import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.TagFieldKey;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 import org.jaudiotagger.tag.reference.PictureTypes;
 
@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
+
 
 /**
  * Picture Block
@@ -51,20 +53,9 @@ public class MetadataBlockDataPicture implements MetadataBlockData, TagField {
     private byte[] imageData;
 
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.flac.MetadataBlockDataPicture");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.flac.MetadataBlockDataPicture");
 
-    /**
-     * Construct picture block by reading from file
-     */
-    //TODO check for buffer underflows see http://research.eeye.com/html/advisories/published/AD20071115.html
-    public MetadataBlockDataPicture(MetadataBlockHeader header, RandomAccessFile raf) throws IOException, InvalidFrameException {
-        ByteBuffer rawdata = ByteBuffer.allocate(header.getDataLength());
-        int bytesRead = raf.getChannel().read(rawdata);
-        if (bytesRead < header.getDataLength()) {
-            throw new IOException("Unable to read required number of databytes read:" + bytesRead + ":required:" + header.getDataLength());
-        }
-        rawdata.rewind();
-
+    private void initFromByteBuffer(ByteBuffer rawdata) throws IOException, InvalidFrameException {
         //Picture Type
         pictureType = rawdata.getInt();
         if (pictureType >= PictureTypes.getInstanceOf().getSize()) {
@@ -96,12 +87,53 @@ public class MetadataBlockDataPicture implements MetadataBlockData, TagField {
         imageData = new byte[rawdataSize];
         rawdata.get(imageData);
 
-//        //logger.info("Read image:" + this.toString());
+        //logger.info("Read image:" + this.toString());
+    }
+
+    /**
+     * Initialize MetaBlockDataPicture from byteBuffer
+     *
+     * @param rawdata
+     * @throws IOException
+     * @throws InvalidFrameException
+     */
+    public MetadataBlockDataPicture(ByteBuffer rawdata) throws IOException, InvalidFrameException {
+        initFromByteBuffer(rawdata);
+    }
+
+    /**
+     * Construct picture block by reading from file, the header informs us how many bytes we should be reading from
+     *
+     * @param header
+     * @param raf
+     * @throws java.io.IOException
+     * @throws org.jaudiotagger.tag.InvalidFrameException
+     *
+     */
+    //TODO check for buffer underflows see http://research.eeye.com/html/advisories/published/AD20071115.html
+    public MetadataBlockDataPicture(MetadataBlockHeader header, RandomAccessFile raf) throws IOException, InvalidFrameException {
+        ByteBuffer rawdata = ByteBuffer.allocate(header.getDataLength());
+        int bytesRead = raf.getChannel().read(rawdata);
+        if (bytesRead < header.getDataLength()) {
+            throw new IOException("Unable to read required number of databytes read:" + bytesRead + ":required:" + header.getDataLength());
+        }
+        rawdata.rewind();
+        initFromByteBuffer(rawdata);
+
 
     }
 
     /**
      * Construct new MetadataPicture block
+     *
+     * @param imageData
+     * @param pictureType
+     * @param mimeType
+     * @param description
+     * @param width
+     * @param height
+     * @param colourDepth
+     * @param indexedColouredCount
      */
     public MetadataBlockDataPicture(byte[] imageData, int pictureType, String mimeType, String description, int width, int height, int colourDepth, int indexedColouredCount) {
         //Picture Type
@@ -146,8 +178,7 @@ public class MetadataBlockDataPicture implements MetadataBlockData, TagField {
             baos.write(imageData);
             return baos.toByteArray();
 
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             throw new RuntimeException(ioe.getMessage());
         }
     }
@@ -228,7 +259,7 @@ public class MetadataBlockDataPicture implements MetadataBlockData, TagField {
      * @return Unique identifier for the fields type. (title, artist...)
      */
     public String getId() {
-        return TagFieldKey.COVER_ART.name();
+        return FieldKey.COVER_ART.name();
     }
 
     /**
@@ -296,5 +327,6 @@ public class MetadataBlockDataPicture implements MetadataBlockData, TagField {
     public boolean isEmpty() {
         return false;
     }
+
 
 }

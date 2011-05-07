@@ -1,5 +1,6 @@
 package org.jaudiotagger.tag.mp4.atom;
 
+
 /**
  * List of valid values for the Content Type (Stik) atom
  * <p/>
@@ -17,6 +18,7 @@ public enum Mp4ContentTypeValue {
 
     private String description;
     private int id;
+
 
     /**
      * @param description of value
@@ -51,5 +53,6 @@ public enum Mp4ContentTypeValue {
     public String getDescription() {
         return description;
     }
+
 
 }

@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 /**
  * Everything in MP4s are held in boxes (formally known as atoms), they are held as a hierachial tree within the MP4.
@@ -48,7 +49,7 @@ import java.nio.ByteBuffer;
  */
 public class Mp4BoxHeader {
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.mp4.atom");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.mp4.atom");
 
     public static final int OFFSET_POS = 0;
     public static final int IDENTIFIER_POS = 4;
@@ -83,6 +84,8 @@ public class Mp4BoxHeader {
     /**
      * Construct header to allow manual creation of header for writing to file
      * <p/>
+     *
+     * @param id
      */
     public Mp4BoxHeader(String id) {
         if (id.length() != IDENTIFIER_LENGTH) {
@@ -95,8 +98,7 @@ public class Mp4BoxHeader {
             dataBuffer.put(5, id.getBytes("ISO-8859-1")[1]);
             dataBuffer.put(6, id.getBytes("ISO-8859-1")[2]);
             dataBuffer.put(7, id.getBytes("ISO-8859-1")[3]);
-        }
-        catch (UnsupportedEncodingException uee) {
+        } catch (UnsupportedEncodingException uee) {
             //Should never happen
             throw new RuntimeException(uee);
         }
@@ -133,8 +135,8 @@ public class Mp4BoxHeader {
         this.length = Utils.getIntBE(b, OFFSET_POS, OFFSET_LENGTH - 1);
         //Calculate box id
         this.id = Utils.getString(b, IDENTIFIER_POS, IDENTIFIER_LENGTH, "ISO-8859-1");
-
-//        //logger.finest("Mp4BoxHeader id:"+id+":length:"+length);
+//
+        //logger.finest("Mp4BoxHeader id:" + id + ":length:" + length);
         if (id.equals("\0\0\0\0")) {
             throw new NullBoxIdException(ErrorMessage.MP4_UNABLE_TO_FIND_NEXT_ATOM_BECAUSE_IDENTIFIER_IS_INVALID.getMsg(id));
         }
@@ -221,6 +223,7 @@ public class Mp4BoxHeader {
         return CHARSET_UTF_8;
     }
 
+
     /**
      * Seek for box with the specified id starting from the current location of filepointer,
      * <p/>
@@ -231,10 +234,11 @@ public class Mp4BoxHeader {
      *
      * @param raf
      * @param id
+     * @return
      * @throws java.io.IOException
      */
     public static Mp4BoxHeader seekWithinLevel(RandomAccessFile raf, String id) throws IOException {
-//        //logger.finer("Started searching for:" + id + " in file at:" + raf.getChannel().position());
+//        logger.finer("Started searching for:" + id + " in file at:" + raf.getChannel().position());
 
         Mp4BoxHeader boxHeader = new Mp4BoxHeader();
         ByteBuffer headerBuffer = ByteBuffer.allocate(HEADER_LENGTH);
@@ -245,20 +249,20 @@ public class Mp4BoxHeader {
         headerBuffer.rewind();
         boxHeader.update(headerBuffer);
         while (!boxHeader.getId().equals(id)) {
-//            //logger.finer("Found:" + boxHeader.getId() + " Still searching for:" + id + " in file at:" + raf.getChannel().position());
+//            logger.finer("Found:" + boxHeader.getId() + " Still searching for:" + id + " in file at:" + raf.getChannel().position());
 
             //Something gone wrong probably not at the start of an atom so return null;
             if (boxHeader.getLength() < Mp4BoxHeader.HEADER_LENGTH) {
                 return null;
             }
             int noOfBytesSkipped = raf.skipBytes(boxHeader.getDataLength());
-//            //logger.finer("Skipped:" + noOfBytesSkipped);
+//            logger.finer("Skipped:" + noOfBytesSkipped);
             if (noOfBytesSkipped < boxHeader.getDataLength()) {
                 return null;
             }
             headerBuffer.rewind();
             bytesRead = raf.getChannel().read(headerBuffer);
-//            //logger.finer("Header Bytes Read:" + bytesRead);
+//            logger.finer("Header Bytes Read:" + bytesRead);
             headerBuffer.rewind();
             if (bytesRead == Mp4BoxHeader.HEADER_LENGTH) {
                 boxHeader.update(headerBuffer);
@@ -268,6 +272,7 @@ public class Mp4BoxHeader {
         }
         return boxHeader;
     }
+
 
     /**
      * Seek for box with the specified id starting from the current location of filepointer,
@@ -279,10 +284,11 @@ public class Mp4BoxHeader {
      *
      * @param data
      * @param id
+     * @return
      * @throws java.io.IOException
      */
     public static Mp4BoxHeader seekWithinLevel(ByteBuffer data, String id) throws IOException {
-//        //logger.finer("Started searching for:" + id + " in bytebuffer at" + data.position());
+//        logger.finer("Started searching for:" + id + " in bytebuffer at" + data.position());
 
         Mp4BoxHeader boxHeader = new Mp4BoxHeader();
         if (data.remaining() >= Mp4BoxHeader.HEADER_LENGTH) {
@@ -291,7 +297,7 @@ public class Mp4BoxHeader {
             return null;
         }
         while (!boxHeader.getId().equals(id)) {
-//            //logger.finer("Found:" + boxHeader.getId() + " Still searching for:" + id + " in bytebuffer at" + data.position());
+//            logger.finer("Found:" + boxHeader.getId() + " Still searching for:" + id + " in bytebuffer at" + data.position());
             //Something gone wrong probably not at the start of an atom so return null;
             if (boxHeader.getLength() < Mp4BoxHeader.HEADER_LENGTH) {
                 return null;
@@ -307,7 +313,7 @@ public class Mp4BoxHeader {
                 return null;
             }
         }
-//        //logger.finer("Found:" + id + " in bytebuffer at" + data.position());
+//        logger.finer("Found:" + id + " in bytebuffer at" + data.position());
 
         return boxHeader;
     }

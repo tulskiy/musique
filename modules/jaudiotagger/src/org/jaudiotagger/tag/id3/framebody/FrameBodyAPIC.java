@@ -85,7 +85,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyAPIC.java,v 1.21 2008/07/21 10:45:42 paultaylor Exp $
+ * @version $Id: FrameBodyAPIC.java 895 2010-04-15 15:21:45Z paultaylor $
  */
 public class FrameBodyAPIC extends AbstractID3v2FrameBody implements ID3v24FrameBody, ID3v23FrameBody {
     public static final String IMAGE_IS_URL = "-->";
@@ -104,6 +104,8 @@ public class FrameBodyAPIC extends AbstractID3v2FrameBody implements ID3v24Frame
 
     /**
      * Conversion from v2 PIC to v3/v4 APIC
+     *
+     * @param body
      */
     public FrameBodyAPIC(FrameBodyPIC body) {
         this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body.getTextEncoding());
@@ -134,11 +136,18 @@ public class FrameBodyAPIC extends AbstractID3v2FrameBody implements ID3v24Frame
     /**
      * Creates a new FrameBodyAPIC datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodyAPIC(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
     }
+
+    public String getUserFriendlyValue() {
+        return getMimeType() + ":" + getDescription() + ":" + getImageData().length;
+    }
+
 
     /**
      * Set a description of the image
@@ -219,11 +228,12 @@ public class FrameBodyAPIC extends AbstractID3v2FrameBody implements ID3v24Frame
         return ID3v24Frames.FRAME_ID_ATTACHED_PICTURE;
     }
 
+
     /**
      * If the description cannot be encoded using current encoder, change the encoder
      */
     public void write(ByteArrayOutputStream tagBuffer) {
-        if (((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded() == false) {
+        if (!((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded()) {
             this.setTextEncoding(TextEncoding.UTF_16);
         }
         super.write(tagBuffer);
@@ -244,10 +254,7 @@ public class FrameBodyAPIC extends AbstractID3v2FrameBody implements ID3v24Frame
      * @return true if imagedata  is held as a url rather than actually being imagedata
      */
     public boolean isImageUrl() {
-        if (getMimeType() == null) {
-            return false;
-        }
-        return getMimeType().equals(IMAGE_IS_URL);
+        return getMimeType() != null && getMimeType().equals(IMAGE_IS_URL);
     }
 
     /**

@@ -21,6 +21,8 @@ package org.jaudiotagger.audio.ogg.util;
 import org.jaudiotagger.audio.generic.Utils;
 import org.jaudiotagger.audio.ogg.VorbisVersion;
 
+import java.util.logging.Logger;
+
 /**
  * Vorbis Identification header
  * <p/>
@@ -40,14 +42,14 @@ import org.jaudiotagger.audio.ogg.VorbisVersion;
  * 8) [blocksize_1] = 2 exponent (read 4 bits as unsigned integer)
  * 9) [framing_flag] = read one bit
  * <p/>
- * $Id: VorbisIdentificationHeader.java,v 1.7 2008/07/21 10:48:37 paultaylor Exp $
+ * $Id: VorbisIdentificationHeader.java 813 2009-09-03 09:23:25Z paultaylor $
  *
  * @author Raphael Slinckx (KiKiDonK)
  * @version 16 d�cembre 2003
  */
 public class VorbisIdentificationHeader implements VorbisHeader {
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.ogg.atom");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.ogg.atom");
 
     private int audioChannels;
     private boolean isValid = false;

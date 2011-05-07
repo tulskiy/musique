@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -22,6 +22,7 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
 
 import com.tulskiy.musique.audio.AudioTagWriter;
+import com.tulskiy.musique.audio.TagWriteException;
 import com.tulskiy.musique.playlist.Track;
 
 /**
@@ -30,14 +31,14 @@ import com.tulskiy.musique.playlist.Track;
  */
 public class VorbisTagWriter extends AudioTagWriter {
     @Override
-    public void write(Track track) {
+    public void write(Track track) throws TagWriteException {
         try {
             org.jaudiotagger.audio.AudioFile af1 = AudioFileIO.read(track.getTrackData().getFile());
             Tag abstractTag = af1.getTagOrCreateDefault();
             copyTagFields(abstractTag, new VorbisCommentTag(), track);
             AudioFileIO.write(af1);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new TagWriteException(e);
         }
     }
 

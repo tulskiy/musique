@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractID3v2FrameBody.java,v 1.21 2008/07/21 10:45:42 paultaylor Exp $
+ *  Version @version:$Id: AbstractID3v2FrameBody.java 901 2010-05-13 18:28:14Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -41,11 +41,13 @@ import java.nio.ByteBuffer;
 public abstract class AbstractID3v2FrameBody extends AbstractTagFrameBody {
     protected static final String TYPE_BODY = "body";
 
+
     /**
      * Frame Body Size, originally this is size as indicated in frame header
      * when we come to writing data we recalculate it.
      */
     private int size;
+
 
     /**
      * Create Empty Body. Super Constructor sets up Object list
@@ -55,16 +57,21 @@ public abstract class AbstractID3v2FrameBody extends AbstractTagFrameBody {
 
     /**
      * Create Body based on another body
+     *
+     * @param copyObject
      */
     protected AbstractID3v2FrameBody(AbstractID3v2FrameBody copyObject) {
         super(copyObject);
     }
 
     /**
-     * Creates a new FrameBody datatype from file. The super
+     * Creates a new FrameBody dataType from file. The super
      * Constructor sets up the Object list for the frame.
      *
      * @param byteBuffer from where to read the frame body from
+     * @param frameSize
+     * @throws org.jaudiotagger.tag.InvalidTagException
+     *
      */
     protected AbstractID3v2FrameBody(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super();
@@ -80,8 +87,9 @@ public abstract class AbstractID3v2FrameBody extends AbstractTagFrameBody {
      */
     public abstract String getIdentifier();
 
+
     /**
-     * Return size of frame body,if framebody already exist will take this value from the frame header
+     * Return size of frame body,if frameBody already exist will take this value from the frame header
      * but it is always recalculated before writing any changes back to disk.
      *
      * @return size in bytes of this frame body
@@ -93,6 +101,8 @@ public abstract class AbstractID3v2FrameBody extends AbstractTagFrameBody {
     /**
      * Set size based on size passed as parameter from frame header,
      * done before read
+     *
+     * @param size
      */
     public void setSize(int size) {
         this.size = size;
@@ -106,7 +116,6 @@ public abstract class AbstractID3v2FrameBody extends AbstractTagFrameBody {
         for (AbstractDataType object : objectList) {
             size += object.getSize();
         }
-        ;
     }
 
     /**
@@ -115,39 +124,40 @@ public abstract class AbstractID3v2FrameBody extends AbstractTagFrameBody {
      * @param obj
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof AbstractID3v2FrameBody) == false) {
-            return false;
-        }
-        return super.equals(obj);
+        return (obj instanceof AbstractID3v2FrameBody) && super.equals(obj);
     }
 
     /**
      * This reads a frame body from a ByteBuffer into the appropriate FrameBody class and update the position of the
-     * buffer to be just after the end of this framebody
+     * buffer to be just after the end of this frameBody
      * <p/>
-     * The ByteBuffer represents the tag and its position should be at the start of this framebody. The size as
+     * The ByteBuffer represents the tag and its position should be at the start of this frameBody. The size as
      * indicated in the header is passed to the frame constructor when reading from file.
      *
      * @param byteBuffer file to read
-     * @throws InvalidFrameException if unable to construct a framebody from the ByteBuffer
+     * @throws InvalidFrameException if unable to construct a frameBody from the ByteBuffer
      */
+    //TODO why don't we just slice byteBuffer, set limit to size and convert readByteArray to take a ByteBuffer
+    //then we wouldn't have to temporary allocate space for the buffer, using lots of needless memory
+    //and providing extra work for the garbage collector.
     public void read(ByteBuffer byteBuffer) throws InvalidTagException {
         int size = getSize();
-        //logger.info("Reading body for" + this.getIdentifier() + ":" + size);
+//        logger.info("Reading body for" + this.getIdentifier() + ":" + size);
 
         //Allocate a buffer to the size of the Frame Body and read from file
         byte[] buffer = new byte[size];
         byteBuffer.get(buffer);
 
-        //Offset into buffer, incremented by length of previous Datatype
+        //Offset into buffer, incremented by length of previous dataType
         //this offset is only used internally to decide where to look for the next
-        //datatype within a framebody, it does not decide where to look for the next frame body
+        //dataType within a frameBody, it does not decide where to look for the next frame body
         int offset = 0;
 
         //Go through the ObjectList of the Frame reading the data into the
-        //correct datatype.
-        for (AbstractDataType object : objectList) {
-            //logger.finest("offset:" + offset);
+        for (AbstractDataType object : objectList)
+        //correct dataType.
+        {
+//            logger.finest("offset:" + offset);
 
             //The read has extended further than the defined frame size (ok to extend upto
             //size because the next datatype may be of length 0.)
@@ -160,10 +170,9 @@ public abstract class AbstractID3v2FrameBody extends AbstractTagFrameBody {
             //if it fails frame is invalid
             try {
                 object.readByteArray(buffer, offset);
-            }
-            catch (InvalidDataTypeException e) {
-                //logger.warning("Invalid DataType for Frame Body:" + e.getMessage());
-                throw new InvalidFrameException("Invalid DataType for Frame Body:" + e.getMessage());
+            } catch (InvalidDataTypeException e) {
+                //logger.warning("Problem reading datatype within Frame Body:" + e.getMessage());
+                throw e;
             }
             //Increment Offset to start of next datatype.
             offset += object.getSize();
@@ -173,27 +182,27 @@ public abstract class AbstractID3v2FrameBody extends AbstractTagFrameBody {
     /**
      * Write the contents of this datatype to the byte array
      *
+     * @param tagBuffer
      * @throws IOException on any I/O error
      */
     public void write(ByteArrayOutputStream tagBuffer)
 
     {
-        //logger.info("Writing frame body for" + this.getIdentifier() + ":Est Size:" + size);
+//        logger.info("Writing frame body for" + this.getIdentifier() + ":Est Size:" + size);
         //Write the various fields to file in order
         for (AbstractDataType object : objectList) {
             byte[] objectData = object.writeByteArray();
             if (objectData != null) {
                 try {
                     tagBuffer.write(objectData);
-                }
-                catch (IOException ioe) {
+                } catch (IOException ioe) {
                     //This could never happen coz not writing to file, so convert to RuntimeException
                     throw new RuntimeException(ioe);
                 }
             }
         }
         setSize();
-        //logger.info("Written frame body for" + this.getIdentifier() + ":Real Size:" + size);
+//        logger.info("Written frame body for" + this.getIdentifier() + ":Real Size:" + size);
 
     }
 

@@ -32,6 +32,8 @@ public class FrameBodyTSOC extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTSOA datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTSOC(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {

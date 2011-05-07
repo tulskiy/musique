@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyUnsupported.java,v 1.16 2008/07/21 10:45:46 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyUnsupported.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -54,6 +54,8 @@ public class FrameBodyUnsupported extends AbstractID3v2FrameBody implements ID3v
 
     /**
      * Creates a new FrameBodyUnsupported
+     *
+     * @param identifier
      */
     public FrameBodyUnsupported(String identifier) {
         this.identifier = identifier;
@@ -87,14 +89,18 @@ public class FrameBodyUnsupported extends AbstractID3v2FrameBody implements ID3v
      */
     public FrameBodyUnsupported(FrameBodyUnsupported copyObject) {
         super(copyObject);
-        this.identifier = new String(copyObject.identifier);
+        this.identifier = copyObject.identifier;
 
     }
 
     /**
      * Creates a new FrameBodyUnsupported datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidFrameException if unable to create framebody from buffer
+     * @throws org.jaudiotagger.tag.InvalidTagException
+     *
      */
     public FrameBodyUnsupported(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
@@ -114,16 +120,14 @@ public class FrameBodyUnsupported extends AbstractID3v2FrameBody implements ID3v
      * @return whether obj is equivalent to this object
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof FrameBodyUnsupported) == false) {
+        if (!(obj instanceof FrameBodyUnsupported)) {
             return false;
         }
 
         FrameBodyUnsupported object = (FrameBodyUnsupported) obj;
-        if (this.identifier.equals(object.identifier) == false) {
-            return false;
-        }
-        return super.equals(obj);
+        return this.identifier.equals(object.identifier) && super.equals(obj);
     }
+
 
     /**
      * Because the contents of this frame are an array of bytes and could be large we just

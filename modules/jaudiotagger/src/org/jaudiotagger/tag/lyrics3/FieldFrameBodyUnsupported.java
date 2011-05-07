@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FieldFrameBodyUnsupported.java,v 1.11 2008/07/21 10:45:49 paultaylor Exp $
+ *  Version @version:$Id: FieldFrameBodyUnsupported.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -27,6 +27,7 @@ import org.jaudiotagger.tag.InvalidTagException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+
 
 public class FieldFrameBodyUnsupported extends AbstractLyrics3v2FieldFrameBody {
     /**
@@ -57,6 +58,10 @@ public class FieldFrameBodyUnsupported extends AbstractLyrics3v2FieldFrameBody {
 
     /**
      * Creates a new FieldBodyUnsupported datatype.
+     *
+     * @param byteBuffer
+     * @throws org.jaudiotagger.tag.InvalidTagException
+     *
      */
     public FieldFrameBodyUnsupported(ByteBuffer byteBuffer) throws InvalidTagException {
 
@@ -76,7 +81,7 @@ public class FieldFrameBodyUnsupported extends AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     public boolean isSubsetOf(Object obj) {
-        if ((obj instanceof FieldFrameBodyUnsupported) == false) {
+        if (!(obj instanceof FieldFrameBodyUnsupported)) {
             return false;
         }
 
@@ -85,11 +90,8 @@ public class FieldFrameBodyUnsupported extends AbstractLyrics3v2FieldFrameBody {
         String subset = new String(this.value);
         String superset = new String(object.value);
 
-        if (!superset.contains(subset)) {
-            return false;
-        }
+        return superset.contains(subset) && super.isSubsetOf(obj);
 
-        return super.isSubsetOf(obj);
     }
 
     /**
@@ -97,17 +99,14 @@ public class FieldFrameBodyUnsupported extends AbstractLyrics3v2FieldFrameBody {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof FieldFrameBodyUnsupported) == false) {
+        if (!(obj instanceof FieldFrameBodyUnsupported)) {
             return false;
         }
 
         FieldFrameBodyUnsupported object = (FieldFrameBodyUnsupported) obj;
 
-        if (java.util.Arrays.equals(this.value, object.value) == false) {
-            return false;
-        }
+        return java.util.Arrays.equals(this.value, object.value) && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**

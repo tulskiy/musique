@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -45,7 +45,7 @@ public class FLACFileReader extends AudioFileReader {
     public Track readSingle(Track track) {
     	TrackData trackData = track.getTrackData();
         try {
-            if (Util.getFileExt(trackData.getFile()).equalsIgnoreCase("oga")) {
+            /*if (Util.getFileExt(trackData.getFile()).equalsIgnoreCase("oga")) {
                 OggFlacDecoder dec = new OggFlacDecoder();
                 dec.open(new RandomAccessFile(trackData.getFile(), "r"));
                 StreamInfo streamInfo = dec.getStreamInfo();
@@ -70,7 +70,7 @@ public class FLACFileReader extends AudioFileReader {
                         copyCommonTagFields(vorbisTag, track);
                     }
                 }
-            } else {
+            } else*/ {
                 FlacFileReader reader = new FlacFileReader();
                 AudioFile af1 = reader.read(trackData.getFile());
                 Tag tag = af1.getTag();

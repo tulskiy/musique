@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: PictureTypes.java,v 1.3 2008/12/10 13:14:35 paultaylor Exp $
+ * Version @version:$Id: PictureTypes.java 775 2008-12-22 13:46:26Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>
@@ -27,7 +27,8 @@ import org.jaudiotagger.tag.datatype.AbstractIntStringValuePair;
 /**
  * Pictures types for Attached Pictures
  * <p/>
- * <P>Note this list is used by APIC and PIC frames. It is also used by Flac format Picture blocks
+ * <P>Note this list is used by APIC and PIC frames within ID3v2. It is also used by Flac format Picture blocks
+ * and WMA Picture fields.
  */
 public class PictureTypes extends AbstractIntStringValuePair {
     private static PictureTypes pictureTypes;

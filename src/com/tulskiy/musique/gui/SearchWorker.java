@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.swing.SwingWorker;
 
-import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
@@ -33,7 +33,7 @@ import com.tulskiy.musique.util.Util;
 * Date: 11/12/10
 */
 public abstract class SearchWorker extends SwingWorker<Playlist, Integer> {
-    private final TagFieldKey[] fields = TagFieldKey.values();
+    private final FieldKey[] fields = FieldKey.values();
     // TODO apply correct search metas, looking through all fields at the moment
 //    {
 //            "artist", "title", "album", "albumArtist", "fileName"
@@ -60,7 +60,7 @@ public abstract class SearchWorker extends SwingWorker<Playlist, Integer> {
                 Track track = playlist.get(i);
 
                 boolean hasText[] = new boolean[text.length];
-                for (TagFieldKey field : fields) {
+                for (FieldKey field : fields) {
                     List<String> values = track.getTrackData().getTagFieldValuesSafeAsList(field);
                     for (String value : values) {
 	                    if (!Util.isEmpty(value)) {

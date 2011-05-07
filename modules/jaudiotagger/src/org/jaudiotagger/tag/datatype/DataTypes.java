@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: DataTypes.java,v 1.6 2008/01/01 15:14:15 paultaylor Exp $
+ *  Version @version:$Id: DataTypes.java 520 2008-01-01 15:16:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -29,10 +29,11 @@
  */
 package org.jaudiotagger.tag.datatype;
 
+
 public class DataTypes {
     /**
      * Represents a text encoding, now only IDv2Frames not Lyrics3 tags use
-     * text encoding objects but both use Object Util and these check
+     * text encoding objects but both use Object Strings and these check
      * for a text encoding. The method below returns a default if one not set.
      */
     public static final String OBJ_TEXT_ENCODING = "TextEncoding";

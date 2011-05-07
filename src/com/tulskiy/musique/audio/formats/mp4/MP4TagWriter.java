@@ -22,6 +22,7 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.mp4.Mp4Tag;
 
 import com.tulskiy.musique.audio.AudioTagWriter;
+import com.tulskiy.musique.audio.TagWriteException;
 import com.tulskiy.musique.playlist.Track;
 
 /**
@@ -30,18 +31,14 @@ import com.tulskiy.musique.playlist.Track;
  */
 public class MP4TagWriter extends AudioTagWriter {
     @Override
-    public void write(Track track) {
+    public void write(Track track) throws TagWriteException {
         try {
             org.jaudiotagger.audio.AudioFile af1 = AudioFileIO.read(track.getTrackData().getFile());
             Tag abstractTag = af1.getTag();
             copyTagFields(abstractTag, new Mp4Tag(), track);
-
-    		// TODO review and remove
-//          abstractTag.set(new Mp4TagTextField("aART", track.getMeta("albumArtist")));
-
             AudioFileIO.write(af1);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new TagWriteException(e);
         }
     }
 

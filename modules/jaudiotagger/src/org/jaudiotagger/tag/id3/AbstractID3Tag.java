@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractID3Tag.java,v 1.9 2008/01/01 15:14:21 paultaylor Exp $
+ *  Version @version:$Id: AbstractID3Tag.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -24,6 +24,8 @@
  */
 package org.jaudiotagger.tag.id3;
 
+import java.util.logging.Logger;
+
 /**
  * This is the abstract base class for all ID3 tags.
  *
@@ -32,7 +34,7 @@ package org.jaudiotagger.tag.id3;
  */
 public abstract class AbstractID3Tag extends AbstractTag {
     //Logger
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.tag.id3");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.tag.id3");
 
     public AbstractID3Tag() {
     }
@@ -53,18 +55,26 @@ public abstract class AbstractID3Tag extends AbstractTag {
 
     /**
      * Retrieve the Release
+     *
+     * @return
      */
     public abstract byte getRelease();
 
+
     /**
      * Retrieve the Major Version
+     *
+     * @return
      */
     public abstract byte getMajorVersion();
 
     /**
      * Retrieve the Revision
+     *
+     * @return
      */
     public abstract byte getRevision();
+
 
     public AbstractID3Tag(AbstractID3Tag copyObject) {
         super(copyObject);

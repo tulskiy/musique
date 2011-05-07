@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyPIC.java,v 1.18 2008/11/12 19:39:13 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyPIC.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -113,6 +113,8 @@ public class FrameBodyPIC extends AbstractID3v2FrameBody implements ID3v22FrameB
 
     /**
      * Conversion from v2 PIC to v3/v4 APIC
+     *
+     * @param body
      */
     public FrameBodyPIC(FrameBodyAPIC body) {
         this.setObjectValue(DataTypes.OBJ_TEXT_ENCODING, body.getTextEncoding());
@@ -125,6 +127,8 @@ public class FrameBodyPIC extends AbstractID3v2FrameBody implements ID3v22FrameB
     /**
      * Creates a new FrameBodyPIC datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodyPIC(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -183,6 +187,7 @@ public class FrameBodyPIC extends AbstractID3v2FrameBody implements ID3v22FrameB
         return ((Long) getObjectValue(DataTypes.OBJ_PICTURE_TYPE)).intValue();
     }
 
+
     /**
      * The ID3v2 frame identifier
      *
@@ -192,11 +197,12 @@ public class FrameBodyPIC extends AbstractID3v2FrameBody implements ID3v22FrameB
         return ID3v22Frames.FRAME_ID_V2_ATTACHED_PICTURE;
     }
 
+
     /**
      * If the description cannot be encoded using current encoder, change the encoder
      */
     public void write(ByteArrayOutputStream tagBuffer) {
-        if (((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded() == false) {
+        if (!((AbstractString) getObject(DataTypes.OBJ_DESCRIPTION)).canBeEncoded()) {
             this.setTextEncoding(TextEncoding.UTF_16);
         }
         super.write(tagBuffer);
@@ -212,10 +218,7 @@ public class FrameBodyPIC extends AbstractID3v2FrameBody implements ID3v22FrameB
     }
 
     public boolean isImageUrl() {
-        if (getFormatType() == null) {
-            return false;
-        }
-        return getFormatType().equals(IMAGE_IS_URL);
+        return getFormatType() != null && getFormatType().equals(IMAGE_IS_URL);
     }
 
     /**

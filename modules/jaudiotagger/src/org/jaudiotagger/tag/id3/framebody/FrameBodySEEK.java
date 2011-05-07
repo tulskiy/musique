@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodySEEK.java,v 1.10 2008/07/21 10:45:43 paultaylor Exp $
+ *  Version @version:$Id: FrameBodySEEK.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -30,6 +30,7 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+
 public class FrameBodySEEK extends AbstractID3v2FrameBody implements ID3v24FrameBody {
     /**
      * Creates a new FrameBodySEEK datatype.
@@ -54,6 +55,8 @@ public class FrameBodySEEK extends AbstractID3v2FrameBody implements ID3v24Frame
     /**
      * Creates a new FrameBodySEEK datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException if unable to create framebody from buffer
      */
     public FrameBodySEEK(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {

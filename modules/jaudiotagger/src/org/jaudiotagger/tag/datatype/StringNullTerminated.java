@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: StringNullTerminated.java,v 1.9 2008/01/01 15:12:56 paultaylor Exp $
+ *  Version @version:$Id: StringNullTerminated.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -36,6 +36,7 @@ public class StringNullTerminated extends TextEncodedStringNullTerminated {
      * Creates a new ObjectStringNullTerminated datatype.
      *
      * @param identifier identifies the frame type
+     * @param frameBody
      */
     public StringNullTerminated(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody);
@@ -46,10 +47,7 @@ public class StringNullTerminated extends TextEncodedStringNullTerminated {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof StringNullTerminated == false) {
-            return false;
-        }
-        return super.equals(obj);
+        return obj instanceof StringNullTerminated && super.equals(obj);
     }
 
     protected String getTextEncodingCharSet() {

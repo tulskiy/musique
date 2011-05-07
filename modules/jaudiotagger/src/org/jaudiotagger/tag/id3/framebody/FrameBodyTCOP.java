@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyTCOP.java,v 1.13 2008/07/21 10:45:44 paultaylor Exp $
+ * @version $Id: FrameBodyTCOP.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodyTCOP extends AbstractFrameBodyTextInfo implements ID3v24FrameBody, ID3v23FrameBody {
     /**
@@ -57,11 +57,14 @@ public class FrameBodyTCOP extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTCOP datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTCOP(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
     }
+
 
     /**
      * The ID3v2 frame identifier

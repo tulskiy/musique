@@ -16,13 +16,21 @@
 package org.jaudiotagger.tag.id3.framebody;
 
 import org.jaudiotagger.tag.InvalidTagException;
+import org.jaudiotagger.tag.datatype.DataTypes;
+import org.jaudiotagger.tag.datatype.NumberHashMap;
+import org.jaudiotagger.tag.datatype.PartOfSet;
 import org.jaudiotagger.tag.id3.ID3v24Frames;
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import java.nio.ByteBuffer;
 
 /**
  * Part of a set Text information frame.
- * <p>The 'Part of a set' frame is a numeric string that describes which part of a set the audio came from. This frame is used if the source described in the "TALB" frame is divided into several mediums, e.g. a double CD. The value may be extended with a "/" character and a numeric string containing the total number of parts in the set. E.g. "1/2".
+ * <p/>
+ * <p>The 'Part of a set' frame is a numeric string that describes which part of a set the audio came from.
+ * This frame is used if the source described in the "TALB" frame is divided into several mediums, e.g. a double CD.
+ * The value may be extended with a "/" character and a numeric string containing the total number of parts in the set.
+ * e.g. "1/2".
  * <p/>
  * <p>For more details, please refer to the ID3 specifications:
  * <ul>
@@ -31,13 +39,15 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyTPOS.java,v 1.11 2008/07/21 10:45:45 paultaylor Exp $
+ * @version $Id: FrameBodyTPOS.java 895 2010-04-15 15:21:45Z paultaylor $
  */
-public class FrameBodyTPOS extends AbstractFrameBodyTextInfo implements ID3v23FrameBody, ID3v24FrameBody {
+public class FrameBodyTPOS extends AbstractID3v2FrameBody implements ID3v23FrameBody, ID3v24FrameBody {
     /**
-     * Creates a new FrameBodyTPOS datatype.
+     * Creates a new FrameBodyTRCK datatype.
      */
     public FrameBodyTPOS() {
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, TextEncoding.ISO_8859_1);
+        setObjectValue(DataTypes.OBJ_TEXT, new PartOfSet.PartOfSetValue());
     }
 
     public FrameBodyTPOS(FrameBodyTPOS body) {
@@ -45,24 +55,35 @@ public class FrameBodyTPOS extends AbstractFrameBodyTextInfo implements ID3v23Fr
     }
 
     /**
-     * Creates a new FrameBodyTPOS datatype.
+     * Creates a new FrameBodyTRCK datatype, the value is parsed literally
      *
      * @param textEncoding
      * @param text
      */
     public FrameBodyTPOS(byte textEncoding, String text) {
-        super(textEncoding, text);
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding);
+        setObjectValue(DataTypes.OBJ_TEXT, new PartOfSet.PartOfSetValue(text));
     }
 
+    public FrameBodyTPOS(byte textEncoding, Integer discNo, Integer discTotal) {
+        super();
+        setObjectValue(DataTypes.OBJ_TEXT_ENCODING, textEncoding);
+        setObjectValue(DataTypes.OBJ_TEXT, new PartOfSet.PartOfSetValue(discNo, discTotal));
+    }
+
+
     /**
-     * Creates a new FrameBodyTPOS datatype.
+     * Creates a new FrameBodyTRCK datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws java.io.IOException
      * @throws InvalidTagException
      */
     public FrameBodyTPOS(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
         super(byteBuffer, frameSize);
     }
+
 
     /**
      * The ID3v2 frame identifier
@@ -71,5 +92,38 @@ public class FrameBodyTPOS extends AbstractFrameBodyTextInfo implements ID3v23Fr
      */
     public String getIdentifier() {
         return ID3v24Frames.FRAME_ID_SET;
+    }
+
+    public String getUserFriendlyValue() {
+        return String.valueOf(getDiscNo());
+    }
+
+    public String getText() {
+        return getObjectValue(DataTypes.OBJ_TEXT).toString();
+    }
+
+    public Integer getDiscNo() {
+        return ((PartOfSet.PartOfSetValue) getObjectValue(DataTypes.OBJ_TEXT)).getCount();
+    }
+
+    public void setDiscNo(Integer discNo) {
+        ((PartOfSet.PartOfSetValue) getObjectValue(DataTypes.OBJ_TEXT)).setCount(discNo);
+    }
+
+    public Integer getDiscTotal() {
+        return ((PartOfSet.PartOfSetValue) getObjectValue(DataTypes.OBJ_TEXT)).getTotal();
+    }
+
+    public void setDiscTotal(Integer discTotal) {
+        ((PartOfSet.PartOfSetValue) getObjectValue(DataTypes.OBJ_TEXT)).setTotal(discTotal);
+    }
+
+    public void setText(String text) {
+        setObjectValue(DataTypes.OBJ_TEXT, new PartOfSet.PartOfSetValue(text));
+    }
+
+    protected void setupObjectList() {
+        objectList.add(new NumberHashMap(DataTypes.OBJ_TEXT_ENCODING, this, TextEncoding.TEXT_ENCODING_FIELD_SIZE));
+        objectList.add(new PartOfSet(DataTypes.OBJ_TEXT, this));
     }
 }

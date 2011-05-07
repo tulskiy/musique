@@ -10,10 +10,8 @@ public enum SupportedFileFormat {
     MP4("mp4"),
     M4A("m4a"),
     M4P("m4p"),
-    WMA("wma"),
     WAV("wav"),
-    RA("ra"),
-    RM("rm");
+    M4B("m4b");
 
     private String filesuffix;
 

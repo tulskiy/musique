@@ -33,18 +33,16 @@ public enum MusicalKey {
 
     private static final int MAX_KEY_LENGTH = 3;
 
-    private static EnumSet<MusicalKey> groundKey;
-    private static EnumSet<MusicalKey> halfKey;
     private final static HashMap<String, MusicalKey> groundKeyMap;
     private final static HashMap<String, MusicalKey> halfKeyMap;
 
     static {
-        groundKey = EnumSet.of(NOTE_A, NOTE_B, NOTE_C, NOTE_D, NOTE_E, NOTE_F, NOTE_G);
+        EnumSet<MusicalKey> groundKey = EnumSet.of(NOTE_A, NOTE_B, NOTE_C, NOTE_D, NOTE_E, NOTE_F, NOTE_G);
         groundKeyMap = new HashMap<String, MusicalKey>(MusicalKey.values().length);
         for (MusicalKey curr : groundKey) {
             groundKeyMap.put(curr.getValue(), curr);
         }
-        halfKey = EnumSet.of(FLAT, SHARP, MINOR);
+        EnumSet<MusicalKey> halfKey = EnumSet.of(FLAT, SHARP, MINOR);
         halfKeyMap = new HashMap<String, MusicalKey>(MusicalKey.values().length);
         for (MusicalKey curr : halfKey) {
             halfKeyMap.put(curr.getValue(), curr);
@@ -55,6 +53,7 @@ public enum MusicalKey {
         if (musicalKey == null || musicalKey.length() > MAX_KEY_LENGTH || musicalKey.length() == 0) {
             return false;
         }
+
 
         if (musicalKey.length() == 1) {
             if (musicalKey.equals(OFF_KEY.getValue())) {

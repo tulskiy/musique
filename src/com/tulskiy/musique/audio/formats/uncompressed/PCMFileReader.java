@@ -23,7 +23,7 @@ import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 
-import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Decoder;
@@ -43,7 +43,7 @@ public class PCMFileReader extends AudioFileReader {
         File file = trackData.getFile();
 
         String title = Util.removeExt(file.getName());
-        trackData.setTagFieldValues(TagFieldKey.TITLE, title);
+        trackData.setTagFieldValues(FieldKey.TITLE, title);
         try {
             AudioFileFormat format = AudioSystem.getAudioFileFormat(file);
             trackData.setStartPosition(0);

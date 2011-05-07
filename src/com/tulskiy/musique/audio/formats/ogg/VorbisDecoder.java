@@ -26,7 +26,7 @@ import com.tulskiy.musique.playlist.TrackData;
 
 import javax.sound.sampled.AudioFormat;
 
-import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.FieldKey;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class VorbisDecoder implements Decoder {
 //                    String key = strings[0].toLowerCase();
                     String value = strings[1];
 
-                    track.getTrackData().addTagFieldValues(TagFieldKey.valueOf(key), value);
+                    track.getTrackData().addTagFieldValues(FieldKey.valueOf(key), value);
                 }
             }
         } catch (Exception e) {

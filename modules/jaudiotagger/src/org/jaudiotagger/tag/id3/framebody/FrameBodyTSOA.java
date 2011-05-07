@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyTSOA.java,v 1.12 2008/07/21 10:45:45 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyTSOA.java 832 2009-11-12 13:25:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -54,6 +54,8 @@ public class FrameBodyTSOA extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTSOA datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTSOA(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {

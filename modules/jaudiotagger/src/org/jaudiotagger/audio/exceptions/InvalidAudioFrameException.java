@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: InvalidAudioFrameException.java,v 1.1 2007/08/07 16:09:42 paultaylor Exp $
+ * Version @version:$Id: InvalidAudioFrameException.java 345 2007-08-07 16:14:03Z paultaylor $
  * Date :${DATE}
  * <p/>
  * Jaikoz Copyright Copyright (C) 2003 -2005 JThink Ltd

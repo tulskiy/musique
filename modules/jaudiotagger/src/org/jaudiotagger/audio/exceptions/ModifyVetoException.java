@@ -40,6 +40,7 @@ public class ModifyVetoException extends Exception {
     /**
      * (overridden)
      *
+     * @param message
      * @see Exception#Exception(java.lang.String)
      */
     public ModifyVetoException(String message) {
@@ -49,7 +50,9 @@ public class ModifyVetoException extends Exception {
     /**
      * (overridden)
      *
-     * @see Exception#Exception(java.lang.String,java.lang.Throwable)
+     * @param message
+     * @param cause
+     * @see Exception#Exception(java.lang.String, java.lang.Throwable)
      */
     public ModifyVetoException(String message, Throwable cause) {
         super(message, cause);
@@ -58,6 +61,7 @@ public class ModifyVetoException extends Exception {
     /**
      * (overridden)
      *
+     * @param cause
      * @see Exception#Exception(java.lang.Throwable)
      */
     public ModifyVetoException(Throwable cause) {

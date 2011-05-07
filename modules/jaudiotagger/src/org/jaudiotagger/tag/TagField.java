@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -25,7 +25,7 @@ import java.io.UnsupportedEncodingException;
  * Very basic functionality is defined for use with
  * {@link org.jaudiotagger.tag.Tag}.
  *
- * @author Raphael Slinckx
+ * @author Rapha�l Slinckx
  */
 public interface TagField {
 

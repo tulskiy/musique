@@ -13,7 +13,6 @@
  *  you can get a copy from http://www.opensource.org/licenses/lgpl-license.php or write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 package org.jaudiotagger.tag.id3.framebody;
 
 import org.jaudiotagger.tag.InvalidTagException;
@@ -33,9 +32,11 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyTIME.java,v 1.13 2008/07/21 10:45:44 paultaylor Exp $
+ * @version $Id: FrameBodyTIME.java 932 2010-11-26 13:13:15Z paultaylor $
  */
 public class FrameBodyTIME extends AbstractFrameBodyTextInfo implements ID3v23FrameBody {
+    private boolean hoursOnly;
+
     /**
      * Creates a new FrameBodyTIME datatype.
      */
@@ -59,6 +60,8 @@ public class FrameBodyTIME extends AbstractFrameBodyTextInfo implements ID3v23Fr
     /**
      * Creates a new FrameBodyTIME datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTIME(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {
@@ -72,5 +75,13 @@ public class FrameBodyTIME extends AbstractFrameBodyTextInfo implements ID3v23Fr
      */
     public String getIdentifier() {
         return ID3v23Frames.FRAME_ID_V3_TIME;
+    }
+
+    public boolean isHoursOnly() {
+        return hoursOnly;
+    }
+
+    public void setHoursOnly(boolean hoursOnly) {
+        this.hoursOnly = hoursOnly;
     }
 }

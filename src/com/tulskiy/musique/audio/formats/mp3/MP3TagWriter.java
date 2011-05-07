@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -25,15 +25,16 @@ import java.util.Map.Entry;
 
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.FieldDataInvalidException;
+import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.TagFieldKey;
 import org.jaudiotagger.tag.id3.ID3v11Tag;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.AudioTagWriter;
+import com.tulskiy.musique.audio.TagWriteException;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
@@ -47,7 +48,7 @@ public class MP3TagWriter extends AudioTagWriter {
     private APETagProcessor apeTagProcessor = new APETagProcessor();
 
     @Override
-    public void write(Track track) {
+	public void write(Track track) throws TagWriteException {
     	TrackData trackData = track.getTrackData();
         File file = trackData.getFile();
         TextEncoding.getInstanceOf().setDefaultNonUnicode(AudioFileReader.getDefaultCharset().name());
@@ -75,7 +76,7 @@ public class MP3TagWriter extends AudioTagWriter {
 
                 mp3File.commit();
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new TagWriteException(e);
             }
         }
     }
@@ -91,24 +92,24 @@ public class MP3TagWriter extends AudioTagWriter {
     	String value;
     	boolean firstValue;
 
-    	Iterator<Entry<TagFieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
+    	Iterator<Entry<FieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
 		while (entries.hasNext()) {
-			Entry<TagFieldKey, Set<String>> entry = entries.next();
+			Entry<FieldKey, Set<String>> entry = entries.next();
 			Iterator<String> values = entry.getValue().iterator();
 			firstValue = true;
 			while (values.hasNext()) {
 				value = values.next();
 				if (Util.isEmpty(value)) {
-					tag.deleteTagField(entry.getKey());
+					tag.deleteField(entry.getKey());
 				}
 				else {
-					field = tag.createTagField(entry.getKey(), value);
+					field = tag.createField(entry.getKey(), value);
 					if (firstValue) {
-						tag.set(field);
+						tag.setField(field);
 						firstValue = false;
 					}
 					else {
-						tag.add(field);
+						tag.addField(field);
 					}
 				}
 			}

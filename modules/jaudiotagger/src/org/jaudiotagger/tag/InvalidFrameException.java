@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: InvalidFrameException.java,v 1.5 2008/01/01 15:14:25 paultaylor Exp $
+ *  Version @version:$Id: InvalidFrameException.java 520 2008-01-01 15:16:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -25,7 +25,7 @@ package org.jaudiotagger.tag;
  * Thrown if frame cannot be read correctly.
  *
  * @author Eric Farng
- * @version $Revision: 1.5 $
+ * @version $Revision: 520 $
  */
 public class InvalidFrameException extends InvalidTagException {
     /**

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: StringFixedLength.java,v 1.14 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: StringFixedLength.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -34,6 +34,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 
+
 /**
  * Represents a fixed length String, whereby the length of the String is known. The String
  * will be encoded based upon the text encoding of the frame that it belongs to.
@@ -43,6 +44,7 @@ public class StringFixedLength extends AbstractString {
      * Creates a new ObjectStringFixedsize datatype.
      *
      * @param identifier
+     * @param frameBody
      * @param size
      * @throws IllegalArgumentException
      */
@@ -64,14 +66,11 @@ public class StringFixedLength extends AbstractString {
      * @return if obj is equivalent to this
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof StringFixedLength) == false) {
+        if (!(obj instanceof StringFixedLength)) {
             return false;
         }
         StringFixedLength object = (StringFixedLength) obj;
-        if (this.size != object.size) {
-            return false;
-        }
-        return super.equals(obj);
+        return this.size == object.size && super.equals(obj);
     }
 
     /**
@@ -88,7 +87,8 @@ public class StringFixedLength extends AbstractString {
 
             //Decode buffer if runs into problems should through exception which we
             //catch and then set value to empty string.
-            //logger.finest("Array length is:" + arr.length + "offset is:" + offset + "Size is:" + size);
+//            logger.finest("Array length is:" + arr.length + "offset is:" + offset + "Size is:" + size);
+
 
             if (arr.length - offset < size) {
                 throw new InvalidDataTypeException("byte array is to small to retrieve string of declared length:" + size);
@@ -98,9 +98,8 @@ public class StringFixedLength extends AbstractString {
                 throw new NullPointerException("String is null");
             }
             value = str;
-        }
-        catch (CharacterCodingException ce) {
-            //logger.severe(ce.getMessage());
+        } catch (CharacterCodingException ce) {
+            logger.severe(ce.getMessage());
             value = "";
         }
         //logger.info("Read StringFixedLength:" + value);
@@ -116,7 +115,7 @@ public class StringFixedLength extends AbstractString {
      * @return the byte array to be written to the file
      */
     public byte[] writeByteArray() {
-        ByteBuffer dataBuffer = null;
+        ByteBuffer dataBuffer;
         byte[] data;
 
         //Create with a series of empty of spaces to try and ensure integrity of field
@@ -140,8 +139,7 @@ public class StringFixedLength extends AbstractString {
                 CharsetEncoder encoder = Charset.forName(charSetName).newEncoder();
                 dataBuffer = encoder.encode(CharBuffer.wrap((String) value));
             }
-        }
-        catch (CharacterCodingException ce) {
+        } catch (CharacterCodingException ce) {
             //logger.warning("There was a problem writing the following StringFixedlength Field:" + value + ":" + ce.getMessage() + "using default value instead");
             data = new byte[size];
             for (int i = 0; i < size; i++) {
@@ -194,7 +192,7 @@ public class StringFixedLength extends AbstractString {
     protected String getTextEncodingCharSet() {
         byte textEncoding = this.getBody().getTextEncoding();
         String charSetName = TextEncoding.getInstanceOf().getValueForId(textEncoding);
-        //logger.finest("text encoding:" + textEncoding + " charset:" + charSetName);
+//        logger.finest("text encoding:" + textEncoding + " charset:" + charSetName);
         return charSetName;
     }
 }

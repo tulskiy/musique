@@ -38,8 +38,7 @@ public class Mp4FtypBox extends AbstractMp4Box {
         CharsetDecoder decoder = Charset.forName("ISO-8859-1").newDecoder();
         try {
             majorBrand = decoder.decode((ByteBuffer) dataBuffer.slice().limit(MAJOR_BRAND_LENGTH)).toString();
-        }
-        catch (CharacterCodingException cee) {
+        } catch (CharacterCodingException cee) {
             //Ignore
 
         }
@@ -57,13 +56,13 @@ public class Mp4FtypBox extends AbstractMp4Box {
                 if (!brand.equals("\u0000\u0000\u0000\u0000")) {
                     compatibleBrands.add(brand);
                 }
-            }
-            catch (CharacterCodingException cee) {
+            } catch (CharacterCodingException cee) {
                 //Ignore    
             }
             dataBuffer.position(dataBuffer.position() + COMPATIBLE_BRAND_LENGTH);
         }
     }
+
 
     public String toString() {
 
@@ -83,9 +82,11 @@ public class Mp4FtypBox extends AbstractMp4Box {
         return majorBrand;
     }
 
+
     public int getMajorBrandVersion() {
         return majorBrandVersion;
     }
+
 
     public List<String> getCompatibleBrands() {
         return compatibleBrands;

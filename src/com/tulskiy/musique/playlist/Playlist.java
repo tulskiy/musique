@@ -32,7 +32,7 @@ import java.text.MessageFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
-import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.FieldKey;
 
 /**
  * @Author: Denis Tulskiy
@@ -110,7 +110,7 @@ public class Playlist extends ArrayList<Track> {
                 meta.clear();
                 // TODO use CODEC const
                 meta.put("codec", trackData.getCodec());
-                for (TagFieldKey key : TagFieldKey.values()) {
+                for (FieldKey key : FieldKey.values()) {
                     List<String> values = trackData.getTagFieldValuesSafeAsList(key);
                     for (String value : values) {
                     	meta.put(key.toString(), value);
@@ -184,7 +184,7 @@ public class Playlist extends ArrayList<Track> {
                         trackData.setCodec(value);
                     }
                 	else {
-                        trackData.addTagFieldValues(TagFieldKey.valueOf(key), value);
+                        trackData.addTagFieldValues(FieldKey.valueOf(key), value);
                     }
                 }
 

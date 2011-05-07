@@ -37,12 +37,12 @@ public interface AudioHeader {
     public String getFormat();
 
     /**
-     * @return the Channel Mode such as Stero or Mono
+     * @return the Channel Mode such as Stereo or Mono
      */
     public String getChannels();
 
     /**
-     * @return if the bitrate is variable
+     * @return if the bitRate is variable
      */
     public boolean isVariableBitRate();
 

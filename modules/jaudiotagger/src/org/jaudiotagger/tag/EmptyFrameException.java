@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: EmptyFrameException.java,v 1.4 2008/01/01 15:14:25 paultaylor Exp $
+ *  Version @version:$Id: EmptyFrameException.java 520 2008-01-01 15:16:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -24,7 +24,7 @@ package org.jaudiotagger.tag;
 /**
  * Thrown when find a Frame but it contains no data.
  *
- * @version $Revision: 1.4 $
+ * @version $Revision: 520 $
  */
 public class EmptyFrameException extends InvalidFrameException {
     /**

@@ -1,6 +1,6 @@
 /*
  * Entagged Audio Tag library
- * Copyright (c) 2003-2005 Raphael Slinckx <raphael@slinckx.net>
+ * Copyright (c) 2003-2005 Raphaël Slinckx <raphael@slinckx.net>
  * 
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -72,7 +72,7 @@ public class Mp4TagBinaryField extends Mp4TagField {
     public Mp4FieldType getFieldType() {
         //TODO dont know what value this should be do we actually have any binary fields other
         //than cover art
-        return Mp4FieldType.NUMERIC;
+        return Mp4FieldType.IMPLICIT;
     }
 
     /**
@@ -125,7 +125,7 @@ public class Mp4TagBinaryField extends Mp4TagField {
     public void copyContent(TagField field) {
         if (field instanceof Mp4TagBinaryField) {
             this.dataBytes = ((Mp4TagBinaryField) field).getData();
-            this.isBinary = ((Mp4TagBinaryField) field).isBinary();
+            this.isBinary = field.isBinary();
         }
     }
 }

@@ -1,7 +1,7 @@
 /**
  *  @author : Paul Taylor
  *
- *  Version @version:$Id: XMLTagDisplayFormatter.java,v 1.9 2008/07/21 10:46:14 paultaylor Exp $
+ *  Version @version:$Id: XMLTagDisplayFormatter.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -40,6 +40,7 @@ public class XMLTagDisplayFormatter extends AbstractTagDisplayFormatter {
     protected static final String xmlCDataTagOpen = "<![CDATA[";
     protected static final String xmlCDataTagClose = "]]>";
 
+
     StringBuffer sb = new StringBuffer();
 
     public XMLTagDisplayFormatter() {
@@ -48,6 +49,9 @@ public class XMLTagDisplayFormatter extends AbstractTagDisplayFormatter {
 
     /**
      * Return xml open tag round a string e.g <tag>
+     *
+     * @param xmlName
+     * @return
      */
     public static String xmlOpen(String xmlName) {
         return xmlOpenStart + xmlName + xmlOpenEnd;
@@ -57,19 +61,23 @@ public class XMLTagDisplayFormatter extends AbstractTagDisplayFormatter {
         return (xmlOpen(name + " id=\"" + data + "\""));
     }
 
+
     /**
      * Return CDATA tag around xml data e.g <![CDATA[xmlData]]>
      * We also need to deal with special chars
+     *
+     * @param xmlData
+     * @return
      */
     public static String xmlCData(String xmlData) {
         char tempChar;
         StringBuffer replacedString = new StringBuffer();
         for (int i = 0; i < xmlData.length(); i++) {
             tempChar = xmlData.charAt(i);
-            if ((Character.isLetterOrDigit(tempChar) == true) || (Character.isSpaceChar(tempChar) == true)) {
+            if ((Character.isLetterOrDigit(tempChar)) || (Character.isSpaceChar(tempChar))) {
                 replacedString.append(tempChar);
             } else {
-                replacedString.append("#x" + Character.digit(tempChar, 16));
+                replacedString.append("#x").append(Character.digit(tempChar, 16));
             }
         }
         return xmlCDataTagOpen + replacedString + xmlCDataTagClose;
@@ -77,6 +85,9 @@ public class XMLTagDisplayFormatter extends AbstractTagDisplayFormatter {
 
     /**
      * Return xml close tag around a string e.g </tag>
+     *
+     * @param xmlName
+     * @return
      */
     public static String xmlClose(String xmlName) {
         return xmlCloseStart + xmlName + xmlCloseEnd;
@@ -89,6 +100,7 @@ public class XMLTagDisplayFormatter extends AbstractTagDisplayFormatter {
     public static String xmlFullTag(String xmlName, String data) {
         return xmlOpen(xmlName) + xmlCData(data) + xmlClose(xmlName);
     }
+
 
     public void openHeadingElement(String type, String value) {
         if (value.length() == 0) {
@@ -126,9 +138,13 @@ public class XMLTagDisplayFormatter extends AbstractTagDisplayFormatter {
         return sb.toString();
     }
 
+
     /**
      * Replace any special xml characters with the appropiate escape sequences
      * required to be done for the actual element names
+     *
+     * @param xmlData
+     * @return
      */
     public static String replaceXMLCharacters(String xmlData) {
         StringBuffer sb = new StringBuffer();
@@ -150,6 +166,7 @@ public class XMLTagDisplayFormatter extends AbstractTagDisplayFormatter {
                 case '\'':
                     sb.append("&apos;");
                     break;
+
 
                 default:
                     sb.append(c);

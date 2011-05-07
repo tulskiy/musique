@@ -21,6 +21,7 @@ package org.jaudiotagger.audio.flac.metadatablock;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.util.logging.Logger;
 
 /**
  * Stream Info
@@ -46,26 +47,20 @@ import java.nio.ByteBuffer;
  * NOTES
  * * FLAC specifies a minimum block size of 16 and a maximum block size of 65535, meaning the bit patterns corresponding to the numbers 0-15 in the minimum blocksize and maximum blocksize fields are invalid.
  */
-public class MetadataBlockDataStreamInfo {
+public class MetadataBlockDataStreamInfo implements MetadataBlockData {
     public static final int STREAM_INFO_DATA_LENGTH = 34;
 
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.flac.MetadataBlockDataStreamInfo");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.flac.MetadataBlockDataStreamInfo");
 
-    private int minBlockSize;
-    private int maxBlockSize;
-    private int minFrameSize;
-    private int maxFrameSize;
-    private int samplingRate;
-    private int samplingRatePerChannel;
-    private int bitsPerSample;
-    private int channelNumber;
-    private long totalNumberOfSamples;
-    private double length;
+    private int minBlockSize, maxBlockSize, minFrameSize, maxFrameSize, samplingRate, samplingRatePerChannel, bitsPerSample, channelNumber, totalNumberOfSamples;
+    private double songLength;
     private boolean isValid = true;
 
+    private ByteBuffer rawdata;
+
     public MetadataBlockDataStreamInfo(MetadataBlockHeader header, RandomAccessFile raf) throws IOException {
-        ByteBuffer rawdata = ByteBuffer.allocate(header.getDataLength());
+        rawdata = ByteBuffer.allocate(header.getDataLength());
         int bytesRead = raf.getChannel().read(rawdata);
         if (bytesRead < header.getDataLength()) {
             throw new IOException("Unable to read required number of databytes read:" + bytesRead + ":required:" + header.getDataLength());
@@ -83,7 +78,8 @@ public class MetadataBlockDataStreamInfo {
         bitsPerSample = ((u(rawdata.get(12)) & 0x01) << 4) + ((u(rawdata.get(13)) & 0xF0) >>> 4) + 1;
 
         totalNumberOfSamples = readTotalNumberOfSamples(rawdata.get(13), rawdata.get(14), rawdata.get(15), rawdata.get(16), rawdata.get(17));
-        length = ((double) totalNumberOfSamples / samplingRate);
+
+        songLength = ((double) totalNumberOfSamples / samplingRate);
 //        //logger.info(this.toString());
     }
 
@@ -91,18 +87,30 @@ public class MetadataBlockDataStreamInfo {
         return totalNumberOfSamples;
     }
 
-    public String toString() {
-
-        return "MinBlockSize:" + minBlockSize + "MaxBlockSize:" + maxBlockSize + "MinFrameSize:" + minFrameSize + "MaxFrameSize:" + maxFrameSize + "SampleRateTotal:" + samplingRate + "SampleRatePerChannel:" + samplingRatePerChannel + ":Channel number:" + channelNumber + ":Bits per sample: " + bitsPerSample + ":TotalNumberOfSamples: " + totalNumberOfSamples + ":Length: " + length;
-
+    /**
+     * @return the rawdata as it will be written to file
+     */
+    public byte[] getBytes() {
+        return rawdata.array();
     }
 
     public int getLength() {
-        return (int) length;
+        return getBytes().length;
+    }
+
+
+    public String toString() {
+
+        return "MinBlockSize:" + minBlockSize + "MaxBlockSize:" + maxBlockSize + "MinFrameSize:" + minFrameSize + "MaxFrameSize:" + maxFrameSize + "SampleRateTotal:" + samplingRate + "SampleRatePerChannel:" + samplingRatePerChannel + ":Channel number:" + channelNumber + ":Bits per sample: " + bitsPerSample + ":TotalNumberOfSamples: " + totalNumberOfSamples + ":Length: " + songLength;
+
+    }
+
+    public int getSongLength() {
+        return (int) songLength;
     }
 
     public double getPreciseLength() {
-        return length;
+        return songLength;
     }
 
     public int getChannelNumber() {
@@ -132,15 +140,14 @@ public class MetadataBlockDataStreamInfo {
 
     //TODO this code seems to be give a sampling rate over 21 bytes instead of 20 bytes but attempt to change
     //to 21 bytes give wrong value
-
     private int readSamplingRate(byte b1, byte b2, byte b3) {
         int rate = (u(b1) << 12) + (u(b2) << 4) + ((u(b3) & 0xF0) >>> 4);
         return rate;
 
     }
 
-    private long readTotalNumberOfSamples(byte b1, byte b2, byte b3, byte b4, byte b5) {
-        long nb = u(b5);
+    private int readTotalNumberOfSamples(byte b1, byte b2, byte b3, byte b4, byte b5) {
+        int nb = u(b5);
         nb += u(b4) << 8;
         nb += u(b3) << 16;
         nb += u(b2) << 24;

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: ByteArraySizeTerminated.java,v 1.8 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: ByteArraySizeTerminated.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -55,11 +55,8 @@ public class ByteArraySizeTerminated extends AbstractDataType {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof ByteArraySizeTerminated == false) {
-            return false;
-        }
+        return obj instanceof ByteArraySizeTerminated && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**

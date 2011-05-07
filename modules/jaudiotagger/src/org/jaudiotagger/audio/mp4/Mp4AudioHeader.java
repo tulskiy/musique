@@ -21,6 +21,7 @@ public class Mp4AudioHeader extends GenericAudioHeader {
      */
     public final static String FIELD_PROFILE = "PROFILE";
 
+
     /**
      * The key for the ftyp brand<br>
      *
@@ -62,11 +63,13 @@ public class Mp4AudioHeader extends GenericAudioHeader {
         content.put(FIELD_BRAND, brand);
     }
 
+
     /**
      * @return brand
      */
     public String getBrand() {
         return (String) content.get(FIELD_BRAND);
     }
+
 
 }

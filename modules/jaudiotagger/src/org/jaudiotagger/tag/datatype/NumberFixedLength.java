@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: NumberFixedLength.java,v 1.12 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: NumberFixedLength.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -27,6 +27,7 @@ import org.jaudiotagger.tag.InvalidDataTypeException;
 import org.jaudiotagger.tag.id3.AbstractTagFrameBody;
 import org.jaudiotagger.tag.id3.ID3Tags;
 
+
 /**
  * Represents a number held as a fixed number of digits.
  * <p/>
@@ -40,6 +41,7 @@ public class NumberFixedLength extends AbstractDataType {
      * Creates a new ObjectNumberFixedLength datatype.
      *
      * @param identifier
+     * @param frameBody
      * @param size       the number of significant places that the number is held to
      * @throws IllegalArgumentException
      */
@@ -56,6 +58,7 @@ public class NumberFixedLength extends AbstractDataType {
         super(copy);
         this.size = copy.size;
     }
+
 
     /**
      * Set Size in Bytes of this Object
@@ -84,19 +87,17 @@ public class NumberFixedLength extends AbstractDataType {
         super.setValue(value);
     }
 
+
     /**
      * @param obj
      * @return true if obj equivalent to this
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof NumberFixedLength) == false) {
+        if (!(obj instanceof NumberFixedLength)) {
             return false;
         }
         NumberFixedLength object = (NumberFixedLength) obj;
-        if (this.size != object.size) {
-            return false;
-        }
-        return super.equals(obj);
+        return this.size == object.size && super.equals(obj);
     }
 
     /**
@@ -114,6 +115,12 @@ public class NumberFixedLength extends AbstractDataType {
         if ((offset < 0) || (offset >= arr.length)) {
             throw new InvalidDataTypeException("Offset to byte array is out of bounds: offset = " + offset + ", array.length = " + arr.length);
         }
+
+        if (offset + size > arr.length) {
+            throw new InvalidDataTypeException("Offset plus size to byte array is out of bounds: offset = "
+                    + offset + ", size = " + size + " + arr.length " + arr.length);
+        }
+
         long lvalue = 0;
         for (int i = offset; i < (offset + size); i++) {
             lvalue <<= 8;
@@ -122,6 +129,7 @@ public class NumberFixedLength extends AbstractDataType {
         value = lvalue;
         //logger.info("Read NumberFixedlength:" + value);
     }
+
 
     /**
      * @return String representation of this datatype

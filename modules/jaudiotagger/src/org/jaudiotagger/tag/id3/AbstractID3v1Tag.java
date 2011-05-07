@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractID3v1Tag.java,v 1.17 2008/12/10 13:14:27 paultaylor Exp $
+ *  Version @version:$Id: AbstractID3v1Tag.java 928 2010-10-27 13:24:43Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -27,7 +27,10 @@ package org.jaudiotagger.tag.id3;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
+import java.util.Arrays;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 /**
@@ -39,7 +42,8 @@ import java.util.regex.Pattern;
 abstract public class AbstractID3v1Tag extends AbstractID3Tag {
 
     //Logger
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.tag.id3");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.tag.id3");
+
 
     public AbstractID3v1Tag() {
     }
@@ -52,7 +56,7 @@ abstract public class AbstractID3v1Tag extends AbstractID3Tag {
     protected static final byte END_OF_FIELD = (byte) 0;
 
     //Used to detect end of field in String constructed from Data
-    protected Pattern endofStringPattern = Pattern.compile("\\x00");
+    protected static Pattern endofStringPattern = Pattern.compile("\\x00");
 
     //Tag ID as held in file
     protected static final byte[] TAG_ID = {(byte) 'T', (byte) 'A', (byte) 'G'};
@@ -92,6 +96,18 @@ abstract public class AbstractID3v1Tag extends AbstractID3Tag {
     }
 
     /**
+     * Does a v1tag or a v11tag exist
+     *
+     * @return whether tag exists within the byteBuffer
+     */
+    public static boolean seekForV1OrV11Tag(ByteBuffer byteBuffer) {
+        byte[] buffer = new byte[FIELD_TAGID_LENGTH];
+        // read the TAG value
+        byteBuffer.get(buffer, 0, FIELD_TAGID_LENGTH);
+        return (Arrays.equals(buffer, TAG_ID));
+    }
+
+    /**
      * Delete tag from file
      * Looks for tag and if found lops it off the file.
      *
@@ -100,22 +116,26 @@ abstract public class AbstractID3v1Tag extends AbstractID3Tag {
      */
     public void delete(RandomAccessFile file) throws IOException {
         //Read into Byte Buffer
-//        //logger.info("Deleting ID3v1 from file if exists");
+        //logger.info("Deleting ID3v1 from file if exists");
 
         FileChannel fc;
         ByteBuffer byteBuffer;
-
         fc = file.getChannel();
+
+        if (file.length() < TAG_LENGTH) {
+            throw new IOException("File not not appear large enough to contain a tag");
+        }
         fc.position(file.length() - TAG_LENGTH);
         byteBuffer = ByteBuffer.allocate(TAG_LENGTH);
         fc.read(byteBuffer);
         byteBuffer.rewind();
-        if (seek(byteBuffer)) {
-//            //logger.info("Deleted ID3v1 tag ");
+        if (AbstractID3v1Tag.seekForV1OrV11Tag(byteBuffer)) {
+            logger.config("Deleted ID3v1 tag");
             file.setLength(file.length() - TAG_LENGTH);
         } else {
-//            //logger.info("Unable to find ID3v1 tag to delete");
+            logger.config("Unable to find ID3v1 tag to deleteField");
         }
     }
+
 
 }

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: InvalidFrameIdentifierException.java,v 1.2 2008/01/01 15:14:25 paultaylor Exp $
+ *  Version @version:$Id: InvalidFrameIdentifierException.java 520 2008-01-01 15:16:38Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -25,7 +25,7 @@ package org.jaudiotagger.tag;
  * Thrown if a frame identifier isn't valid.
  *
  * @author Eric Farng
- * @version $Revision: 1.2 $
+ * @version $Revision: 520 $
  */
 public class InvalidFrameIdentifierException extends InvalidFrameException {
     /**

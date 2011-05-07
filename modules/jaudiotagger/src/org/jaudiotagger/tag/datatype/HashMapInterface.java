@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: HashMapInterface.java,v 1.8 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: HashMapInterface.java 625 2008-07-21 10:49:58Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *

@@ -19,6 +19,7 @@ public class TextEncodedStringNullTerminated extends AbstractString {
      * Creates a new TextEncodedStringNullTerminated datatype.
      *
      * @param identifier identifies the frame type
+     * @param frameBody
      */
     public TextEncodedStringNullTerminated(String identifier, AbstractTagFrameBody frameBody) {
         super(identifier, frameBody);
@@ -40,10 +41,7 @@ public class TextEncodedStringNullTerminated extends AbstractString {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof TextEncodedStringNullTerminated == false) {
-            return false;
-        }
-        return super.equals(obj);
+        return obj instanceof TextEncodedStringNullTerminated && super.equals(obj);
     }
 
     /**
@@ -57,10 +55,13 @@ public class TextEncodedStringNullTerminated extends AbstractString {
      * @param offset this is where to start reading in the buffer for this field
      */
     public void readByteArray(byte[] arr, int offset) throws InvalidDataTypeException {
-        int bufferSize = 0;
-
+        if (offset >= arr.length) {
+            throw new InvalidDataTypeException("Unable to find null terminated string");
+        }
+        int bufferSize;
+//
         //logger.finer("Reading from array starting from offset:" + offset);
-        int size = 0;
+        int size;
 
         //Get the Specified Decoder
         String charSetName = getTextEncodingCharSet();
@@ -84,7 +85,7 @@ public class TextEncodedStringNullTerminated extends AbstractString {
                     buffer.mark();
                     buffer.reset();
                     endPosition = buffer.position() - 1;
-                    //logger.finest("Null terminator found starting at:" + endPosition);
+//                    logger.finest("Null terminator found starting at:" + endPosition);
 
                     isNullTerminatorFound = true;
                     break;
@@ -96,7 +97,7 @@ public class TextEncodedStringNullTerminated extends AbstractString {
                             buffer.mark();
                             buffer.reset();
                             endPosition = buffer.position() - 2;
-                            //logger.finest("UTF16:Null terminator found starting  at:" + endPosition);
+//                            logger.finest("UTF16:Null terminator found starting  at:" + endPosition);
                             isNullTerminatorFound = true;
                             break;
                         } else {
@@ -123,9 +124,10 @@ public class TextEncodedStringNullTerminated extends AbstractString {
             }
         }
 
-        if (isNullTerminatorFound == false) {
+        if (!isNullTerminatorFound) {
             throw new InvalidDataTypeException("Unable to find null terminated string");
         }
+//
 
         //logger.finest("End Position is:" + endPosition + "Offset:" + offset);
 
@@ -141,7 +143,7 @@ public class TextEncodedStringNullTerminated extends AbstractString {
         //catch and then set value to empty string. (We don't read the null terminator
         //because we dont want to display this)
         bufferSize = endPosition - offset;
-        //logger.finest("Text size is:" + bufferSize);
+//        logger.finest("Text size is:" + bufferSize);
         if (bufferSize == 0) {
             value = "";
         } else {
@@ -168,7 +170,7 @@ public class TextEncodedStringNullTerminated extends AbstractString {
      */
     public byte[] writeByteArray() {
         //logger.info("Writing NullTerminatedString." + value);
-        byte[] data = null;
+        byte[] data;
         //Write to buffer using the CharSet defined by getTextEncodingCharSet()
         //Add a null terminator which will be encoded based on encoding.
         try {
@@ -176,7 +178,7 @@ public class TextEncodedStringNullTerminated extends AbstractString {
             if (charSetName.equals(TextEncoding.CHARSET_UTF_16)) {
                 charSetName = TextEncoding.CHARSET_UTF_16_ENCODING_FORMAT;
                 CharsetEncoder encoder = Charset.forName(charSetName).newEncoder();
-                //Note remember LE BOM is ff fe but tis is handled by encoder Unicode char is fe ff
+                //Note remember LE BOM is ff fe but this is handled by encoder Unicode char is fe ff
                 ByteBuffer bb = encoder.encode(CharBuffer.wrap('\ufeff' + (String) value + '\0'));
                 data = new byte[bb.limit()];
                 bb.get(data, 0, bb.limit());
@@ -189,7 +191,7 @@ public class TextEncodedStringNullTerminated extends AbstractString {
         }
         //Should never happen so if does throw a RuntimeException
         catch (CharacterCodingException ce) {
-            //logger.severe(ce.getMessage());
+            logger.severe(ce.getMessage());
             throw new RuntimeException(ce);
         }
         setSize(data.length);

@@ -25,7 +25,7 @@ import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.FieldKey;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,10 +80,10 @@ public abstract class AudioFileReader {
     protected void copyCommonTagFields(Tag tag, Track track) throws IOException {
     	TrackData trackData = track.getTrackData();
         if (tag != null && track != null) {
-    		for (TagFieldKey key : TagFieldKey.values()) {
+    		for (FieldKey key : FieldKey.values()) {
     			List<TagField> fields;
     			try {
-    				fields = tag.get(key);
+    				fields = tag.getFields(key);
     			}
     			catch (KeyNotFoundException knfe) {
     				// TODO review

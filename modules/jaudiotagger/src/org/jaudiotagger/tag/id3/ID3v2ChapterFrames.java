@@ -10,7 +10,7 @@
  * See the GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License along with this library; if not,
- * you can get a copy from http://www.opensource.org/licenses/lgpl-license.php or write to the Free Software
+ * you can getFields a copy from http://www.opensource.org/licenses/lgpl-license.php or write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 package org.jaudiotagger.tag.id3;
@@ -26,7 +26,7 @@ import java.util.TreeSet;
  * </ul>
  *
  * @author Marc Gimpel, Horizon Wimba S.A.
- * @version $Id: ID3v2ChapterFrames.java,v 1.4 2008/05/12 15:42:50 paultaylor Exp $
+ * @version $Id: ID3v2ChapterFrames.java 830 2009-11-12 12:23:47Z paultaylor $
  */
 public class ID3v2ChapterFrames extends ID3Frames {
     public static final String FRAME_ID_CHAPTER = "CHAP";

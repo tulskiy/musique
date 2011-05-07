@@ -30,10 +30,10 @@ import java.io.File;
  * <p>It will be notified on several occasions:<br>
  * <ul>
  * <li>An audio file is about to be modified
- * {@link #fileWillBeModified(AudioFile,boolean)}<br>
+ * {@link #fileWillBeModified(AudioFile, boolean)}<br>
  * Here one can modify the tag data because of global settings.</li>
  * <li>The write process has just finished. But if a copy was created the
- * original has not been replaced yet. ({@link #fileModified(AudioFile,File)}).</li>
+ * original has not been replaced yet. ({@link #fileModified(AudioFile, File)}).</li>
  * <li>The operation has been finished. {@link #fileOperationFinished(File)}</li>
  * </ul>
  *

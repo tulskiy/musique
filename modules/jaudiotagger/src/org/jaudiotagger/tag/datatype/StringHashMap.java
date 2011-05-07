@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: StringHashMap.java,v 1.12 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: StringHashMap.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeSet;
 
+
 /**
  * Represents a String thats acts as a key into an enumeration of values. The String will be encoded
  * using the default encoding regardless of what encoding may be specified in the framebody
@@ -56,6 +57,7 @@ public class StringHashMap extends StringFixedLength implements HashMapInterface
      * Creates a new ObjectStringHashMap datatype.
      *
      * @param identifier
+     * @param frameBody
      * @param size
      * @throws IllegalArgumentException
      */
@@ -97,7 +99,12 @@ public class StringHashMap extends StringFixedLength implements HashMapInterface
      */
     public void setValue(Object value) {
         if (value instanceof String) {
-            this.value = ((String) value).toLowerCase();
+            //Issue #273 temporary hack for MM
+            if (value.equals("XXX")) {
+                this.value = value.toString();
+            } else {
+                this.value = ((String) value).toLowerCase();
+            }
         } else {
             this.value = value;
         }
@@ -108,7 +115,7 @@ public class StringHashMap extends StringFixedLength implements HashMapInterface
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof StringHashMap) == false) {
+        if (!(obj instanceof StringHashMap)) {
             return false;
         }
 
@@ -123,7 +130,7 @@ public class StringHashMap extends StringFixedLength implements HashMapInterface
                 return false;
             }
         } else {
-            if (this.keyToValue.equals(object.keyToValue) == false) {
+            if (!this.keyToValue.equals(object.keyToValue)) {
                 return false;
             }
         }
@@ -133,7 +140,7 @@ public class StringHashMap extends StringFixedLength implements HashMapInterface
                 return false;
             }
         } else {
-            if (this.valueToKey.equals(object.valueToKey) == false) {
+            if (!this.valueToKey.equals(object.valueToKey)) {
                 return false;
             }
         }
@@ -168,7 +175,7 @@ public class StringHashMap extends StringFixedLength implements HashMapInterface
         } else if (keyToValue.get(value) == null) {
             return "";
         } else {
-            return keyToValue.get(value).toString();
+            return keyToValue.get(value);
         }
     }
 

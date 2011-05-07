@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: Lyrics3v2.java,v 1.10 2008/07/21 10:45:49 paultaylor Exp $
+ *  Version @version:$Id: Lyrics3v2.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -58,8 +58,8 @@ public class Lyrics3v2 extends AbstractLyrics3 {
         Lyrics3v2Field newObject;
 
         while (iterator.hasNext()) {
-            oldIdentifier = iterator.next().toString();
-            newIdentifier = new String(oldIdentifier);
+            oldIdentifier = iterator.next();
+            newIdentifier = oldIdentifier;
             newObject = new Lyrics3v2Field(copyObject.fieldMap.get(newIdentifier));
             fieldMap.put(newIdentifier, newObject);
         }
@@ -93,9 +93,8 @@ public class Lyrics3v2 extends AbstractLyrics3 {
                         if (newField != null) {
                             fieldMap.put(newField.getIdentifier(), newField);
                         }
-                    }
-                    catch (TagException ex) {
-                        //invalid frame to create lyrics3 field. ignore and keep going
+                    } catch (TagException ex) {
+                        //invalid frame to createField lyrics3 field. ignore and keep going
                     }
                 }
             }
@@ -106,14 +105,14 @@ public class Lyrics3v2 extends AbstractLyrics3 {
      * Creates a new Lyrics3v2 datatype.
      *
      * @param file
+     * @param byteBuffer
      * @throws TagNotFoundException
      * @throws IOException
      */
     public Lyrics3v2(ByteBuffer byteBuffer) throws TagNotFoundException, IOException {
         try {
             this.read(byteBuffer);
-        }
-        catch (TagException e) {
+        } catch (TagException e) {
             e.printStackTrace();
         }
     }
@@ -166,22 +165,20 @@ public class Lyrics3v2 extends AbstractLyrics3 {
         return 11 + size;
     }
 
+
     /**
      * @param obj
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof Lyrics3v2) == false) {
+        if (!(obj instanceof Lyrics3v2)) {
             return false;
         }
 
         Lyrics3v2 object = (Lyrics3v2) obj;
 
-        if (this.fieldMap.equals(object.fieldMap) == false) {
-            return false;
-        }
+        return this.fieldMap.equals(object.fieldMap) && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**
@@ -199,6 +196,7 @@ public class Lyrics3v2 extends AbstractLyrics3 {
         return fieldMap.values().iterator();
     }
 
+
     /**
      * TODO implement
      *
@@ -209,6 +207,7 @@ public class Lyrics3v2 extends AbstractLyrics3 {
     public boolean seek(ByteBuffer byteBuffer) {
         return false;
     }
+
 
     public void read(ByteBuffer byteBuffer) throws TagException {
         long filePointer;
@@ -233,8 +232,7 @@ public class Lyrics3v2 extends AbstractLyrics3 {
             try {
                 lyric = new Lyrics3v2Field(byteBuffer);
                 setField(lyric);
-            }
-            catch (InvalidTagException ex) {
+            } catch (InvalidTagException ex) {
                 // keep reading until we're done
             }
         }
@@ -254,10 +252,10 @@ public class Lyrics3v2 extends AbstractLyrics3 {
      */
     public boolean seek(RandomAccessFile file) throws IOException {
         byte[] buffer = new byte[11];
-        String lyricEnd = "";
-        String lyricStart = "";
-        long filePointer = 0;
-        long lyricSize = 0;
+        String lyricEnd;
+        String lyricStart;
+        long filePointer;
+        long lyricSize;
 
         // check right before the ID3 1.0 tag for the lyrics tag
         file.seek(file.length() - 128 - 9);
@@ -292,7 +290,7 @@ public class Lyrics3v2 extends AbstractLyrics3 {
         file.read(buffer, 0, 11);
         lyricStart = new String(buffer, 0, 11);
 
-        return lyricStart.equals("LYRICSBEGIN") == true;
+        return lyricStart.equals("LYRICSBEGIN");
     }
 
     /**
@@ -339,7 +337,6 @@ public class Lyrics3v2 extends AbstractLyrics3 {
      */
     public void write(RandomAccessFile file) throws IOException {
         int offset = 0;
-        ;
 
         long size;
         long filePointer;
@@ -348,7 +345,8 @@ public class Lyrics3v2 extends AbstractLyrics3 {
         String str;
         Lyrics3v2Field field;
         Iterator<Lyrics3v2Field> iterator;
-        ID3v1Tag id3v1tag = new ID3v1Tag();
+        ID3v1Tag id3v1tag;
+        new ID3v1Tag();
 
         id3v1tag = null;
 
@@ -365,7 +363,7 @@ public class Lyrics3v2 extends AbstractLyrics3 {
 
         file.write(buffer, 0, str.length());
 
-        // IND needs to go first. lets create/update it and write it first.
+        // IND needs to go first. lets createField/update it and write it first.
         updateField("IND");
         field = fieldMap.get("IND");
         field.write(file);
@@ -378,7 +376,7 @@ public class Lyrics3v2 extends AbstractLyrics3 {
             String id = field.getIdentifier();
             boolean save = TagOptionSingleton.getInstance().getLyrics3SaveField(id);
 
-            if ((id.equals("IND") == false) && save) {
+            if ((!id.equals("IND")) && save) {
                 field.write(file);
             }
         }
@@ -386,9 +384,9 @@ public class Lyrics3v2 extends AbstractLyrics3 {
         size = file.getFilePointer() - filePointer;
 
         if (this.getSize() != size) {
-            ////logger.info("Lyrics3v2 size didn't match up while writing.");
-            ////logger.info("this.getsize()     = " + this.getSize());
-            ////logger.info("size (filePointer) = " + size);
+            //logger.info("Lyrics3v2 size didn't match up while writing.");
+            //logger.info("this.getsize()     = " + this.getSize());
+            //logger.info("size (filePointer) = " + size);
         }
 
         str = Long.toString(size);
@@ -422,6 +420,9 @@ public class Lyrics3v2 extends AbstractLyrics3 {
 
     /**
      * TODO
+     *
+     * @param byteBuffer
+     * @return
      */
     private int seekSize(ByteBuffer byteBuffer) {
         /*

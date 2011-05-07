@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.util.Util;
 
@@ -43,21 +43,15 @@ import com.tulskiy.musique.util.Util;
 public class TrackData implements Cloneable {
 
 	// generic jaudiotagger tag field values
-	private Map<TagFieldKey, Set<String>> tagFields = new HashMap<TagFieldKey, Set<String>>();
+	private Map<FieldKey, Set<String>> tagFields = new HashMap<FieldKey, Set<String>>();
 	
 	// common tag fields (to be displayed in TrackInfoDialog even if missed)
-	private static final TagFieldKey[] COMMON_TAG_FIELDS = {
-			TagFieldKey.ARTIST, TagFieldKey.ALBUM_ARTIST, TagFieldKey.ALBUM,
-			TagFieldKey.YEAR, TagFieldKey.TITLE, TagFieldKey.TRACK, TagFieldKey.DISC_NO,
-			TagFieldKey.RECORD_LABEL, TagFieldKey.CATALOG_NO
+	private static final FieldKey[] COMMON_TAG_FIELDS = {
+			FieldKey.ARTIST, FieldKey.ALBUM_ARTIST, FieldKey.ALBUM,
+			FieldKey.YEAR, FieldKey.TITLE, FieldKey.TRACK, FieldKey.DISC_NO,
+			FieldKey.RECORD_LABEL, FieldKey.CATALOG_NO
 	};
 	
-	// meta fields
-    private String trackNumber;
-    private String totalTracks;
-    private String discNumber;
-    private String totalDiscs;
-
     // song info
     private int sampleRate;
     private int channels;
@@ -74,7 +68,7 @@ public class TrackData implements Cloneable {
 
     // runtime stuff
     private String cueSheet;
-    private String track;
+    private String trackNumberFormatted;
     private String length;
     private String fileName;
     private String directory;
@@ -128,9 +122,9 @@ public class TrackData implements Cloneable {
         }
 
         // merge tag fields
-        Iterator<Entry<TagFieldKey, Set<String>>> entries = newData.getAllTagFieldValuesIterator();
+        Iterator<Entry<FieldKey, Set<String>>> entries = newData.getAllTagFieldValuesIterator();
 		while (entries.hasNext()) {
-			Entry<TagFieldKey, Set<String>> entry = entries.next();
+			Entry<FieldKey, Set<String>> entry = entries.next();
 			addTagFieldValues(entry.getKey(), entry.getValue());
 		}
 
@@ -144,11 +138,11 @@ public class TrackData implements Cloneable {
 
     // ------------------- meta methods ------------------- //
 
-    public Iterator<Entry<TagFieldKey, Set<String>>> getAllTagFieldValuesIterator() {
+    public Iterator<Entry<FieldKey, Set<String>>> getAllTagFieldValuesIterator() {
 		return tagFields.entrySet().iterator();
     }
 
-    public Set<String> getTagFieldValuesSafeAsSet(TagFieldKey key) {
+    public Set<String> getTagFieldValuesSafeAsSet(FieldKey key) {
     	Set<String> result = tagFields.get(key);
 
     	if (result == null) {
@@ -158,7 +152,7 @@ public class TrackData implements Cloneable {
     	return result;
     }
 
-    public List<String> getTagFieldValuesSafeAsList(TagFieldKey key) {
+    public List<String> getTagFieldValuesSafeAsList(FieldKey key) {
     	List<String> result = new ArrayList<String>();
     	
     	Set<String> values = getTagFieldValuesSafeAsSet(key);
@@ -171,38 +165,49 @@ public class TrackData implements Cloneable {
     }
     
     // TODO add String.intern() support
-    public void setTagFieldValues(TagFieldKey key, Set<String> values) {
+    public void setTagFieldValues(FieldKey key, Set<String> values) {
+    	if (values.isEmpty()) {
+    		return;
+    	}
+
+    	// handle additional business logic
+    	if (FieldKey.TRACK.equals(key)) {
+    		String track = values.iterator().next();
+    		trackNumberFormatted = new Formatter().format("%02d", Integer.parseInt(track)).toString();
+    	}
+
     	// handle technical tags
-    	if (TagFieldKey.ENCODER.equals(key) && !values.isEmpty()) {
+    	if (FieldKey.ENCODER.equals(key)) {
     		setEncoder(values.iterator().next());
     	}
+    	// handle common cases
     	else {
     		tagFields.put(key, values);
     	}
     }
     
     // TODO add String.intern() support
-    public void setTagFieldValues(TagFieldKey key, String value) {
+    public void setTagFieldValues(FieldKey key, String value) {
     	Set<String> newValues = new HashSet<String>();
     	newValues.add(value);
     	setTagFieldValues(key, newValues);
     }
     
     // TODO add String.intern() support
-    public void addTagFieldValues(TagFieldKey key, Set<String> values) {
+    public void addTagFieldValues(FieldKey key, Set<String> values) {
     	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
     	existingValues.addAll(values);
     	setTagFieldValues(key, existingValues);
     }
     
     // TODO add String.intern() support
-    public void addTagFieldValues(TagFieldKey key, String value) {
+    public void addTagFieldValues(FieldKey key, String value) {
     	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
     	existingValues.add(value);
     	setTagFieldValues(key, existingValues);
     }
     
-    public String getFirstTagFieldValue(TagFieldKey key) {
+    public String getFirstTagFieldValue(FieldKey key) {
     	List<String> values = getTagFieldValuesSafeAsList(key);
     	
     	if (!values.isEmpty()) {
@@ -212,182 +217,159 @@ public class TrackData implements Cloneable {
     	return null;
     }
     
-    public void removeTagField(TagFieldKey key) {
+    public void removeTagField(FieldKey key) {
     	tagFields.remove(key);
     }
 
     // ------------------- common methods ------------------- //
 
     public String getArtist() {
-        return Util.firstNotEmpty(getFirstTagFieldValue(TagFieldKey.ARTIST),
-        		getFirstTagFieldValue(TagFieldKey.ALBUM_ARTIST));
+        return Util.firstNotEmpty(getFirstTagFieldValue(FieldKey.ARTIST),
+        		getFirstTagFieldValue(FieldKey.ALBUM_ARTIST));
     }
     
     public void addArtist(String value) {
-    	addTagFieldValues(TagFieldKey.ARTIST, value);
+    	addTagFieldValues(FieldKey.ARTIST, value);
     }
 
     public String getAlbum() {
-        return getFirstTagFieldValue(TagFieldKey.ALBUM);
+        return getFirstTagFieldValue(FieldKey.ALBUM);
     }
     
     public void addAlbum(String value) {
-    	addTagFieldValues(TagFieldKey.ALBUM, value);
+    	addTagFieldValues(FieldKey.ALBUM, value);
     }
 
     public String getTitle() {
-        return Util.firstNotEmpty(getFirstTagFieldValue(TagFieldKey.TITLE), getFileName());
+        return Util.firstNotEmpty(getFirstTagFieldValue(FieldKey.TITLE), getFileName());
     }
     
     public void addTitle(String value) {
-    	addTagFieldValues(TagFieldKey.TITLE, value);
+    	addTagFieldValues(FieldKey.TITLE, value);
     }
 
     public String getAlbumArtist() {
-        return Util.firstNotEmpty(getFirstTagFieldValue(TagFieldKey.ALBUM_ARTIST),
-        		getFirstTagFieldValue(TagFieldKey.ARTIST));
+        return Util.firstNotEmpty(getFirstTagFieldValue(FieldKey.ALBUM_ARTIST),
+        		getFirstTagFieldValue(FieldKey.ARTIST));
     }
     
     public void addAlbumArtist(String value) {
-    	addTagFieldValues(TagFieldKey.ALBUM_ARTIST, value);
+    	addTagFieldValues(FieldKey.ALBUM_ARTIST, value);
     }
 
     public String getYear() {
-    	// TODO think about TagFieldKey.DATE
-        return getFirstTagFieldValue(TagFieldKey.YEAR);
+        return getFirstTagFieldValue(FieldKey.YEAR);
     }
     
     public void addYear(String value) {
-    	addTagFieldValues(TagFieldKey.YEAR, value);
+    	addTagFieldValues(FieldKey.YEAR, value);
     }
 
     public String getGenre() {
-        return getFirstTagFieldValue(TagFieldKey.GENRE);
+        return getFirstTagFieldValue(FieldKey.GENRE);
     }
 
     public Set<String> getGenres() {
-        return getTagFieldValuesSafeAsSet(TagFieldKey.GENRE);
+        return getTagFieldValuesSafeAsSet(FieldKey.GENRE);
     }
     
     public void addGenre(String value) {
-    	addTagFieldValues(TagFieldKey.GENRE, value);
+    	addTagFieldValues(FieldKey.GENRE, value);
     }
 
     public String getComment() {
-        return getFirstTagFieldValue(TagFieldKey.COMMENT);
+        return getFirstTagFieldValue(FieldKey.COMMENT);
     }
     
     public void addComment(String value) {
-    	addTagFieldValues(TagFieldKey.COMMENT, value);
+    	addTagFieldValues(FieldKey.COMMENT, value);
     }
 
-    // TODO rewrite all that TRACK/DISC number stuff
     public String getTrack() {
-        if (trackNumber != null) {
-            if (totalTracks != null && !totalTracks.isEmpty()) {
-                return trackNumber + "/" + totalTracks;
-            } else {
-                return trackNumber;
-            }
-        }
+    	return getFirstTagFieldValue(FieldKey.TRACK);
+    }
 
-        return "";
+    public void addTrack(String value) {
+    	addTagFieldValues(FieldKey.TRACK, value);
+    }
+
+    public void addTrack(Integer value) {
+    	if (value != null) {
+    		addTrack(value.toString());
+    	}
     }
 
     /**
      * @return track number formatted to two digits
      */
     public String getTrackNumber() {
-        return track;
-    }
-
-    public void setTrackNumber(String value) {
-        if (value != null) {
-            String[] s = value.split("/");
-            if (s.length > 0) {
-                try {
-                    int i = Integer.parseInt(s[0]);
-                    if (i != 0)
-                        track = new Formatter().format("%02d", i).toString();
-                    else
-                        track = null;
-                } catch (NumberFormatException ignored) {
-                    track = s[0];
-                }
-
-                trackNumber = s[0];
-
-            }
-
-            if (s.length > 1)
-                totalTracks = s[1];
-        }
+        return trackNumberFormatted;
     }
 
     public String getTrackTotal() {
-        return totalTracks;
+    	return getFirstTagFieldValue(FieldKey.TRACK_TOTAL);
     }
 
-    public void setTrackTotal(String value) {
-        totalTracks = value.intern();
+    public void addTrackTotal(String value) {
+    	addTagFieldValues(FieldKey.TRACK_TOTAL, value);
+    }
+
+    public void addTrackTotal(Integer value) {
+    	if (value != null) {
+    		addTrackTotal(value.toString());
+    	}
     }
 
     public String getDisc() {
-        if (discNumber != null) {
-            if (totalDiscs != null && !totalDiscs.isEmpty()) {
-                return discNumber + "/" + totalDiscs;
-            } else {
-                return discNumber;
-            }
-        }
-
-        return "";
+    	return getFirstTagFieldValue(FieldKey.DISC_NO);
     }
 
-    public String getDiscNumber() {
-        return discNumber;
+    public void addDisc(String value) {
+    	addTagFieldValues(FieldKey.DISC_NO, value);
     }
 
-    public void setDiscNumber(String value) {
-        if (value != null && value.length() > 0) {
-            String[] s = value.split("/");
-            if (s.length > 0)
-                discNumber = s[0];
-            if (s.length > 1)
-                totalDiscs = s[1];
-        }
+    public void addDisc(Integer value) {
+    	if (value != null) {
+    		addDisc(value.toString());
+    	}
     }
 
     public String getDiscTotal() {
-        return totalDiscs;
+    	return getFirstTagFieldValue(FieldKey.DISC_TOTAL);
     }
 
-    public void setDiscTotal(String value) {
-        totalDiscs = value.intern();
+    public void addDiscTotal(String value) {
+    	addTagFieldValues(FieldKey.DISC_TOTAL, value);
+    }
+
+    public void addDiscTotal(Integer value) {
+    	if (value != null) {
+    		addDiscTotal(value.toString());
+    	}
     }
 
     public String getRecordLabel() {
-    	return getFirstTagFieldValue(TagFieldKey.RECORD_LABEL);
+    	return getFirstTagFieldValue(FieldKey.RECORD_LABEL);
     }
 
     public Set<String> getRecordLabels() {
-    	return getTagFieldValuesSafeAsSet(TagFieldKey.RECORD_LABEL);
+    	return getTagFieldValuesSafeAsSet(FieldKey.RECORD_LABEL);
     }
 
     public void addRecordLabel(String value) {
-    	addTagFieldValues(TagFieldKey.RECORD_LABEL, value);
+    	addTagFieldValues(FieldKey.RECORD_LABEL, value);
     }
 
     public String getCatalogNo() {
-    	return getFirstTagFieldValue(TagFieldKey.CATALOG_NO);
+    	return getFirstTagFieldValue(FieldKey.CATALOG_NO);
     }
 
     public Set<String> getCatalogNos() {
-    	return getTagFieldValuesSafeAsSet(TagFieldKey.CATALOG_NO);
+    	return getTagFieldValuesSafeAsSet(FieldKey.CATALOG_NO);
     }
 
     public void addCatalogNo(String value) {
-    	addTagFieldValues(TagFieldKey.CATALOG_NO, value);
+    	addTagFieldValues(FieldKey.CATALOG_NO, value);
     }
 
     // ------------------- cuesheet methods ------------------- //
@@ -574,7 +556,7 @@ public class TrackData implements Cloneable {
     // ------------------- business logic methods ------------------- //
     
     public void populateWithEmptyCommonTagFields() {
-    	for (TagFieldKey key : COMMON_TAG_FIELDS) {
+    	for (FieldKey key : COMMON_TAG_FIELDS) {
     		if (getTagFieldValuesSafeAsSet(key).isEmpty()) {
     			setTagFieldValues(key, "");
     		}
@@ -582,7 +564,7 @@ public class TrackData implements Cloneable {
     }
     
     public void removeEmptyCommonTagFields() {
-    	for (TagFieldKey key : COMMON_TAG_FIELDS) {
+    	for (FieldKey key : COMMON_TAG_FIELDS) {
     		if (Util.isEmpty(getFirstTagFieldValue(key))) {
     			removeTagField(key);
     		}

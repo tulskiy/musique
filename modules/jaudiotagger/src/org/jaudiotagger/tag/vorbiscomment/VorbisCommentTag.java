@@ -18,75 +18,116 @@
  */
 package org.jaudiotagger.tag.vorbiscomment;
 
+import org.jaudiotagger.audio.flac.metadatablock.MetadataBlockDataPicture;
 import org.jaudiotagger.audio.generic.AbstractTag;
+import org.jaudiotagger.audio.generic.Utils;
 import org.jaudiotagger.audio.ogg.util.VorbisHeader;
 import org.jaudiotagger.logging.ErrorMessage;
-import org.jaudiotagger.tag.FieldDataInvalidException;
-import org.jaudiotagger.tag.KeyNotFoundException;
-import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.*;
 import org.jaudiotagger.tag.datatype.Artwork;
-import static org.jaudiotagger.tag.vorbiscomment.VorbisCommentFieldKey.*;
+
+import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
+import org.jaudiotagger.tag.reference.Tagger;
 import org.jaudiotagger.tag.vorbiscomment.util.Base64Coder;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
+
+import static org.jaudiotagger.tag.vorbiscomment.VorbisCommentFieldKey.*;
 
 /**
  * This is the logical representation of  Vorbis Comment Data
  */
 public class VorbisCommentTag extends AbstractTag {
-    private static EnumMap<TagFieldKey, VorbisCommentFieldKey> tagFieldToOggField = new EnumMap<TagFieldKey, VorbisCommentFieldKey>(TagFieldKey.class);
+    private static EnumMap<FieldKey, VorbisCommentFieldKey> tagFieldToOggField = new EnumMap<FieldKey, VorbisCommentFieldKey>(FieldKey.class);
+    private static EnumMap<FieldKey, VorbisCommentFieldKey> alternatives = new EnumMap<FieldKey, VorbisCommentFieldKey>(FieldKey.class);
 
     static {
-        tagFieldToOggField.put(TagFieldKey.ARTIST, VorbisCommentFieldKey.ARTIST);
-        tagFieldToOggField.put(TagFieldKey.ALBUM, VorbisCommentFieldKey.ALBUM);
-        tagFieldToOggField.put(TagFieldKey.TITLE, VorbisCommentFieldKey.TITLE);
-        tagFieldToOggField.put(TagFieldKey.TRACK, VorbisCommentFieldKey.TRACKNUMBER);
-        tagFieldToOggField.put(TagFieldKey.YEAR, VorbisCommentFieldKey.DATE);
-        tagFieldToOggField.put(TagFieldKey.GENRE, VorbisCommentFieldKey.GENRE);
-        tagFieldToOggField.put(TagFieldKey.COMMENT, VorbisCommentFieldKey.COMMENT);
-        tagFieldToOggField.put(TagFieldKey.ALBUM_ARTIST, VorbisCommentFieldKey.ALBUMARTIST);
-        tagFieldToOggField.put(TagFieldKey.COMPOSER, VorbisCommentFieldKey.COMPOSER);
-        tagFieldToOggField.put(TagFieldKey.GROUPING, VorbisCommentFieldKey.GROUPING);
-        tagFieldToOggField.put(TagFieldKey.DISC_NO, VorbisCommentFieldKey.DISCNUMBER);
-        tagFieldToOggField.put(TagFieldKey.BPM, VorbisCommentFieldKey.BPM);
-        tagFieldToOggField.put(TagFieldKey.MUSICBRAINZ_ARTISTID, VorbisCommentFieldKey.MUSICBRAINZ_ARTISTID);
-        tagFieldToOggField.put(TagFieldKey.MUSICBRAINZ_RELEASEID, VorbisCommentFieldKey.MUSICBRAINZ_ALBUMID);
-        tagFieldToOggField.put(TagFieldKey.MUSICBRAINZ_RELEASEARTISTID, VorbisCommentFieldKey.MUSICBRAINZ_ALBUMARTISTID);
-        tagFieldToOggField.put(TagFieldKey.MUSICBRAINZ_TRACK_ID, VorbisCommentFieldKey.MUSICBRAINZ_TRACKID);
-        tagFieldToOggField.put(TagFieldKey.MUSICBRAINZ_DISC_ID, VorbisCommentFieldKey.MUSICBRAINZ_DISCID);
-        tagFieldToOggField.put(TagFieldKey.MUSICIP_ID, VorbisCommentFieldKey.MUSICIP_PUID);
-        tagFieldToOggField.put(TagFieldKey.AMAZON_ID, VorbisCommentFieldKey.ASIN);
-        tagFieldToOggField.put(TagFieldKey.MUSICBRAINZ_RELEASE_STATUS, VorbisCommentFieldKey.MUSICBRAINZ_ALBUMSTATUS);
-        tagFieldToOggField.put(TagFieldKey.MUSICBRAINZ_RELEASE_TYPE, VorbisCommentFieldKey.MUSICBRAINZ_ALBUMTYPE);
-        tagFieldToOggField.put(TagFieldKey.MUSICBRAINZ_RELEASE_COUNTRY, VorbisCommentFieldKey.RELEASECOUNTRY);
-        tagFieldToOggField.put(TagFieldKey.LYRICS, VorbisCommentFieldKey.LYRICS);
-        tagFieldToOggField.put(TagFieldKey.IS_COMPILATION, VorbisCommentFieldKey.COMPILATION);
-        tagFieldToOggField.put(TagFieldKey.ARTIST_SORT, VorbisCommentFieldKey.ARTISTSORT);
-        tagFieldToOggField.put(TagFieldKey.ALBUM_ARTIST_SORT, VorbisCommentFieldKey.ALBUMARTISTSORT);
-        tagFieldToOggField.put(TagFieldKey.ALBUM_SORT, VorbisCommentFieldKey.ALBUMSORT);
-        tagFieldToOggField.put(TagFieldKey.TITLE_SORT, VorbisCommentFieldKey.TITLESORT);
-        tagFieldToOggField.put(TagFieldKey.COMPOSER_SORT, VorbisCommentFieldKey.COMPOSERSORT);
-        tagFieldToOggField.put(TagFieldKey.ENCODER, VorbisCommentFieldKey.VENDOR);     //Known as vendor in VorbisComment
-        tagFieldToOggField.put(TagFieldKey.ISRC, VorbisCommentFieldKey.ISRC);
-        tagFieldToOggField.put(TagFieldKey.BARCODE, VorbisCommentFieldKey.BARCODE);
-        tagFieldToOggField.put(TagFieldKey.CATALOG_NO, VorbisCommentFieldKey.CATALOGNUMBER);
-        tagFieldToOggField.put(TagFieldKey.RECORD_LABEL, VorbisCommentFieldKey.LABEL);
-        tagFieldToOggField.put(TagFieldKey.LYRICIST, VorbisCommentFieldKey.LYRICIST);
-        tagFieldToOggField.put(TagFieldKey.CONDUCTOR, VorbisCommentFieldKey.CONDUCTOR);
-        tagFieldToOggField.put(TagFieldKey.REMIXER, VorbisCommentFieldKey.REMIXER);
-        tagFieldToOggField.put(TagFieldKey.MOOD, VorbisCommentFieldKey.MOOD);
-        tagFieldToOggField.put(TagFieldKey.MEDIA, VorbisCommentFieldKey.MEDIA);
-        tagFieldToOggField.put(TagFieldKey.URL_DISCOGS_ARTIST_SITE, VorbisCommentFieldKey.URL_DISCOGS_ARTIST_SITE);
-        tagFieldToOggField.put(TagFieldKey.URL_DISCOGS_RELEASE_SITE, VorbisCommentFieldKey.URL_DISCOGS_RELEASE_SITE);
-        tagFieldToOggField.put(TagFieldKey.URL_OFFICIAL_ARTIST_SITE, VorbisCommentFieldKey.URL_OFFICIAL_ARTIST_SITE);
-        tagFieldToOggField.put(TagFieldKey.URL_OFFICIAL_RELEASE_SITE, VorbisCommentFieldKey.URL_OFFICIAL_RELEASE_SITE);
-        tagFieldToOggField.put(TagFieldKey.URL_WIKIPEDIA_ARTIST_SITE, VorbisCommentFieldKey.URL_WIKIPEDIA_ARTIST_SITE);
-        tagFieldToOggField.put(TagFieldKey.URL_WIKIPEDIA_RELEASE_SITE, VorbisCommentFieldKey.URL_WIKIPEDIA_RELEASE_SITE);
-        tagFieldToOggField.put(TagFieldKey.LANGUAGE, VorbisCommentFieldKey.LANGUAGE);
-        tagFieldToOggField.put(TagFieldKey.KEY, VorbisCommentFieldKey.KEY);
+        tagFieldToOggField.put(FieldKey.ALBUM, VorbisCommentFieldKey.ALBUM);
+        tagFieldToOggField.put(FieldKey.ALBUM_ARTIST, VorbisCommentFieldKey.ALBUMARTIST);
+        tagFieldToOggField.put(FieldKey.ALBUM_ARTIST_SORT, VorbisCommentFieldKey.ALBUMARTISTSORT);
+        tagFieldToOggField.put(FieldKey.ALBUM_SORT, VorbisCommentFieldKey.ALBUMSORT);
+        tagFieldToOggField.put(FieldKey.ARTIST, VorbisCommentFieldKey.ARTIST);
+        tagFieldToOggField.put(FieldKey.AMAZON_ID, VorbisCommentFieldKey.ASIN);
+        tagFieldToOggField.put(FieldKey.ARTIST_SORT, VorbisCommentFieldKey.ARTISTSORT);
+        tagFieldToOggField.put(FieldKey.BARCODE, VorbisCommentFieldKey.BARCODE);
+        tagFieldToOggField.put(FieldKey.BPM, VorbisCommentFieldKey.BPM);
+        tagFieldToOggField.put(FieldKey.CATALOG_NO, VorbisCommentFieldKey.CATALOGNUMBER);
+        tagFieldToOggField.put(FieldKey.COMMENT, VorbisCommentFieldKey.COMMENT);
+        tagFieldToOggField.put(FieldKey.COMPOSER, VorbisCommentFieldKey.COMPOSER);
+        tagFieldToOggField.put(FieldKey.COMPOSER_SORT, VorbisCommentFieldKey.COMPOSERSORT);
+        tagFieldToOggField.put(FieldKey.CONDUCTOR, VorbisCommentFieldKey.CONDUCTOR);
+        tagFieldToOggField.put(FieldKey.COVER_ART, VorbisCommentFieldKey.METADATA_BLOCK_PICTURE);
+        tagFieldToOggField.put(FieldKey.CUSTOM1, VorbisCommentFieldKey.CUSTOM1);
+        tagFieldToOggField.put(FieldKey.CUSTOM2, VorbisCommentFieldKey.CUSTOM2);
+        tagFieldToOggField.put(FieldKey.CUSTOM3, VorbisCommentFieldKey.CUSTOM3);
+        tagFieldToOggField.put(FieldKey.CUSTOM4, VorbisCommentFieldKey.CUSTOM4);
+        tagFieldToOggField.put(FieldKey.CUSTOM5, VorbisCommentFieldKey.CUSTOM5);
+        tagFieldToOggField.put(FieldKey.DISC_NO, VorbisCommentFieldKey.DISCNUMBER);
+        tagFieldToOggField.put(FieldKey.DISC_TOTAL, VorbisCommentFieldKey.DISCTOTAL);
+        tagFieldToOggField.put(FieldKey.ENCODER, VorbisCommentFieldKey.VENDOR);     //Known as vendor in VorbisComment
+        tagFieldToOggField.put(FieldKey.FBPM, VorbisCommentFieldKey.FBPM);
+        tagFieldToOggField.put(FieldKey.GENRE, VorbisCommentFieldKey.GENRE);
+        tagFieldToOggField.put(FieldKey.GROUPING, VorbisCommentFieldKey.GROUPING);
+        tagFieldToOggField.put(FieldKey.ISRC, VorbisCommentFieldKey.ISRC);
+        tagFieldToOggField.put(FieldKey.IS_COMPILATION, VorbisCommentFieldKey.COMPILATION);
+        tagFieldToOggField.put(FieldKey.KEY, VorbisCommentFieldKey.KEY);
+        tagFieldToOggField.put(FieldKey.LANGUAGE, VorbisCommentFieldKey.LANGUAGE);
+        tagFieldToOggField.put(FieldKey.LYRICIST, VorbisCommentFieldKey.LYRICIST);
+        tagFieldToOggField.put(FieldKey.LYRICS, VorbisCommentFieldKey.LYRICS);
+        tagFieldToOggField.put(FieldKey.MEDIA, VorbisCommentFieldKey.MEDIA);
+        tagFieldToOggField.put(FieldKey.MOOD, VorbisCommentFieldKey.MOOD);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_ARTISTID, VorbisCommentFieldKey.MUSICBRAINZ_ARTISTID);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_DISC_ID, VorbisCommentFieldKey.MUSICBRAINZ_DISCID);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_RELEASEARTISTID, VorbisCommentFieldKey.MUSICBRAINZ_ALBUMARTISTID);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_RELEASEID, VorbisCommentFieldKey.MUSICBRAINZ_ALBUMID);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_RELEASE_GROUP_ID, VorbisCommentFieldKey.MUSICBRAINZ_RELEASEGROUPID);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_RELEASE_COUNTRY, VorbisCommentFieldKey.RELEASECOUNTRY);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_RELEASE_STATUS, VorbisCommentFieldKey.MUSICBRAINZ_ALBUMSTATUS);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_RELEASE_TYPE, VorbisCommentFieldKey.MUSICBRAINZ_ALBUMTYPE);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_TRACK_ID, VorbisCommentFieldKey.MUSICBRAINZ_TRACKID);
+        tagFieldToOggField.put(FieldKey.MUSICBRAINZ_WORK_ID, VorbisCommentFieldKey.MUSICBRAINZ_WORKID);
+        tagFieldToOggField.put(FieldKey.OCCASION, VorbisCommentFieldKey.OCCASION);
+        tagFieldToOggField.put(FieldKey.ORIGINAL_ALBUM, VorbisCommentFieldKey.ORIGINAL_ALBUM);
+        tagFieldToOggField.put(FieldKey.ORIGINAL_ARTIST, VorbisCommentFieldKey.ORIGINAL_ARTIST);
+        tagFieldToOggField.put(FieldKey.ORIGINAL_LYRICIST, VorbisCommentFieldKey.ORIGINAL_LYRICIST);
+        tagFieldToOggField.put(FieldKey.ORIGINAL_YEAR, VorbisCommentFieldKey.ORIGINAL_YEAR);
+        tagFieldToOggField.put(FieldKey.MUSICIP_ID, VorbisCommentFieldKey.MUSICIP_PUID);
+        tagFieldToOggField.put(FieldKey.QUALITY, VorbisCommentFieldKey.QUALITY);
+        tagFieldToOggField.put(FieldKey.RATING, VorbisCommentFieldKey.RATING);
+        tagFieldToOggField.put(FieldKey.RECORD_LABEL, VorbisCommentFieldKey.LABEL);
+        tagFieldToOggField.put(FieldKey.REMIXER, VorbisCommentFieldKey.REMIXER);
+        tagFieldToOggField.put(FieldKey.TAGS, VorbisCommentFieldKey.TAGS);
+        tagFieldToOggField.put(FieldKey.SCRIPT, VorbisCommentFieldKey.SCRIPT);
+        tagFieldToOggField.put(FieldKey.TEMPO, VorbisCommentFieldKey.TEMPO);
+        tagFieldToOggField.put(FieldKey.TITLE, VorbisCommentFieldKey.TITLE);
+        tagFieldToOggField.put(FieldKey.TITLE_SORT, VorbisCommentFieldKey.TITLESORT);
+        tagFieldToOggField.put(FieldKey.TRACK, VorbisCommentFieldKey.TRACKNUMBER);
+        tagFieldToOggField.put(FieldKey.TRACK_TOTAL, VorbisCommentFieldKey.TRACKTOTAL);
+        tagFieldToOggField.put(FieldKey.URL_DISCOGS_ARTIST_SITE, VorbisCommentFieldKey.URL_DISCOGS_ARTIST_SITE);
+        tagFieldToOggField.put(FieldKey.URL_DISCOGS_RELEASE_SITE, VorbisCommentFieldKey.URL_DISCOGS_RELEASE_SITE);
+        tagFieldToOggField.put(FieldKey.URL_LYRICS_SITE, VorbisCommentFieldKey.URL_LYRICS_SITE);
+        tagFieldToOggField.put(FieldKey.URL_OFFICIAL_ARTIST_SITE, VorbisCommentFieldKey.URL_OFFICIAL_ARTIST_SITE);
+        tagFieldToOggField.put(FieldKey.URL_OFFICIAL_RELEASE_SITE, VorbisCommentFieldKey.URL_OFFICIAL_RELEASE_SITE);
+        tagFieldToOggField.put(FieldKey.URL_WIKIPEDIA_ARTIST_SITE, VorbisCommentFieldKey.URL_WIKIPEDIA_ARTIST_SITE);
+        tagFieldToOggField.put(FieldKey.URL_WIKIPEDIA_RELEASE_SITE, VorbisCommentFieldKey.URL_WIKIPEDIA_RELEASE_SITE);
+        tagFieldToOggField.put(FieldKey.YEAR, VorbisCommentFieldKey.DATE);
+
+        tagFieldToOggField.put(FieldKey.ENGINEER, VorbisCommentFieldKey.ENGINEER);
+        tagFieldToOggField.put(FieldKey.PRODUCER, VorbisCommentFieldKey.PRODUCER);
+        tagFieldToOggField.put(FieldKey.DJMIXER, VorbisCommentFieldKey.DJMIXER);
+        tagFieldToOggField.put(FieldKey.MIXER, VorbisCommentFieldKey.MIXER);
+        tagFieldToOggField.put(FieldKey.ARRANGER, VorbisCommentFieldKey.ARRANGER);
+
+        alternatives.put(FieldKey.ALBUM_ARTIST, ALBUM_ARTIST);
+        alternatives.put(FieldKey.TRACK_TOTAL, TOTALTRACKS);
+        alternatives.put(FieldKey.DISC_TOTAL, TOTALDISCS);
     }
 
     //This is the vendor string that will be written if no other is supplied. Should be the name of the software
@@ -112,88 +153,11 @@ public class VorbisCommentTag extends AbstractTag {
         return tag;
     }
 
-    public TagField createAlbumField(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
-        }
-        return new VorbisCommentTagField(getAlbumId(), content);
-    }
-
-    public TagField createArtistField(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
-        }
-        return new VorbisCommentTagField(getArtistId(), content);
-    }
-
-    public TagField createCommentField(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
-        }
-        return new VorbisCommentTagField(getCommentId(), content);
-    }
-
-    public TagField createGenreField(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
-        }
-        return new VorbisCommentTagField(getGenreId(), content);
-    }
-
-    public TagField createTitleField(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
-        }
-        return new VorbisCommentTagField(getTitleId(), content);
-    }
-
-    public TagField createTrackField(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
-        }
-        return new VorbisCommentTagField(getTrackId(), content);
-    }
-
-    public TagField createYearField(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
-        }
-        return new VorbisCommentTagField(getYearId(), content);
-    }
-
-    protected String getAlbumId() {
-        return ALBUM.name();
-    }
-
-    protected String getArtistId() {
-        return ARTIST.name();
-    }
-
-    protected String getCommentId() {
-        return COMMENT.name();
-    }
-
-    protected String getGenreId() {
-        return GENRE.name();
-    }
-
-    protected String getTitleId() {
-        return TITLE.name();
-    }
-
-    protected String getTrackId() {
-        return TRACKNUMBER.name();
-    }
-
     /**
      * @return the vendor, generically known as the encoder
      */
     public String getVendor() {
-        return getFirst(VENDOR.name());
-    }
-
-    protected String getYearId() {
-        return DATE.toString();
+        return getFirst(VENDOR.getFieldName());
     }
 
     /**
@@ -208,7 +172,7 @@ public class VorbisCommentTag extends AbstractTag {
         if (vendor == null) {
             vendor = DEFAULT_VENDOR;
         }
-        super.set(new VorbisCommentTagField(VENDOR.name(), vendor));
+        super.setField(new VorbisCommentTagField(VENDOR.getFieldName(), vendor));
     }
 
     protected boolean isAllowedEncoding(String enc) {
@@ -223,11 +187,11 @@ public class VorbisCommentTag extends AbstractTag {
      * Create Tag Field using generic key
      */
     @Override
-    public TagField createTagField(TagFieldKey genericKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+    public TagField createField(FieldKey genericKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
         if (genericKey == null) {
             throw new KeyNotFoundException();
         }
-        return createTagField(tagFieldToOggField.get(genericKey), value);
+        return createField(tagFieldToOggField.get(genericKey), value);
     }
 
     /**
@@ -236,8 +200,12 @@ public class VorbisCommentTag extends AbstractTag {
      * @param vorbisCommentFieldKey
      * @param value
      * @return
+     * @throws org.jaudiotagger.tag.KeyNotFoundException
+     *
+     * @throws org.jaudiotagger.tag.FieldDataInvalidException
+     *
      */
-    public TagField createTagField(VorbisCommentFieldKey vorbisCommentFieldKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+    public TagField createField(VorbisCommentFieldKey vorbisCommentFieldKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
         if (value == null) {
             throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
         }
@@ -245,7 +213,7 @@ public class VorbisCommentTag extends AbstractTag {
             throw new KeyNotFoundException();
         }
 
-        return new VorbisCommentTagField(vorbisCommentFieldKey.name(), value);
+        return new VorbisCommentTagField(vorbisCommentFieldKey.getFieldName(), value);
     }
 
     /**
@@ -258,7 +226,7 @@ public class VorbisCommentTag extends AbstractTag {
      * @param value
      * @return
      */
-    public TagField createTagField(String vorbisCommentFieldKey, String value) {
+    public TagField createField(String vorbisCommentFieldKey, String value) {
         if (value == null) {
             throw new IllegalArgumentException(ErrorMessage.GENERAL_INVALID_NULL_ARGUMENT.getMsg());
         }
@@ -271,12 +239,17 @@ public class VorbisCommentTag extends AbstractTag {
      * @param genericKey
      */
     @Override
-    public List<TagField> get(TagFieldKey genericKey) throws KeyNotFoundException {
+    public List<TagField> getFields(FieldKey genericKey) throws KeyNotFoundException {
         VorbisCommentFieldKey vorbisCommentFieldKey = tagFieldToOggField.get(genericKey);
         if (vorbisCommentFieldKey == null) {
             throw new KeyNotFoundException();
         }
-        return super.get(vorbisCommentFieldKey.name());
+        List<TagField> tagFields = super.getFields(vorbisCommentFieldKey.getFieldName());
+        if (tagFields == null || tagFields.isEmpty()) {
+            vorbisCommentFieldKey = alternatives.get(genericKey);
+            tagFields = super.getFields(vorbisCommentFieldKey.getFieldName());
+        }
+        return tagFields;
     }
 
     /**
@@ -284,26 +257,27 @@ public class VorbisCommentTag extends AbstractTag {
      *
      * @param vorbisCommentKey
      * @return
+     * @throws org.jaudiotagger.tag.KeyNotFoundException
+     *
      */
     public List<TagField> get(VorbisCommentFieldKey vorbisCommentKey) throws KeyNotFoundException {
         if (vorbisCommentKey == null) {
             throw new KeyNotFoundException();
         }
-        return super.get(vorbisCommentKey.name());
+        return super.getFields(vorbisCommentKey.getFieldName());
     }
 
-    /**
-     * Retrieve the first value that exists for this generic key
-     *
-     * @param genericKey
-     * @return
-     */
-    public String getFirst(TagFieldKey genericKey) throws KeyNotFoundException {
+    public String getValue(FieldKey genericKey, int index) throws KeyNotFoundException {
         VorbisCommentFieldKey vorbisCommentFieldKey = tagFieldToOggField.get(genericKey);
         if (vorbisCommentFieldKey == null) {
             throw new KeyNotFoundException();
         }
-        return super.getFirst(vorbisCommentFieldKey.name());
+        String item = super.getItem(vorbisCommentFieldKey.getFieldName(), index);
+        if (item == null || item.isEmpty()) {
+            vorbisCommentFieldKey = alternatives.get(genericKey);
+            item = super.getItem(vorbisCommentFieldKey.getFieldName(), index);
+        }
+        return item;
     }
 
     /**
@@ -311,12 +285,14 @@ public class VorbisCommentTag extends AbstractTag {
      *
      * @param vorbisCommentKey
      * @return
+     * @throws org.jaudiotagger.tag.KeyNotFoundException
+     *
      */
     public String getFirst(VorbisCommentFieldKey vorbisCommentKey) throws KeyNotFoundException {
         if (vorbisCommentKey == null) {
             throw new KeyNotFoundException();
         }
-        return super.getFirst(vorbisCommentKey.name());
+        return super.getFirst(vorbisCommentKey.getFieldName());
     }
 
     /**
@@ -324,51 +300,31 @@ public class VorbisCommentTag extends AbstractTag {
      *
      * @param genericKey
      */
-    public void deleteTagField(TagFieldKey genericKey) throws KeyNotFoundException {
+    public void deleteField(FieldKey genericKey) throws KeyNotFoundException {
         if (genericKey == null) {
             throw new KeyNotFoundException();
         }
         VorbisCommentFieldKey vorbisCommentFieldKey = tagFieldToOggField.get(genericKey);
-        deleteTagField(vorbisCommentFieldKey);
+        deleteField(vorbisCommentFieldKey);
     }
 
     /**
      * Delete fields with this vorbisCommentFieldKey
      *
      * @param vorbisCommentFieldKey
+     * @throws org.jaudiotagger.tag.KeyNotFoundException
+     *
      */
-    public void deleteTagField(VorbisCommentFieldKey vorbisCommentFieldKey) throws KeyNotFoundException {
+    public void deleteField(VorbisCommentFieldKey vorbisCommentFieldKey) throws KeyNotFoundException {
         if (vorbisCommentFieldKey == null) {
             throw new KeyNotFoundException();
         }
-        super.deleteField(vorbisCommentFieldKey.name());
+        super.deleteField(vorbisCommentFieldKey.getFieldName());
     }
 
-    /**
-     * Create artwork field
-     * <p/>
-     * Actually create two fields , the data field and the mimetype
-     *
-     * @param data     raw image data
-     * @param mimeType mimeType of data
-     *                 <p/>
-     *                 TODO could possibly work out mimetype from data, but unlike mp4 there is nothing to restrict to only png
-     *                 or jpeg images
-     * @return
-     */
-    public void setArtworkField(byte[] data, String mimeType) {
-        char[] testdata = Base64Coder.encode(data);
-        String base64image = new String(testdata);
-        VorbisCommentTagField dataField = new VorbisCommentTagField(VorbisCommentFieldKey.COVERART.name(), base64image);
-        VorbisCommentTagField mimeField = new VorbisCommentTagField(VorbisCommentFieldKey.COVERARTMIME.name(), mimeType);
-
-        set(dataField);
-        set(mimeField);
-
-    }
 
     /**
-     * Retrieve artwork raw data
+     * Retrieve artwork raw data when using the deprecated COVERART format
      *
      * @return
      */
@@ -379,6 +335,8 @@ public class VorbisCommentTag extends AbstractTag {
     }
 
     /**
+     * Retrieve artwork mimeType when using deprecated COVERART format
+     *
      * @return mimetype
      */
     public String getArtworkMimeType() {
@@ -404,60 +362,198 @@ public class VorbisCommentTag extends AbstractTag {
      *
      * @param field
      */
-    public void add(TagField field) {
-        if (field.getId().equals(VorbisCommentFieldKey.VENDOR.name())) {
-            super.set(field);
+    public void addField(TagField field) {
+        if (field.getId().equals(VorbisCommentFieldKey.VENDOR.getFieldName())) {
+            super.setField(field);
         } else {
-            super.add(field);
+            super.addField(field);
         }
     }
 
-    public TagField getFirstField(TagFieldKey genericKey) throws KeyNotFoundException {
+    public TagField getFirstField(FieldKey genericKey) throws KeyNotFoundException {
         if (genericKey == null) {
             throw new KeyNotFoundException();
         }
-        return getFirstField(tagFieldToOggField.get(genericKey).name());
+        return getFirstField(tagFieldToOggField.get(genericKey).getFieldName());
     }
 
+    /**
+     * @return list of artwork images
+     */
     public List<Artwork> getArtworkList() {
         List<Artwork> artworkList = new ArrayList<Artwork>(1);
 
+        //Read Old Format
         if (getArtworkBinaryData() != null & getArtworkBinaryData().length > 0) {
             Artwork artwork = new Artwork();
             artwork.setMimeType(getArtworkMimeType());
             artwork.setBinaryData(getArtworkBinaryData());
             artworkList.add(artwork);
         }
+
+        //New Format (Supports Multiple Images)
+        List<TagField> metadataBlockPics = this.get(VorbisCommentFieldKey.METADATA_BLOCK_PICTURE);
+        for (TagField tagField : metadataBlockPics) {
+
+            try {
+                byte[] imageBinaryData = Base64Coder.decode(((TagTextField) tagField).getContent());
+                MetadataBlockDataPicture coverArt = new MetadataBlockDataPicture(ByteBuffer.wrap(imageBinaryData));
+                Artwork artwork = Artwork.createArtworkFromMetadataBlockDataPicture(coverArt);
+                artworkList.add(artwork);
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
+            } catch (InvalidFrameException ife) {
+                throw new RuntimeException(ife);
+            }
+        }
         return artworkList;
     }
 
+
     /**
-     * Create artwork field
-     * <p/>
-     * Not supported because reuire two fields to be created use
+     * Create MetadataBlockPicture field, this is the preferred way of storing artwork in VorbisComment tag now but
+     * has to be base encoded to be stored in VorbisComment
      *
-     * @return
+     * @return MetadataBlockDataPicture
      */
-    public TagField createArtworkField(Artwork artwork) throws FieldDataInvalidException {
-        throw new UnsupportedOperationException("Please use createAndSetArtworkField instead");
+    private MetadataBlockDataPicture createMetadataBlockDataPicture(Artwork artwork) throws FieldDataInvalidException {
+        if (artwork.isLinked()) {
+            return new MetadataBlockDataPicture(
+                    Utils.getDefaultBytes(artwork.getImageUrl(), TextEncoding.CHARSET_ISO_8859_1),
+                    artwork.getPictureType(),
+                    MetadataBlockDataPicture.IMAGE_IS_URL,
+                    "",
+                    0,
+                    0,
+                    0,
+                    0);
+        } else {
+            BufferedImage image;
+            try {
+                image = artwork.getImage();
+            } catch (IOException ioe) {
+                throw new FieldDataInvalidException("Unable to create MetadataBlockDataPicture from buffered:" + ioe.getMessage());
+            }
+
+            return new MetadataBlockDataPicture(artwork.getBinaryData(),
+                    artwork.getPictureType(),
+                    artwork.getMimeType(),
+                    artwork.getDescription(),
+                    image.getWidth(),
+                    image.getHeight(),
+                    0,
+                    0);
+        }
     }
 
     /**
-     * Create artwork field
-     * <p/>
-     * Actually sets two fields
+     * Create Artwork field
+     *
+     * @param artwork
+     * @return
+     * @throws FieldDataInvalidException
+     */
+    public TagField createField(Artwork artwork) throws FieldDataInvalidException {
+        try {
+            char[] testdata = Base64Coder.encode(createMetadataBlockDataPicture(artwork).getRawContent());
+            String base64image = new String(testdata);
+            TagField imageTagField = createField(VorbisCommentFieldKey.METADATA_BLOCK_PICTURE, base64image);
+            return imageTagField;
+        } catch (UnsupportedEncodingException uee) {
+            throw new RuntimeException(uee);
+        }
+    }
+
+    /**
+     * Create and set artwork field
      *
      * @return
      */
     @Override
-    public void createAndSetArtworkField(Artwork artwork) throws FieldDataInvalidException {
-        char[] testdata = Base64Coder.encode(artwork.getBinaryData());
-        String base64image = new String(testdata);
-        TagField imageTagField = createTagField(VorbisCommentFieldKey.COVERART, base64image);
-        TagField imageTypeField = createTagField(VorbisCommentFieldKey.COVERARTMIME, artwork.getMimeType());
+    public void setField(Artwork artwork) throws FieldDataInvalidException {
+        //Set field
+        this.setField(createField(artwork));
 
-        this.set(imageTagField);
-        this.set(imageTypeField);
+        //If worked okay above then that should be first artwork and if we still had old coverart format
+        //that should be removed
+        if (this.getFirst(VorbisCommentFieldKey.COVERART).length() > 0) {
+            this.deleteField(VorbisCommentFieldKey.COVERART);
+            this.deleteField(VorbisCommentFieldKey.COVERARTMIME);
+        }
+    }
+
+    /**
+     * Add artwork field
+     *
+     * @param artwork
+     * @throws FieldDataInvalidException
+     */
+    public void addField(Artwork artwork) throws FieldDataInvalidException {
+        this.addField(createField(artwork));
+    }
+
+    /**
+     * Create artwork field using the non-standard COVERART tag
+     * <p/>
+     * <p/>
+     * Actually create two fields , the data field and the mimetype. Its is not recommended that you use this
+     * method anymore.
+     *
+     * @param data     raw image data
+     * @param mimeType mimeType of data
+     *                 <p/>
+     * @return
+     */
+    @Deprecated
+    public void setArtworkField(byte[] data, String mimeType) {
+        char[] testdata = Base64Coder.encode(data);
+        String base64image = new String(testdata);
+        VorbisCommentTagField dataField = new VorbisCommentTagField(VorbisCommentFieldKey.COVERART.getFieldName(), base64image);
+        VorbisCommentTagField mimeField = new VorbisCommentTagField(VorbisCommentFieldKey.COVERARTMIME.getFieldName(), mimeType);
+
+        setField(dataField);
+        setField(mimeField);
+
+    }
+
+    /**
+     * Create and set field with name of vorbisCommentkey
+     *
+     * @param vorbisCommentKey
+     * @param value
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    public void setField(String vorbisCommentKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        TagField tagfield = createField(vorbisCommentKey, value);
+        setField(tagfield);
+    }
+
+    /**
+     * Create and add field with name of vorbisCommentkey
+     *
+     * @param vorbisCommentKey
+     * @param value
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    public void addField(String vorbisCommentKey, String value) throws KeyNotFoundException, FieldDataInvalidException {
+        TagField tagfield = createField(vorbisCommentKey, value);
+        addField(tagfield);
+    }
+
+    /**
+     * Delete all instance of artwork Field
+     *
+     * @throws KeyNotFoundException
+     */
+    public void deleteArtworkField() throws KeyNotFoundException {
+        //New Method
+        this.deleteField(VorbisCommentFieldKey.METADATA_BLOCK_PICTURE);
+
+        //Old Method
+        this.deleteField(VorbisCommentFieldKey.COVERART);
+        this.deleteField(VorbisCommentFieldKey.COVERARTMIME);
     }
 }
 

@@ -58,12 +58,9 @@ public class VbriFrame {
     private static final byte[] VBRI_VBR_ID = {'V', 'B', 'R', 'I'};
 
     private static ByteBuffer header;
-    private static VbriFrame VBRIFrame = null;
 
     private boolean vbr = false;
-    private boolean isFrameCountEnabled = false;
     private int frameCount = -1;
-    private boolean isAudioSizeEnabled = false;
     private int audioSize = -1;
     private LameFrame lameFrame;
 
@@ -84,7 +81,7 @@ public class VbriFrame {
     private void setAudioSize() {
         byte frameSizeBuffer[] = new byte[VBRI_AUDIOSIZE_BUFFER_SIZE];
         header.get(frameSizeBuffer);
-        isAudioSizeEnabled = true;
+        boolean audioSizeEnabled = true;
         audioSize = (frameSizeBuffer[BYTE_1] << 24) & 0xFF000000 | (frameSizeBuffer[BYTE_2] << 16) & 0x00FF0000 | (frameSizeBuffer[BYTE_3] << 8) & 0x0000FF00 | frameSizeBuffer[BYTE_4] & 0x000000FF;
     }
 
@@ -94,9 +91,10 @@ public class VbriFrame {
     private void setFrameCount() {
         byte frameCountBuffer[] = new byte[VBRI_FRAMECOUNT_BUFFER_SIZE];
         header.get(frameCountBuffer);
-        isFrameCountEnabled = true;
+        boolean frameCountEnabled = true;
         frameCount = (frameCountBuffer[BYTE_1] << 24) & 0xFF000000 | (frameCountBuffer[BYTE_2] << 16) & 0x00FF0000 | (frameCountBuffer[BYTE_3] << 8) & 0x0000FF00 | frameCountBuffer[BYTE_4] & 0x000000FF;
     }
+
 
     /**
      * @return count of frames
@@ -121,13 +119,15 @@ public class VbriFrame {
      *
      */
     public static VbriFrame parseVBRIFrame() throws InvalidAudioFrameException {
-        VBRIFrame = new VbriFrame();
+        VbriFrame VBRIFrame = new VbriFrame();
         return VBRIFrame;
     }
 
     /**
      * IS this a VBRI frame
      *
+     * @param bb
+     * @param mpegFrameHeader
      * @return true if this is a VBRI frame
      */
     public static boolean isVbriFrame(ByteBuffer bb, MPEGFrameHeader mpegFrameHeader) {

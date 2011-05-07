@@ -28,14 +28,16 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Write Flac Tag
  */
 public class FlacTagWriter {
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.flac");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.flac");
 
+    private MetadataBlock streamInfoBlock;
     private List<MetadataBlock> metadataBlockPadding = new ArrayList<MetadataBlock>(1);
     private List<MetadataBlock> metadataBlockApplication = new ArrayList<MetadataBlock>(1);
     private List<MetadataBlock> metadataBlockSeekTable = new ArrayList<MetadataBlock>(1);
@@ -73,18 +75,18 @@ public class FlacTagWriter {
 //        //logger.info("Writing tag");
 
         //Clean up old data
+        streamInfoBlock = null;
         metadataBlockPadding.clear();
         metadataBlockApplication.clear();
         metadataBlockSeekTable.clear();
         metadataBlockCueSheet.clear();
 
-        byte[] b;
+
         //Read existing data
         FlacStreamReader flacStream = new FlacStreamReader(raf);
         try {
             flacStream.findStream();
-        }
-        catch (CannotReadException cre) {
+        } catch (CannotReadException cre) {
             throw new CannotWriteException(cre.getMessage());
         }
 
@@ -92,6 +94,11 @@ public class FlacTagWriter {
         while (!isLastBlock) {
             MetadataBlockHeader mbh = MetadataBlockHeader.readHeader(raf);
             switch (mbh.getBlockType()) {
+                case STREAMINFO: {
+                    streamInfoBlock = new MetadataBlock(mbh, new MetadataBlockDataStreamInfo(mbh, raf));
+                    break;
+                }
+
                 case VORBIS_COMMENT:
                 case PADDING:
                 case PICTURE: {
@@ -144,24 +151,28 @@ public class FlacTagWriter {
         //adjust padding accordingly need to allow space for padding header if padding required
         if ((availableRoom == neededRoom) || (availableRoom > neededRoom + MetadataBlockHeader.HEADER_LENGTH)) {
             //Jump over Id3 (if exists) Flac and StreamInfoBlock
-            raf.seek(flacStream.getStartOfFlacInFile() + FlacStreamReader.FLAC_STREAM_IDENTIFIER_LENGTH + MetadataBlockHeader.HEADER_LENGTH + MetadataBlockDataStreamInfo.STREAM_INFO_DATA_LENGTH);
+            raf.seek(flacStream.getStartOfFlacInFile() + FlacStreamReader.FLAC_STREAM_IDENTIFIER_LENGTH);
+
+            //Write StreamInfo, we always write this first even if wasnt first in original spec
+            raf.write(streamInfoBlock.getHeader().getBytesWithoutIsLastBlockFlag());
+            raf.write(streamInfoBlock.getData().getBytes());
 
             //Write Application Blocks
-            for (int i = 0; i < metadataBlockApplication.size(); i++) {
-                raf.write(metadataBlockApplication.get(i).getHeader().getBytesWithoutIsLastBlockFlag());
-                raf.write(metadataBlockApplication.get(i).getData().getBytes());
+            for (MetadataBlock aMetadataBlockApplication : metadataBlockApplication) {
+                raf.write(aMetadataBlockApplication.getHeader().getBytesWithoutIsLastBlockFlag());
+                raf.write(aMetadataBlockApplication.getData().getBytes());
             }
 
             //Write Seek Table Blocks
-            for (int i = 0; i < metadataBlockSeekTable.size(); i++) {
-                raf.write(metadataBlockSeekTable.get(i).getHeader().getBytesWithoutIsLastBlockFlag());
-                raf.write(metadataBlockSeekTable.get(i).getData().getBytes());
+            for (MetadataBlock aMetadataBlockSeekTable : metadataBlockSeekTable) {
+                raf.write(aMetadataBlockSeekTable.getHeader().getBytesWithoutIsLastBlockFlag());
+                raf.write(aMetadataBlockSeekTable.getData().getBytes());
             }
 
             //Write Cue sheet Blocks
-            for (int i = 0; i < metadataBlockCueSheet.size(); i++) {
-                raf.write(metadataBlockCueSheet.get(i).getHeader().getBytesWithoutIsLastBlockFlag());
-                raf.write(metadataBlockCueSheet.get(i).getData().getBytes());
+            for (MetadataBlock aMetadataBlockCueSheet : metadataBlockCueSheet) {
+                raf.write(aMetadataBlockCueSheet.getHeader().getBytesWithoutIsLastBlockFlag());
+                raf.write(aMetadataBlockCueSheet.getData().getBytes());
             }
 
             //Write tag (and padding)
@@ -177,19 +188,19 @@ public class FlacTagWriter {
             rafTemp.seek(dataStartSize);
 
             //Write all the metadatablocks
-            for (int i = 0; i < metadataBlockApplication.size(); i++) {
-                rafTemp.write(metadataBlockApplication.get(i).getHeader().getBytesWithoutIsLastBlockFlag());
-                rafTemp.write(metadataBlockApplication.get(i).getData().getBytes());
+            for (MetadataBlock aMetadataBlockApplication : metadataBlockApplication) {
+                rafTemp.write(aMetadataBlockApplication.getHeader().getBytesWithoutIsLastBlockFlag());
+                rafTemp.write(aMetadataBlockApplication.getData().getBytes());
             }
 
-            for (int i = 0; i < metadataBlockSeekTable.size(); i++) {
-                rafTemp.write(metadataBlockSeekTable.get(i).getHeader().getBytesWithoutIsLastBlockFlag());
-                rafTemp.write(metadataBlockSeekTable.get(i).getData().getBytes());
+            for (MetadataBlock aMetadataBlockSeekTable : metadataBlockSeekTable) {
+                rafTemp.write(aMetadataBlockSeekTable.getHeader().getBytesWithoutIsLastBlockFlag());
+                rafTemp.write(aMetadataBlockSeekTable.getData().getBytes());
             }
 
-            for (int i = 0; i < metadataBlockCueSheet.size(); i++) {
-                rafTemp.write(metadataBlockCueSheet.get(i).getHeader().getBytesWithoutIsLastBlockFlag());
-                rafTemp.write(metadataBlockCueSheet.get(i).getData().getBytes());
+            for (MetadataBlock aMetadataBlockCueSheet : metadataBlockCueSheet) {
+                rafTemp.write(aMetadataBlockCueSheet.getHeader().getBytesWithoutIsLastBlockFlag());
+                rafTemp.write(aMetadataBlockCueSheet.getData().getBytes());
             }
 
             //Write tag data use default padding
@@ -206,20 +217,20 @@ public class FlacTagWriter {
     private int computeAvailableRoom() {
         int length = 0;
 
-        for (int i = 0; i < metadataBlockApplication.size(); i++) {
-            length += metadataBlockApplication.get(i).getLength();
+        for (MetadataBlock aMetadataBlockApplication : metadataBlockApplication) {
+            length += aMetadataBlockApplication.getLength();
         }
 
-        for (int i = 0; i < metadataBlockSeekTable.size(); i++) {
-            length += metadataBlockSeekTable.get(i).getLength();
+        for (MetadataBlock aMetadataBlockSeekTable : metadataBlockSeekTable) {
+            length += aMetadataBlockSeekTable.getLength();
         }
 
-        for (int i = 0; i < metadataBlockCueSheet.size(); i++) {
-            length += metadataBlockCueSheet.get(i).getLength();
+        for (MetadataBlock aMetadataBlockCueSheet : metadataBlockCueSheet) {
+            length += aMetadataBlockCueSheet.getLength();
         }
 
-        for (int i = 0; i < metadataBlockPadding.size(); i++) {
-            length += metadataBlockPadding.get(i).getLength();
+        for (MetadataBlock aMetadataBlockPadding : metadataBlockPadding) {
+            length += aMetadataBlockPadding.getLength();
         }
 
         return length;
@@ -232,16 +243,16 @@ public class FlacTagWriter {
     private int computeNeededRoom() {
         int length = 0;
 
-        for (int i = 0; i < metadataBlockApplication.size(); i++) {
-            length += metadataBlockApplication.get(i).getLength();
+        for (MetadataBlock aMetadataBlockApplication : metadataBlockApplication) {
+            length += aMetadataBlockApplication.getLength();
         }
 
-        for (int i = 0; i < metadataBlockSeekTable.size(); i++) {
-            length += metadataBlockSeekTable.get(i).getLength();
+        for (MetadataBlock aMetadataBlockSeekTable : metadataBlockSeekTable) {
+            length += aMetadataBlockSeekTable.getLength();
         }
 
-        for (int i = 0; i < metadataBlockCueSheet.size(); i++) {
-            length += metadataBlockCueSheet.get(i).getLength();
+        for (MetadataBlock aMetadataBlockCueSheet : metadataBlockCueSheet) {
+            length += aMetadataBlockCueSheet.getLength();
         }
 
         return length;

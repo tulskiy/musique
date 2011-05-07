@@ -26,6 +26,7 @@ public class ID3v24PreferredFrameOrderComparator implements Comparator<String> {
         frameIdsInPreferredOrder.add(FRAME_ID_CONTENT_GROUP_DESC);
         frameIdsInPreferredOrder.add(FRAME_ID_TRACK);
         frameIdsInPreferredOrder.add(FRAME_ID_YEAR);
+        frameIdsInPreferredOrder.add(FRAME_ID_ACCOMPANIMENT);
         frameIdsInPreferredOrder.add(FRAME_ID_BPM);
         frameIdsInPreferredOrder.add(FRAME_ID_ISRC);
         frameIdsInPreferredOrder.add(FRAME_ID_TITLE_SORT_ORDER);
@@ -56,7 +57,6 @@ public class ID3v24PreferredFrameOrderComparator implements Comparator<String> {
         frameIdsInPreferredOrder.add(FRAME_ID_COMMENT);
 
         //Not so bothered about these
-        frameIdsInPreferredOrder.add(FRAME_ID_ACCOMPANIMENT);
         frameIdsInPreferredOrder.add(FRAME_ID_AUDIO_SEEK_POINT_INDEX);
         frameIdsInPreferredOrder.add(FRAME_ID_COMMERCIAL_FRAME);
         frameIdsInPreferredOrder.add(FRAME_ID_COPYRIGHTINFO);
@@ -121,6 +121,7 @@ public class ID3v24PreferredFrameOrderComparator implements Comparator<String> {
         return comparator;
     }
 
+
     /**
      * @param frameId1
      * @param frameId2
@@ -133,10 +134,7 @@ public class ID3v24PreferredFrameOrderComparator implements Comparator<String> {
     }
 
     public boolean equals(Object obj) {
-        if (obj instanceof ID3v24PreferredFrameOrderComparator) {
-            return true;
-        }
-        return false;
+        return obj instanceof ID3v24PreferredFrameOrderComparator;
     }
 
 }

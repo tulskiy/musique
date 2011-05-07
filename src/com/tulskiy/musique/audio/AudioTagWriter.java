@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -23,10 +23,10 @@ import java.util.Map.Entry;
 
 import org.jaudiotagger.audio.generic.AbstractTag;
 import org.jaudiotagger.tag.FieldDataInvalidException;
+import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.TagFieldKey;
 
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
@@ -37,7 +37,7 @@ import com.tulskiy.musique.util.Util;
  */
 public abstract class AudioTagWriter {
 
-	public abstract void write(Track track);
+	public abstract void write(Track track) throws TagWriteException;
 
     public abstract boolean isFileSupported(String ext);
 
@@ -52,34 +52,41 @@ public abstract class AudioTagWriter {
      */
     // in case of logic change, review MP3TagWriter and APETagProcessor
     // TODO take a look if refactoring to AbstractTag only fits (in format specific writers)
-    public void copyTagFields(Tag tag, AbstractTag abstractTag, Track track)
-    		throws KeyNotFoundException, FieldDataInvalidException {
+    public void copyTagFields(Tag tag, AbstractTag abstractTag, Track track) throws TagWriteException {
     	TagField field;
     	String value;
     	boolean firstValue;
 
-    	Iterator<Entry<TagFieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
-		while (entries.hasNext()) {
-			Entry<TagFieldKey, Set<String>> entry = entries.next();
-			Iterator<String> values = entry.getValue().iterator();
-			firstValue = true;
-			while (values.hasNext()) {
-				value = values.next();
-				if (Util.isEmpty(value)) {
-					tag.deleteTagField(entry.getKey());
-				}
-				else {
-					field = abstractTag.createTagField(entry.getKey(), value);
-					if (firstValue) {
-						tag.set(field);
-						firstValue = false;
+    	Iterator<Entry<FieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
+    	try {
+			while (entries.hasNext()) {
+				Entry<FieldKey, Set<String>> entry = entries.next();
+				Iterator<String> values = entry.getValue().iterator();
+				firstValue = true;
+				while (values.hasNext()) {
+					value = values.next();
+					if (Util.isEmpty(value)) {
+						tag.deleteField(entry.getKey());
 					}
 					else {
-						tag.add(field);
+						field = abstractTag.createField(entry.getKey(), value);
+						if (firstValue) {
+							tag.setField(field);
+							firstValue = false;
+						}
+						else {
+							tag.addField(field);
+						}
 					}
 				}
 			}
-		}
+    	}
+    	catch (KeyNotFoundException knfe) {
+    		throw new TagWriteException(knfe);
+    	}
+    	catch (FieldDataInvalidException fdie) {
+    		throw new TagWriteException(fdie);
+    	}
     }
 
 }

@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractTagFrame.java,v 1.4 2008/07/21 10:45:47 paultaylor Exp $
+ *  Version @version:$Id: AbstractTagFrame.java 857 2009-12-03 11:21:11Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -26,6 +26,8 @@
  */
 package org.jaudiotagger.tag.id3;
 
+import org.jaudiotagger.utils.EqualsUtil;
+
 /**
  * A frame contains meta-information of a particular type. A frame contains a header and a body
  */
@@ -42,6 +44,8 @@ public abstract class AbstractTagFrame extends AbstractTagItem {
     /**
      * This constructs the bodies copy constructor this in turn invokes
      * * bodies objectlist.
+     *
+     * @param copyObject
      */
     public AbstractTagFrame(AbstractTagFrame copyObject) {
         this.frameBody = (AbstractTagFrameBody) ID3Tags.copyObject(copyObject.frameBody);
@@ -77,7 +81,7 @@ public abstract class AbstractTagFrame extends AbstractTagItem {
      * @return true if this datatype and it's body is a subset of the argument.
      */
     public boolean isSubsetOf(Object obj) {
-        if ((obj instanceof AbstractTagFrame) == false) {
+        if (!(obj instanceof AbstractTagFrame)) {
             return false;
         }
 
@@ -89,11 +93,8 @@ public abstract class AbstractTagFrame extends AbstractTagItem {
             return false;
         }
 
-        if (frameBody.isSubsetOf(((AbstractTagFrame) obj).frameBody) == false) {
-            return false;
-        }
+        return frameBody.isSubsetOf(((AbstractTagFrame) obj).frameBody) && super.isSubsetOf(obj);
 
-        return super.isSubsetOf(obj);
     }
 
     /**
@@ -106,20 +107,16 @@ public abstract class AbstractTagFrame extends AbstractTagItem {
      *         body.
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof AbstractTagFrame) == false) {
+        if (this == obj) return true;
+        if (!(obj instanceof AbstractTagFrame)) {
             return false;
         }
 
-        AbstractTagFrame object = (AbstractTagFrame) obj;
+        AbstractTagFrame that = (AbstractTagFrame) obj;
+        return
+                EqualsUtil.areEqual(this.getIdentifier(), that.getIdentifier()) &&
+                        EqualsUtil.areEqual(this.frameBody, that.frameBody) &&
+                        super.equals(that);
 
-        if (this.getIdentifier().equals(object.getIdentifier()) == false) {
-            return false;
-        }
-
-        if (this.frameBody.equals(object.frameBody) == false) {
-            return false;
-        }
-
-        return super.equals(obj);
     }
 }

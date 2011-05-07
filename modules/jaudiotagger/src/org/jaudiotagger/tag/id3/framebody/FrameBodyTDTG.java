@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: FrameBodyTDTG.java,v 1.8 2008/07/21 10:45:44 paultaylor Exp $
+ *  Version @version:$Id: FrameBodyTDTG.java 869 2010-02-01 14:44:01Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -28,6 +28,12 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+
+/**
+ * <p>The 'Tagging time' frame contains a timestamp describing then the
+ * audio was tagged. Timestamp format is described in the ID3v2
+ * structure document </p>
+ */
 public class FrameBodyTDTG extends AbstractFrameBodyTextInfo implements ID3v24FrameBody {
 
     /**
@@ -53,6 +59,8 @@ public class FrameBodyTDTG extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTDTG datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws java.io.IOException
      * @throws InvalidTagException
      */
@@ -61,10 +69,11 @@ public class FrameBodyTDTG extends AbstractFrameBodyTextInfo implements ID3v24Fr
     }
 
     /**
-     * @return the frmae identifier
+     * @return the frame identifier
      */
     public String getIdentifier() {
         return ID3v24Frames.FRAME_ID_TAGGING_TIME;
     }
+
 
 }

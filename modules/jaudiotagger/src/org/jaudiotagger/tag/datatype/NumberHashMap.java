@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: NumberHashMap.java,v 1.14 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: NumberHashMap.java 857 2009-12-03 11:21:11Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -29,6 +29,7 @@ import org.jaudiotagger.tag.id3.AbstractTagFrameBody;
 import org.jaudiotagger.tag.id3.valuepair.*;
 import org.jaudiotagger.tag.reference.GenreTypes;
 import org.jaudiotagger.tag.reference.PictureTypes;
+import org.jaudiotagger.utils.EqualsUtil;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -54,10 +55,12 @@ public class NumberHashMap extends NumberFixedLength implements HashMapInterface
      */
     private boolean hasEmptyValue = false;
 
+
     /**
      * Creates a new ObjectNumberHashMap datatype.
      *
      * @param identifier
+     * @param frameBody
      * @param size
      * @throws IllegalArgumentException
      */
@@ -146,37 +149,21 @@ public class NumberHashMap extends NumberFixedLength implements HashMapInterface
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof NumberHashMap) == false) {
+        if (obj == this) {
+            return true;
+        }
+
+        if (!(obj instanceof NumberHashMap)) {
             return false;
         }
 
-        NumberHashMap object = (NumberHashMap) obj;
+        NumberHashMap that = (NumberHashMap) obj;
 
-        if (this.hasEmptyValue != object.hasEmptyValue) {
-            return false;
-        }
-
-        if (this.keyToValue == null) {
-            if (object.keyToValue != null) {
-                return false;
-            }
-        } else {
-            if (this.keyToValue.equals(object.keyToValue) == false) {
-                return false;
-            }
-        }
-
-        if (this.valueToKey == null) {
-            if (object.valueToKey != null) {
-                return false;
-            }
-        } else {
-            if (this.valueToKey.equals(object.valueToKey) == false) {
-                return false;
-            }
-        }
-
-        return super.equals(obj);
+        return
+                EqualsUtil.areEqual(hasEmptyValue, that.hasEmptyValue) &&
+                        EqualsUtil.areEqual(keyToValue, that.keyToValue) &&
+                        EqualsUtil.areEqual(valueToKey, that.valueToKey) &&
+                        super.equals(that);
     }
 
     /**
@@ -210,7 +197,7 @@ public class NumberHashMap extends NumberFixedLength implements HashMapInterface
         //Mismatch:Superclass uses Long, but maps expect Integer
         Integer intValue = ((Long) value).intValue();
         if (!keyToValue.containsKey(intValue)) {
-            if (hasEmptyValue == false) {
+            if (!hasEmptyValue) {
                 throw new InvalidDataTypeException(ErrorMessage.MP3_REFERENCE_KEY_INVALID.getMsg(identifier, intValue));
             } else if (identifier.equals(DataTypes.OBJ_PICTURE_TYPE)) {
                 //logger.warning(ErrorMessage.MP3_PICTURE_TYPE_INVALID.getMsg(value));
@@ -227,7 +214,7 @@ public class NumberHashMap extends NumberFixedLength implements HashMapInterface
         } else if (keyToValue.get(value) == null) {
             return "";
         } else {
-            return keyToValue.get(value).toString();
+            return keyToValue.get(value);
         }
     }
 }

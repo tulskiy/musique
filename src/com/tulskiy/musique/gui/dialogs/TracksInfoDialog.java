@@ -59,7 +59,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.jaudiotagger.tag.TagFieldKey;
+import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
@@ -447,13 +447,13 @@ public class TracksInfoDialog extends JDialog {
     // TODO add support of MultiValue editing
     private class TrackInfoItem {
 
-    	private TagFieldKey key;
+    	private FieldKey key;
     	private List<Track> tracks;
 
     	private Set<String> allValues;
     	private boolean isUpdated;
     	
-    	public TrackInfoItem(TagFieldKey key, List<Track> tracks) {
+    	public TrackInfoItem(FieldKey key, List<Track> tracks) {
     		this.key = key;
     		this.tracks = tracks;
     		
@@ -465,7 +465,7 @@ public class TracksInfoDialog extends JDialog {
     		isUpdated = false;
     	}
     	
-    	public TagFieldKey getKey() {
+    	public FieldKey getKey() {
     		return key;
     	}
     	
@@ -505,77 +505,53 @@ public class TracksInfoDialog extends JDialog {
     private class TrackInfoItemComparator implements Comparator<TrackInfoItem> {
 
     	// TODO move keys to enum with human readable name and priority props
-    	// TODO add TRACK/DISC TOTAL keys
-    	private TagFieldKey[] sortedKeys = {
-    			TagFieldKey.ARTIST,
-    			TagFieldKey.ALBUM_ARTIST,
-    			TagFieldKey.TITLE,
-    			TagFieldKey.ALBUM,
-    			TagFieldKey.YEAR,
-    			TagFieldKey.DATE,
-    			TagFieldKey.COMMENT,
-    			TagFieldKey.GENRE,
-    			TagFieldKey.TRACK,
-    			TagFieldKey.DISC_NO,
-    			TagFieldKey.IS_COMPILATION,
-    			TagFieldKey.RECORD_LABEL,
-    			TagFieldKey.CATALOG_NO,
-    			TagFieldKey.LYRICS,
-    			TagFieldKey.ARTIST_SORT,
-    			TagFieldKey.ALBUM_ARTIST_SORT,
-    			TagFieldKey.ALBUM_SORT,
-    			TagFieldKey.TITLE_SORT,
-    			TagFieldKey.COMPOSER_SORT,
-    			TagFieldKey.COMPOSER,
-    			TagFieldKey.GROUPING,
-    			TagFieldKey.COVER_ART,
-    			TagFieldKey.BPM,
-    			TagFieldKey.MUSICBRAINZ_ARTISTID,
-    			TagFieldKey.MUSICBRAINZ_RELEASEID,
-    			TagFieldKey.MUSICBRAINZ_RELEASEARTISTID,
-    			TagFieldKey.MUSICBRAINZ_TRACK_ID,
-    			TagFieldKey.MUSICBRAINZ_DISC_ID,
-    			TagFieldKey.MUSICIP_ID,
-    			TagFieldKey.AMAZON_ID,
-    			TagFieldKey.MUSICBRAINZ_RELEASE_STATUS,
-    			TagFieldKey.MUSICBRAINZ_RELEASE_TYPE,
-    			TagFieldKey.MUSICBRAINZ_RELEASE_COUNTRY,
-    			TagFieldKey.ENCODER,
-    			TagFieldKey.ISRC,
-    			TagFieldKey.BARCODE,
-    			TagFieldKey.LYRICIST,
-    			TagFieldKey.CONDUCTOR,
-    			TagFieldKey.REMIXER,
-    			TagFieldKey.MOOD,
-    			TagFieldKey.MEDIA,
-    			TagFieldKey.URL_OFFICIAL_RELEASE_SITE,
-    			TagFieldKey.URL_DISCOGS_RELEASE_SITE,
-    			TagFieldKey.URL_WIKIPEDIA_RELEASE_SITE,
-    			TagFieldKey.URL_OFFICIAL_ARTIST_SITE,
-    			TagFieldKey.URL_DISCOGS_ARTIST_SITE,
-    			TagFieldKey.URL_WIKIPEDIA_ARTIST_SITE,
-    			TagFieldKey.LANGUAGE,
-    			TagFieldKey.KEY
+    	private FieldKey[] sortedKeys = {
+    			FieldKey.ARTIST,
+    			FieldKey.ALBUM_ARTIST,
+    			FieldKey.TITLE,
+    			FieldKey.ALBUM,
+    			FieldKey.YEAR,
+    			FieldKey.COMMENT,
+    			FieldKey.GENRE,
+    			FieldKey.TRACK,
+    			FieldKey.TRACK_TOTAL,
+    			FieldKey.DISC_NO,
+    			FieldKey.DISC_TOTAL,
+    			FieldKey.IS_COMPILATION,
+    			FieldKey.RECORD_LABEL,
+    			FieldKey.CATALOG_NO,
+    			FieldKey.LYRICS
     	};
 
 		@Override
 		public int compare(TrackInfoItem o1, TrackInfoItem o2) {
 			int index1;
+			boolean index1found = false;
 			int index2;
+			boolean index2found = false;
 
 			for (index1 = 0; index1 < sortedKeys.length; index1++) {
 				if (sortedKeys[index1].equals(o1.getKey())) {
+					index1found = true;
 					break;
 				}
 			}
 
 			for (index2 = 0; index2 < sortedKeys.length; index2++) {
 				if (sortedKeys[index2].equals(o2.getKey())) {
+					index2found = true;
 					break;
 				}
 			}
 
-			return index1 - index2;
+			if (index1found && index2found) {
+				return index1 - index2;
+			}
+			else if (!(index1found && index2found)) {
+				return o1.getKey().compareTo(o2.getKey());
+			}
+			
+			return index1found ? -1 : 1;
 		}
 
    	
@@ -590,15 +566,15 @@ public class TracksInfoDialog extends JDialog {
         }
 
         protected void loadTracks(List<Track> tracks) {
-        	Set<TagFieldKey> usedKeys = new LinkedHashSet<TagFieldKey>();
+        	Set<FieldKey> usedKeys = new LinkedHashSet<FieldKey>();
             for (int i = 0; i < tracks.size(); i++) {
             	TrackData trackData = tracks.get(i).getTrackData();
             	trackData.populateWithEmptyCommonTagFields();
 
-            	Iterator<Entry<TagFieldKey, Set<String>>> entries =
+            	Iterator<Entry<FieldKey, Set<String>>> entries =
             			trackData.getAllTagFieldValuesIterator();
             	while (entries.hasNext()) {
-            		Entry<TagFieldKey, Set<String>> entry = entries.next();
+            		Entry<FieldKey, Set<String>> entry = entries.next();
             		if (!usedKeys.contains(entry.getKey())) {
             			usedKeys.add(entry.getKey());
             			trackInfoItems.add(new TrackInfoItem(entry.getKey(), tracks));

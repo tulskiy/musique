@@ -13,7 +13,6 @@
  *  you can get a copy from http://www.opensource.org/licenses/lgpl-license.php or write to the Free Software
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
 package org.jaudiotagger.tag.id3.framebody;
 
 import org.jaudiotagger.tag.InvalidTagException;
@@ -32,7 +31,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyWOAR.java,v 1.13 2008/07/21 10:45:46 paultaylor Exp $
+ * @version $Id: FrameBodyWOAR.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodyWOAR extends AbstractFrameBodyUrlLink implements ID3v24FrameBody, ID3v23FrameBody {
     /**
@@ -57,6 +56,8 @@ public class FrameBodyWOAR extends AbstractFrameBodyUrlLink implements ID3v24Fra
     /**
      * Creates a new FrameBodyWOAR datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyWOAR(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {

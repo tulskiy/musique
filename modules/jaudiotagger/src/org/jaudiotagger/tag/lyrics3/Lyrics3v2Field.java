@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: Lyrics3v2Field.java,v 1.11 2008/07/21 10:45:49 paultaylor Exp $
+ *  Version @version:$Id: Lyrics3v2Field.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -36,6 +36,7 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodyUSLT;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
+
 
 public class Lyrics3v2Field extends AbstractTagFrame {
     /**
@@ -74,7 +75,7 @@ public class Lyrics3v2Field extends AbstractTagFrame {
             frameBody = new FieldFrameBodyLYR("");
             ((FieldFrameBodyLYR) frameBody).addLyric((FrameBodySYLT) frame.getBody());
         } else if (frameIdentifier.startsWith("COMM")) {
-            text = new String(((FrameBodyCOMM) frame.getBody()).getText());
+            text = ((FrameBodyCOMM) frame.getBody()).getText();
             frameBody = new FieldFrameBodyINF(text);
         } else if (frameIdentifier.equals("TCOM")) {
             textFrame = (AbstractFrameBodyTextInfo) frame.getBody();
@@ -98,7 +99,7 @@ public class Lyrics3v2Field extends AbstractTagFrame {
                 frameBody = new FieldFrameBodyETT(textFrame.getText());
             }
         } else {
-            throw new TagException("Cannot create Lyrics3v2 field from given ID3v2 frame");
+            throw new TagException("Cannot createField Lyrics3v2 field from given ID3v2 frame");
         }
     }
 
@@ -106,6 +107,7 @@ public class Lyrics3v2Field extends AbstractTagFrame {
      * Creates a new Lyrics3v2Field datatype.
      *
      * @param file
+     * @param byteBuffer
      * @throws InvalidTagException
      */
     public Lyrics3v2Field(ByteBuffer byteBuffer) throws InvalidTagException {
@@ -148,7 +150,7 @@ public class Lyrics3v2Field extends AbstractTagFrame {
         byteBuffer.get(buffer, 0, 3);
         String identifier = new String(buffer, 0, 3);
         // is this a valid identifier?
-        if (Lyrics3v2Fields.isLyrics3v2FieldIdentifier(identifier) == false) {
+        if (!Lyrics3v2Fields.isLyrics3v2FieldIdentifier(identifier)) {
             throw new InvalidTagException(identifier + " is not a valid ID3v2.4 frame");
         }
         frameBody = readBody(identifier, byteBuffer);
@@ -169,7 +171,7 @@ public class Lyrics3v2Field extends AbstractTagFrame {
      * @throws IOException
      */
     public void write(RandomAccessFile file) throws IOException {
-        if ((((AbstractLyrics3v2FieldFrameBody) frameBody).getSize() > 0) || TagOptionSingleton.getInstance().isLyrics3SaveEmptyField()) {
+        if ((frameBody.getSize() > 0) || TagOptionSingleton.getInstance().isLyrics3SaveEmptyField()) {
             byte[] buffer = new byte[3];
             String str = getIdentifier();
             for (int i = 0; i < str.length(); i++) {
@@ -184,11 +186,12 @@ public class Lyrics3v2Field extends AbstractTagFrame {
      * Read a Lyrics3 Field from a file.
      *
      * @param identifier
+     * @param byteBuffer
      * @return
      * @throws InvalidTagException
      */
     private AbstractLyrics3v2FieldFrameBody readBody(String identifier, ByteBuffer byteBuffer) throws InvalidTagException {
-        AbstractLyrics3v2FieldFrameBody newBody = null;
+        AbstractLyrics3v2FieldFrameBody newBody;
         if (identifier.equals(Lyrics3v2Fields.FIELD_V2_AUTHOR)) {
             newBody = new FieldFrameBodyAUT(byteBuffer);
         } else if (identifier.equals(Lyrics3v2Fields.FIELD_V2_ALBUM)) {

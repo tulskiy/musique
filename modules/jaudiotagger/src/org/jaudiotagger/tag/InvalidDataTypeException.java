@@ -17,7 +17,7 @@ package org.jaudiotagger.tag;
  * Indicates there was a problem parsing this datatype due to a problem with the data
  * such as the array being empty when trying to read from a file.
  *
- * @version $Revision: 1.6 $
+ * @version $Revision: 520 $
  */
 public class InvalidDataTypeException extends InvalidTagException {
     /**

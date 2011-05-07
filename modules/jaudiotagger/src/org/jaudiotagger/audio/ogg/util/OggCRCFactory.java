@@ -18,17 +18,19 @@
  */
 package org.jaudiotagger.audio.ogg.util;
 
+import java.util.logging.Logger;
+
 /**
  * OffCRC Calculations
  * <p/>
- * $Id: OggCRCFactory.java,v 1.5 2007/12/10 09:13:30 paultaylor Exp $
+ * $Id: OggCRCFactory.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  * @author Raphael Slinckx (KiKiDonK)
  * @version 19 d�cembre 2003
  */
 public class OggCRCFactory {
     // Logger Object
-    //public static Logger logger = //logger.getLogger("org.jaudiotagger.audio.ogg");
+    public static Logger logger = Logger.getLogger("org.jaudiotagger.audio.ogg");
 
     private static long[] crc_lookup = new long[256];
     private static boolean init = false;
@@ -45,7 +47,7 @@ public class OggCRCFactory {
                 }
             }
 
-            crc_lookup[i] = (r & 0xffffffff);
+            crc_lookup[i] = (r);
         }
         init = true;
     }
@@ -62,8 +64,8 @@ public class OggCRCFactory {
 
         long crc_reg = 0;
 
-        for (int i = 0; i < data.length; i++) {
-            int tmp = (int) (((crc_reg >>> 24) & 0xff) ^ u(data[i]));
+        for (byte aData : data) {
+            int tmp = (int) (((crc_reg >>> 24) & 0xff) ^ u(aData));
 
             crc_reg = (crc_reg << 8) ^ crc_lookup[tmp];
             crc_reg &= 0xffffffff;

@@ -21,6 +21,7 @@ public class Mp4StsdBox extends AbstractMp4Box {
     public static final int VERSION_FLAG_LENGTH = 1;
     public static final int OTHER_FLAG_LENGTH = 3;
     public static final int NO_OF_DESCRIPTIONS_POS_LENGTH = 4;
+    private int entryCount;
 
     /**
      * @param header     header info
@@ -33,6 +34,8 @@ public class Mp4StsdBox extends AbstractMp4Box {
 
     public void processData() throws CannotReadException {
         //Skip the data
-        dataBuffer.position(dataBuffer.position() + VERSION_FLAG_LENGTH + OTHER_FLAG_LENGTH + NO_OF_DESCRIPTIONS_POS_LENGTH);
+//        dataBuffer.position(dataBuffer.position() + VERSION_FLAG_LENGTH + OTHER_FLAG_LENGTH + NO_OF_DESCRIPTIONS_POS_LENGTH);
+        int flags = dataBuffer.getInt();
+        entryCount = dataBuffer.getInt();
     }
 }

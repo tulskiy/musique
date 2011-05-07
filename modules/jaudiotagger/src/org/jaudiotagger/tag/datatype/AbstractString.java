@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractString.java,v 1.13 2008/07/21 10:45:40 paultaylor Exp $
+ *  Version @version:$Id: AbstractString.java 899 2010-04-19 14:32:20Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -48,6 +48,7 @@ public abstract class AbstractString extends AbstractDataType {
      *
      * @param identifier
      * @param frameBody
+     * @param value
      */
     public AbstractString(String identifier, AbstractTagFrameBody frameBody, String value) {
         super(identifier, frameBody, value);
@@ -73,16 +74,18 @@ public abstract class AbstractString extends AbstractDataType {
     }
 
     /**
-     * Sets the size in bytes of this datatype.
+     * Sets the size in bytes of this data type.
      * This is set after writing the data to allow us to recalculate the size for
      * frame header.
+     *
+     * @param size
      */
     protected void setSize(int size) {
         this.size = size;
     }
 
     /**
-     * Return String representation of datatype
+     * Return String representation of data type
      *
      * @return a string representation of the value
      */
@@ -92,6 +95,8 @@ public abstract class AbstractString extends AbstractDataType {
 
     /**
      * Check the value can be encoded with the specified encoding
+     *
+     * @return
      */
     public boolean canBeEncoded() {
         //Try and write to buffer using the CharSet defined by the textEncoding field (note if using UTF16 we dont
@@ -103,7 +108,7 @@ public abstract class AbstractString extends AbstractDataType {
         if (encoder.canEncode((String) value)) {
             return true;
         } else {
-            //logger.finest("Failed Trying to decode" + value + "with" + encoder.toString());
+//            logger.finest("Failed Trying to decode" + value + "with" + encoder.toString());
             return false;
         }
     }

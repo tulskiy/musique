@@ -55,8 +55,7 @@ public class Utils {
     public static byte[] getDefaultBytes(String s, String charSet) {
         try {
             return s.getBytes(charSet);
-        }
-        catch (UnsupportedEncodingException uee) {
+        } catch (UnsupportedEncodingException uee) {
             throw new RuntimeException(uee);
         }
 
@@ -200,8 +199,7 @@ public class Utils {
     public static String getString(byte[] b, int offset, int length, String encoding) {
         try {
             return new String(b, offset, length, encoding);
-        }
-        catch (UnsupportedEncodingException ue) {
+        } catch (UnsupportedEncodingException ue) {
             //Shouldnt have to worry about this exception as should only be calling with well defined charsets
             throw new RuntimeException(ue);
         }
@@ -223,8 +221,7 @@ public class Utils {
         buffer.get(b);
         try {
             return new String(b, 0, length, encoding);
-        }
-        catch (UnsupportedEncodingException uee) {
+        } catch (UnsupportedEncodingException uee) {
             //TODO, will we ever use unsupported encodings
             throw new RuntimeException(uee);
         }

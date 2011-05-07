@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: NumberVariableLength.java,v 1.10 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: NumberVariableLength.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -42,11 +42,13 @@ public class NumberVariableLength extends AbstractDataType {
 
     int minLength = MINIMUM_NO_OF_DIGITS;
 
+
     /**
      * Creates a new ObjectNumberVariableLength datatype, set minimum length to zero
      * if this datatype is optional.
      *
      * @param identifier
+     * @param frameBody
      * @param minimumSize
      */
     public NumberVariableLength(String identifier, AbstractTagFrameBody frameBody, int minimumSize) {
@@ -119,17 +121,14 @@ public class NumberVariableLength extends AbstractDataType {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof NumberVariableLength) == false) {
+        if (!(obj instanceof NumberVariableLength)) {
             return false;
         }
 
         NumberVariableLength object = (NumberVariableLength) obj;
 
-        if (this.minLength != object.minLength) {
-            return false;
-        }
+        return this.minLength == object.minLength && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**
@@ -175,6 +174,7 @@ public class NumberVariableLength extends AbstractDataType {
 
         value = lvalue;
     }
+
 
     /**
      * @return String representation of the number

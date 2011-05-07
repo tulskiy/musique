@@ -1,6 +1,7 @@
 package org.jaudiotagger.tag.mp4.field;
 
 import org.jaudiotagger.audio.mp4.atom.Mp4BoxHeader;
+import org.jaudiotagger.logging.ErrorMessage;
 import org.jaudiotagger.tag.mp4.Mp4FieldKey;
 import org.jaudiotagger.tag.mp4.atom.Mp4DataBox;
 import org.jaudiotagger.tag.reference.GenreTypes;
@@ -32,8 +33,7 @@ public class Mp4GenreField extends Mp4TagTextNumberField {
             if ((genreVal - 1) <= GenreTypes.getMaxStandardGenreId()) {
                 return true;
             }
-        }
-        catch (NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) {
             //Do Nothing test as String instead
         }
 
@@ -67,15 +67,14 @@ public class Mp4GenreField extends Mp4TagTextNumberField {
             numbers = new ArrayList<Short>();
             numbers.add((short) (1));
             return;
-        }
-        catch (NumberFormatException nfe) {
+        } catch (NumberFormatException nfe) {
             //Do Nothing test as String instead
         }
 
         //Is it the String value ?
         Integer id3GenreId = GenreTypes.getInstanceOf().getIdForValue(genreId);
         if (id3GenreId != null) {
-            if (id3GenreId.intValue() <= GenreTypes.getMaxStandardGenreId()) {
+            if (id3GenreId <= GenreTypes.getMaxStandardGenreId()) {
                 numbers = new ArrayList<Short>();
                 numbers.add((short) (id3GenreId + 1));
                 return;
@@ -83,7 +82,6 @@ public class Mp4GenreField extends Mp4TagTextNumberField {
         }
         numbers = new ArrayList<Short>();
         numbers.add((short) (1));
-        return;
     }
 
     protected void build(ByteBuffer data) throws UnsupportedEncodingException {

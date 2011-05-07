@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: MPEGFrameHeader.java,v 1.18 2008/07/21 10:48:01 paultaylor Exp $
+ * Version @version:$Id: MPEGFrameHeader.java 836 2009-11-12 15:44:07Z paultaylor $
  * Date :${DATE}
  * <p/>
  * Jaikoz Copyright Copyright (C) 2003 -2005 JThink Ltd
@@ -16,10 +16,12 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+
 /**
  * Represents a MPEGFrameHeader, an MP3 is made up of a number of frames each frame starts with a four
  * byte frame header.
  */
+@SuppressWarnings({"PointlessArithmeticExpression"})
 public class MPEGFrameHeader {
     /**
      * Constants for MP3 Frame header, each frame has a basic header of
@@ -39,8 +41,8 @@ public class MPEGFrameHeader {
     public static final int SYNC_BYTE1 = 0xFF;
     public static final int SYNC_BYTE2 = 0xE0;
 
-    private static int position = 0;
     private static final byte[] header = new byte[HEADER_SIZE];
+
 
     /**
      * Constants for MPEG Version
@@ -207,6 +209,7 @@ public class MPEGFrameHeader {
         emphasisMap.put(EMPHASIS_CCITT, "CCITT");
     }
 
+
     private static final Map<Integer, String> modeExtensionMap = new HashMap<Integer, String>();
     private final static int MODE_EXTENSION_NONE = 0;
     private final static int MODE_EXTENSION_ONE = 1;
@@ -282,6 +285,7 @@ public class MPEGFrameHeader {
 
     }
 
+
     private static final int SCALE_BY_THOUSAND = 1000;
     private static final int LAYER_I_FRAME_SIZE_COEFFICIENT = 12;
     private static final int LAYER_II_FRAME_SIZE_COEFFICIENT = 144;
@@ -352,6 +356,7 @@ public class MPEGFrameHeader {
      */
     private static final int MASK_MP3_EMPHASIS = FileConstants.BIT1 | FileConstants.BIT0;
 
+
     private byte[] mpegBytes;
 
     /**
@@ -417,12 +422,14 @@ public class MPEGFrameHeader {
      */
     private boolean isProtected;
 
+
     /**
      * Flag indicating if this frame is private
      */
     private boolean isPrivate;
 
     private Integer samplingRate;
+
 
     /**
      * Gets the layerVersion attribute of the MPEGFrame object
@@ -444,8 +451,12 @@ public class MPEGFrameHeader {
         isCopyrighted = (mpegBytes[BYTE_4] & MASK_MP3_COPY) != 0;
     }
 
+
     /**
      * Set the version of this frame as an int value (see constants)
+     *
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     private void setVersion() throws InvalidAudioFrameException {
         //MPEG Version
@@ -479,6 +490,9 @@ public class MPEGFrameHeader {
 
     /**
      * Get the setBitrate of this frame
+     *
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     private void setBitrate() throws InvalidAudioFrameException {
         /* BitRate, get by checking header setBitrate bits and MPEG Version and Layer */
@@ -490,8 +504,12 @@ public class MPEGFrameHeader {
         }
     }
 
+
     /**
      * Set the Mpeg channel mode of this frame as a constant (see constants)
+     *
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     private void setChannelMode() throws InvalidAudioFrameException {
         channelMode = (mpegBytes[BYTE_4] & MASK_MP3_MODE) >>> 6;
@@ -503,6 +521,9 @@ public class MPEGFrameHeader {
 
     /**
      * Get the setEmphasis mode of this frame in a string representation
+     *
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     private void setEmphasis() throws InvalidAudioFrameException {
         emphasis = mpegBytes[BYTE_4] & MASK_MP3_EMPHASIS;
@@ -512,6 +533,7 @@ public class MPEGFrameHeader {
         }
     }
 
+
     /**
      * Set whether this frame uses padding bytes
      */
@@ -519,8 +541,12 @@ public class MPEGFrameHeader {
         isPadding = (mpegBytes[BYTE_3] & MASK_MP3_PADDING) != 0;
     }
 
+
     /**
      * Get the layer version of this frame as a constant int value (see constants)
+     *
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     private void setLayer() throws InvalidAudioFrameException {
         layer = (mpegBytes[BYTE_2] & MASK_MP3_LAYER) >>> 1;
@@ -530,8 +556,12 @@ public class MPEGFrameHeader {
         }
     }
 
+
     /**
      * Sets the string representation of the mode extension of this frame
+     *
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     private void setModeExtension() throws InvalidAudioFrameException {
         int index = (mpegBytes[BYTE_4] & MASK_MP3_MODE_EXTENSION) >> 4;
@@ -550,6 +580,9 @@ public class MPEGFrameHeader {
 
     /**
      * set the sampling rate in Hz of this frame
+     *
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     private void setSamplingRate() throws InvalidAudioFrameException {
         //Frequency
@@ -656,10 +689,12 @@ public class MPEGFrameHeader {
                             return (LAYER_III_FRAME_SIZE_COEFFICIENT) * (getBitRate() * SCALE_BY_THOUSAND) / getSamplingRate() + getPaddingLength() * LAYER_III_SLOT_SIZE;
                         }
 
+
                     default:
                         throw new RuntimeException("Mp3 Unknown Layer:" + layer);
 
                 }
+
 
             case VERSION_1:
                 switch (layer) {
@@ -686,11 +721,14 @@ public class MPEGFrameHeader {
     /**
      * Get the number of samples in a frame, all frames in a file have a set number of samples as defined by their MPEG Versiona
      * and Layer
+     *
+     * @return
      */
     public int getNoOfSamples() {
         Integer noOfSamples = samplesPerFrameMap.get(version).get(layer);
         return noOfSamples;
     }
+
 
     public boolean isPadding() {
         return isPadding;
@@ -728,8 +766,12 @@ public class MPEGFrameHeader {
         return modeExtension;
     }
 
+
     /**
      * Hide Constructor
+     *
+     * @throws org.jaudiotagger.audio.exceptions.InvalidAudioFrameException
+     *
      */
     private MPEGFrameHeader() throws InvalidAudioFrameException {
 
@@ -777,10 +819,11 @@ public class MPEGFrameHeader {
     /**
      * Gets the MPEGFrame attribute of the MPEGFrame object
      *
+     * @param bb
      * @return The mPEGFrame value
      */
     public static boolean isMPEGFrame(ByteBuffer bb) {
-        position = bb.position();
+        int position = bb.position();
         return (((bb.get(position) & SYNC_BYTE1) == SYNC_BYTE1) && ((bb.get(position + 1) & SYNC_BYTE2) == SYNC_BYTE2));
 
     }

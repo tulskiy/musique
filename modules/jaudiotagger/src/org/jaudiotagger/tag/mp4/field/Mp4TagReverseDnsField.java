@@ -2,6 +2,7 @@ package org.jaudiotagger.tag.mp4.field;
 
 import org.jaudiotagger.audio.generic.Utils;
 import org.jaudiotagger.audio.mp4.atom.Mp4BoxHeader;
+import org.jaudiotagger.logging.ErrorMessage;
 import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.TagTextField;
 import org.jaudiotagger.tag.mp4.Mp4FieldKey;
@@ -47,6 +48,7 @@ public class Mp4TagReverseDnsField extends Mp4TagField implements TagTextField {
     /**
      * Construct from existing file data
      *
+     * @param parentHeader
      * @param data
      * @throws UnsupportedEncodingException
      */
@@ -69,6 +71,11 @@ public class Mp4TagReverseDnsField extends Mp4TagField implements TagTextField {
 
     /**
      * Newly created Reverse Dns field bypassing the Mp4TagField enum for creation of temporary reverse dns fields
+     *
+     * @param fieldName
+     * @param issuer
+     * @param identifier
+     * @param content
      */
     public Mp4TagReverseDnsField(final String fieldName, final String issuer, final String identifier, final String content) {
         super(fieldName);
@@ -115,6 +122,7 @@ public class Mp4TagReverseDnsField extends Mp4TagField implements TagTextField {
         }
     }
 
+
     public void copyContent(TagField field) {
         if (field instanceof Mp4TagReverseDnsField) {
             this.issuer = ((Mp4TagReverseDnsField) field).getIssuer();
@@ -129,6 +137,7 @@ public class Mp4TagReverseDnsField extends Mp4TagField implements TagTextField {
     public String getContent() {
         return content;
     }
+
 
     protected byte[] getDataBytes() throws UnsupportedEncodingException {
         return content.getBytes(getEncoding());
@@ -173,8 +182,7 @@ public class Mp4TagReverseDnsField extends Mp4TagField implements TagTextField {
             outerbaos.write(baos.toByteArray());
             return outerbaos.toByteArray();
 
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //This should never happen as were not actually writing to/from a file
             throw new RuntimeException(ioe);
         }
@@ -193,8 +201,7 @@ public class Mp4TagReverseDnsField extends Mp4TagField implements TagTextField {
             baos.write(new byte[]{0, 0, 0, 0});
             baos.write(dataRawData);
             return baos.toByteArray();
-        }
-        catch (IOException ioe) {
+        } catch (IOException ioe) {
             //This should never happen as were not actually writing to/from a file
             throw new RuntimeException(ioe);
         }

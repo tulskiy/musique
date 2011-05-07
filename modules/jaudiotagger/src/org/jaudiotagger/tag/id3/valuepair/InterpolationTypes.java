@@ -1,7 +1,7 @@
 /**
  * @author : Paul Taylor
  * <p/>
- * Version @version:$Id: InterpolationTypes.java,v 1.3 2007/08/06 16:04:36 paultaylor Exp $
+ * Version @version:$Id: InterpolationTypes.java 339 2007-08-06 16:04:38Z paultaylor $
  * <p/>
  * Jaudiotagger Copyright (C)2004,2005
  * <p/>

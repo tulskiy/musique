@@ -20,6 +20,7 @@ import org.jaudiotagger.tag.id3.ID3v24Frames;
 
 import java.nio.ByteBuffer;
 
+
 /**
  * Content group description Text information frame.
  * <p>The 'Content group description' frame is used if the sound belongs to a larger category of sounds/music.
@@ -32,7 +33,7 @@ import java.nio.ByteBuffer;
  *
  * @author : Paul Taylor
  * @author : Eric Farng
- * @version $Id: FrameBodyTIT1.java,v 1.13 2008/07/21 10:45:44 paultaylor Exp $
+ * @version $Id: FrameBodyTIT1.java 832 2009-11-12 13:25:38Z paultaylor $
  */
 public class FrameBodyTIT1 extends AbstractFrameBodyTextInfo implements ID3v24FrameBody, ID3v23FrameBody {
     /**
@@ -58,6 +59,8 @@ public class FrameBodyTIT1 extends AbstractFrameBodyTextInfo implements ID3v24Fr
     /**
      * Creates a new FrameBodyTIT1 datatype.
      *
+     * @param byteBuffer
+     * @param frameSize
      * @throws InvalidTagException
      */
     public FrameBodyTIT1(ByteBuffer byteBuffer, int frameSize) throws InvalidTagException {

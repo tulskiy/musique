@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: ID3v2LyricLine.java,v 1.8 2008/07/21 10:45:41 paultaylor Exp $
+ *  Version @version:$Id: ID3v2LyricLine.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -44,7 +44,7 @@ public class ID3v2LyricLine extends AbstractDataType {
 
     public ID3v2LyricLine(ID3v2LyricLine copy) {
         super(copy);
-        this.text = new String(copy.text);
+        this.text = copy.text;
         this.timeStamp = copy.timeStamp;
     }
 
@@ -82,21 +82,18 @@ public class ID3v2LyricLine extends AbstractDataType {
      * @return
      */
     public boolean equals(Object obj) {
-        if ((obj instanceof ID3v2LyricLine) == false) {
+        if (!(obj instanceof ID3v2LyricLine)) {
             return false;
         }
 
         ID3v2LyricLine object = (ID3v2LyricLine) obj;
 
-        if (this.text.equals(object.text) == false) {
+        if (!this.text.equals(object.text)) {
             return false;
         }
 
-        if (this.timeStamp != object.timeStamp) {
-            return false;
-        }
+        return this.timeStamp == object.timeStamp && super.equals(obj);
 
-        return super.equals(obj);
     }
 
     /**

@@ -26,6 +26,7 @@ import com.tulskiy.musique.audio.formats.cue.CUEFileReader;
 import com.tulskiy.musique.audio.formats.flac.FLACFileReader;
 import com.tulskiy.musique.audio.formats.mp3.MP3FileReader;
 import com.tulskiy.musique.audio.formats.mp3.MP3TagWriter;
+import com.tulskiy.musique.audio.formats.mp4.MP4TagWriter;
 import com.tulskiy.musique.audio.formats.ogg.OGGFileReader;
 import com.tulskiy.musique.audio.formats.ogg.VorbisTagWriter;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMFileReader;
@@ -58,6 +59,7 @@ public class TrackIO {
         writers.add(new MP3TagWriter());
         writers.add(new APETagWriter());
         writers.add(new VorbisTagWriter());
+        writers.add(new MP4TagWriter());
     }
 
     public static AudioFileReader getAudioFileReader(String fileName) {
@@ -84,7 +86,11 @@ public class TrackIO {
         if (track.getTrackData().isFile()) {
             AudioTagWriter writer = TrackIO.getAudioFileWriter(track.getTrackData().getFile().getName());
             if (writer != null)
-                writer.write(track);
+                try {
+                    writer.write(track);
+                } catch (com.tulskiy.musique.audio.TagWriteException e) {
+                    e.printStackTrace();
+                }
         }
     }
 }

@@ -28,7 +28,7 @@ import java.util.TreeSet;
  * Here we specify how frames are mapped between different Tag Versions
  *
  * @author Paul Taylor
- * @version $Id: ID3Frames.java,v 1.15 2008/07/21 10:45:47 paultaylor Exp $
+ * @version $Id: ID3Frames.java 932 2010-11-26 13:13:15Z paultaylor $
  */
 public abstract class ID3Frames extends AbstractStringStringValuePair {
     /**
@@ -63,13 +63,19 @@ public abstract class ID3Frames extends AbstractStringStringValuePair {
 
     /**
      * If file changes discard these frames
+     *
+     * @param frameID
+     * @return
      */
     public boolean isDiscardIfFileAltered(String frameID) {
         return discardIfFileAlteredFrames.contains(frameID);
     }
 
     /**
-     * Are multiple ocurrences of frame allowed
+     * Are multiple occurrences of frame allowed
+     *
+     * @param frameID
+     * @return
      */
     public boolean isMultipleAllowed(String frameID) {
         return multipleFrames.contains(frameID);
@@ -81,6 +87,10 @@ public abstract class ID3Frames extends AbstractStringStringValuePair {
      */
     public boolean isSupportedFrames(String frameID) {
         return supportedFrames.contains(frameID);
+    }
+
+    public TreeSet<String> getSupportedFrames() {
+        return supportedFrames;
     }
 
     /**
@@ -99,6 +109,7 @@ public abstract class ID3Frames extends AbstractStringStringValuePair {
         return binaryFrames.contains(frameID);
     }
 
+
     /**
      * @param frameID
      * @return true if frame is a known extension
@@ -106,6 +117,7 @@ public abstract class ID3Frames extends AbstractStringStringValuePair {
     public boolean isExtensionFrames(String frameID) {
         return extensionFrames.contains(frameID);
     }
+
 
     /**
      * Mapping from v22 to v23
@@ -119,6 +131,7 @@ public abstract class ID3Frames extends AbstractStringStringValuePair {
     public static final Map<String, String> convertv24Tov23 = new LinkedHashMap<String, String>();
     public static final Map<String, String> forcev23Tov24 = new LinkedHashMap<String, String>();
     public static final Map<String, String> forcev24Tov23 = new LinkedHashMap<String, String>();
+
 
     private static void loadID3v23ID3v24Mapping() {
         // Define the mapping from v23 to v24 only maps values where
@@ -142,12 +155,17 @@ public abstract class ID3Frames extends AbstractStringStringValuePair {
         forcev23Tov24.put(ID3v23Frames.FRAME_ID_V3_TRDA, ID3v24Frames.FRAME_ID_YEAR);
         forcev23Tov24.put(ID3v23Frames.FRAME_ID_V3_TYER, ID3v24Frames.FRAME_ID_YEAR);
 
-        // Note Force v24 to v23, TDRC is a 1M relationship handled specially.
+        forcev23Tov24.put(ID3v23Frames.FRAME_ID_V3_TYER, ID3v24Frames.FRAME_ID_YEAR);
+
+        //Note Force v24 to v23, TDRC is a 1M relationship handled specially.
         // @TODO EQUALISATION
         forcev24Tov23.put(ID3v24Frames.FRAME_ID_RELATIVE_VOLUME_ADJUSTMENT2, ID3v23Frames.FRAME_ID_V3_RELATIVE_VOLUME_ADJUSTMENT);
-
-        // Used to be a special frame now a text frame
+        //Used to be a special frame now a text frame
         forcev24Tov23.put(ID3v24Frames.FRAME_ID_INVOLVED_PEOPLE, ID3v23Frames.FRAME_ID_V3_IPLS);
+        //No Mood frame in v23 so use a TXXX frame
+        forcev24Tov23.put(ID3v24Frames.FRAME_ID_MOOD, ID3v23Frames.FRAME_ID_V3_USER_DEFINED_INFO);
+        //Release time can be mapped to release year (but can only hold year)
+        forcev24Tov23.put(ID3v24Frames.FRAME_ID_ORIGINAL_RELEASE_TIME, ID3v23Frames.FRAME_ID_V3_TORY);
 
     }
 
@@ -256,5 +274,6 @@ public abstract class ID3Frames extends AbstractStringStringValuePair {
         loadID3v22ID3v23Mapping();
         loadID3v23ID3v24Mapping();
     }
+
 
 }

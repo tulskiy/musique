@@ -2,7 +2,7 @@
  *  @author : Paul Taylor
  *  @author : Eric Farng
  *
- *  Version @version:$Id: AbstractLyrics3v2FieldFrameBody.java,v 1.11 2008/07/21 10:45:49 paultaylor Exp $
+ *  Version @version:$Id: AbstractLyrics3v2FieldFrameBody.java 836 2009-11-12 15:44:07Z paultaylor $
  *
  *  MusicTag Copyright (C)2003,2004
  *
@@ -56,7 +56,7 @@ public abstract class AbstractLyrics3v2FieldFrameBody extends AbstractTagFrameBo
         file.read(buffer, 0, 5);
         size = Integer.parseInt(new String(buffer, 0, 5));
 
-        if ((size == 0) && (TagOptionSingleton.getInstance().isLyrics3KeepEmptyFieldIfRead() == false)) {
+        if ((size == 0) && (!TagOptionSingleton.getInstance().isLyrics3KeepEmptyFieldIfRead())) {
             throw new InvalidTagException("Lyircs3v2 Field has size of zero.");
         }
 
