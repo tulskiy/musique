@@ -102,6 +102,8 @@ public class APETagProcessor {
             tag.SetFieldString("CUESHEET", trackData.getCueSheet());
 
             tag.Save();
+    		
+    		track.getTrackData().removeEmptyTagFields();
         } finally {
             if (ras != null)
                 ras.close();

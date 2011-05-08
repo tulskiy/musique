@@ -87,6 +87,8 @@ public abstract class AudioTagWriter {
     	catch (FieldDataInvalidException fdie) {
     		throw new TagWriteException(fdie);
     	}
+		
+		track.getTrackData().removeEmptyTagFields();
     }
 
 }

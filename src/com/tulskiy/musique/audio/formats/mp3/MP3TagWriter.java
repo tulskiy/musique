@@ -114,6 +114,8 @@ public class MP3TagWriter extends AudioTagWriter {
 				}
 			}
 		}
+		
+		track.getTrackData().removeEmptyTagFields();
     }
 
 }

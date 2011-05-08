@@ -21,32 +21,31 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -54,14 +53,14 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.jaudiotagger.tag.FieldKey;
-
 import com.tulskiy.musique.gui.components.GroupTable;
+import com.tulskiy.musique.gui.model.FileInfoModel;
+import com.tulskiy.musique.gui.model.TagFieldsModel;
+import com.tulskiy.musique.gui.model.TrackInfoItem;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
@@ -82,8 +81,8 @@ public class TracksInfoDialog extends JDialog {
         setTitle("Properties");
         setModal(false);
 
-        final MetadataModel metaModel = new MetadataModel(tracks);
-        JComponent tagsTable = createTable(metaModel);
+        final TagFieldsModel tagFieldsModel = new TagFieldsModel(tracks);
+        JComponent tagsTable = createTable(tagFieldsModel);
         JComponent propsTable = createTable(new FileInfoModel(tracks));
 
         JTabbedPane tp = new JTabbedPane();
@@ -100,7 +99,7 @@ public class TracksInfoDialog extends JDialog {
         write.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                writeTracks(metaModel, tracks);
+                writeTracks(tagFieldsModel, tracks);
             }
         });
         cancel = new JButton("Cancel");
@@ -123,7 +122,7 @@ public class TracksInfoDialog extends JDialog {
         setLocationRelativeTo(SwingUtilities.windowForComponent(parent));
     }
 
-    private void writeTracks(final MetadataModel metaModel, final List<Track> tracks) {
+    private void writeTracks(final TagFieldsModel tagFieldsModel, final List<Track> tracks) {
         ProgressDialog dialog = new ProgressDialog(this, "Writing tags");
         dialog.show(new Task() {
             String status;
@@ -180,8 +179,9 @@ public class TracksInfoDialog extends JDialog {
                         continue;
                     }
                     status = trackData.getFile().getName();
-                    for (TrackInfoItem item : metaModel.trackInfoItems) {
-                    	item.updateTracks();
+                    tagFieldsModel.sync();
+                    for (TrackInfoItem item : tagFieldsModel.getTrackInfoItems()) {
+                    	item.updateTrack(track);
                     }
                     TrackIO.write(track);
                     processed++;
@@ -238,8 +238,8 @@ public class TracksInfoDialog extends JDialog {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof MetadataModel) {
-                    if (((MetadataModel) tableModel).trackInfoItems.get(row).isMultiple()) {
+                if (tableModel instanceof TagFieldsModel) {
+                    if (((TagFieldsModel) tableModel).getTrackInfoItems().get(row).isMultiple()) {
                         value = "";
                     }
                 }
@@ -258,9 +258,9 @@ public class TracksInfoDialog extends JDialog {
             @Override
             protected void fireEditingStopped() {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof MetadataModel) {
+                if (tableModel instanceof TagFieldsModel) {
                     String value = (String) table.getCellEditor().getCellEditorValue();
-                    if (Util.isEmpty(value) && ((MetadataModel) tableModel).trackInfoItems.get(table.getEditingRow()).isMultiple()) {
+                    if (Util.isEmpty(value) && ((TagFieldsModel) tableModel).getTrackInfoItems().get(table.getEditingRow()).isMultiple()) {
                         super.fireEditingCanceled();
                         return;
                     }
@@ -303,6 +303,26 @@ public class TracksInfoDialog extends JDialog {
                 }
             }
         });
+        
+        table.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				show(e);
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				show(e);
+			}
+
+            public void show(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    JPopupMenu contextMenu = buildContextMenu(parent, table, new Point(e.getX(), e.getY()));
+                    contextMenu.show(e.getComponent(), e.getX(), e.getY());
+                }
+            }
+		});
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -310,314 +330,49 @@ public class TracksInfoDialog extends JDialog {
         return scrollPane;
     }
 
-    private class FileInfoModel extends MetadataModel {
-        class Entry {
-            String key;
-            Object value;
+    private JPopupMenu buildContextMenu(final PlaylistTable playlist, final GroupTable properties, final Point point) {
+    	final TagFieldsModel tagFieldsModel = (TagFieldsModel) properties.getModel();
 
-            Entry(String key, Object value) {
-                this.key = key;
-                this.value = value;
-            }
-        }
-
-        private ArrayList<Entry> list;
-
-        private FileInfoModel(List<Track> tracks) {
-            super(tracks);
-        }
-
-        @Override
-        protected void loadTracks(List<Track> tracks) {
-            list = new ArrayList<Entry>();
-            if (tracks.size() == 1) {
-                fillSingleTrack(tracks.get(0));
-            } else {
-                fillMultipleTracks(tracks);
-            }
-        }
-
-        private void fillMultipleTracks(List<Track> tracks) {
-            list.add(new Entry("Tracks selected", tracks.size()));
-            long fileSize = 0;
-            double length = 0;
-            HashMap<String, Integer> formats = new HashMap<String, Integer>();
-            HashMap<String, Integer> channels = new HashMap<String, Integer>();
-            HashMap<String, Integer> sampleRate = new HashMap<String, Integer>();
-            HashSet<String> files = new HashSet<String>();
-            for (Track track : tracks) {
-            	TrackData trackData = track.getTrackData();
-                if (trackData.isFile()) {
-                    fileSize += trackData.getFile().length();
-                    length += trackData.getTotalSamples() / (double) trackData.getSampleRate();
-                    files.add(trackData.getFile().getAbsolutePath());
-                    increment(formats, trackData.getCodec());
-                    increment(channels, trackData.getChannelsAsString());
-                    increment(sampleRate, trackData.getSampleRate() + " Hz");
-                }
-            }
-
-            list.add(new Entry("Files", files.toString()));
-            list.add(new Entry("Total size", fileSize + " bytes"));
-            list.add(new Entry("Total Length", Util.formatSeconds(length, 3)));
-            list.add(new Entry("Format", calcPercentage(formats)));
-            list.add(new Entry("Channels", calcPercentage(channels)));
-            list.add(new Entry("Sample Rate", calcPercentage(sampleRate)));
-        }
-
-        private Object calcPercentage(Map<String, Integer> map) {
-            double total = 0;
-            for (Integer val : map.values()) {
-                total += val;
-            }
-            ArrayList<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(map.entrySet());
-            Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-                @Override
-                public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                    return o2.getValue().compareTo(o1.getValue());
-                }
-            });
-
-            boolean single = map.size() == 1;
-            StringBuilder sb = new StringBuilder();
-            for (Map.Entry<String, Integer> entry : list) {
-                sb.append(entry.getKey());
-                if (!single) {
-                    sb.append(" (").append(String.format("%.2f", entry.getValue() / total * 100))
-                            .append("%), ");
-                }
-            }
-
-            return sb.toString().replaceAll(", $", "");
-        }
-
-        private void increment(Map<String, Integer> map, String key) {
-            Integer val = map.get(key);
-            if (val == null) {
-                map.put(key, 1);
-            } else {
-                map.put(key, val + 1);
-            }
-        }
-
-        private void fillSingleTrack(Track track) {
-        	TrackData trackData = track.getTrackData();
-            list.add(new Entry("Location", trackData.getLocation().toString().replaceAll("%\\d\\d", " ")));
-            if (trackData.isFile())
-                list.add(new Entry("File Size (bytes)", trackData.getFile().length()));
-            if (trackData.getTotalSamples() >= 0)
-                list.add(new Entry("Length", Util.samplesToTime(trackData.getTotalSamples(), trackData.getSampleRate(), 3) +
-                                             " (" + trackData.getTotalSamples() + " samples)"));
-            list.add(new Entry("Subsong Index", trackData.getSubsongIndex()));
-            if (trackData.isCue()) {
-                list.add(new Entry("Cue Embedded", trackData.isCueEmbedded()));
-                if (!trackData.isCueEmbedded()) {
-                    list.add(new Entry("Cue Path", trackData.getCueLocation()));
-                }
-            }
-            list.add(new Entry("Format", trackData.getCodec()));
-            if (!Util.isEmpty(trackData.getEncoder())) {
-            	list.add(new Entry("Encoder", trackData.getEncoder()));
-            }
-            list.add(new Entry("Channels", trackData.getChannels()));
-            if (trackData.getSampleRate() > 0)
-                list.add(new Entry("Sample Rate", trackData.getSampleRate() + " Hz"));
-        }
-
-        @Override
-        public int getRowCount() {
-            return list.size();
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            Entry entry = list.get(rowIndex);
-            if (columnIndex == 0)
-                return entry.key;
-            else
-                return String.valueOf(entry.value);
-        }
-
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false;
-        }
-    }
-
-    // TODO add support of MultiValue editing
-    private class TrackInfoItem {
-
-    	private FieldKey key;
-    	private List<Track> tracks;
-
-    	private Set<String> allValues;
-    	private boolean isUpdated;
-    	
-    	public TrackInfoItem(FieldKey key, List<Track> tracks) {
-    		this.key = key;
-    		this.tracks = tracks;
-    		
-    		allValues = new LinkedHashSet<String>();
-    		for (Track track : tracks) {
-    			allValues.addAll(track.getTrackData().getTagFieldValuesSafeAsSet(key));
-    		}
-    		
-    		isUpdated = false;
+    	final List<TrackInfoItem> trackInfoItemsSelected = new LinkedList<TrackInfoItem>();
+    	if (properties.getSelectedRowCount() > 0) {
+	    	for (int row : properties.getSelectedRows()) {
+	    		trackInfoItemsSelected.add(tagFieldsModel.getTrackInfoItems().get(row));
+	    	}
     	}
-    	
-    	public FieldKey getKey() {
-    		return key;
-    	}
-    	
-    	public void setCommonValue(String value) {
-    		allValues.clear();
-    		allValues.add(value);
-    		isUpdated = true;
-    	}
-    	
-    	public void updateTracks() {
-    		if (isUpdated) {
-	    		for (Track track : tracks) {
-	    			track.getTrackData().setTagFieldValues(key, allValues);
-	    		}
+    	else {
+    		int row = properties.rowAtPoint(new Point(point));
+    		if (row > -1) {
+    			trackInfoItemsSelected.add(tagFieldsModel.getTrackInfoItems().get(row));
     		}
     	}
-    	
-    	public boolean isMultiple() {
-    		return allValues.size() > 1;
-    	}
-    	
-    	public String toString() {
-    		String result = null;
 
-    		if (allValues.size() > 1) {
-    			result = "<multiple values> " + allValues.toString();
-            }
-            else if (allValues.size() == 1) {
-            	result = allValues.iterator().next();
-            }
-    		
-    		return result;
-    	}
+    	ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
 
-    }
-    
-    private class TrackInfoItemComparator implements Comparator<TrackInfoItem> {
+        final JPopupMenu menu = new JPopupMenu();
 
-    	// TODO move keys to enum with human readable name and priority props
-    	private FieldKey[] sortedKeys = {
-    			FieldKey.ARTIST,
-    			FieldKey.ALBUM_ARTIST,
-    			FieldKey.TITLE,
-    			FieldKey.ALBUM,
-    			FieldKey.YEAR,
-    			FieldKey.COMMENT,
-    			FieldKey.GENRE,
-    			FieldKey.TRACK,
-    			FieldKey.TRACK_TOTAL,
-    			FieldKey.DISC_NO,
-    			FieldKey.DISC_TOTAL,
-    			FieldKey.IS_COMPILATION,
-    			FieldKey.RECORD_LABEL,
-    			FieldKey.CATALOG_NO,
-    			FieldKey.LYRICS
-    	};
-
-		@Override
-		public int compare(TrackInfoItem o1, TrackInfoItem o2) {
-			int index1;
-			boolean index1found = false;
-			int index2;
-			boolean index2found = false;
-
-			for (index1 = 0; index1 < sortedKeys.length; index1++) {
-				if (sortedKeys[index1].equals(o1.getKey())) {
-					index1found = true;
-					break;
+        JMenuItem menuItemAdd = new JMenuItem("Add");
+        menuItemAdd.setIcon(emptyIcon);
+        menu.add(menuItemAdd).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TracksInfoAddFieldDialog dialog = new TracksInfoAddFieldDialog(playlist, properties, tagFieldsModel);
+				dialog.setVisible(true);
+			}
+        });
+        
+        if (!trackInfoItemsSelected.isEmpty()) {
+	        JMenuItem menuItemRemove = new JMenuItem("Remove");
+	        menuItemRemove.setIcon(emptyIcon);
+	        menu.add(menuItemRemove).addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					tagFieldsModel.removeTrackInfoItems(trackInfoItemsSelected);
+					properties.repaint();
 				}
-			}
-
-			for (index2 = 0; index2 < sortedKeys.length; index2++) {
-				if (sortedKeys[index2].equals(o2.getKey())) {
-					index2found = true;
-					break;
-				}
-			}
-
-			if (index1found && index2found) {
-				return index1 - index2;
-			}
-			else if (!(index1found && index2found)) {
-				return o1.getKey().compareTo(o2.getKey());
-			}
-			
-			return index1found ? -1 : 1;
-		}
-
-   	
+			});
+        }
+        
+        return menu;
     }
 
-    private class MetadataModel extends AbstractTableModel {
-    	
-    	private List<TrackInfoItem> trackInfoItems = new LinkedList<TrackInfoItem>();
-
-        private MetadataModel(List<Track> tracks) {
-            loadTracks(tracks);
-        }
-
-        protected void loadTracks(List<Track> tracks) {
-        	Set<FieldKey> usedKeys = new LinkedHashSet<FieldKey>();
-            for (int i = 0; i < tracks.size(); i++) {
-            	TrackData trackData = tracks.get(i).getTrackData();
-            	trackData.populateWithEmptyCommonTagFields();
-
-            	Iterator<Entry<FieldKey, Set<String>>> entries =
-            			trackData.getAllTagFieldValuesIterator();
-            	while (entries.hasNext()) {
-            		Entry<FieldKey, Set<String>> entry = entries.next();
-            		if (!usedKeys.contains(entry.getKey())) {
-            			usedKeys.add(entry.getKey());
-            			trackInfoItems.add(new TrackInfoItem(entry.getKey(), tracks));
-            		}
-            	}
-            }
-            Collections.sort(trackInfoItems, new TrackInfoItemComparator());
-        }
-
-        @Override
-        public int getRowCount() {
-            return trackInfoItems.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return 2;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            if (rowIndex < 0 || rowIndex > trackInfoItems.size())
-                return null;
-
-            if (columnIndex == 0)
-                return Util.humanize(trackInfoItems.get(rowIndex).getKey().toString());
-            else
-                return trackInfoItems.get(rowIndex).toString();
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            return column == 0 ? "Key" : "Value";
-        }
-
-        @Override
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        	trackInfoItems.get(rowIndex).setCommonValue((String) aValue);
-        }
-
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 1;
-        }
-    }
 }

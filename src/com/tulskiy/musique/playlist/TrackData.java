@@ -47,9 +47,20 @@ public class TrackData implements Cloneable {
 	
 	// common tag fields (to be displayed in TrackInfoDialog even if missed)
 	private static final FieldKey[] COMMON_TAG_FIELDS = {
-			FieldKey.ARTIST, FieldKey.ALBUM_ARTIST, FieldKey.ALBUM,
-			FieldKey.YEAR, FieldKey.TITLE, FieldKey.TRACK, FieldKey.DISC_NO,
-			FieldKey.RECORD_LABEL, FieldKey.CATALOG_NO
+		FieldKey.ARTIST,
+		FieldKey.ALBUM_ARTIST,
+		FieldKey.TITLE,
+		FieldKey.ALBUM,
+		FieldKey.YEAR,
+		FieldKey.GENRE,
+		FieldKey.TRACK,
+		FieldKey.TRACK_TOTAL,
+		FieldKey.DISC_NO,
+		FieldKey.DISC_TOTAL,
+		FieldKey.RECORD_LABEL,
+		FieldKey.CATALOG_NO,
+		FieldKey.COMMENT,
+		FieldKey.RATING
 	};
 	
     // song info
@@ -565,6 +576,14 @@ public class TrackData implements Cloneable {
     
     public void removeEmptyCommonTagFields() {
     	for (FieldKey key : COMMON_TAG_FIELDS) {
+    		if (Util.isEmpty(getFirstTagFieldValue(key))) {
+    			removeTagField(key);
+    		}
+    	}
+    }
+    
+    public void removeEmptyTagFields() {
+    	for (FieldKey key : FieldKey.values()) {
     		if (Util.isEmpty(getFirstTagFieldValue(key))) {
     			removeTagField(key);
     		}
