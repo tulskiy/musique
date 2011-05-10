@@ -17,6 +17,33 @@
 
 package com.tulskiy.musique.playlist;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URI;
+import java.net.URL;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.logging.Logger;
+
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.datatype.Pair;
+
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
@@ -24,15 +51,6 @@ import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.AudioMath;
 import com.tulskiy.musique.util.Util;
-
-import java.io.*;
-import java.net.URI;
-import java.net.URL;
-import java.text.MessageFormat;
-import java.util.*;
-import java.util.logging.Logger;
-
-import org.jaudiotagger.tag.FieldKey;
 
 /**
  * @Author: Denis Tulskiy
@@ -87,7 +105,7 @@ public class Playlist extends ArrayList<Track> {
             dos.write(MAGIC);
             dos.writeInt(VERSION);
             dos.writeInt(size());
-            HashMap<String, String> meta = new HashMap<String, String>();
+            List<Pair> meta = new LinkedList<Pair>();
             TrackData trackData;
             for (Track track : this) {
             	trackData = track.getTrackData();
@@ -109,18 +127,18 @@ public class Playlist extends ArrayList<Track> {
 
                 meta.clear();
                 // TODO use CODEC const
-                meta.put("codec", trackData.getCodec());
+                meta.add(new Pair("codec", trackData.getCodec()));
                 for (FieldKey key : FieldKey.values()) {
                     List<String> values = trackData.getTagFieldValuesSafeAsList(key);
                     for (String value : values) {
-                    	meta.put(key.toString(), value);
+                    	meta.add(new Pair(key.toString(), value));
                     }
                 }
 
                 dos.writeInt(meta.size());
-                for (Map.Entry<String, String> e : meta.entrySet()) {
-                    dos.writeUTF(e.getKey());
-                    dos.writeUTF(e.getValue());
+                for (Pair pair : meta) {
+                    dos.writeUTF(pair.getKey());
+                    dos.writeUTF(pair.getValue());
                 }
             }
 
