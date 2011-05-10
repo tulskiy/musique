@@ -57,7 +57,11 @@ import com.tulskiy.musique.util.Util;
  * @Date: Dec 30, 2009
  */
 public class Playlist extends ArrayList<Track> {
-    private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\" {2}");
+
+	private static final String META_KEY_CODEC = "codec";
+    private static final String META_KEY_ENCODER = "encoder";
+
+	private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\" {2}");
 
     private static final int VERSION = 2;
     private static final byte[] MAGIC = "BARABASHKA".getBytes();
@@ -126,8 +130,10 @@ public class Playlist extends ArrayList<Track> {
                 dos.writeLong(trackData.getLastModified());
 
                 meta.clear();
-                // TODO use CODEC const
-                meta.add(new Pair("codec", trackData.getCodec()));
+                meta.add(new Pair(META_KEY_CODEC, trackData.getCodec()));
+                if (!Util.isEmpty(trackData.getEncoder())) {
+                	meta.add(new Pair(META_KEY_ENCODER, trackData.getEncoder()));
+                }
                 for (FieldKey key : FieldKey.values()) {
                     List<String> values = trackData.getTagFieldValuesSafeAsList(key);
                     for (String value : values) {
@@ -197,9 +203,11 @@ public class Playlist extends ArrayList<Track> {
                 for (int j = 0; j < metaSize; j++) {
                     String key = dis.readUTF();
                     String value = dis.readUTF();
-                    // TODO use CODEC const
-                    if (key.equals("codec")) {
+                    if (key.equals(META_KEY_CODEC)) {
                         trackData.setCodec(value);
+                    }
+                    else if (key.equals(META_KEY_ENCODER)) {
+                        trackData.setEncoder(value);
                     }
                 	else {
                         trackData.addTagFieldValues(FieldKey.valueOf(key), value);
