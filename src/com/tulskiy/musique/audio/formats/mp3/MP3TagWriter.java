@@ -88,7 +88,6 @@ public class MP3TagWriter extends AudioTagWriter {
 
     // @see AudioTagWriter#copyTagFields(Tag, AbstractTag, Track) as source
     public void copyTagFields(ID3v24Tag tag, Track track) throws KeyNotFoundException, FieldDataInvalidException {
-    	TagField field;
     	String value;
     	boolean firstValue;
 
@@ -99,18 +98,12 @@ public class MP3TagWriter extends AudioTagWriter {
 			firstValue = true;
 			while (values.hasNext()) {
 				value = values.next();
-				if (Util.isEmpty(value)) {
+				if (firstValue) {
 					tag.deleteField(entry.getKey());
+					firstValue = false;
 				}
-				else {
-					field = tag.createField(entry.getKey(), value);
-					if (firstValue) {
-						tag.setField(field);
-						firstValue = false;
-					}
-					else {
-						tag.addField(field);
-					}
+				if (!Util.isEmpty(value)) {
+					tag.addField(tag.createField(entry.getKey(), value));
 				}
 			}
 		}

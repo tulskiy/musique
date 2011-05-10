@@ -53,7 +53,6 @@ public abstract class AudioTagWriter {
     // in case of logic change, review MP3TagWriter and APETagProcessor
     // TODO take a look if refactoring to AbstractTag only fits (in format specific writers)
     public void copyTagFields(Tag tag, AbstractTag abstractTag, Track track) throws TagWriteException {
-    	TagField field;
     	String value;
     	boolean firstValue;
 
@@ -65,18 +64,12 @@ public abstract class AudioTagWriter {
 				firstValue = true;
 				while (values.hasNext()) {
 					value = values.next();
-					if (Util.isEmpty(value)) {
+					if (firstValue) {
 						tag.deleteField(entry.getKey());
+						firstValue = false;
 					}
-					else {
-						field = abstractTag.createField(entry.getKey(), value);
-						if (firstValue) {
-							tag.setField(field);
-							firstValue = false;
-						}
-						else {
-							tag.addField(field);
-						}
+					if (!Util.isEmpty(value)) {
+						tag.addField(abstractTag.createField(entry.getKey(), value));
 					}
 				}
 			}
