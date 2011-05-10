@@ -76,7 +76,7 @@ public class TagFieldsModel extends AbstractTableModel {
 
 	public void removeTrackInfoItems(List<TrackInfoItem> items) {
 		for (TrackInfoItem item : items) {
-			item.setCommonValue(null);
+			item.setValue(null);
 		}
 		trackInfoItemsRemoved.addAll(items);
 		trackInfoItems.removeAll(items);
@@ -133,7 +133,7 @@ public class TagFieldsModel extends AbstractTableModel {
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		trackInfoItems.get(rowIndex).setCommonValue((String) aValue);
+		trackInfoItems.get(rowIndex).setValue((String) aValue);
 	}
 
 	@Override

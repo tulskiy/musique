@@ -20,6 +20,7 @@ package com.tulskiy.musique.util;
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
+import java.util.Set;
 
 /**
  * @Author: Denis Tulskiy
@@ -182,4 +183,23 @@ public class Util {
         return String.format("%1$#" + n + "s", s);
     }
 
+    public static String formatFieldValues(Object values, String separator) {
+        if (values != null && separator != null) {
+        	if (values instanceof String) {
+        		return (String) values;
+        	}
+        	else if (values instanceof Set) {
+            	StringBuilder sb = new StringBuilder();
+            	for (Object value : ((Set) values).toArray()) {
+            		if (sb.length() != 0) {
+            			sb.append(separator);
+            		}
+            		sb.append(value.toString());
+            	}
+            	return sb.toString();
+        	}
+        }
+        
+        return null;
+    }
 }

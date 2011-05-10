@@ -17,32 +17,29 @@
 
 package com.tulskiy.musique.gui.model;
 
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.playlist.Track;
 
-// TODO add support of MultiValue editing
 public class TrackInfoItem {
 
 	private FieldKey key;
 	private List<Track> tracks;
 
-	private Set<String> allValues;
+	private Map<Track, Set<String>> values;
 	private boolean isUpdated;
 
 	public TrackInfoItem(FieldKey key, List<Track> tracks) {
 		this.key = key;
 		this.tracks = tracks;
-
-		allValues = new LinkedHashSet<String>();
-		for (Track track : tracks) {
-			allValues.addAll(track.getTrackData().getTagFieldValuesSafeAsSet(key));
-		}
-
+		initValues();
 		isUpdated = false;
 	}
 
@@ -53,38 +50,100 @@ public class TrackInfoItem {
 	public List<Track> getTracks() {
 		return tracks;
 	}
+	
+	public void initValues() {
+		values = new LinkedHashMap<Track, Set<String>>();
+		for (Track track : tracks) {
+			values.put(track, new HashSet<String>(track.getTrackData().getTagFieldValuesSafeAsSet(key)));
+		}
+	}
+	
+	public Set<String> getValues() {
+		Set<String> result = new LinkedHashSet<String>();
 
-	public void setCommonValue(String value) {
-		allValues.clear();
-		allValues.add(value);
-		isUpdated = true;
+		for (Set<String> vs : values.values()) {
+			result.addAll(vs);
+		}
+
+		return result;
+	}
+	
+	public Set<String> getValues(Track track) {
+		return track == null ? getValues() : values.get(track);
 	}
 
-	public void updateTrack(Track track) {
-		if (isUpdated && tracks.contains(track)) {
-			track.getTrackData().setTagFieldValues(key, allValues);
+	public int getValuesAmount() {
+		return getValues().size();
+	}
+	
+	public void addValue(String value) {
+		for (Set<String> vs : values.values()) {
+			vs.add(value);
+		}
+		isUpdated = true;
+	}
+	
+	public void addValue(String value, Track track) {
+		if (track == null) {
+			addValue(value);
+		}
+		else {
+			Set<String> vs = values.get(track);
+			vs.add(value);
+			isUpdated = true;
 		}
 	}
 
-	public void updateTracks() {
+	public void setValue(String value) {
+		for (Set<String> vs : values.values()) {
+			vs.clear();
+			vs.add(value);
+		}
+		isUpdated = true;
+	}
+
+	public void setValue(String value, Track track) {
+		if (track == null) {
+			setValue(value);
+		}
+		else {
+			Set<String> vs = values.get(track);
+			vs.clear();
+			vs.add(value);
+			isUpdated = true;
+		}
+	}
+
+	public void update() {
 		if (isUpdated) {
 			for (Track track : tracks) {
-				track.getTrackData().setTagFieldValues(key, allValues);
+				track.getTrackData().setTagFieldValues(key, values.get(track));
 			}
 		}
 	}
 
+	public void update(Track track) {
+		if (track == null) {
+			update();
+		}
+		else if (isUpdated && tracks.contains(track)) {
+			track.getTrackData().setTagFieldValues(key, values.get(track));
+		}
+	}
+
 	public boolean isMultiple() {
-		return allValues.size() > 1;
+		return values.size() > 1;
 	}
 
 	public String toString() {
 		String result = null;
+		Set<String> vs = getValues();
 
-		if (allValues.size() > 1) {
-			result = "<multiple values> " + allValues.toString();
-		} else if (allValues.size() == 1) {
-			result = allValues.iterator().next();
+		if (vs.size() > 1) {
+			result = "<multiple values> " + vs.toString();
+		}
+		else if (vs.size() == 1) {
+			result = vs.iterator().next();
 		}
 
 		return result;

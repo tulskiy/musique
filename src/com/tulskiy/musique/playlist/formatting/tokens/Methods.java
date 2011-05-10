@@ -157,22 +157,7 @@ public class Methods {
 
     	Object tagFieldValues = args.get(0).eval(track);
         String separator = (String) args.get(1).eval(track);
-        if (tagFieldValues != null && separator != null) {
-        	if (tagFieldValues instanceof String) {
-        		return (String) tagFieldValues;
-        	}
-        	else {
-            	StringBuilder sb = new StringBuilder();
-            	for (Object value : ((Set<String>) tagFieldValues).toArray()) {
-            		if (sb.length() != 0) {
-            			sb.append(separator);
-            		}
-            		sb.append(value.toString());
-            	}
-            	return sb.toString();
-        	}
-        }
-
-        return null;
+        
+        return Util.formatFieldValues(tagFieldValues, separator);
     }
 }

@@ -71,7 +71,7 @@ public class TracksInfoAddFieldDialog extends JDialog {
             	FieldKeyMeta keyMeta = (FieldKeyMeta) key.getSelectedItem();
             	TrackInfoItem trackInfoItem = new TrackInfoItem(keyMeta.getKey(),
             			tagFieldsModel.getTrackInfoItems().get(0).getTracks());
-            	trackInfoItem.setCommonValue(value.getText());
+            	trackInfoItem.setValue(value.getText());
             	
             	tagFieldsModel.addTrackInfoItem(trackInfoItem);
 

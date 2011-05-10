@@ -29,9 +29,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -47,7 +44,6 @@ import javax.swing.JDialog;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -58,62 +54,59 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import com.tulskiy.musique.gui.components.GroupTable;
-import com.tulskiy.musique.gui.model.FileInfoModel;
 import com.tulskiy.musique.gui.model.TagFieldModel;
 import com.tulskiy.musique.gui.model.TagFieldsModel;
-import com.tulskiy.musique.gui.model.TrackInfoItem;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.playlist.TrackData;
-import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
 
 /**
  * Author: Denis Tulskiy
  * Date: Jul 15, 2010
  */
-public class TracksInfoDialog extends JDialog {
+public class TracksInfoEditFieldDialog extends JDialog {
     private JButton cancel;
-    private PlaylistTable parent;
-    private int DEFAULT_COLUMN_WIDTH = 430;
+    private int DEFAULT_COLUMN_WIDTH = 280;
 
-    public TracksInfoDialog(final PlaylistTable parent, final List<Track> tracks) {
-        this.parent = parent;
-        setTitle("Properties");
+    public TracksInfoEditFieldDialog(final PlaylistTable playlist, final GroupTable properties,
+    		final TagFieldModel tagFieldModel) {
+        setTitle(tagFieldModel.isMultiTrackEditMode() ? "Edit multiple files" : "Edit single file");
         setModal(false);
 
-        final TagFieldsModel tagFieldsModel = new TagFieldsModel(tracks);
-        JComponent tagsTable = createTable(tagFieldsModel);
-        JComponent propsTable = createTable(new FileInfoModel(tracks));
+        JComponent tagsTable = createTable(properties, tagFieldModel);
 
-        JTabbedPane tp = new JTabbedPane();
-        tp.setFocusable(false);
-        tp.addTab("Metadata", tagsTable);
-        tp.addTab("Properties", propsTable);
-
-        add(tp, BorderLayout.CENTER);
+        add(tagsTable, BorderLayout.CENTER);
 
         Box b1 = new Box(BoxLayout.X_AXIS);
         b1.add(Box.createHorizontalGlue());
-        JButton write = new JButton("Write");
-        b1.add(write);
-        write.addActionListener(new ActionListener() {
+        JButton update = new JButton("Update");
+        b1.add(update);
+        update.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                writeTracks(tagFieldsModel, tracks);
+            	tagFieldModel.updateTrackInfoItem();
+
+            	if (properties.getModel() instanceof TagFieldModel) {
+            		((TagFieldModel) properties.getModel()).updateModel();
+            	}
+            	properties.revalidate();
+            	properties.repaint();
+            	if (playlist != null) {
+            		playlist.getPlaylist().firePlaylistChanged();
+            	}
+                setVisible(false);
+                dispose();
+                properties.requestFocus();
             }
         });
         cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	for (TrackInfoItem item : tagFieldsModel.getTrackInfoItems()) {
-            		item.initValues();
-            	}
+            	tagFieldModel.cancel();
 
             	setVisible(false);
                 dispose();
-                parent.requestFocus();
+                properties.requestFocus();
             }
         });
 
@@ -124,91 +117,10 @@ public class TracksInfoDialog extends JDialog {
         add(b1, BorderLayout.SOUTH);
 
         setSize(600, 380);
-        setLocationRelativeTo(SwingUtilities.windowForComponent(parent));
+        setLocationRelativeTo(SwingUtilities.windowForComponent(playlist == null ? properties : playlist));
     }
 
-    private void writeTracks(final TagFieldsModel tagFieldsModel, final List<Track> tracks) {
-        ProgressDialog dialog = new ProgressDialog(this, "Writing tags");
-        dialog.show(new Task() {
-            String status;
-            boolean abort = false;
-            public int processed;
-
-            @Override
-            public boolean isIndeterminate() {
-                return false;
-            }
-
-            @Override
-            public float getProgress() {
-                return (float) processed / tracks.size();
-            }
-
-            @Override
-            public String getStatus() {
-                return "Writing Tags to: " + status;
-            }
-
-            @Override
-            public void abort() {
-                abort = true;
-            }
-
-            @Override
-            public void start() {
-                HashMap<File, ArrayList<Track>> cues = new HashMap<File, ArrayList<Track>>();
-
-                for (Track track : tracks) {
-                	TrackData trackData = track.getTrackData();
-                    if (!trackData.isFile()) {
-                        processed++;
-                        continue;
-                    }
-
-                    if (abort)
-                        break;
-
-                    if (trackData.isCue()) {
-                        File file;
-                        if (trackData.isCueEmbedded()) {
-                            file = trackData.getFile();
-                        } else {
-                            file = new File(trackData.getCueLocation());
-                        }
-
-                        if (!cues.containsKey(file)) {
-                            cues.put(file, new ArrayList<Track>());
-                        }
-
-                        cues.get(file).add(track);
-                        continue;
-                    }
-                    status = trackData.getFile().getName();
-                    tagFieldsModel.sync();
-                    for (TrackInfoItem item : tagFieldsModel.getTrackInfoItems()) {
-                    	item.update(track);
-                    }
-                    TrackIO.write(track);
-                    processed++;
-                }
-
-                // now let's write cue files
-                // not implemented for now
-//                CUEWriter writer = new CUEWriter();
-//                for (File file : cues.keySet()) {
-//                    status = file.getName();
-//                    writer.write(file, cues.get(file));
-//                }
-
-                parent.getPlaylist().firePlaylistChanged();
-                setVisible(false);
-                dispose();
-                parent.requestFocus();
-            }
-        });
-    }
-
-    private JComponent createTable(TableModel model) {
+    private JComponent createTable(final GroupTable parent, final TableModel model) {
         final GroupTable table = new GroupTable() {
             public Component prepareRenderer(final TableCellRenderer renderer,
                                              final int row, final int column) {
@@ -231,7 +143,7 @@ public class TracksInfoDialog extends JDialog {
         table.setFont(table.getFont().deriveFont(11f));
 
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        table.getColumn("Key").setMaxWidth(120);
+//        table.getColumn("Key").setMaxWidth(120);
 
         table.setShowVerticalLines(true);
         table.setIntercellSpacing(new Dimension(1, 1));
@@ -243,8 +155,8 @@ public class TracksInfoDialog extends JDialog {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof TagFieldsModel) {
-                    if (((TagFieldsModel) tableModel).getTrackInfoItems().get(row).isMultiple()) {
+                if (tableModel instanceof TagFieldModel) {
+                    if (((TagFieldModel) tableModel).getTrackInfoItem().isMultiple()) {
                         value = "";
                     }
                 }
@@ -323,7 +235,7 @@ public class TracksInfoDialog extends JDialog {
 
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    JPopupMenu contextMenu = buildContextMenu(parent, table, new Point(e.getX(), e.getY()));
+                    JPopupMenu contextMenu = buildContextMenu(table, new Point(e.getX(), e.getY()));
                     contextMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -335,65 +247,70 @@ public class TracksInfoDialog extends JDialog {
         return scrollPane;
     }
 
-    private JPopupMenu buildContextMenu(final PlaylistTable playlist, final GroupTable properties, final Point point) {
-    	final TagFieldsModel tagFieldsModel = (TagFieldsModel) properties.getModel();
-
-    	final List<TrackInfoItem> trackInfoItemsSelected = new LinkedList<TrackInfoItem>();
+    private JPopupMenu buildContextMenu(final GroupTable properties, final Point point) {
+    	final TagFieldModel tagFieldModel = (TagFieldModel) properties.getModel();
+        
+        final List<Integer> selectedRows = new LinkedList<Integer>();
     	if (properties.getSelectedRowCount() > 0) {
 	    	for (int row : properties.getSelectedRows()) {
-	    		trackInfoItemsSelected.add(tagFieldsModel.getTrackInfoItems().get(row));
+	    		selectedRows.add(row);
 	    	}
     	}
     	else {
     		int row = properties.rowAtPoint(new Point(point));
     		if (row > -1) {
-    			trackInfoItemsSelected.add(tagFieldsModel.getTrackInfoItems().get(row));
+    			selectedRows.add(row);
     		}
     	}
-    	
+
     	ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
 
         final JPopupMenu menu = new JPopupMenu();
 
-        if (!trackInfoItemsSelected.isEmpty()) {
-        	final TagFieldModel tagFieldModel = trackInfoItemsSelected.get(0).getTracks().size() == 1 ?
-        			new TagFieldModel(trackInfoItemsSelected.get(0), trackInfoItemsSelected.get(0).getTracks().get(0)) :
-       				new TagFieldModel(trackInfoItemsSelected.get(0));
+        if (tagFieldModel.isMultiTrackEditMode()) {
+            if (!selectedRows.isEmpty()) {
+            	final TagFieldModel editTagFieldModel = new TagFieldModel(tagFieldModel.getTrackInfoItem(),
+            			tagFieldModel.getTrackInfoItem().getTracks().get(selectedRows.get(0)));
 
-	        JMenuItem menuItemEdit = new JMenuItem("Edit");
-	        menuItemEdit.setIcon(emptyIcon);
-	        menu.add(menuItemEdit).addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					TracksInfoEditFieldDialog dialog =
-							new TracksInfoEditFieldDialog(playlist, properties, tagFieldModel);
-					dialog.setVisible(true);
-				}
-	        });
-	        
-	        menu.addSeparator();
+    	        JMenuItem menuItemEdit = new JMenuItem("Edit");
+    	        menuItemEdit.setIcon(emptyIcon);
+    	        menu.add(menuItemEdit).addActionListener(new ActionListener() {
+    				@Override
+    				public void actionPerformed(ActionEvent e) {
+    					// no playlist given since edit dialog is actual parent here
+    					TracksInfoEditFieldDialog dialog =
+    							new TracksInfoEditFieldDialog(null, properties, editTagFieldModel);
+    					dialog.setVisible(true);
+    				}
+    	        });
+             }
         }
-
-        JMenuItem menuItemAdd = new JMenuItem("Add");
-        menuItemAdd.setIcon(emptyIcon);
-        menu.add(menuItemAdd).addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				TracksInfoAddFieldDialog dialog = new TracksInfoAddFieldDialog(playlist, properties, tagFieldsModel);
-				dialog.setVisible(true);
-			}
-        });
-        
-        if (!trackInfoItemsSelected.isEmpty()) {
-	        JMenuItem menuItemRemove = new JMenuItem("Remove");
-	        menuItemRemove.setIcon(emptyIcon);
-	        menu.add(menuItemRemove).addActionListener(new ActionListener() {
+        else {
+	        JMenuItem menuItemAdd = new JMenuItem("Add");
+	        menuItemAdd.setIcon(emptyIcon);
+	        menu.add(menuItemAdd).addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					tagFieldsModel.removeTrackInfoItems(trackInfoItemsSelected);
+					tagFieldModel.addValue();
+
+					properties.revalidate();
 					properties.repaint();
 				}
-			});
+	        });
+
+	    	if (!selectedRows.isEmpty()) {
+		        JMenuItem menuItemRemove = new JMenuItem("Remove");
+		        menuItemRemove.setIcon(emptyIcon);
+		        menu.add(menuItemRemove).addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						for (int row : selectedRows) {
+							tagFieldModel.removeValue(row);
+						}
+						properties.repaint();
+					}
+				});
+	        }
         }
         
         return menu;
