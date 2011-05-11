@@ -184,7 +184,7 @@ public class TrackData implements Cloneable {
     	// handle additional business logic
     	if (FieldKey.TRACK.equals(key)) {
     		String track = values.iterator().next();
-    		trackNumberFormatted = new Formatter().format("%02d", Integer.parseInt(track)).toString();
+    		trackNumberFormatted = Util.isEmpty(track) ? track : new Formatter().format("%02d", Integer.parseInt(track)).toString();
     	}
 
     	// handle technical tags
