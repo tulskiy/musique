@@ -54,8 +54,9 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import com.tulskiy.musique.gui.components.GroupTable;
+import com.tulskiy.musique.gui.model.MultiTagFieldModel;
+import com.tulskiy.musique.gui.model.SingleTagFieldModel;
 import com.tulskiy.musique.gui.model.TagFieldModel;
-import com.tulskiy.musique.gui.model.TagFieldsModel;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.util.Util;
 
@@ -68,7 +69,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
     private int DEFAULT_COLUMN_WIDTH = 280;
 
     public TracksInfoEditFieldDialog(final PlaylistTable playlist, final GroupTable properties,
-    		final TagFieldModel tagFieldModel) {
+    		final SingleTagFieldModel tagFieldModel) {
         setTitle(tagFieldModel.isMultiTrackEditMode() ? "Edit multiple files" : "Edit single file");
         setModal(false);
 
@@ -83,11 +84,10 @@ public class TracksInfoEditFieldDialog extends JDialog {
         update.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	tagFieldModel.updateTrackInfoItem();
-
-            	if (properties.getModel() instanceof TagFieldModel) {
-            		((TagFieldModel) properties.getModel()).updateModel();
-            	}
+            	// update state with this dialog values
+            	tagFieldModel.approveModel();
+            	// sync parent dialog values with approved state
+            	((TagFieldModel) properties.getModel()).refreshModel();
             	properties.revalidate();
             	properties.repaint();
             	if (playlist != null) {
@@ -102,8 +102,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	tagFieldModel.cancel();
-
+            	tagFieldModel.rejectModel();
             	setVisible(false);
                 dispose();
                 properties.requestFocus();
@@ -155,8 +154,8 @@ public class TracksInfoEditFieldDialog extends JDialog {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof TagFieldModel) {
-                    if (((TagFieldModel) tableModel).getTrackInfoItem().isMultiple()) {
+                if (tableModel instanceof SingleTagFieldModel) {
+                    if (((SingleTagFieldModel) tableModel).getTrackInfoItem().isMultiple()) {
                         value = "";
                     }
                 }
@@ -175,9 +174,9 @@ public class TracksInfoEditFieldDialog extends JDialog {
             @Override
             protected void fireEditingStopped() {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof TagFieldsModel) {
+                if (tableModel instanceof MultiTagFieldModel) {
                     String value = (String) table.getCellEditor().getCellEditorValue();
-                    if (Util.isEmpty(value) && ((TagFieldsModel) tableModel).getTrackInfoItems().get(table.getEditingRow()).isMultiple()) {
+                    if (Util.isEmpty(value) && ((MultiTagFieldModel) tableModel).getTrackInfoItems().get(table.getEditingRow()).isMultiple()) {
                         super.fireEditingCanceled();
                         return;
                     }
@@ -248,7 +247,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
     }
 
     private JPopupMenu buildContextMenu(final GroupTable properties, final Point point) {
-    	final TagFieldModel tagFieldModel = (TagFieldModel) properties.getModel();
+    	final SingleTagFieldModel tagFieldModel = (SingleTagFieldModel) properties.getModel();
         
         final List<Integer> selectedRows = new LinkedList<Integer>();
     	if (properties.getSelectedRowCount() > 0) {
@@ -269,7 +268,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
 
         if (tagFieldModel.isMultiTrackEditMode()) {
             if (!selectedRows.isEmpty()) {
-            	final TagFieldModel editTagFieldModel = new TagFieldModel(tagFieldModel.getTrackInfoItem(),
+            	final SingleTagFieldModel editTagFieldModel = new SingleTagFieldModel(tagFieldModel.getTrackInfoItem(),
             			tagFieldModel.getTrackInfoItem().getTracks().get(selectedRows.get(0)));
 
     	        JMenuItem menuItemEdit = new JMenuItem("Edit");

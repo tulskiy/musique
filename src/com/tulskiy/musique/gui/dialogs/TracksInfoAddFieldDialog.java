@@ -37,7 +37,7 @@ import javax.swing.SwingUtilities;
 import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.gui.components.GroupTable;
-import com.tulskiy.musique.gui.model.TagFieldsModel;
+import com.tulskiy.musique.gui.model.MultiTagFieldModel;
 import com.tulskiy.musique.gui.model.TrackInfoItem;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.util.FieldKeyMetaHelper;
@@ -51,7 +51,7 @@ public class TracksInfoAddFieldDialog extends JDialog {
 
 	private JButton cancel;
 
-    public TracksInfoAddFieldDialog(final PlaylistTable playlist, final GroupTable properties, final TagFieldsModel tagFieldsModel) {
+    public TracksInfoAddFieldDialog(final PlaylistTable playlist, final GroupTable properties, final MultiTagFieldModel tagFieldsModel) {
         setTitle("Add field");
         setModal(false);
 
@@ -71,7 +71,8 @@ public class TracksInfoAddFieldDialog extends JDialog {
             	FieldKeyMeta keyMeta = (FieldKeyMeta) key.getSelectedItem();
             	TrackInfoItem trackInfoItem = new TrackInfoItem(keyMeta.getKey(),
             			tagFieldsModel.getTrackInfoItems().get(0).getTracks());
-            	trackInfoItem.setValue(value.getText());
+            	trackInfoItem.getState().setValue(value.getText());
+            	trackInfoItem.approveState(false);
             	
             	tagFieldsModel.addTrackInfoItem(trackInfoItem);
 
@@ -103,7 +104,7 @@ public class TracksInfoAddFieldDialog extends JDialog {
         setLocationRelativeTo(SwingUtilities.windowForComponent(properties));
     }
     
-    private List<FieldKey> getAvailableFieldKeys(final TagFieldsModel tagFieldsModel) {
+    private List<FieldKey> getAvailableFieldKeys(final MultiTagFieldModel tagFieldsModel) {
     	List<FieldKey> result = new ArrayList<FieldKey>(Arrays.asList(FieldKey.values()));
     	result.removeAll(tagFieldsModel.getAllUsedFieldKeys());
     	return result;

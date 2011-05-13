@@ -17,12 +17,8 @@
 
 package com.tulskiy.musique.gui.model;
 
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Stack;
 
 import org.jaudiotagger.tag.FieldKey;
 
@@ -33,14 +29,14 @@ public class TrackInfoItem {
 	private FieldKey key;
 	private List<Track> tracks;
 
-	private Map<Track, Set<String>> values;
-	private boolean isUpdated;
+	private Stack<TrackInfoItemState> states;
 
 	public TrackInfoItem(FieldKey key, List<Track> tracks) {
 		this.key = key;
 		this.tracks = tracks;
-		initValues();
-		isUpdated = false;
+
+		states = new Stack<TrackInfoItemState>();
+		addState(key, tracks);
 	}
 
 	public FieldKey getKey() {
@@ -51,102 +47,72 @@ public class TrackInfoItem {
 		return tracks;
 	}
 	
-	public void initValues() {
-		values = new LinkedHashMap<Track, Set<String>>();
-		for (Track track : tracks) {
-			values.put(track, new HashSet<String>(track.getTrackData().getTagFieldValuesSafeAsSet(key)));
-		}
-	}
-	
-	public Set<String> getValues() {
-		Set<String> result = new LinkedHashSet<String>();
-
-		for (Set<String> vs : values.values()) {
-			result.addAll(vs);
-		}
-
-		return result;
-	}
-	
-	public Set<String> getValues(Track track) {
-		return track == null ? getValues() : values.get(track);
+	public TrackInfoItemState getState() {
+		return states.peek();
 	}
 
-	public int getValuesAmount() {
-		return getValues().size();
-	}
-	
-	public void addValue(String value) {
-		for (Set<String> vs : values.values()) {
-			vs.add(value);
-		}
-		isUpdated = true;
-	}
-	
-	public void addValue(String value, Track track) {
-		if (track == null) {
-			addValue(value);
-		}
-		else {
-			Set<String> vs = values.get(track);
-			vs.add(value);
-			isUpdated = true;
-		}
+	/**
+	 * Adds new state cloned from current.
+	 */
+	public void addState() {
+		states.push(new TrackInfoItemState(getState()));
 	}
 
-	public void setValue(String value) {
-		for (Set<String> vs : values.values()) {
-			vs.clear();
-			vs.add(value);
-		}
-		isUpdated = true;
+	/**
+	 * Adds new state based on field key and tracks.
+	 * 
+	 * @param key field key for this track info item
+	 * @param tracks list of tracks associated with this track info item
+	 */
+	private void addState(FieldKey key, List<Track> tracks) {
+		states.push(new TrackInfoItemState(key, tracks));
 	}
 
-	public void setValue(String value, Track track) {
-		if (track == null) {
-			setValue(value);
+	/**
+	 * Approves current state (replaces previous state with current one).
+	 * 
+	 * @param updateTracks indicates whether tracks are to be updated with approved state data
+	 */
+	public void approveState(boolean updateTracks) {
+		// update states
+		if (states.size() > 1) {
+			TrackInfoItemState currentState = states.pop();
+			states.pop();
+			states.push(currentState);
 		}
-		else {
-			Set<String> vs = values.get(track);
-			vs.clear();
-			vs.add(value);
-			isUpdated = true;
-		}
-	}
-
-	public void update() {
-		if (isUpdated) {
+		// update tracks
+		if (updateTracks && getState().isUpdated()) {
 			for (Track track : tracks) {
-				track.getTrackData().setTagFieldValues(key, values.get(track));
+				track.getTrackData().setTagFieldValues(key, getState().getValues(track));
 			}
 		}
 	}
 
-	public void update(Track track) {
-		if (track == null) {
-			update();
+	/**
+	 * Rejects current state.
+	 * Nothing happens in case there is one state only.
+	 */
+	public void rejectState() {
+		if (states.size() > 1) {
+			states.pop();
 		}
-		else if (isUpdated && tracks.contains(track)) {
-			track.getTrackData().setTagFieldValues(key, values.get(track));
+	}
+
+	/**
+	 * Resets track info item state to initial one.
+	 */
+	public void resetStates() {
+		while (states.size() > 1) {
+			states.pop();
 		}
 	}
 
 	public boolean isMultiple() {
-		return values.size() > 1;
+		return getState().isMultiple();
 	}
 
 	public String toString() {
-		String result = null;
-		Set<String> vs = getValues();
-
-		if (vs.size() > 1) {
-			result = "<multiple values> " + vs.toString();
-		}
-		else if (vs.size() == 1) {
-			result = vs.iterator().next();
-		}
-
-		return result;
+		return getState().toString();
 	}
 
 }

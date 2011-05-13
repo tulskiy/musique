@@ -33,12 +33,12 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.util.FieldKeyMetaHelper;
 
-public class TagFieldsModel extends AbstractTableModel {
+public class MultiTagFieldModel extends AbstractTableModel implements TagFieldModel {
 
 	private List<TrackInfoItem> trackInfoItems = new LinkedList<TrackInfoItem>();
 	private List<TrackInfoItem> trackInfoItemsRemoved = new LinkedList<TrackInfoItem>();
 
-	public TagFieldsModel(List<Track> tracks) {
+	public MultiTagFieldModel(List<Track> tracks) {
 		loadTracks(tracks);
 	}
 
@@ -76,7 +76,7 @@ public class TagFieldsModel extends AbstractTableModel {
 
 	public void removeTrackInfoItems(List<TrackInfoItem> items) {
 		for (TrackInfoItem item : items) {
-			item.setValue(null);
+			item.getState().setValue(null);
 		}
 		trackInfoItemsRemoved.addAll(items);
 		trackInfoItems.removeAll(items);
@@ -87,9 +87,27 @@ public class TagFieldsModel extends AbstractTableModel {
 	 * will be physically removed by AudioFileWriter. Should be used by
 	 * "apply changes" event handler only.
 	 */
-	public void sync() {
+	private void sync() {
 		trackInfoItems.addAll(trackInfoItemsRemoved);
 		trackInfoItemsRemoved.clear();
+	}
+	
+	public void approveModel() {
+		sync();
+    	for (TrackInfoItem item : trackInfoItems) {
+    		item.approveState(true);
+    	}
+	}
+
+	public void refreshModel() {
+		// do nothing, according to nature of this model
+	}
+	
+	public void rejectModel() {
+		sync();
+    	for (TrackInfoItem item : trackInfoItems) {
+    		item.rejectState();
+    	}
 	}
 	
 	public List<FieldKey> getAllUsedFieldKeys() {
@@ -133,11 +151,12 @@ public class TagFieldsModel extends AbstractTableModel {
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		trackInfoItems.get(rowIndex).setValue((String) aValue);
+		trackInfoItems.get(rowIndex).getState().setValue((String) aValue);
 	}
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		return columnIndex == 1;
 	}
+
 }

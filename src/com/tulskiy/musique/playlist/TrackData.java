@@ -191,6 +191,9 @@ public class TrackData implements Cloneable {
     	if (FieldKey.ENCODER.equals(key)) {
     		setEncoder(values.iterator().next());
     	}
+    	else if (FieldKey.COVER_ART.equals(key)) {
+    		// TODO skipping, should be handled in its own way
+    	}
     	// handle common cases
     	else {
     		tagFields.put(key, values);

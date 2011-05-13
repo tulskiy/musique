@@ -183,6 +183,27 @@ public class Util {
         return String.format("%1$#" + n + "s", s);
     }
 
+    public static String formatFieldValues(Object values) {
+		String result = null;
+
+		if (values != null) {
+        	if (values instanceof String) {
+        		result = (String) values;
+        	}
+        	else if (values instanceof Set) {
+        		Set vs = (Set) values;
+        		if (vs.size() > 1) {
+        			result = "<multiple values> " + vs.toString();
+        		}
+        		else if (vs.size() == 1) {
+        			result = vs.iterator().next().toString();
+        		}
+        	}
+        }
+        
+        return result;
+    }
+
     public static String formatFieldValues(Object values, String separator) {
         if (values != null && separator != null) {
         	if (values instanceof String) {

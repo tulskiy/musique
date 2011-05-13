@@ -59,8 +59,8 @@ import javax.swing.table.TableModel;
 
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.model.FileInfoModel;
-import com.tulskiy.musique.gui.model.TagFieldModel;
-import com.tulskiy.musique.gui.model.TagFieldsModel;
+import com.tulskiy.musique.gui.model.SingleTagFieldModel;
+import com.tulskiy.musique.gui.model.MultiTagFieldModel;
 import com.tulskiy.musique.gui.model.TrackInfoItem;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Track;
@@ -82,7 +82,7 @@ public class TracksInfoDialog extends JDialog {
         setTitle("Properties");
         setModal(false);
 
-        final TagFieldsModel tagFieldsModel = new TagFieldsModel(tracks);
+        final MultiTagFieldModel tagFieldsModel = new MultiTagFieldModel(tracks);
         JComponent tagsTable = createTable(tagFieldsModel);
         JComponent propsTable = createTable(new FileInfoModel(tracks));
 
@@ -100,6 +100,7 @@ public class TracksInfoDialog extends JDialog {
         write.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	tagFieldsModel.approveModel();
                 writeTracks(tagFieldsModel, tracks);
             }
         });
@@ -107,10 +108,7 @@ public class TracksInfoDialog extends JDialog {
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	for (TrackInfoItem item : tagFieldsModel.getTrackInfoItems()) {
-            		item.initValues();
-            	}
-
+            	tagFieldsModel.rejectModel();
             	setVisible(false);
                 dispose();
                 parent.requestFocus();
@@ -127,7 +125,7 @@ public class TracksInfoDialog extends JDialog {
         setLocationRelativeTo(SwingUtilities.windowForComponent(parent));
     }
 
-    private void writeTracks(final TagFieldsModel tagFieldsModel, final List<Track> tracks) {
+    private void writeTracks(final MultiTagFieldModel tagFieldsModel, final List<Track> tracks) {
         ProgressDialog dialog = new ProgressDialog(this, "Writing tags");
         dialog.show(new Task() {
             String status;
@@ -184,10 +182,6 @@ public class TracksInfoDialog extends JDialog {
                         continue;
                     }
                     status = trackData.getFile().getName();
-                    tagFieldsModel.sync();
-                    for (TrackInfoItem item : tagFieldsModel.getTrackInfoItems()) {
-                    	item.update(track);
-                    }
                     TrackIO.write(track);
                     processed++;
                 }
@@ -243,8 +237,8 @@ public class TracksInfoDialog extends JDialog {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof TagFieldsModel) {
-                    if (((TagFieldsModel) tableModel).getTrackInfoItems().get(row).isMultiple()) {
+                if (tableModel instanceof MultiTagFieldModel) {
+                    if (((MultiTagFieldModel) tableModel).getTrackInfoItems().get(row).isMultiple()) {
                         value = "";
                     }
                 }
@@ -263,9 +257,9 @@ public class TracksInfoDialog extends JDialog {
             @Override
             protected void fireEditingStopped() {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof TagFieldsModel) {
+                if (tableModel instanceof MultiTagFieldModel) {
                     String value = (String) table.getCellEditor().getCellEditorValue();
-                    if (Util.isEmpty(value) && ((TagFieldsModel) tableModel).getTrackInfoItems().get(table.getEditingRow()).isMultiple()) {
+                    if (Util.isEmpty(value) && ((MultiTagFieldModel) tableModel).getTrackInfoItems().get(table.getEditingRow()).isMultiple()) {
                         super.fireEditingCanceled();
                         return;
                     }
@@ -336,7 +330,7 @@ public class TracksInfoDialog extends JDialog {
     }
 
     private JPopupMenu buildContextMenu(final PlaylistTable playlist, final GroupTable properties, final Point point) {
-    	final TagFieldsModel tagFieldsModel = (TagFieldsModel) properties.getModel();
+    	final MultiTagFieldModel tagFieldsModel = (MultiTagFieldModel) properties.getModel();
 
     	final List<TrackInfoItem> trackInfoItemsSelected = new LinkedList<TrackInfoItem>();
     	if (properties.getSelectedRowCount() > 0) {
@@ -356,9 +350,9 @@ public class TracksInfoDialog extends JDialog {
         final JPopupMenu menu = new JPopupMenu();
 
         if (!trackInfoItemsSelected.isEmpty()) {
-        	final TagFieldModel tagFieldModel = trackInfoItemsSelected.get(0).getTracks().size() == 1 ?
-        			new TagFieldModel(trackInfoItemsSelected.get(0), trackInfoItemsSelected.get(0).getTracks().get(0)) :
-       				new TagFieldModel(trackInfoItemsSelected.get(0));
+        	final SingleTagFieldModel tagFieldModel = trackInfoItemsSelected.get(0).getTracks().size() == 1 ?
+        			new SingleTagFieldModel(trackInfoItemsSelected.get(0), trackInfoItemsSelected.get(0).getTracks().get(0)) :
+       				new SingleTagFieldModel(trackInfoItemsSelected.get(0));
 
 	        JMenuItem menuItemEdit = new JMenuItem("Edit");
 	        menuItemEdit.setIcon(emptyIcon);

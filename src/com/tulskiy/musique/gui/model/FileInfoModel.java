@@ -29,7 +29,7 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.util.Util;
 
-public class FileInfoModel extends TagFieldsModel {
+public class FileInfoModel extends MultiTagFieldModel {
 
 	class Entry {
 		String key;
