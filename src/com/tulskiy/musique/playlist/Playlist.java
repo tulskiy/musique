@@ -60,12 +60,23 @@ import com.tulskiy.musique.util.Util;
  */
 public class Playlist extends ArrayList<Track> {
 
+	private static final String OLD_META_KEY_COMMENT = "comment";
+	private static final String OLD_META_KEY_GENRE = "genre";
+	private static final String OLD_META_KEY_YEAR = "year";
+	private static final String OLD_META_KEY_TOTAL_DISCS = "totalDiscs";
+	private static final String OLD_META_KEY_DISC_NUMBER = "discNumber";
+	private static final String OLD_META_KEY_TOTAL_TRACKS = "totalTracks";
+	private static final String OLD_META_KEY_TRACK_NUMBER = "trackNumber";
+	private static final String OLD_META_KEY_TITLE = "title";
+	private static final String OLD_META_KEY_ALBUM_ARTIST = "albumArtist";
+	private static final String OLD_META_KEY_ALBUM = "album";
+	private static final String OLD_META_KEY_ARTIST = "artist";
 	private static final String META_KEY_CODEC = "codec";
     private static final String META_KEY_ENCODER = "encoder";
 
 	private static MessageFormat format = new MessageFormat("\"{0}\" \"{1}\" {2}");
 
-    private static final int VERSION = 2;
+    private static final int VERSION = 3;
     private static final byte[] MAGIC = "BARABASHKA".getBytes();
 
     private static final Logger logger = Logger.getLogger("musique");
@@ -210,14 +221,55 @@ public class Playlist extends ArrayList<Track> {
                 for (int j = 0; j < metaSize; j++) {
                     String key = dis.readUTF();
                     String value = dis.readUTF();
-                    if (key.equals(META_KEY_CODEC)) {
-                        trackData.setCodec(value);
+                    if (version == VERSION) {
+	                    if (key.equals(META_KEY_CODEC)) {
+	                        trackData.setCodec(value);
+	                    }
+	                    else if (key.equals(META_KEY_ENCODER)) {
+	                        trackData.setEncoder(value);
+	                    }
+	                	else {
+	                        trackData.addTagFieldValues(FieldKey.valueOf(key), value);
+	                    }
                     }
-                    else if (key.equals(META_KEY_ENCODER)) {
-                        trackData.setEncoder(value);
-                    }
-                	else {
-                        trackData.addTagFieldValues(FieldKey.valueOf(key), value);
+                    // read older playlist version
+                    else {
+	                    if (key.equals(META_KEY_CODEC)) {
+	                        trackData.setCodec(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_ARTIST)) {
+	                        trackData.addArtist(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_ALBUM)) {
+	                        trackData.addAlbum(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_ALBUM_ARTIST)) {
+	                        trackData.addAlbumArtist(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_TITLE)) {
+	                        trackData.addTitle(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_TRACK_NUMBER)) {
+	                        trackData.addTrack(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_TOTAL_TRACKS)) {
+	                        trackData.addTrackTotal(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_DISC_NUMBER)) {
+	                        trackData.addDisc(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_TOTAL_DISCS)) {
+	                        trackData.addDiscTotal(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_YEAR)) {
+	                        trackData.addYear(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_GENRE)) {
+	                        trackData.addGenre(value);
+	                    }
+	                    else if (key.equals(OLD_META_KEY_COMMENT)) {
+	                        trackData.addComment(value);
+	                    }
                     }
                 }
 
