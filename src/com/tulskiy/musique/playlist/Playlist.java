@@ -39,6 +39,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
 
 import org.jaudiotagger.tag.FieldKey;
@@ -113,6 +115,7 @@ public class Playlist extends ArrayList<Track> {
             TrackData trackData;
             for (Track track : this) {
             	trackData = track.getTrackData();
+            	trackData.removeEmptyTagFields();
                 dos.writeUTF(trackData.getLocation().toString());
                 dos.writeLong(trackData.getStartPosition());
                 dos.writeLong(trackData.getTotalSamples());
@@ -134,11 +137,15 @@ public class Playlist extends ArrayList<Track> {
                 if (!Util.isEmpty(trackData.getEncoder())) {
                 	meta.add(new Pair(META_KEY_ENCODER, trackData.getEncoder()));
                 }
-                for (FieldKey key : FieldKey.values()) {
-                    List<String> values = trackData.getTagFieldValuesSafeAsList(key);
-                    for (String value : values) {
-                    	meta.add(new Pair(key.toString(), value));
-                    }
+                Iterator<Entry<FieldKey, Set<String>>> fields = trackData.getAllTagFieldValuesIterator();
+                if (fields != null) {
+	                while (fields.hasNext()) {
+	                	Entry<FieldKey, Set<String>> field = fields.next();
+	                	Iterator<String> values = field.getValue().iterator();
+	                    while (values.hasNext()) {
+	                    	meta.add(new Pair(field.getKey().toString(), values.next()));
+	                    }
+	                }
                 }
 
                 dos.writeInt(meta.size());

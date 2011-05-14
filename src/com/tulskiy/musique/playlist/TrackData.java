@@ -160,8 +160,12 @@ public class TrackData implements Cloneable {
 		return tagFields.entrySet().iterator();
     }
 
+    public Set<String> getTagFieldValues(FieldKey key) {
+    	return tagFields.get(key);
+    }
+
     public Set<String> getTagFieldValuesSafeAsSet(FieldKey key) {
-    	Set<String> result = tagFields.get(key);
+    	Set<String> result = getTagFieldValues(key);
 
     	if (result == null) {
     		result = new HashSet<String>(1, 1);
@@ -170,6 +174,7 @@ public class TrackData implements Cloneable {
     	return result;
     }
 
+    @Deprecated
     public List<String> getTagFieldValuesSafeAsList(FieldKey key) {
     	List<String> result = new ArrayList<String>();
     	
@@ -237,10 +242,10 @@ public class TrackData implements Cloneable {
     }
     
     public String getFirstTagFieldValue(FieldKey key) {
-    	List<String> values = getTagFieldValuesSafeAsList(key);
+    	Set<String> values = getTagFieldValues(key);
     	
-    	if (!values.isEmpty()) {
-    		return values.get(0);
+    	if (values != null && !values.isEmpty()) {
+    		return values.iterator().next();
     	}
     	
     	return null;

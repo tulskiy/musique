@@ -18,7 +18,10 @@
 package com.tulskiy.musique.gui;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.swing.SwingWorker;
 
@@ -61,20 +64,24 @@ public abstract class SearchWorker extends SwingWorker<Playlist, Integer> {
 
                 boolean hasText[] = new boolean[text.length];
                 for (FieldKey field : fields) {
-                    List<String> values = track.getTrackData().getTagFieldValuesSafeAsList(field);
-                    for (String value : values) {
-	                    if (!Util.isEmpty(value)) {
-	                        value = value.toLowerCase();
-	                        String[] vals = value.split("\\s+");
-	                        for (String val : vals) {
-	                            for (int j = 0, textLength = text.length; j < textLength; j++) {
-	                                String s = text[j];
-	                                if (val.startsWith(s)) {
-	                                    hasText[j] = true;
-	                                }
-	                            }
-	                        }
-	                    }
+                    Set<String> values = track.getTrackData().getTagFieldValues(field);
+                    if (values != null) {
+		                Iterator<String> it = values.iterator();
+		                while (it.hasNext()) {
+		                	String value = it.next();
+		                    if (!Util.isEmpty(value)) {
+		                        value = value.toLowerCase();
+		                        String[] vals = value.split("\\s+");
+		                        for (String val : vals) {
+		                            for (int j = 0, textLength = text.length; j < textLength; j++) {
+		                                String s = text[j];
+		                                if (val.startsWith(s)) {
+		                                    hasText[j] = true;
+		                                }
+		                            }
+		                        }
+		                    }
+		                }
                     }
                 }
 
