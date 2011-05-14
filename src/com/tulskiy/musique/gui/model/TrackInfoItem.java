@@ -94,7 +94,7 @@ public class TrackInfoItem {
 	 */
 	public void rejectState() {
 		if (states.size() > 1) {
-			states.pop();
+			states.pop().clear();
 		}
 	}
 
@@ -103,7 +103,7 @@ public class TrackInfoItem {
 	 */
 	public void resetStates() {
 		while (states.size() > 1) {
-			states.pop();
+			rejectState();
 		}
 	}
 

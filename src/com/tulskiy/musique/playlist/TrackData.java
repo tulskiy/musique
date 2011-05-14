@@ -23,10 +23,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,7 +45,7 @@ import com.tulskiy.musique.util.Util;
 public class TrackData implements Cloneable {
 
 	// generic jaudiotagger tag field values
-	private Map<FieldKey, Set<String>> tagFields = new HashMap<FieldKey, Set<String>>();
+	private Map<FieldKey, Set<String>> tagFields = new EnumMap<FieldKey, Set<String>>(FieldKey.class);
 	
 	// common tag fields (to be displayed in TrackInfoDialog even if missed)
 	private static final FieldKey[] COMMON_TAG_FIELDS = {
@@ -62,6 +64,19 @@ public class TrackData implements Cloneable {
 		FieldKey.COMMENT,
 		FieldKey.RATING
 	};
+
+    private static HashSet<FieldKey> INTERNED_FIELDS = new HashSet<FieldKey>() {{
+        add(FieldKey.ARTIST);
+        add(FieldKey.ALBUM_ARTIST);
+        add(FieldKey.YEAR);
+        add(FieldKey.GENRE);
+        add(FieldKey.TRACK);
+        add(FieldKey.TRACK_TOTAL);
+        add(FieldKey.DISC_NO);
+        add(FieldKey.DISC_TOTAL);
+        add(FieldKey.RECORD_LABEL);
+        add(FieldKey.RATING);
+    }};
 	
     // song info
     private int sampleRate;
@@ -86,16 +101,6 @@ public class TrackData implements Cloneable {
     private long dateAdded;
     private long lastModified;
 
-    private static HashSet<String> internedFields = new HashSet<String>() {{
-        add("year");
-        add("artist");
-        add("album");
-        add("genre");
-        add("albumArtist");
-        add("artist");
-        add("codec");
-    }};
-
     public TrackData() {
     }
 
@@ -106,7 +111,9 @@ public class TrackData implements Cloneable {
 
     public TrackData copy() {
         try {
-            return (TrackData) this.clone();
+        	TrackData copy = (TrackData) this.clone();
+        	copy.tagFields = new EnumMap<FieldKey, Set<String>>(copy.tagFields);
+            return copy;
         } catch (CloneNotSupportedException ignored) {
             return null;
         }
@@ -157,7 +164,7 @@ public class TrackData implements Cloneable {
     	Set<String> result = tagFields.get(key);
 
     	if (result == null) {
-    		result = new HashSet<String>();
+    		result = new HashSet<String>(1, 1);
     	}
     	
     	return result;
@@ -175,7 +182,6 @@ public class TrackData implements Cloneable {
     	return result;
     }
     
-    // TODO add String.intern() support
     public void setTagFieldValues(FieldKey key, Set<String> values) {
     	if (values.isEmpty()) {
     		return;
@@ -184,7 +190,8 @@ public class TrackData implements Cloneable {
     	// handle additional business logic
     	if (FieldKey.TRACK.equals(key)) {
     		String track = values.iterator().next();
-    		trackNumberFormatted = Util.isEmpty(track) ? track : new Formatter().format("%02d", Integer.parseInt(track)).toString();
+    		trackNumberFormatted = (Util.isEmpty(track) ?
+    				"" : new Formatter().format("%02d", Integer.parseInt(track)).toString()).intern();
     	}
 
     	// handle technical tags
@@ -196,25 +203,33 @@ public class TrackData implements Cloneable {
     	}
     	// handle common cases
     	else {
-    		tagFields.put(key, values);
+    		if (INTERNED_FIELDS.contains(key)) {
+        		Set<String> valuesOptimized = new LinkedHashSet<String>();
+    			Iterator<String> it = values.iterator();
+    			while (it.hasNext()) {
+    				String value = it.next();
+					valuesOptimized.add(value == null ? null : value.intern());
+    			}
+        		tagFields.put(key, valuesOptimized);
+    		}
+    		else {
+        		tagFields.put(key, values);
+    		}
     	}
     }
     
-    // TODO add String.intern() support
     public void setTagFieldValues(FieldKey key, String value) {
-    	Set<String> newValues = new HashSet<String>();
+    	Set<String> newValues = new HashSet<String>(1, 1);
     	newValues.add(value);
     	setTagFieldValues(key, newValues);
     }
     
-    // TODO add String.intern() support
     public void addTagFieldValues(FieldKey key, Set<String> values) {
     	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
     	existingValues.addAll(values);
     	setTagFieldValues(key, existingValues);
     }
     
-    // TODO add String.intern() support
     public void addTagFieldValues(FieldKey key, String value) {
     	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
     	existingValues.add(value);

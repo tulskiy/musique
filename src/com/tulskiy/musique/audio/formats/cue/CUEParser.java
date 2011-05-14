@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 import java.util.List;
 
+import org.jaudiotagger.tag.FieldKey;
+
 import jwbroek.cuelib.CueParser;
 import jwbroek.cuelib.CueSheet;
 import jwbroek.cuelib.FileData;
@@ -63,21 +65,20 @@ public class CUEParser {
                             track.getTrackData().setCueLocation(cueLocation);
 
                         String album = trackData.getMetaData(CueSheet.MetaDataField.ALBUMTITLE);
-                        // TODO review all this and rewrite
                         if (album.length() > 0)
-                            track.getTrackData().addAlbum(album);
+                            track.getTrackData().setTagFieldValues(FieldKey.ALBUM, album);
                         String artist = trackData.getPerformer();
-                        track.getTrackData().addArtist(artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
-//                        track.setMeta("albumArtist", cueSheet.getPerformer());
-//                        track.setMeta("comment", cueSheet.getComment());
-//                        track.setMeta("title", trackData.getTitle());
-//                        String year = trackData.getMetaData(CueSheet.MetaDataField.YEAR);
-//                        if (year.length() > 0)
-//                            track.setMeta("year", year);
-//                        track.setTrackNumber(String.valueOf(trackData.getNumber()));
-//                        String genre = trackData.getMetaData(CueSheet.MetaDataField.GENRE);
-//                        if (genre.length() > 0)
-//                            track.setMeta("genre", genre);
+                        track.getTrackData().setTagFieldValues(FieldKey.ARTIST, artist != null && artist.length() > 0 ? artist : cueSheet.getPerformer());
+                        track.getTrackData().setTagFieldValues(FieldKey.ALBUM_ARTIST, cueSheet.getPerformer());
+                        track.getTrackData().setTagFieldValues(FieldKey.COMMENT, cueSheet.getComment());
+                        track.getTrackData().setTagFieldValues(FieldKey.TITLE, trackData.getTitle());
+                        String year = trackData.getMetaData(CueSheet.MetaDataField.YEAR);
+                        if (year.length() > 0)
+                        	track.getTrackData().setTagFieldValues(FieldKey.YEAR, year);
+                        track.getTrackData().setTagFieldValues(FieldKey.TRACK, String.valueOf(trackData.getNumber()));
+                        String genre = trackData.getMetaData(CueSheet.MetaDataField.GENRE);
+                        if (genre.length() > 0)
+                            track.getTrackData().setTagFieldValues(FieldKey.GENRE, genre);
                         int sampleRate = track.getTrackData().getSampleRate();
                         long startPosition = indexToSample(trackData.getIndex(1), sampleRate);
 //                        System.out.println(song.getFile().getName() + " " + startPosition);

@@ -63,6 +63,13 @@ public class TrackInfoItemState {
 		this(state.values, state.isUpdated);
 	}
 	
+	public void clear() {
+		for (Set<String> value : values.values()) {
+			value.clear();
+		}
+		values.clear();
+	}
+	
 	public Set<String> getValues() {
 		Set<String> result = new LinkedHashSet<String>();
 
