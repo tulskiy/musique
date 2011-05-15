@@ -33,7 +33,7 @@ import com.tulskiy.musique.util.Util;
 public class TrackInfoItemSelection implements Transferable, ClipboardOwner {
 	
 	public static final DataFlavor objectFlavor = new DataFlavor(List.class, "Musique.TrackInfoItem object");
-	public static final DataFlavor textFlavor = new DataFlavor("text/plain; charset=unicode", "Musique.TrackInfoItem text");
+	public static final DataFlavor textFlavor = DataFlavor.stringFlavor;
 
 	private final DataFlavor[] supportedFlavors = {objectFlavor, textFlavor};	
 
