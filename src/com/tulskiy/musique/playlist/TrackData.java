@@ -605,11 +605,15 @@ public class TrackData implements Cloneable {
     	}
     }
     
+    public void removeEmptyTagField(FieldKey key) {
+		if (Util.isEmpty(getFirstTagFieldValue(key))) {
+			removeTagField(key);
+		}
+    }
+    
     public void removeEmptyTagFields() {
     	for (FieldKey key : FieldKey.values()) {
-    		if (Util.isEmpty(getFirstTagFieldValue(key))) {
-    			removeTagField(key);
-    		}
+    		removeEmptyTagField(key);
     	}
     }
 

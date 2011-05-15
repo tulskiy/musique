@@ -75,6 +75,7 @@ public class TracksInfoAddFieldDialog extends JDialog {
             	trackInfoItem.approveState(false);
             	
             	tagFieldsModel.addTrackInfoItem(trackInfoItem);
+            	tagFieldsModel.sort();
 
             	properties.revalidate();
             	properties.repaint();

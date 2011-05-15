@@ -58,7 +58,7 @@ public class MultiTagFieldModel extends AbstractTableModel implements TagFieldMo
 				}
 			}
 		}
-		Collections.sort(trackInfoItems, new TrackInfoItemComparator());
+		sort();
 	}
 
 	public List<TrackInfoItem> getTrackInfoItems() {
@@ -72,6 +72,57 @@ public class MultiTagFieldModel extends AbstractTableModel implements TagFieldMo
 			}
 		}
 		trackInfoItems.add(item);
+	}
+
+	// TODO optimize
+	public void mergeTrackInfoItems(List<TrackInfoItem> items) {
+		boolean isFound;
+
+		for (TrackInfoItem item : items) {
+			isFound = false;
+
+			// update existing fields
+			for (TrackInfoItem tii : trackInfoItems) {
+				if (tii.getKey().equals(item.getKey())) {
+					for (int i = 0; i < item.getTracks().size() && i < tii.getTracks().size(); i++) {
+						Track itemTrack = item.getTracks().get(i);
+						Track tiiTrack = tii.getTracks().get(i);
+						tii.getState().setValues(item.getState().getValues(itemTrack), tiiTrack);
+					}
+					isFound = true;
+					break;
+				}
+			}
+
+			// update removed fields
+			if (!isFound) {	
+				for (TrackInfoItem tiir : trackInfoItemsRemoved) {
+					if (tiir.getKey().equals(item.getKey())) {
+						for (int i = 0; i < item.getTracks().size() && i < tiir.getTracks().size(); i++) {
+							Track itemTrack = item.getTracks().get(i);
+							Track tiiTrack = tiir.getTracks().get(i);
+							tiir.getState().setValues(item.getState().getValues(itemTrack), tiiTrack);
+						}
+						trackInfoItems.add(tiir);
+						trackInfoItemsRemoved.remove(tiir);
+						isFound = true;
+						break;
+					}
+				}
+			}
+
+			// add new fields
+			if (!isFound) {
+				List<Track> tracks = trackInfoItems.isEmpty() ? trackInfoItemsRemoved.get(0).getTracks() : trackInfoItems.get(0).getTracks();
+				TrackInfoItem itemNew = new TrackInfoItem(item.getKey(), tracks);
+				for (int i = 0; i < item.getTracks().size() && i < tracks.size(); i++) {
+					Track itemTrack = item.getTracks().get(i);
+					Track itemNewTrack = tracks.get(i);
+					itemNew.getState().setValues(item.getState().getValues(itemTrack), itemNewTrack);
+				}
+				addTrackInfoItem(itemNew);
+			}
+		}
 	}
 
 	public void removeTrackInfoItems(List<TrackInfoItem> items) {
@@ -97,10 +148,11 @@ public class MultiTagFieldModel extends AbstractTableModel implements TagFieldMo
     	for (TrackInfoItem item : trackInfoItems) {
     		item.approveState(true);
     	}
+    	sort();
 	}
 
 	public void refreshModel() {
-		// do nothing, according to nature of this model
+		sort();
 	}
 	
 	public void rejectModel() {
@@ -108,6 +160,10 @@ public class MultiTagFieldModel extends AbstractTableModel implements TagFieldMo
     	for (TrackInfoItem item : trackInfoItems) {
     		item.rejectState();
     	}
+	}
+	
+	public void sort() {
+		Collections.sort(trackInfoItems, new TrackInfoItemComparator());
 	}
 	
 	public List<FieldKey> getAllUsedFieldKeys() {

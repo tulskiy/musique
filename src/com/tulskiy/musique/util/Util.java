@@ -196,7 +196,8 @@ public class Util {
         			result = "<multiple values> " + vs.toString();
         		}
         		else if (vs.size() == 1) {
-        			result = vs.iterator().next().toString();
+        			Object value = vs.iterator().next();
+        			result = value == null ? "" : value.toString();
         		}
         	}
         }
@@ -215,7 +216,7 @@ public class Util {
             		if (sb.length() != 0) {
             			sb.append(separator);
             		}
-            		sb.append(value.toString());
+            		sb.append(value == null ? "" : value.toString());
             	}
             	return sb.toString();
         	}

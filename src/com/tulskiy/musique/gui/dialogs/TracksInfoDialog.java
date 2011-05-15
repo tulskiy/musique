@@ -22,6 +22,9 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -30,7 +33,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,10 +63,12 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
 import com.tulskiy.musique.gui.components.GroupTable;
+import com.tulskiy.musique.gui.cpp.TrackInfoItemSelection;
 import com.tulskiy.musique.gui.model.FileInfoModel;
-import com.tulskiy.musique.gui.model.SingleTagFieldModel;
 import com.tulskiy.musique.gui.model.MultiTagFieldModel;
+import com.tulskiy.musique.gui.model.SingleTagFieldModel;
 import com.tulskiy.musique.gui.model.TrackInfoItem;
+import com.tulskiy.musique.gui.model.TrackInfoItemComparator;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
@@ -230,7 +237,7 @@ public class TracksInfoDialog extends JDialog {
         table.setShowVerticalLines(true);
         table.setIntercellSpacing(new Dimension(1, 1));
         table.setGridColor(Color.lightGray);
-        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         final JTextField editor = new JTextField();
         table.setDefaultEditor(Object.class, new DefaultCellEditor(editor) {
@@ -368,6 +375,65 @@ public class TracksInfoDialog extends JDialog {
 	        menu.addSeparator();
         }
 
+        JMenuItem menuItemCut = new JMenuItem("Cut");
+        menuItemCut.setIcon(emptyIcon);
+        menuItemCut.setEnabled(!trackInfoItemsSelected.isEmpty());
+        menuItemCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
+        menu.add(menuItemCut).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TrackInfoItemSelection selection = new TrackInfoItemSelection(trackInfoItemsSelected);
+				getToolkit().getSystemClipboard().setContents(selection, selection);
+				tagFieldsModel.removeTrackInfoItems(trackInfoItemsSelected);
+				properties.clearSelection();
+				properties.revalidate();
+				properties.repaint();
+			}
+        });
+
+        JMenuItem menuItemCopy = new JMenuItem("Copy");
+        menuItemCopy.setIcon(emptyIcon);
+        menuItemCopy.setEnabled(!trackInfoItemsSelected.isEmpty());
+        menuItemCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
+        menu.add(menuItemCopy).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TrackInfoItemSelection selection = new TrackInfoItemSelection(trackInfoItemsSelected);
+				getToolkit().getSystemClipboard().setContents(selection, selection);
+			}
+        });
+
+		final Transferable clipboardContent = getToolkit().getSystemClipboard().getContents(null);
+
+        JMenuItem menuItemPaste = new JMenuItem("Paste");
+        menuItemPaste.setIcon(emptyIcon);
+        menuItemPaste.setEnabled(clipboardContent != null && clipboardContent.isDataFlavorSupported(TrackInfoItemSelection.objectFlavor));
+        menuItemPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
+        menu.add(menuItemPaste).addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					List<TrackInfoItem> items = (List<TrackInfoItem>) clipboardContent.getTransferData(TrackInfoItemSelection.objectFlavor);
+					if (items != null) {
+						tagFieldsModel.mergeTrackInfoItems(items);
+						tagFieldsModel.sort();
+						properties.clearSelection();
+						properties.revalidate();
+						properties.repaint();
+					}
+				}
+				catch (IOException ioe) {
+					// TODO Auto-generated catch block
+					ioe.printStackTrace();
+				}
+				catch (UnsupportedFlavorException ufe) {
+					// ignore since we already checked at menu construction that flavor is supported
+				}
+			}
+        });
+
+        menu.addSeparator();
+
         JMenuItem menuItemAdd = new JMenuItem("Add");
         menuItemAdd.setIcon(emptyIcon);
         menu.add(menuItemAdd).addActionListener(new ActionListener() {
@@ -375,6 +441,9 @@ public class TracksInfoDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				TracksInfoAddFieldDialog dialog = new TracksInfoAddFieldDialog(playlist, properties, tagFieldsModel);
 				dialog.setVisible(true);
+				properties.clearSelection();
+				properties.revalidate();
+				properties.repaint();
 			}
         });
         
@@ -385,6 +454,8 @@ public class TracksInfoDialog extends JDialog {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					tagFieldsModel.removeTrackInfoItems(trackInfoItemsSelected);
+					properties.clearSelection();
+					properties.revalidate();
 					properties.repaint();
 				}
 			});

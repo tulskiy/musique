@@ -23,6 +23,7 @@ import java.util.Stack;
 import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.util.Util;
 
 public class TrackInfoItem {
 
@@ -84,6 +85,7 @@ public class TrackInfoItem {
 		if (updateTracks && getState().isUpdated()) {
 			for (Track track : tracks) {
 				track.getTrackData().setTagFieldValues(key, getState().getValues(track));
+				track.getTrackData().removeEmptyTagField(key);
 			}
 		}
 	}

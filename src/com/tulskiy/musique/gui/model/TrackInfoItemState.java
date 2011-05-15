@@ -126,6 +126,26 @@ public class TrackInfoItemState {
 		}
 	}
 
+	public void setValues(Set<String> values) {
+		for (Set<String> vs : this.values.values()) {
+			vs.clear();
+			vs.addAll(values);
+		}
+		isUpdated = true;
+	}
+
+	public void setValues(Set<String> values, Track track) {
+		if (track == null) {
+			setValues(values);
+		}
+		else {
+			Set<String> vs = this.values.get(track);
+			vs.clear();
+			vs.addAll(values);
+			isUpdated = true;
+		}
+	}
+
 	public boolean isMultiple() {
 		return values.size() > 1;
 	}

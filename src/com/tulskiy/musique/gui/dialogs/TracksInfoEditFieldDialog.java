@@ -291,7 +291,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					tagFieldModel.addValue();
-
+					properties.clearSelection();
 					properties.revalidate();
 					properties.repaint();
 				}
@@ -306,6 +306,8 @@ public class TracksInfoEditFieldDialog extends JDialog {
 						for (int row : selectedRows) {
 							tagFieldModel.removeValue(row);
 						}
+						properties.clearSelection();
+						properties.revalidate();
 						properties.repaint();
 					}
 				});
