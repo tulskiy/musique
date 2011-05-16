@@ -88,8 +88,15 @@ public class TrackInfoItemSelection implements Transferable, ClipboardOwner {
 		}
 
 		StringBuilder result = new StringBuilder();
-		
+
+		boolean isNotFirst = false;
 		for (TrackInfoItem item : items) {
+			if (isNotFirst) {
+				result.append('\n');
+			}
+			else {
+				isNotFirst = true;
+			}
 			result.append(FieldKeyMetaHelper.getDisplayName(item.getKey()))
 				.append(" : ")
 				.append(Util.formatFieldValues(item.getState().getValues(), "; "));
