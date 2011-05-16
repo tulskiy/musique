@@ -406,6 +406,14 @@ public class TrackData implements Cloneable {
     	addTagFieldValues(FieldKey.CATALOG_NO, value);
     }
 
+    public String getRating() {
+    	return getFirstTagFieldValue(FieldKey.RATING);
+    }
+
+    public void addRating(String value) {
+    	addTagFieldValues(FieldKey.RATING, value);
+    }
+
     // ------------------- cuesheet methods ------------------- //
 
     public String getCueSheet() {

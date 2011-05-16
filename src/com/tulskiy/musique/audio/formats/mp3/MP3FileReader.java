@@ -29,10 +29,14 @@ import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
+import org.jaudiotagger.tag.id3.ID3v24Frames;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.framebody.AbstractFrameBodyTextInfo;
+import org.jaudiotagger.tag.id3.framebody.FrameBodyCOMM;
+import org.jaudiotagger.tag.id3.framebody.FrameBodyPOPM;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyTPOS;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyTRCK;
+import org.jaudiotagger.tag.id3.framebody.FrameBodyTXXX;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import com.tulskiy.musique.audio.AudioFileReader;
@@ -155,10 +159,19 @@ public class MP3FileReader extends AudioFileReader {
 				track.getTrackData().addDisc(body.getDiscNo());
 				track.getTrackData().addDiscTotal(body.getDiscTotal());
 			}
+			else if (frame.getBody() instanceof FrameBodyCOMM) {
+				FrameBodyCOMM body = (FrameBodyCOMM) frame.getBody();
+				track.getTrackData().addComment(body.getText());
+			}
+			else if (frame.getBody() instanceof FrameBodyPOPM) {
+				FrameBodyPOPM body = (FrameBodyPOPM) frame.getBody();
+				track.getTrackData().addRating(String.valueOf(body.getRating()));
+			}
 			else if (frame.getBody() instanceof AbstractFrameBodyTextInfo) {
 				AbstractFrameBodyTextInfo body = (AbstractFrameBodyTextInfo) frame.getBody();
-				// TODO not sure about body.getFirstTextValue()
-				track.getTrackData().addTagFieldValues(key, body.getFirstTextValue());
+				for (int i = 0; i < body.getNumberOfValues(); i++) {
+					track.getTrackData().addTagFieldValues(key, body.getValueAtIndex(i));
+				}
 			}
 		}
 	}

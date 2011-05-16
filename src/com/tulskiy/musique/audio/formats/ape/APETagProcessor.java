@@ -52,11 +52,9 @@ public class APETagProcessor {
             	setMusiqueTagFieldValue(tag, trackData, FieldKey.YEAR, APETag.APE_TAG_FIELD_YEAR);
             	setMusiqueTagFieldValue(tag, trackData, FieldKey.GENRE, APETag.APE_TAG_FIELD_GENRE);
             	setMusiqueTagFieldValue(tag, trackData, FieldKey.COMMENT, APETag.APE_TAG_FIELD_COMMENT);
-            	setMusiqueTagFieldValue(tag, trackData, FieldKey.TRACK, APETag.APE_TAG_FIELD_TRACK);
+            	
+            	handleTrackDiscFields(tag, trackData);
 
-            	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.DISC_NO);
-            	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.TRACK_TOTAL);
-            	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.DISC_TOTAL);
             	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.ALBUM_ARTIST);
             	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.RECORD_LABEL);
             	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.CATALOG_NO);
@@ -133,6 +131,26 @@ public class APETagProcessor {
 
     private void setCustomApeTagFieldValue(APETag tag, TrackData trackData, FieldKey musiqueKey) throws IOException {
     	setApeTagFieldValue(tag, trackData, musiqueKey, musiqueKey.toString());
+    }
+    
+    private void handleTrackDiscFields(APETag tag, TrackData trackData) throws IOException {
+    	String value = tag.GetFieldString(APETag.APE_TAG_FIELD_TRACK);
+    	if (!Util.isEmpty(value)) {
+	    	if (value.indexOf("/") == -1) {
+	    		setMusiqueTagFieldValue(tag, trackData, FieldKey.TRACK, APETag.APE_TAG_FIELD_TRACK);
+	        	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.TRACK_TOTAL);
+	    	}
+	    	else {
+	    		String[] parts = value.split("/");
+	    		trackData.setTagFieldValues(FieldKey.TRACK, parts[0]);
+	    		if (parts.length > 1) {
+	    			trackData.setTagFieldValues(FieldKey.TRACK_TOTAL, parts[1]);
+	    		}
+	    	}
+    	}
+
+    	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.DISC_NO);
+    	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.DISC_TOTAL);
     }
 
 }

@@ -26,7 +26,6 @@ import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagField;
 
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
