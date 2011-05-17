@@ -17,19 +17,27 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.util.Util;
-import org.junit.Test;
+import static com.tulskiy.musique.system.TrackIO.getAudioFileReader;
+import static com.tulskiy.musique.system.TrackIO.getAudioFileWriter;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
-import static com.tulskiy.musique.system.TrackIO.getAudioFileReader;
-import static com.tulskiy.musique.system.TrackIO.getAudioFileWriter;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import junit.framework.Assert;
+
+import org.jaudiotagger.tag.FieldKey;
+import org.junit.Test;
+
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
+import com.tulskiy.musique.util.Util;
 
 /**
  * @Author: Denis Tulskiy
@@ -37,7 +45,28 @@ import static org.junit.Assert.fail;
  */
 @SuppressWarnings({"ResultOfMethodCallIgnored"})
 public class TagTest {
-    @Test
+	
+	private final String ARTIST = "artist";
+	private final String[] ARTISTS = {"artist1", "artist2"};
+	private final String ALBUM_ARTIST = "album artist";
+	private final String TITLE = "title";
+	private final String ALBUM = "album";
+	private final String YEAR = "2000";
+	private final String GENRE = "genre";
+	private final String[] GENRES = {"genre1", "genre2", "genre3"};
+	private final String TRACK = "1";
+	private final String TRACK_TOTAL = "2";
+	private final String DISC_NO = "3";
+	private final String DISC_TOTAL = "4";
+	private final String RECORD_LABEL = "record label";
+	private final String[] RECORD_LABELS = {"record label 1", "record label 2"};
+	private final String CATALOG_NO = "catalog no";
+	private final String[] CATALOG_NOS = {"catalog no 1", "catalog no 2"};
+	// TODO add multiline check
+	private final String COMMENT = "comment";
+	private final String RATING = "6";
+
+	@Test
     public void testMP3() {
         testRead("testfiles/mp3/sample.mp3");
         testWrite("testfiles/mp3/sample_notag.mp3");
@@ -53,15 +82,15 @@ public class TagTest {
 
     @Test
     public void testAPE() {
-        testRead("testfiles/ape/sample.ape");
-        testWrite("testfiles/ape/sample_notag.ape");
+        testReadApe("testfiles/ape/sample.ape");
+        testWriteApe("testfiles/ape/sample_notag.ape");
         testEmptyWrite("testfiles/ape/sample_notag.ape");
     }
 
     @Test
     public void testWavPack() {
-        testRead("testfiles/wavpack/sample.wv");
-        testWrite("testfiles/wavpack/sample_notag.wv");
+        testReadApe("testfiles/wavpack/sample.wv");
+        testWriteApe("testfiles/wavpack/sample_notag.wv");
         testEmptyWrite("testfiles/wavpack/sample_notag.wv");
     }
 
@@ -85,7 +114,7 @@ public class TagTest {
             File file = new File(name);
             File fo = new File("testfiles/temp." + Util.getFileExt(name));
             copy(file, fo);
-            track.setLocation(fo.toURI().toString());
+            track.getTrackData().setLocation(fo.toURI().toString());
             getAudioFileWriter(fo.getName()).write(track);
 
             fo.delete();
@@ -95,43 +124,88 @@ public class TagTest {
         }
     }
 
-
     private void testRead(String file) {
         Track track = getAudioFileReader(file).read(new File(file));
+        TrackData trackData = track.getTrackData();
 
-        assertEquals("artist", track.getArtist());
-        assertEquals("title", track.getTitle());
-        assertEquals("album", track.getAlbum());
-        assertEquals("date", track.getYear());
-        assertEquals("genre", track.getGenre());
-        assertEquals("album artist", track.getAlbumArtist());
-        assertEquals("1", track.getMeta("trackNumber"));
-        assertEquals("2", track.getTotalTracks());
-        assertEquals("3", track.getDiscNumber());
-        assertEquals("4", track.getTotalDiscs());
-        assertEquals("comment", track.getComment());
+        // test metadata fields
+        testMulti(ARTISTS, trackData.getTagFieldValues(FieldKey.ARTIST));
+        Assert.assertTrue(trackData.getTagFieldValues(FieldKey.ARTIST).contains(trackData.getArtist()));
+        testSingle(ALBUM_ARTIST, trackData.getAlbumArtist());
+        testSingle(TITLE, trackData.getTitle());
+        testSingle(ALBUM, trackData.getAlbum());
+        testSingle(YEAR, trackData.getYear());
+        testMulti(GENRES, trackData.getTagFieldValues(FieldKey.GENRE));
+        testMulti(GENRES, trackData.getGenres());
+        Assert.assertTrue(trackData.getGenres().contains(trackData.getGenre()));
+        testSingle(TRACK, trackData.getTrack());
+        testSingle(TRACK_TOTAL, trackData.getTrackTotal());
+        testSingle(DISC_NO, trackData.getDisc());
+        testSingle(DISC_TOTAL, trackData.getDiscTotal());
+        testMulti(RECORD_LABELS, trackData.getTagFieldValues(FieldKey.RECORD_LABEL));
+        testMulti(RECORD_LABELS, trackData.getRecordLabels());
+        Assert.assertTrue(trackData.getRecordLabels().contains(trackData.getRecordLabel()));
+        testMulti(CATALOG_NOS, trackData.getTagFieldValues(FieldKey.CATALOG_NO));
+        testMulti(CATALOG_NOS, trackData.getCatalogNos());
+        Assert.assertTrue(trackData.getCatalogNos().contains(trackData.getCatalogNo()));
+        testSingle(COMMENT, trackData.getComment());
+        testSingle(RATING, trackData.getRating());
+
+        // test technical fields
 //        assertEquals(29400, track.getTotalSamples());
-        assertEquals(2, track.getChannels());
-        assertEquals(44100, track.getSampleRate());
+        assertEquals(2, trackData.getChannels());
+        assertEquals(44100, trackData.getSampleRate());
+    }
+
+    private void testReadApe(String file) {
+        Track track = getAudioFileReader(file).read(new File(file));
+        TrackData trackData = track.getTrackData();
+
+        // test metadata fields
+        testSingle(ARTIST, trackData.getArtist());
+        testSingle(ALBUM_ARTIST, trackData.getAlbumArtist());
+        testSingle(TITLE, trackData.getTitle());
+        testSingle(ALBUM, trackData.getAlbum());
+        testSingle(YEAR, trackData.getYear());
+        testSingle(GENRE, trackData.getGenre());
+        testSingle(TRACK, trackData.getTrack());
+        testSingle(TRACK_TOTAL, trackData.getTrackTotal());
+        testSingle(DISC_NO, trackData.getDisc());
+        testSingle(DISC_TOTAL, trackData.getDiscTotal());
+        testSingle(RECORD_LABEL, trackData.getRecordLabel());
+        testSingle(CATALOG_NO, trackData.getCatalogNo());
+        testSingle(COMMENT, trackData.getComment());
+        testSingle(RATING, trackData.getRating());
+
+        // test technical fields
+//        assertEquals(29400, track.getTotalSamples());
+        assertEquals(2, trackData.getChannels());
+        assertEquals(44100, trackData.getSampleRate());
     }
 
     private void testWrite(String name) {
         Track track = new Track();
+        TrackData trackData = track.getTrackData();
 
-        track.setMeta("album", "album");
-        track.setMeta("albumArtist", "album artist");
-        track.setMeta("artist", "artist");
-        track.setMeta("comment", "comment");
-        track.setDiscNumber("3/4");
-        track.setTrackNumber("1/2");
-        track.setMeta("genre", "genre");
-        track.setMeta("title", "title");
-        track.setMeta("year", "date");
+        addMulti(trackData, FieldKey.ARTIST, ARTISTS);
+    	trackData.addAlbumArtist(ALBUM_ARTIST);
+    	trackData.addTitle(TITLE);
+    	trackData.addAlbum(ALBUM);
+    	trackData.addYear(YEAR);
+    	addMulti(trackData, FieldKey.GENRE, GENRES);
+    	trackData.addTrack(TRACK);
+    	trackData.addTrackTotal(TRACK_TOTAL);
+    	trackData.addDisc(DISC_NO);
+    	trackData.addDiscTotal(DISC_TOTAL);
+    	addMulti(trackData, FieldKey.RECORD_LABEL, RECORD_LABELS);
+    	addMulti(trackData, FieldKey.CATALOG_NO, CATALOG_NOS);
+    	trackData.addComment(COMMENT);
+    	trackData.addRating(RATING);
 
         File file = new File(name);
         File fo = new File("testfiles/temp." + Util.getFileExt(name));
         copy(file, fo);
-        track.setLocation(fo.toURI().toString());
+        trackData.setLocation(fo.toURI().toString());
         try {
             getAudioFileWriter(fo.getName()).write(track);
         } catch (TagWriteException e) {
@@ -139,6 +213,39 @@ public class TagTest {
         }
 
         testRead(fo.getPath());
+        fo.delete();
+    }
+
+    private void testWriteApe(String name) {
+        Track track = new Track();
+        TrackData trackData = track.getTrackData();
+
+        trackData.addArtist(ARTIST);
+    	trackData.addAlbumArtist(ALBUM_ARTIST);
+    	trackData.addTitle(TITLE);
+    	trackData.addAlbum(ALBUM);
+    	trackData.addYear(YEAR);
+    	trackData.addGenre(GENRE);
+    	trackData.addTrack(TRACK);
+    	trackData.addTrackTotal(TRACK_TOTAL);
+    	trackData.addDisc(DISC_NO);
+    	trackData.addDiscTotal(DISC_TOTAL);
+    	trackData.addRecordLabel(RECORD_LABEL);
+    	trackData.addCatalogNo(CATALOG_NO);
+    	trackData.addComment(COMMENT);
+    	trackData.addRating(RATING);
+
+        File file = new File(name);
+        File fo = new File("testfiles/temp." + Util.getFileExt(name));
+        copy(file, fo);
+        trackData.setLocation(fo.toURI().toString());
+        try {
+            getAudioFileWriter(fo.getName()).write(track);
+        } catch (TagWriteException e) {
+            e.printStackTrace();
+        }
+
+        testReadApe(fo.getPath());
         fo.delete();
     }
 
@@ -161,4 +268,22 @@ public class TagTest {
             e.printStackTrace();
         }
     }
+    
+    private void testSingle(String expected, String actual) {
+    	Assert.assertNotNull(actual);
+    	Assert.assertEquals(expected, actual);
+    }
+    
+    private void testMulti(String[] expected, Set<String> actual) {
+        Assert.assertNotNull(actual);
+        Assert.assertEquals(expected.length, actual.size());
+        for (String value : expected) {
+        	Assert.assertTrue(actual.contains(value));
+        }
+    }
+    
+    private void addMulti(TrackData trackData, FieldKey key, String[] values) {
+		trackData.addTagFieldValues(key, new HashSet<String>(Arrays.asList(values)));
+    }
+
 }

@@ -41,10 +41,10 @@ public class ParserTest {
     public void testBrackets() {
         Expression t = Parser.parse("[%artist% - ]%title%");
 
-        s.setMeta("title", "title");
+        s.getTrackData().addTitle("title");
         assertEquals("title", t.eval(s));
 
-        s.setMeta("artist", "artist");
+        s.getTrackData().addArtist("artist");
         assertEquals("artist - title", t.eval(s));
     }
 
@@ -52,15 +52,15 @@ public class ParserTest {
     public void testIf3() {
         Expression t = Parser.parse("$if3(%artist%, %title%, %albumArtist%, unknown)");
 
-        s.setMeta("artist", "artist");
+        s.getTrackData().addArtist("artist");
         assertEquals("artist", t.eval(s));
-        s.setMeta("artist", null);
-        s.setMeta("title", ("title"));
+        s.getTrackData().addArtist(null);
+        s.getTrackData().addTitle("title");
         assertEquals("title", t.eval(s));
-        s.setMeta("title", "");
-        s.setMeta("albumArtist", "album artist");
+        s.getTrackData().addTitle("");
+        s.getTrackData().addAlbumArtist("album artist");
         assertEquals("album artist", t.eval(s));
-        s.setMeta("albumArtist", null);
+        s.getTrackData().addAlbumArtist(null);
 
         assertEquals("unknown", t.eval(s));
     }
@@ -69,11 +69,11 @@ public class ParserTest {
     public void testIf1() {
         Expression t = Parser.parse("$if1(%artist%,%artist%,%title%)");
 
-        s.setMeta("artist", "artist");
-        s.setMeta("title", ("title"));
+        s.getTrackData().addArtist("artist");
+        s.getTrackData().addTitle("title");
         assertEquals("artist", t.eval(s));
 
-        s.setMeta("artist", null);
+        s.getTrackData().addArtist(null);
         assertEquals("title", t.eval(s));
     }
 
@@ -81,8 +81,8 @@ public class ParserTest {
     public void testQuot() {
         Expression t = Parser.parse("'%artist%'%title%");
 
-        s.setMeta("artist", "artist here");
-        s.setMeta("title", "title here");
+        s.getTrackData().addArtist("artist here");
+        s.getTrackData().addTitle("title here");
 
         assertEquals("%artist%title here", t.eval(s));
     }
@@ -91,13 +91,13 @@ public class ParserTest {
     public void testSmth() {
         Expression t = Parser.parse("$if1($strcmp(%albumArtist%,%artist%),%artist%,$if3(%album%,Unknown))");
 
-        s.setMeta("albumArtist", "album artist");
-        s.setMeta("year", "year");
-        s.setMeta("album", "album");
-        s.setDiscNumber("1");
-        s.setTrackNumber("10");
-        s.setMeta("artist", "artist");
-        s.setMeta("title", ("title"));
+        s.getTrackData().addAlbumArtist("album artist");
+        s.getTrackData().addYear("year");
+        s.getTrackData().addAlbum("album");
+        s.getTrackData().addDisc("1");
+        s.getTrackData().addTrack("10");
+        s.getTrackData().addArtist("artist");
+        s.getTrackData().addTitle("title");
 
 //        System.out.println(t.eval(s));
     }

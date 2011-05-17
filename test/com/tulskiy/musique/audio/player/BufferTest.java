@@ -35,26 +35,26 @@ public class BufferTest {
         byte[] buf = new byte[100];
         Track t = new Track();
         Arrays.fill(buf, (byte) 1);
-        t.setBitrate(5);
+        t.getTrackData().setBitrate(5);
         buffer.addNextTrack(t, null, 0);
         buffer.write(buf, 0, buf.length);
         buffer.write(buf, 0, buf.length);
 
         t = new Track();
-        t.setBitrate(10);
+        t.getTrackData().setBitrate(10);
         buffer.addNextTrack(t, null, 0);
         t = new Track();
-        t.setBitrate(20);
+        t.getTrackData().setBitrate(20);
 
         buffer.addNextTrack(t, null, 0);
         buffer.write(buf, 0, buf.length);
         t = new Track();
-        t.setBitrate(30);
+        t.getTrackData().setBitrate(30);
         buffer.addNextTrack(t, null, 0);
 
         assertEquals(-1, buffer.read(buf, 0, 100));
         Buffer.NextEntry nextTrack = buffer.pollNextTrack();
-        assertEquals(5, nextTrack.track.getBitrate());
+        assertEquals(5, nextTrack.track.getTrackData().getBitrate());
 
         assertEquals(55, buffer.read(buf, 0, 55));
         assertEquals(100, buffer.read(buf, 0, 100));
@@ -62,12 +62,12 @@ public class BufferTest {
 
         assertEquals(-1, buffer.read(buf, 0, 100));
         nextTrack = buffer.pollNextTrack();
-        assertEquals(10, nextTrack.track.getBitrate());
+        assertEquals(10, nextTrack.track.getTrackData().getBitrate());
 
         assertEquals(-1, buffer.read(buf, 0, 100));
         nextTrack = buffer.pollNextTrack();
 
-        assertEquals(20, nextTrack.track.getBitrate());
+        assertEquals(20, nextTrack.track.getTrackData().getBitrate());
         assertEquals(100, buffer.read(buf, 0, 100));
         assertEquals(-1, buffer.read(buf, 0, 100));
     }
