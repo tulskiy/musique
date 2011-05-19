@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Formatter;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -65,7 +63,7 @@ public class TrackData implements Cloneable {
 		FieldKey.RATING
 	};
 
-    private static HashSet<FieldKey> INTERNED_FIELDS = new HashSet<FieldKey>() {{
+    private static Set<FieldKey> INTERNED_FIELDS = new LinkedHashSet<FieldKey>() {{
         add(FieldKey.ARTIST);
         add(FieldKey.ALBUM_ARTIST);
         add(FieldKey.YEAR);
@@ -168,7 +166,7 @@ public class TrackData implements Cloneable {
     	Set<String> result = getTagFieldValues(key);
 
     	if (result == null) {
-    		result = new HashSet<String>(1, 1);
+    		result = new LinkedHashSet<String>(1, 1);
     	}
     	
     	return result;
@@ -224,7 +222,7 @@ public class TrackData implements Cloneable {
     }
     
     public void setTagFieldValues(FieldKey key, String value) {
-    	Set<String> newValues = new HashSet<String>(1, 1);
+    	Set<String> newValues = new LinkedHashSet<String>(1, 1);
     	newValues.add(value);
     	setTagFieldValues(key, newValues);
     }

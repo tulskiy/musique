@@ -17,7 +17,6 @@
 
 package com.tulskiy.musique.gui.model;
 
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -39,7 +38,7 @@ public class TrackInfoItemState {
 	public TrackInfoItemState(FieldKey key, List<Track> tracks) {
 		values = new LinkedHashMap<Track, Set<String>>();
 		for (Track track : tracks) {
-			values.put(track, new HashSet<String>(track.getTrackData().getTagFieldValuesSafeAsSet(key)));
+			values.put(track, new LinkedHashSet<String>(track.getTrackData().getTagFieldValuesSafeAsSet(key)));
 		}
 
 		isUpdated = false;
