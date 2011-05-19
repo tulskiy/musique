@@ -68,8 +68,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
     private JButton cancel;
     private int DEFAULT_COLUMN_WIDTH = 280;
 
-    public TracksInfoEditFieldDialog(final PlaylistTable playlist, final GroupTable properties,
-    		final SingleTagFieldModel tagFieldModel) {
+    public TracksInfoEditFieldDialog(final GroupTable properties, final SingleTagFieldModel tagFieldModel) {
         setTitle(tagFieldModel.isMultiTrackEditMode() ? "Edit multiple files" : "Edit single file");
         setModal(false);
 
@@ -90,9 +89,6 @@ public class TracksInfoEditFieldDialog extends JDialog {
             	((TagFieldModel) properties.getModel()).refreshModel();
             	properties.revalidate();
             	properties.repaint();
-            	if (playlist != null) {
-            		playlist.getPlaylist().firePlaylistChanged();
-            	}
                 setVisible(false);
                 dispose();
                 properties.requestFocus();
@@ -116,7 +112,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
         add(b1, BorderLayout.SOUTH);
 
         setSize(600, 380);
-        setLocationRelativeTo(SwingUtilities.windowForComponent(playlist == null ? properties : playlist));
+        setLocationRelativeTo(SwingUtilities.windowForComponent(properties));
     }
 
     private JComponent createTable(final GroupTable parent, final TableModel model) {
@@ -276,9 +272,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
     	        menu.add(menuItemEdit).addActionListener(new ActionListener() {
     				@Override
     				public void actionPerformed(ActionEvent e) {
-    					// no playlist given since edit dialog is actual parent here
-    					TracksInfoEditFieldDialog dialog =
-    							new TracksInfoEditFieldDialog(null, properties, editTagFieldModel);
+    					TracksInfoEditFieldDialog dialog = new TracksInfoEditFieldDialog(properties, editTagFieldModel);
     					dialog.setVisible(true);
     				}
     	        });

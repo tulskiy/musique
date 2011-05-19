@@ -43,7 +43,7 @@ public class TrackInfoItemSelection implements Transferable, ClipboardOwner {
 		if (data != null) {
 			items = new ArrayList<TrackInfoItem>(data.size());
 			for (TrackInfoItem item : data) {
-				items.add(new TrackInfoItem(item.getKey(), item.getTracks()));
+				items.add(new TrackInfoItem(item));
 			}
 		}
 	}

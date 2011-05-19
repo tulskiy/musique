@@ -23,7 +23,6 @@ import java.util.Stack;
 import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.util.Util;
 
 public class TrackInfoItem {
 
@@ -38,6 +37,14 @@ public class TrackInfoItem {
 
 		states = new Stack<TrackInfoItemState>();
 		addState(key, tracks);
+	}
+
+	public TrackInfoItem(TrackInfoItem item) {
+		key = item.getKey();
+		tracks = item.getTracks();
+
+		states = new Stack<TrackInfoItemState>();
+		addState(item.getState());
 	}
 
 	public FieldKey getKey() {
@@ -56,7 +63,14 @@ public class TrackInfoItem {
 	 * Adds new state cloned from current.
 	 */
 	public void addState() {
-		states.push(new TrackInfoItemState(getState()));
+		addState(getState());
+	}
+
+	/**
+	 * Adds new state cloned from given one.
+	 */
+	private void addState(TrackInfoItemState state) {
+		states.push(new TrackInfoItemState(state));
 	}
 
 	/**

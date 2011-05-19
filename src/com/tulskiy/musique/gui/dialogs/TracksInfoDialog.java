@@ -21,7 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -39,11 +38,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultCellEditor;
 import javax.swing.ImageIcon;
+import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -307,6 +308,8 @@ public class TracksInfoDialog extends JDialog {
             }
         });
         
+        buildActions(table);
+        
         table.addMouseListener(new MouseAdapter() {
 			
 			@Override
@@ -321,8 +324,14 @@ public class TracksInfoDialog extends JDialog {
 
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    JPopupMenu contextMenu = buildContextMenu(parent, table, new Point(e.getX(), e.getY()));
-                    contextMenu.show(e.getComponent(), e.getX(), e.getY());
+                	int index = table.rowAtPoint(e.getPoint());
+                	if (index != -1) {
+                        if (!table.isRowSelected(index)) {
+                        	table.setRowSelectionInterval(index, index);
+                        }
+	                    JPopupMenu contextMenu = buildContextMenu(parent, table);
+	                    contextMenu.show(e.getComponent(), e.getX(), e.getY());
+                	}
                 }
             }
 		});
@@ -333,83 +342,72 @@ public class TracksInfoDialog extends JDialog {
         return scrollPane;
     }
 
-    private JPopupMenu buildContextMenu(final PlaylistTable playlist, final GroupTable properties, final Point point) {
-    	final MultiTagFieldModel tagFieldsModel = (MultiTagFieldModel) properties.getModel();
+    private MultiTagFieldModel getTagFieldModel(final GroupTable properties) {
+    	return (MultiTagFieldModel) properties.getModel();
+    }
 
+    private List<TrackInfoItem> getSelectedItems(final GroupTable properties) {
     	final List<TrackInfoItem> trackInfoItemsSelected = new LinkedList<TrackInfoItem>();
+
     	if (properties.getSelectedRowCount() > 0) {
 	    	for (int row : properties.getSelectedRows()) {
-	    		trackInfoItemsSelected.add(tagFieldsModel.getTrackInfoItems().get(row));
+	    		trackInfoItemsSelected.add(getTagFieldModel(properties).getTrackInfoItems().get(row));
 	    	}
     	}
-    	else {
-    		int row = properties.rowAtPoint(new Point(point));
-    		if (row > -1) {
-    			trackInfoItemsSelected.add(tagFieldsModel.getTrackInfoItems().get(row));
-    		}
-    	}
     	
-    	ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+    	return trackInfoItemsSelected;
+    }
+    
+    private void buildActions(final GroupTable table) {
+        ActionMap aMap = table.getActionMap();
+        InputMap iMap = table.getInputMap(table.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        final JPopupMenu menu = new JPopupMenu();
-
-        if (!trackInfoItemsSelected.isEmpty()) {
-        	final SingleTagFieldModel tagFieldModel = trackInfoItemsSelected.get(0).getTracks().size() == 1 ?
-        			new SingleTagFieldModel(trackInfoItemsSelected.get(0), trackInfoItemsSelected.get(0).getTracks().get(0)) :
-       				new SingleTagFieldModel(trackInfoItemsSelected.get(0));
-
-	        JMenuItem menuItemEdit = new JMenuItem("Edit");
-	        menuItemEdit.setIcon(emptyIcon);
-	        menu.add(menuItemEdit).addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					TracksInfoEditFieldDialog dialog =
-							new TracksInfoEditFieldDialog(playlist, properties, tagFieldModel);
+        aMap.put("edit", new AbstractAction("Edit") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	TrackInfoItem firstItem = selectedItems.get(0);
+            	if (!selectedItems.isEmpty()) {
+		        	final SingleTagFieldModel tagFieldModel = firstItem.getTracks().size() == 1 ?
+		        			new SingleTagFieldModel(firstItem, firstItem.getTracks().get(0)) :
+		       				new SingleTagFieldModel(firstItem);
+					TracksInfoEditFieldDialog dialog = new TracksInfoEditFieldDialog(table, tagFieldModel);
 					dialog.setVisible(true);
-				}
-	        });
-	        
-	        menu.addSeparator();
-        }
-
-        JMenuItem menuItemCut = new JMenuItem("Cut");
-        menuItemCut.setIcon(emptyIcon);
-        menuItemCut.setEnabled(!trackInfoItemsSelected.isEmpty());
-        menuItemCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, ActionEvent.CTRL_MASK));
-        menu.add(menuItemCut).addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				TrackInfoItemSelection selection = new TrackInfoItemSelection(trackInfoItemsSelected);
-				getToolkit().getSystemClipboard().setContents(selection, selection);
-				tagFieldsModel.removeTrackInfoItems(trackInfoItemsSelected);
-				refreshTable(properties);
-			}
+            	}
+            }
         });
 
-        JMenuItem menuItemCopy = new JMenuItem("Copy");
-        menuItemCopy.setIcon(emptyIcon);
-        menuItemCopy.setEnabled(!trackInfoItemsSelected.isEmpty());
-        menuItemCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, ActionEvent.CTRL_MASK));
-        menu.add(menuItemCopy).addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				TrackInfoItemSelection selection = new TrackInfoItemSelection(trackInfoItemsSelected);
-				getToolkit().getSystemClipboard().setContents(selection, selection);
-			}
+        aMap.put("cut", new AbstractAction("Cut fields") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	if (!selectedItems.isEmpty()) {
+					TrackInfoItemSelection selection = new TrackInfoItemSelection(selectedItems);
+					getToolkit().getSystemClipboard().setContents(selection, selection);
+					getTagFieldModel(table).removeTrackInfoItems(selectedItems);
+					refreshTable(table);
+            	}
+            }
         });
 
-		final Transferable clipboardContent = getToolkit().getSystemClipboard().getContents(null);
+        aMap.put("copy", new AbstractAction("Copy fields") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	if (!selectedItems.isEmpty()) {
+					TrackInfoItemSelection selection = new TrackInfoItemSelection(selectedItems);
+					getToolkit().getSystemClipboard().setContents(selection, selection);
+            	}
+            }
+        });
 
-        JMenuItem menuItemPaste = new JMenuItem("Paste");
-        menuItemPaste.setIcon(emptyIcon);
-        menuItemPaste.setEnabled(clipboardContent != null && clipboardContent.isDataFlavorSupported(TrackInfoItemSelection.objectFlavor));
-        menuItemPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, ActionEvent.CTRL_MASK));
-        menu.add(menuItemPaste).addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
+        aMap.put("paste", new AbstractAction("Paste fields") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 				List<TrackInfoItem> items = null;
 				try {
-					items = (List<TrackInfoItem>) clipboardContent.getTransferData(TrackInfoItemSelection.objectFlavor);
+					items = (List<TrackInfoItem>) getToolkit().getSystemClipboard().getContents(null).
+							getTransferData(TrackInfoItemSelection.objectFlavor);
 				}
 				catch (IOException ioe) {
 					// ignore, treating as the clipboard is empty
@@ -418,37 +416,88 @@ public class TracksInfoDialog extends JDialog {
 					// ignore since we already checked at menu construction that flavor is supported
 				}
 				if (items != null) {
-					tagFieldsModel.mergeTrackInfoItems(items);
-					tagFieldsModel.sort();
-					refreshTable(properties);
+					MultiTagFieldModel model = getTagFieldModel(table);
+					model.mergeTrackInfoItems(items);
+					model.sort();
+					refreshTable(table);
 				}
-			}
+            }
         });
+
+        aMap.put("add", new AbstractAction("Add") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+				TracksInfoAddFieldDialog dialog = new TracksInfoAddFieldDialog(table, getTagFieldModel(table));
+				dialog.setVisible(true);
+				refreshTable(table);
+            }
+        });
+
+        aMap.put("remove", new AbstractAction("Remove") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	if (!selectedItems.isEmpty()) {
+					getTagFieldModel(table).removeTrackInfoItems(selectedItems);
+					refreshTable(table);
+            	}
+            }
+        });
+
+        iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK), "cut");
+        iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK), "copy");
+        iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK), "paste");
+    }
+
+    private JPopupMenu buildContextMenu(final PlaylistTable playlist, final GroupTable properties) {
+    	boolean isAnyRowSelected = properties.getSelectedRowCount() > 0;
+        Transferable clipboardContent = getToolkit().getSystemClipboard().getContents(null);
+    	
+    	ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+
+        final JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem menuItemEdit = new JMenuItem("Edit");
+        menuItemEdit.setIcon(emptyIcon);
+        menuItemEdit.setEnabled(isAnyRowSelected);
+        menu.add(menuItemEdit).addActionListener(properties.getActionMap().get("edit"));
+        
+        menu.addSeparator();
+
+        JMenuItem menuItemCut = new JMenuItem("Cut fields");
+        menuItemCut.setIcon(emptyIcon);
+        menuItemCut.setEnabled(isAnyRowSelected);
+        menuItemCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+        menu.add(menuItemCut).addActionListener(properties.getActionMap().get("cut"));
+
+        JMenuItem menuItemCopy = new JMenuItem("Copy fields");
+        menuItemCopy.setIcon(emptyIcon);
+        menuItemCopy.setEnabled(isAnyRowSelected);
+        menuItemCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+        menu.add(menuItemCopy).addActionListener(properties.getActionMap().get("copy"));
+
+        JMenuItem menuItemPaste = new JMenuItem("Paste fields");
+        menuItemPaste.setIcon(emptyIcon);
+        menuItemPaste.setEnabled(clipboardContent != null && clipboardContent.isDataFlavorSupported(TrackInfoItemSelection.objectFlavor));
+        menuItemPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+        menu.add(menuItemPaste).addActionListener(properties.getActionMap().get("paste"));
 
         menu.addSeparator();
 
         JMenuItem menuItemAdd = new JMenuItem("Add");
         menuItemAdd.setIcon(emptyIcon);
-        menu.add(menuItemAdd).addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				TracksInfoAddFieldDialog dialog = new TracksInfoAddFieldDialog(playlist, properties, tagFieldsModel);
-				dialog.setVisible(true);
-				refreshTable(properties);
-			}
-        });
+        menu.add(menuItemAdd).addActionListener(properties.getActionMap().get("add"));
         
-        if (!trackInfoItemsSelected.isEmpty()) {
-	        JMenuItem menuItemRemove = new JMenuItem("Remove");
-	        menuItemRemove.setIcon(emptyIcon);
-	        menu.add(menuItemRemove).addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					tagFieldsModel.removeTrackInfoItems(trackInfoItemsSelected);
-					refreshTable(properties);
-				}
-			});
-        }
+        JMenuItem menuItemRemove = new JMenuItem("Remove");
+        menuItemRemove.setIcon(emptyIcon);
+        menuItemRemove.setEnabled(isAnyRowSelected);
+        menu.add(menuItemRemove).addActionListener(properties.getActionMap().get("remove"));
         
         return menu;
     }

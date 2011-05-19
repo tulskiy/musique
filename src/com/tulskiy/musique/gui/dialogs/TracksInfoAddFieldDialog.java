@@ -51,7 +51,7 @@ public class TracksInfoAddFieldDialog extends JDialog {
 
 	private JButton cancel;
 
-    public TracksInfoAddFieldDialog(final PlaylistTable playlist, final GroupTable properties, final MultiTagFieldModel tagFieldsModel) {
+    public TracksInfoAddFieldDialog(final GroupTable properties, final MultiTagFieldModel tagFieldsModel) {
         setTitle("Add field");
         setModal(false);
 
@@ -79,7 +79,6 @@ public class TracksInfoAddFieldDialog extends JDialog {
 
             	properties.revalidate();
             	properties.repaint();
-            	playlist.getPlaylist().firePlaylistChanged();
                 setVisible(false);
                 dispose();
                 properties.requestFocus();
