@@ -65,19 +65,23 @@ public class MP4FileReader extends AudioFileReader {
     	TrackData trackData = track.getTrackData();
     	
     	Mp4TrackField trackField = (Mp4TrackField) mp4Tag.getFirstField(Mp4FieldKey.TRACK);
-    	if (trackField.getTrackNo() != null) {
-    		trackData.addTrack(trackField.getTrackNo().intValue());
-    	}
-    	if (trackField.getTrackTotal() != null) {
-    		trackData.addTrackTotal(trackField.getTrackTotal().intValue());
+    	if (trackField != null) {
+	    	if (trackField.getTrackNo() != null) {
+	    		trackData.addTrack(trackField.getTrackNo().intValue());
+	    	}
+	    	if (trackField.getTrackTotal() != null) {
+	    		trackData.addTrackTotal(trackField.getTrackTotal().intValue());
+	    	}
     	}
     	
     	Mp4DiscNoField discField = (Mp4DiscNoField) mp4Tag.getFirstField(Mp4FieldKey.DISCNUMBER);
-    	if (discField.getDiscNo() != null) {
-    		trackData.addDisc(discField.getDiscNo().intValue());
-    	}
-    	if (discField.getDiscTotal() != null) {
-    		trackData.addDiscTotal(discField.getDiscTotal().intValue());
+    	if (discField != null) {
+	    	if (discField.getDiscNo() != null) {
+	    		trackData.addDisc(discField.getDiscNo().intValue());
+	    	}
+	    	if (discField.getDiscTotal() != null) {
+	    		trackData.addDiscTotal(discField.getDiscTotal().intValue());
+	    	}
     	}
 
     	List<TagField> genreFields = mp4Tag.get(Mp4FieldKey.GENRE_CUSTOM);
