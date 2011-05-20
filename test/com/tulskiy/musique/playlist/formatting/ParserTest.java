@@ -17,13 +17,16 @@
 
 package com.tulskiy.musique.playlist.formatting;
 
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.playlist.formatting.tokens.Expression;
-
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+
+import org.jaudiotagger.tag.FieldKey;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 
 /**
  * @Author: Denis Tulskiy
@@ -35,6 +38,8 @@ public class ParserTest {
     @Before
     public void setUp() {
         s = new Track();
+        File file = new File("testfiles/ogg/sample.ogg");
+        s.getTrackData().setLocation(file.toURI().toString());
     }
 
     @Test
@@ -52,16 +57,24 @@ public class ParserTest {
     public void testIf3() {
         Expression t = Parser.parse("$if3(%artist%, %title%, %albumArtist%, unknown)");
 
-        s.getTrackData().addArtist("artist");
+        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, "artist");
         assertEquals("artist", t.eval(s));
-        s.getTrackData().addArtist(null);
-        s.getTrackData().addTitle("title");
+        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, (String) null);
+        s.getTrackData().setTagFieldValues(FieldKey.TITLE, "title");
         assertEquals("title", t.eval(s));
-        s.getTrackData().addTitle("");
-        s.getTrackData().addAlbumArtist("album artist");
+        s.getTrackData().setTagFieldValues(FieldKey.TITLE, "");
+        s.getTrackData().setTagFieldValues(FieldKey.ALBUM_ARTIST, "album artist");
         assertEquals("album artist", t.eval(s));
-        s.getTrackData().addAlbumArtist(null);
-
+        s.getTrackData().setTagFieldValues(FieldKey.ALBUM_ARTIST, (String) null);
+        // file name is taken once title is empty
+        assertEquals("sample", t.eval(s));
+        
+        t = Parser.parse("$if3(%genre%, unknown)");
+        s.getTrackData().setTagFieldValues(FieldKey.GENRE, "genre");
+        assertEquals("genre", t.eval(s));
+        s.getTrackData().setTagFieldValues(FieldKey.GENRE, "");
+        assertEquals("unknown", t.eval(s));
+        s.getTrackData().setTagFieldValues(FieldKey.GENRE, (String) null);
         assertEquals("unknown", t.eval(s));
     }
 
@@ -69,11 +82,11 @@ public class ParserTest {
     public void testIf1() {
         Expression t = Parser.parse("$if1(%artist%,%artist%,%title%)");
 
-        s.getTrackData().addArtist("artist");
-        s.getTrackData().addTitle("title");
+        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, "artist");
+        s.getTrackData().setTagFieldValues(FieldKey.TITLE, "title");
         assertEquals("artist", t.eval(s));
 
-        s.getTrackData().addArtist(null);
+        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, (String) null);
         assertEquals("title", t.eval(s));
     }
 
