@@ -140,6 +140,7 @@ public class LibraryTree extends JTree {
             playlist.clear();
             playlist.addAll(tracks);
             player.open(playlist.get(0));
+            playlistManager.setActivePlaylist(playlist);
             playlist.firePlaylistChanged();
         }
     }
