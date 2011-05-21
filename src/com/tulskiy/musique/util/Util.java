@@ -17,10 +17,18 @@
 
 package com.tulskiy.musique.util;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.io.File;
+import java.util.List;
 import java.util.Set;
+
+import javax.swing.AbstractButton;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.UIManager;
+
+import com.tulskiy.musique.gui.model.FieldValues;
 
 /**
  * @Author: Denis Tulskiy
@@ -104,8 +112,16 @@ public class Util {
         return null;
     }
 
-    public static boolean isEmpty(String s) {
-        return s == null || s.isEmpty();
+    public static boolean isEmpty(String value) {
+        return value == null || value.isEmpty();
+    }
+
+    public static boolean isEmpty(List values) {
+        return values == null || values.isEmpty();
+    }
+
+    public static boolean isEmpty(Set values) {
+        return values == null || values.isEmpty();
     }
 
     public static String humanize(String property) {
@@ -190,14 +206,13 @@ public class Util {
         	if (values instanceof String) {
         		result = (String) values;
         	}
-        	else if (values instanceof Set) {
-        		Set vs = (Set) values;
+        	else if (values instanceof FieldValues) {
+        		FieldValues vs = (FieldValues) values;
         		if (vs.size() > 1) {
         			result = "<multiple values> " + vs.toString();
         		}
-        		else if (vs.size() == 1) {
-        			Object value = vs.iterator().next();
-        			result = value == null ? "" : value.toString();
+        		else {
+        			result = vs.toString();
         		}
         	}
         }
@@ -210,9 +225,11 @@ public class Util {
         	if (values instanceof String) {
         		return (String) values;
         	}
-        	else if (values instanceof Set) {
+        	else if (values instanceof FieldValues) {
             	StringBuilder sb = new StringBuilder();
-            	for (Object value : ((Set) values).toArray()) {
+            	FieldValues vs = (FieldValues) values;
+            	for (int i = 0; i < vs.size(); i++) {
+            		String value = vs.get(i);
             		if (sb.length() != 0) {
             			sb.append(separator);
             		}

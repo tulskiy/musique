@@ -19,7 +19,6 @@ package com.tulskiy.musique.gui.model;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,26 +31,26 @@ import com.tulskiy.musique.util.Util;
 
 public class TrackInfoItemState {
 
-	private Map<Track, Set<String>> values;
+	private Map<Track, FieldValues> values;
 	private boolean isUpdated;
 
 	public TrackInfoItemState(FieldKey key, List<Track> tracks) {
-		values = new LinkedHashMap<Track, Set<String>>();
+		values = new LinkedHashMap<Track, FieldValues>();
 		for (Track track : tracks) {
-			values.put(track, new LinkedHashSet<String>(track.getTrackData().getTagFieldValuesSafeAsSet(key)));
+			values.put(track, new FieldValues(track.getTrackData().getTagFieldValuesSafe(key)));
 		}
 
 		isUpdated = false;
 	}
 
-	public TrackInfoItemState(Map<Track, Set<String>> valuesOriginal, boolean isUpdatedOriginal) {
-		values = new LinkedHashMap<Track, Set<String>>();
-		Set<Entry<Track, Set<String>>> entriesOriginal = valuesOriginal.entrySet();
+	public TrackInfoItemState(Map<Track, FieldValues> valuesOriginal, boolean isUpdatedOriginal) {
+		values = new LinkedHashMap<Track, FieldValues>();
+		Set<Entry<Track, FieldValues>> entriesOriginal = valuesOriginal.entrySet();
 		if (entriesOriginal != null && !entriesOriginal.isEmpty()) {
-			Iterator<Entry<Track, Set<String>>> it = entriesOriginal.iterator();
+			Iterator<Entry<Track, FieldValues>> it = entriesOriginal.iterator();
 			while (it.hasNext()) {
-				Entry<Track, Set<String>> entry = it.next();
-				values.put(entry.getKey(), new LinkedHashSet<String>(entry.getValue()));
+				Entry<Track, FieldValues> entry = it.next();
+				values.put(entry.getKey(), new FieldValues(entry.getValue()));
 			}
 		}
 
@@ -63,23 +62,23 @@ public class TrackInfoItemState {
 	}
 	
 	public void clear() {
-		for (Set<String> value : values.values()) {
-			value.clear();
+		for (FieldValues value : values.values()) {
+			value.clearValues();
 		}
 		values.clear();
 	}
 	
-	public Set<String> getValues() {
-		Set<String> result = new LinkedHashSet<String>();
+	public FieldValues getValues() {
+		FieldValues result = new FieldValues();
 
-		for (Set<String> vs : values.values()) {
-			result.addAll(vs);
+		for (FieldValues vs : values.values()) {
+			result.addValues(vs);
 		}
 
 		return result;
 	}
 	
-	public Set<String> getValues(Track track) {
+	public FieldValues getValues(Track track) {
 		return track == null ? getValues() : values.get(track);
 	}
 	
@@ -88,8 +87,8 @@ public class TrackInfoItemState {
 	}
 	
 	public void addValue(String value) {
-		for (Set<String> vs : values.values()) {
-			vs.add(value);
+		for (FieldValues vs : values.values()) {
+			vs.addValues(value);
 		}
 		isUpdated = true;
 	}
@@ -99,16 +98,16 @@ public class TrackInfoItemState {
 			addValue(value);
 		}
 		else {
-			Set<String> vs = values.get(track);
-			vs.add(value);
+			FieldValues vs = values.get(track);
+			vs.addValues(value);
 			isUpdated = true;
 		}
 	}
 
 	public void setValue(String value) {
-		for (Set<String> vs : values.values()) {
-			vs.clear();
-			vs.add(value);
+		for (FieldValues vs : values.values()) {
+			vs.clearValues();
+			vs.addValues(value);
 		}
 		isUpdated = true;
 	}
@@ -118,29 +117,29 @@ public class TrackInfoItemState {
 			setValue(value);
 		}
 		else {
-			Set<String> vs = values.get(track);
-			vs.clear();
-			vs.add(value);
+			FieldValues vs = values.get(track);
+			vs.clearValues();
+			vs.addValues(value);
 			isUpdated = true;
 		}
 	}
 
-	public void setValues(Set<String> values) {
-		for (Set<String> vs : this.values.values()) {
-			vs.clear();
-			vs.addAll(values);
+	public void setValues(FieldValues values) {
+		for (FieldValues vs : this.values.values()) {
+			vs.clearValues();
+			vs.addValues(values);
 		}
 		isUpdated = true;
 	}
 
-	public void setValues(Set<String> values, Track track) {
+	public void setValues(FieldValues values, Track track) {
 		if (track == null) {
 			setValues(values);
 		}
 		else {
-			Set<String> vs = this.values.get(track);
-			vs.clear();
-			vs.addAll(values);
+			FieldValues vs = this.values.get(track);
+			vs.clearValues();
+			vs.addValues(values);
 			isUpdated = true;
 		}
 	}

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -42,6 +41,7 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.AudioTagWriter;
 import com.tulskiy.musique.audio.TagWriteException;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.util.Util;
@@ -97,17 +97,15 @@ public class MP3TagWriter extends AudioTagWriter {
 
     // @see AudioTagWriter#copyTagFields(Tag, AbstractTag, Track) as source
     public void copyTagFields(ID3v24Tag tag, Track track) throws KeyNotFoundException, FieldDataInvalidException {
-    	String value;
     	boolean firstValue;
 
-    	Iterator<Entry<FieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
+    	Iterator<Entry<FieldKey, FieldValues>> entries = track.getTrackData().getAllTagFieldValuesIterator();
 		while (entries.hasNext()) {
-			Entry<FieldKey, Set<String>> entry = entries.next();
+			Entry<FieldKey, FieldValues> entry = entries.next();
 			if (!trackDiscFieldKeys.contains(entry.getKey())) {
-				Iterator<String> values = entry.getValue().iterator();
 				firstValue = true;
-				while (values.hasNext()) {
-					value = values.next();
+				for (int i = 0; i < entry.getValue().size(); i++) {
+					String value = entry.getValue().get(i);
 					if (firstValue) {
 						tag.deleteField(entry.getKey());
 						firstValue = false;

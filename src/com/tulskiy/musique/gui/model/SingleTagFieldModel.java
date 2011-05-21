@@ -64,8 +64,9 @@ public class SingleTagFieldModel extends AbstractTableModel implements TagFieldM
 			}
 		}
 		else {
-			oldValues.addAll(trackInfoItem.getState().getValues(selectedTrack));
-			newValues.addAll(oldValues);
+			FieldValues values = trackInfoItem.getState().getValues(selectedTrack);
+			values.setFieldValuesToList(oldValues);
+			values.setFieldValuesToList(newValues);
 		}
 	}
 	

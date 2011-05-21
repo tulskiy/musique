@@ -28,13 +28,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 
 import junit.framework.Assert;
 
 import org.jaudiotagger.tag.FieldKey;
 import org.junit.Test;
 
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.util.Util;
@@ -274,7 +274,7 @@ public class TagTest {
     	Assert.assertEquals(expected, actual);
     }
     
-    private void testMulti(String[] expected, Set<String> actual) {
+    private void testMulti(String[] expected, FieldValues actual) {
         Assert.assertNotNull(actual);
         Assert.assertEquals(expected.length, actual.size());
         for (String value : expected) {
@@ -283,7 +283,7 @@ public class TagTest {
     }
     
     private void addMulti(TrackData trackData, FieldKey key, String[] values) {
-		trackData.addTagFieldValues(key, new HashSet<String>(Arrays.asList(values)));
+		trackData.addTagFieldValues(key, new FieldValues(Arrays.asList(values)));
     }
 
 }

@@ -21,19 +21,17 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.Formatter;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
 import org.jaudiotagger.tag.FieldKey;
 
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.util.Util;
 
 /**
@@ -43,7 +41,7 @@ import com.tulskiy.musique.util.Util;
 public class TrackData implements Cloneable {
 
 	// generic jaudiotagger tag field values
-	private Map<FieldKey, Set<String>> tagFields = new EnumMap<FieldKey, Set<String>>(FieldKey.class);
+	private Map<FieldKey, FieldValues> tagFields = new EnumMap<FieldKey, FieldValues>(FieldKey.class);
 	
 	// common tag fields (to be displayed in TrackInfoDialog even if missed)
 	private static final FieldKey[] COMMON_TAG_FIELDS = {
@@ -110,7 +108,7 @@ public class TrackData implements Cloneable {
     public TrackData copy() {
         try {
         	TrackData copy = (TrackData) this.clone();
-        	copy.tagFields = new EnumMap<FieldKey, Set<String>>(copy.tagFields);
+        	copy.tagFields = new EnumMap<FieldKey, FieldValues>(copy.tagFields);
             return copy;
         } catch (CloneNotSupportedException ignored) {
             return null;
@@ -138,9 +136,9 @@ public class TrackData implements Cloneable {
         }
 
         // merge tag fields
-        Iterator<Entry<FieldKey, Set<String>>> entries = newData.getAllTagFieldValuesIterator();
+        Iterator<Entry<FieldKey, FieldValues>> entries = newData.getAllTagFieldValuesIterator();
 		while (entries.hasNext()) {
-			Entry<FieldKey, Set<String>> entry = entries.next();
+			Entry<FieldKey, FieldValues> entry = entries.next();
 			addTagFieldValues(entry.getKey(), entry.getValue());
 		}
 
@@ -154,52 +152,39 @@ public class TrackData implements Cloneable {
 
     // ------------------- meta methods ------------------- //
 
-    public Iterator<Entry<FieldKey, Set<String>>> getAllTagFieldValuesIterator() {
+    public Iterator<Entry<FieldKey, FieldValues>> getAllTagFieldValuesIterator() {
 		return tagFields.entrySet().iterator();
     }
 
-    public Set<String> getTagFieldValues(FieldKey key) {
+    public FieldValues getTagFieldValues(FieldKey key) {
     	return tagFields.get(key);
     }
 
-    public Set<String> getTagFieldValuesSafeAsSet(FieldKey key) {
-    	Set<String> result = getTagFieldValues(key);
+    public FieldValues getTagFieldValuesSafe(FieldKey key) {
+    	FieldValues result = getTagFieldValues(key);
 
     	if (result == null) {
-    		result = new LinkedHashSet<String>(1, 1);
+    		result = new FieldValues();
     	}
     	
-    	return result;
-    }
-
-    @Deprecated
-    public List<String> getTagFieldValuesSafeAsList(FieldKey key) {
-    	List<String> result = new ArrayList<String>();
-    	
-    	Set<String> values = getTagFieldValuesSafeAsSet(key);
-
-    	if (!values.isEmpty()) {
-    		result.addAll(Arrays.asList(values.toArray(new String[values.size()])));
-    	}
-
     	return result;
     }
     
-    public void setTagFieldValues(FieldKey key, Set<String> values) {
+    public void setTagFieldValues(FieldKey key, FieldValues values) {
     	if (values.isEmpty()) {
     		return;
     	}
 
     	// handle additional business logic
     	if (FieldKey.TRACK.equals(key)) {
-    		String track = values.iterator().next();
+    		String track = values.get(0);
     		trackNumberFormatted = (Util.isEmpty(track) ?
     				"" : new Formatter().format("%02d", Integer.parseInt(track)).toString()).intern();
     	}
 
     	// handle technical tags
     	if (FieldKey.ENCODER.equals(key)) {
-    		setEncoder(values.iterator().next());
+    		setEncoder(values.get(0));
     	}
     	else if (FieldKey.COVER_ART.equals(key)) {
     		// TODO skipping, should be handled in its own way
@@ -207,11 +192,10 @@ public class TrackData implements Cloneable {
     	// handle common cases
     	else {
     		if (INTERNED_FIELDS.contains(key)) {
-        		Set<String> valuesOptimized = new LinkedHashSet<String>();
-    			Iterator<String> it = values.iterator();
-    			while (it.hasNext()) {
-    				String value = it.next();
-					valuesOptimized.add(value == null ? null : value.intern());
+    			FieldValues valuesOptimized = new FieldValues();
+    			for (int i = 0; i < values.size(); i++) {
+    				String value = values.get(i);
+					valuesOptimized.addValues(value == null ? null : value.intern());
     			}
         		tagFields.put(key, valuesOptimized);
     		}
@@ -222,28 +206,26 @@ public class TrackData implements Cloneable {
     }
     
     public void setTagFieldValues(FieldKey key, String value) {
-    	Set<String> newValues = new LinkedHashSet<String>(1, 1);
-    	newValues.add(value);
-    	setTagFieldValues(key, newValues);
+    	setTagFieldValues(key, new FieldValues(value));
     }
     
-    public void addTagFieldValues(FieldKey key, Set<String> values) {
-    	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
-    	existingValues.addAll(values);
+    public void addTagFieldValues(FieldKey key, FieldValues values) {
+    	FieldValues existingValues = getTagFieldValuesSafe(key);
+    	existingValues.addValues(values);
     	setTagFieldValues(key, existingValues);
     }
     
     public void addTagFieldValues(FieldKey key, String value) {
-    	Set<String> existingValues = getTagFieldValuesSafeAsSet(key);
-    	existingValues.add(value);
+    	FieldValues existingValues = getTagFieldValuesSafe(key);
+    	existingValues.addValues(value);
     	setTagFieldValues(key, existingValues);
     }
     
     public String getFirstTagFieldValue(FieldKey key) {
-    	Set<String> values = getTagFieldValues(key);
+    	FieldValues values = getTagFieldValues(key);
     	
-    	if (values != null && !values.isEmpty()) {
-    		return values.iterator().next();
+    	if (!FieldValues.isEmptyEx(values)) {
+    		return values.get(0);
     	}
     	
     	return null;
@@ -301,8 +283,8 @@ public class TrackData implements Cloneable {
         return getFirstTagFieldValue(FieldKey.GENRE);
     }
 
-    public Set<String> getGenres() {
-        return getTagFieldValuesSafeAsSet(FieldKey.GENRE);
+    public FieldValues getGenres() {
+        return getTagFieldValuesSafe(FieldKey.GENRE);
     }
     
     public void addGenre(String value) {
@@ -384,8 +366,8 @@ public class TrackData implements Cloneable {
     	return getFirstTagFieldValue(FieldKey.RECORD_LABEL);
     }
 
-    public Set<String> getRecordLabels() {
-    	return getTagFieldValuesSafeAsSet(FieldKey.RECORD_LABEL);
+    public FieldValues getRecordLabels() {
+    	return getTagFieldValuesSafe(FieldKey.RECORD_LABEL);
     }
 
     public void addRecordLabel(String value) {
@@ -396,8 +378,8 @@ public class TrackData implements Cloneable {
     	return getFirstTagFieldValue(FieldKey.CATALOG_NO);
     }
 
-    public Set<String> getCatalogNos() {
-    	return getTagFieldValuesSafeAsSet(FieldKey.CATALOG_NO);
+    public FieldValues getCatalogNos() {
+    	return getTagFieldValuesSafe(FieldKey.CATALOG_NO);
     }
 
     public void addCatalogNo(String value) {
@@ -597,7 +579,7 @@ public class TrackData implements Cloneable {
     
     public void populateWithEmptyCommonTagFields() {
     	for (FieldKey key : COMMON_TAG_FIELDS) {
-    		if (getTagFieldValuesSafeAsSet(key).isEmpty()) {
+    		if (getTagFieldValuesSafe(key).isEmpty()) {
     			setTagFieldValues(key, "");
     		}
     	}

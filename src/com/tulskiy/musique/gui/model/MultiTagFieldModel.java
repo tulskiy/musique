@@ -48,10 +48,10 @@ public class MultiTagFieldModel extends AbstractTableModel implements TagFieldMo
 			TrackData trackData = tracks.get(i).getTrackData();
 			trackData.populateWithEmptyCommonTagFields();
 
-			Iterator<Entry<FieldKey, Set<String>>> entries = trackData
+			Iterator<Entry<FieldKey, FieldValues>> entries = trackData
 					.getAllTagFieldValuesIterator();
 			while (entries.hasNext()) {
-				Entry<FieldKey, Set<String>> entry = entries.next();
+				Entry<FieldKey, FieldValues> entry = entries.next();
 				if (!usedKeys.contains(entry.getKey())) {
 					usedKeys.add(entry.getKey());
 					trackInfoItems.add(new TrackInfoItem(entry.getKey(), tracks));

@@ -47,6 +47,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.datatype.Pair;
 
 import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
@@ -148,13 +149,13 @@ public class Playlist extends ArrayList<Track> {
                 if (!Util.isEmpty(trackData.getEncoder())) {
                 	meta.add(new Pair(META_KEY_ENCODER, trackData.getEncoder()));
                 }
-                Iterator<Entry<FieldKey, Set<String>>> fields = trackData.getAllTagFieldValuesIterator();
+                Iterator<Entry<FieldKey, FieldValues>> fields = trackData.getAllTagFieldValuesIterator();
                 if (fields != null) {
 	                while (fields.hasNext()) {
-	                	Entry<FieldKey, Set<String>> field = fields.next();
-	                	Iterator<String> values = field.getValue().iterator();
-	                    while (values.hasNext()) {
-	                    	meta.add(new Pair(field.getKey().toString(), values.next()));
+	                	Entry<FieldKey, FieldValues> field = fields.next();
+        				for (int i = 0; i < field.getValue().size(); i++) {
+        					String value = field.getValue().get(i);
+	                    	meta.add(new Pair(field.getKey().toString(), value));
 	                    }
 	                }
                 }

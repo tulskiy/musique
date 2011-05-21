@@ -19,14 +19,12 @@ package com.tulskiy.musique.gui;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import javax.swing.SwingWorker;
 
 import org.jaudiotagger.tag.FieldKey;
 
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
@@ -64,11 +62,10 @@ public abstract class SearchWorker extends SwingWorker<Playlist, Integer> {
 
                 boolean hasText[] = new boolean[text.length];
                 for (FieldKey field : fields) {
-                    Set<String> values = track.getTrackData().getTagFieldValues(field);
+                    FieldValues values = track.getTrackData().getTagFieldValues(field);
                     if (values != null) {
-		                Iterator<String> it = values.iterator();
-		                while (it.hasNext()) {
-		                	String value = it.next();
+        				for (int k = 0; k < values.size(); k++) {
+        					String value = values.get(k);
 		                    if (!Util.isEmpty(value)) {
 		                        value = value.toLowerCase();
 		                        String[] vals = value.split("\\s+");

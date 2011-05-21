@@ -27,6 +27,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
 
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
@@ -52,17 +53,15 @@ public abstract class AudioTagWriter {
     // in case of logic change, review MP3TagWriter and APETagProcessor
     // TODO take a look if refactoring to AbstractTag only fits (in format specific writers)
     public void copyTagFields(Tag tag, AbstractTag abstractTag, Track track) throws TagWriteException {
-    	String value;
     	boolean firstValue;
 
-    	Iterator<Entry<FieldKey, Set<String>>> entries = track.getTrackData().getAllTagFieldValuesIterator();
+    	Iterator<Entry<FieldKey, FieldValues>> entries = track.getTrackData().getAllTagFieldValuesIterator();
     	try {
 			while (entries.hasNext()) {
-				Entry<FieldKey, Set<String>> entry = entries.next();
-				Iterator<String> values = entry.getValue().iterator();
+				Entry<FieldKey, FieldValues> entry = entries.next();
 				firstValue = true;
-				while (values.hasNext()) {
-					value = values.next();
+				for (int i = 0; i < entry.getValue().size(); i++) {
+					String value = entry.getValue().get(i);
 					if (firstValue) {
 						tag.deleteField(entry.getKey());
 						firstValue = false;

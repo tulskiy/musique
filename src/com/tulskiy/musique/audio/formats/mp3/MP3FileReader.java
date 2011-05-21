@@ -151,13 +151,21 @@ public class MP3FileReader extends AudioFileReader {
 			ID3v24Frame frame = (ID3v24Frame) field;
 			if (frame.getBody() instanceof FrameBodyTRCK) {
 				FrameBodyTRCK body = (FrameBodyTRCK) frame.getBody();
-				track.getTrackData().addTrack(body.getTrackNo());
-				track.getTrackData().addTrackTotal(body.getTrackTotal());
+				if (FieldKey.TRACK.equals(key)) {
+					track.getTrackData().addTrack(body.getTrackNo());
+				}
+				else if (FieldKey.TRACK_TOTAL.equals(key)) {
+					track.getTrackData().addTrackTotal(body.getTrackTotal());
+				}
 			}
 			else if (frame.getBody() instanceof FrameBodyTPOS) {
 				FrameBodyTPOS body = (FrameBodyTPOS) frame.getBody();
-				track.getTrackData().addDisc(body.getDiscNo());
-				track.getTrackData().addDiscTotal(body.getDiscTotal());
+				if (FieldKey.DISC_NO.equals(key)) {
+					track.getTrackData().addDisc(body.getDiscNo());
+				}
+				else if (FieldKey.DISC_TOTAL.equals(key)) {
+					track.getTrackData().addDiscTotal(body.getDiscTotal());
+				}
 			}
 			else if (frame.getBody() instanceof FrameBodyCOMM) {
 				FrameBodyCOMM body = (FrameBodyCOMM) frame.getBody();

@@ -18,7 +18,6 @@
 package com.tulskiy.musique.audio.formats.mp4;
 
 import java.util.Iterator;
-import java.util.Set;
 
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.tag.FieldDataInvalidException;
@@ -32,6 +31,7 @@ import org.jaudiotagger.tag.mp4.field.Mp4TrackField;
 
 import com.tulskiy.musique.audio.AudioTagWriter;
 import com.tulskiy.musique.audio.TagWriteException;
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.util.Util;
@@ -110,18 +110,17 @@ public class MP4TagWriter extends AudioTagWriter {
     }
 
     private void handleGenreFields(Tag tag, Track track) throws FieldDataInvalidException, KeyNotFoundException {
-    	Set<String> genres = track.getTrackData().getGenres();
+    	FieldValues genres = track.getTrackData().getGenres();
     	if (genres != null && !genres.isEmpty()) {
 	    	Mp4Tag mp4Tag = (Mp4Tag) tag;
 	    	
 	    	mp4Tag.deleteField(Mp4FieldKey.GENRE);
 	    	mp4Tag.deleteField(Mp4FieldKey.GENRE_CUSTOM);
 	    	
-	    	Iterator<String> it = genres.iterator();
-	    	while (it.hasNext()) {
-	    		String value = it.next();
-	    		if (!Util.isEmpty(value)) {
-	    			mp4Tag.addField(FieldKey.GENRE, value);
+			for (int i = 0; i < genres.size(); i++) {
+				String genre = genres.get(i);
+	    		if (!Util.isEmpty(genre)) {
+	    			mp4Tag.addField(FieldKey.GENRE, genre);
 	    		}
 	    	}
     	}
