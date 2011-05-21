@@ -21,7 +21,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -57,7 +56,6 @@ import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.model.MultiTagFieldModel;
 import com.tulskiy.musique.gui.model.SingleTagFieldModel;
 import com.tulskiy.musique.gui.model.TagFieldModel;
-import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.util.Util;
 
 /**
@@ -230,7 +228,13 @@ public class TracksInfoEditFieldDialog extends JDialog {
 
             public void show(MouseEvent e) {
                 if (e.isPopupTrigger()) {
-                    JPopupMenu contextMenu = buildContextMenu(table, new Point(e.getX(), e.getY()));
+                	int index = table.rowAtPoint(e.getPoint());
+                	if (index != -1) {
+                        if (!table.isRowSelected(index)) {
+                        	table.setRowSelectionInterval(index, index);
+                        }
+                	}
+                    JPopupMenu contextMenu = buildContextMenu(table);
                     contextMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
@@ -242,7 +246,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
         return scrollPane;
     }
 
-    private JPopupMenu buildContextMenu(final GroupTable properties, final Point point) {
+    private JPopupMenu buildContextMenu(final GroupTable properties) {
     	final SingleTagFieldModel tagFieldModel = (SingleTagFieldModel) properties.getModel();
         
         final List<Integer> selectedRows = new LinkedList<Integer>();
@@ -250,12 +254,6 @@ public class TracksInfoEditFieldDialog extends JDialog {
 	    	for (int row : properties.getSelectedRows()) {
 	    		selectedRows.add(row);
 	    	}
-    	}
-    	else {
-    		int row = properties.rowAtPoint(new Point(point));
-    		if (row > -1) {
-    			selectedRows.add(row);
-    		}
     	}
 
     	ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
