@@ -202,6 +202,7 @@ public class Playlist extends ArrayList<Track> {
                 trackData.setTotalSamples(dis.readLong());
                 trackData.setSubsongIndex(dis.readInt());
                 cache.cache(track);
+                trackData = track.getTrackData();
                 if (trackData.getSubsongIndex() > 0) {
                     trackData.setCueEmbedded(dis.readBoolean());
                     if (!trackData.isCueEmbedded())
