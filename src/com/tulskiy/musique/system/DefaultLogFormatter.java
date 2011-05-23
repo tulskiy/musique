@@ -30,7 +30,7 @@ public class DefaultLogFormatter extends Formatter {
     @Override
     public String format(LogRecord record) {
         java.util.Formatter formatter = new java.util.Formatter();
-        formatter.format("%1$tm/%1$td/%1$ty %1$tH:%1$tM:%1$tS,%1$tL %2$s <%3$s> %4$s: %5$s\n",
+        formatter.format("%1$tm/%1$td/%1$ty %1$tH:%1$tM:%1$tS,%1$tL %4$s %2$s <%3$s>: %5$s\n",
                 record.getMillis(),
                 record.getSourceClassName().replaceAll(".*?\\.(.*?)", "$1"),
                 record.getSourceMethodName(),
