@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -26,13 +26,6 @@ import java.util.logging.LogManager;
  */
 public class Main {
     public static void main(String[] args) {
-        System.setProperty("java.util.logging.config.file", "logging.properties");
-        try {
-            LogManager.getLogManager().readConfiguration();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         Application app = Application.getInstance();
         app.load();
         app.start();

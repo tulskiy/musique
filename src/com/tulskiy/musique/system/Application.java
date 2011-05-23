@@ -43,7 +43,8 @@ import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
-import java.util.logging.Logger;
+import java.util.logging.*;
+import java.util.logging.Formatter;
 
 public class Application {
     private static Application ourInstance = new Application();
@@ -62,6 +63,32 @@ public class Application {
     }
 
     private Application() {
+        initHome();
+        initLoggers();
+        logger.fine("Using '" + CONFIG_HOME + "' as a home directory");
+    }
+
+    private void initLoggers() {
+        LogManager.getLogManager().reset();
+        logger.setLevel(Level.FINE);
+
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.FINE);
+
+        Formatter formatter = new DefaultLogFormatter();
+        consoleHandler.setFormatter(formatter);
+        logger.addHandler(consoleHandler);
+
+        try {
+            FileHandler fileHandler = new FileHandler(new File(CONFIG_HOME, "musique.log").getAbsolutePath(), 10000, 1, true);
+            fileHandler.setFormatter(formatter);
+            logger.addHandler(fileHandler);
+        } catch (IOException e) {
+            logger.log(Level.WARNING, "Could not open file for logging", e);
+        }
+    }
+
+    private void initHome() {
         String home = System.getenv("APPDATA");
         if (Util.isEmpty(home)) {
             home = System.getProperty("user.home");
@@ -70,8 +97,6 @@ public class Application {
         //noinspection ResultOfMethodCallIgnored
         CONFIG_HOME.mkdirs();
         configFile = new File(CONFIG_HOME, "config");
-
-        logger.fine("Using '" + CONFIG_HOME + "' as a home directory");
     }
 
     public void load() {
@@ -275,4 +300,5 @@ public class Application {
     public PlaylistManager getPlaylistManager() {
         return playlistManager;
     }
+
 }

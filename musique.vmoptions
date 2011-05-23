@@ -6,7 +6,7 @@
 -XX:+TieredCompilation
 -Dsun.java2d.noddraw=true
 -Dswing.aatext=true
--XX:MaxHeapFreeRatio=50
+-XX:MaxHeapFreeRatio=20
 -XX:MinHeapFreeRatio=10
 -Dcom.apple.macos.useScreenMenuBar=true
 -Dcom.apple.mrj.application.apple.menu.about.name=Musique
@@ -16,3 +16,6 @@
 -XX:+UseAdaptiveGCBoundary
 -XX:MaxTenuringThreshold=5
 -XX:TargetSurvivorRatio=90
+-XX:+UseStringCache
+-XX:+UseCompressedStrings
+-XX:+UseStringCache

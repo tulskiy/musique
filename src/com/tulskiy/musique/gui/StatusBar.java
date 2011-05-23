@@ -20,6 +20,7 @@ package com.tulskiy.musique.gui;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
+import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
@@ -29,6 +30,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
@@ -56,7 +59,15 @@ public class StatusBar extends JPanel {
         Box box = new Box(BoxLayout.X_AXIS);
         box.add(info);
         box.add(Box.createGlue());
-        box.add(Box.createHorizontalStrut(20));
+        JLabel gc = new JLabel(Images.loadIcon("gc.png"));
+        gc.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                System.gc();
+            }
+        });
+        box.add(gc);
+        box.add(Box.createHorizontalStrut(10));
         add(box);
 
         buildListeners();
