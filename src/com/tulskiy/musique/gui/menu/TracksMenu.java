@@ -156,6 +156,25 @@ public class TracksMenu extends Menu {
                             }
 
                             if (track.getTrackData().getFile().delete()) {
+                            	File current = track.getTrackData().getFile().getParentFile();
+                            	File parent;
+                            	File[] files = current.listFiles();
+                            	if (files != null && files.length == 0) {
+                            		ret = JOptionPane.showConfirmDialog(null, "Do you want delete empty folder(s) as well?", "Delete File(s)?", JOptionPane.YES_NO_OPTION);
+                            		if (ret == JOptionPane.YES_OPTION) {
+                            			while (current != null) {
+                            				parent = current.getParentFile();
+                            				current.delete();
+                                        	files = parent.listFiles();
+                                        	if (files != null && files.length == 0) {
+                                        		current = parent;
+                                        	}
+                                        	else {
+                                        		current = null;
+                                        	}
+                            			}
+                            		}
+                            	}
                                 playlist.remove(track);
                             }
                         }
