@@ -51,11 +51,11 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Component id="volumeSlider" alignment="0" pref="27" max="32767" attributes="1"/>
-          <Component id="progressSlider" alignment="0" pref="27" max="32767" attributes="1"/>
-          <Component id="statusLabel" alignment="0" pref="27" max="32767" attributes="1"/>
+          <Component id="volumeSlider" alignment="0" min="-2" pref="31" max="-2" attributes="1"/>
+          <Component id="progressSlider" alignment="0" min="-2" pref="31" max="-2" attributes="1"/>
+          <Component id="statusLabel" alignment="0" min="-2" pref="31" max="-2" attributes="1"/>
           <Component id="playbackOrder" alignment="0" min="-2" pref="25" max="-2" attributes="1"/>
-          <Component id="jToolBar1" alignment="0" pref="27" max="32767" attributes="1"/>
+          <Component id="jToolBar1" alignment="0" min="-2" pref="31" max="-2" attributes="1"/>
       </Group>
     </DimensionLayout>
   </Layout>
