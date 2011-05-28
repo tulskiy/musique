@@ -63,7 +63,7 @@ public class TrackInfoItemState {
 	
 	public void clear() {
 		for (FieldValues value : values.values()) {
-			value.clearValues();
+			value.clear();
 		}
 		values.clear();
 	}
@@ -72,7 +72,7 @@ public class TrackInfoItemState {
 		FieldValues result = new FieldValues();
 
 		for (FieldValues vs : values.values()) {
-			result.addValues(vs);
+			result.add(vs);
 		}
 
 		return result;
@@ -88,7 +88,7 @@ public class TrackInfoItemState {
 	
 	public void addValue(String value) {
 		for (FieldValues vs : values.values()) {
-			vs.addValues(value);
+			vs.add(value);
 		}
 		isUpdated = true;
 	}
@@ -99,15 +99,15 @@ public class TrackInfoItemState {
 		}
 		else {
 			FieldValues vs = values.get(track);
-			vs.addValues(value);
+			vs.add(value);
 			isUpdated = true;
 		}
 	}
 
 	public void setValue(String value) {
 		for (FieldValues vs : values.values()) {
-			vs.clearValues();
-			vs.addValues(value);
+			vs.clear();
+			vs.add(value);
 		}
 		isUpdated = true;
 	}
@@ -118,16 +118,16 @@ public class TrackInfoItemState {
 		}
 		else {
 			FieldValues vs = values.get(track);
-			vs.clearValues();
-			vs.addValues(value);
+			vs.clear();
+			vs.add(value);
 			isUpdated = true;
 		}
 	}
 
 	public void setValues(FieldValues values) {
 		for (FieldValues vs : this.values.values()) {
-			vs.clearValues();
-			vs.addValues(values);
+			vs.clear();
+			vs.add(values);
 		}
 		isUpdated = true;
 	}
@@ -138,8 +138,8 @@ public class TrackInfoItemState {
 		}
 		else {
 			FieldValues vs = this.values.get(track);
-			vs.clearValues();
-			vs.addValues(values);
+			vs.clear();
+			vs.add(values);
 			isUpdated = true;
 		}
 	}

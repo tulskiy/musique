@@ -195,7 +195,7 @@ public class TrackData implements Cloneable {
     			FieldValues valuesOptimized = new FieldValues();
     			for (int i = 0; i < values.size(); i++) {
     				String value = values.get(i);
-					valuesOptimized.addValues(value == null ? null : value.intern());
+					valuesOptimized.add(value == null ? null : value.intern());
     			}
         		tagFields.put(key, valuesOptimized);
     		}
@@ -211,13 +211,13 @@ public class TrackData implements Cloneable {
     
     public void addTagFieldValues(FieldKey key, FieldValues values) {
     	FieldValues existingValues = getTagFieldValuesSafe(key);
-    	existingValues.addValues(values);
+    	existingValues.add(values);
     	setTagFieldValues(key, existingValues);
     }
     
     public void addTagFieldValues(FieldKey key, String value) {
     	FieldValues existingValues = getTagFieldValuesSafe(key);
-    	existingValues.addValues(value);
+    	existingValues.add(value);
     	setTagFieldValues(key, existingValues);
     }
     

@@ -37,26 +37,26 @@ public class FieldValues {
 	
 	public FieldValues(String value) {
 		this();
-		setValues(value);
+		set(value);
 	}
 	
 	public FieldValues(List<String> values) {
 		this();
-		setValues(values);
+		set(values);
 	}
 	
 	public FieldValues(FieldValues values) {
 		this();
-		setValues(values);
+		set(values);
 	}
 	
-	public void setValues(String value) {
-		clearValues();
+	public void set(String value) {
+		clear();
 		singleV = value;
 	}
 	
-	public void setValues(List<String> values) {
-		clearValues();
+	public void set(List<String> values) {
+		clear();
 		if (!Util.isEmpty(values)) {
 			if (values.size() == 1) {
 				singleV = values.get(0);
@@ -75,23 +75,23 @@ public class FieldValues {
 		}
 	}
 	
-	public void setValues(FieldValues values) {
-		clearValues();
+	public void set(FieldValues values) {
+		clear();
 		if (values != null) {
 			for (int i = 0; i < values.size(); i++) {
-				addValues(values.get(i));
+				add(values.get(i));
 			}
 		}
 	}
 	
-	public void addValues(String value) {
+	public void add(String value) {
 		if (isStripModeEnabled && contains(value)) {
 			return;
 		}
 
 		if (multiV == null) {
 			if (singleV == null) {
-				setValues(value);
+				set(value);
 			}
 			else {
 				multiV = new ArrayList<String>(2);
@@ -105,15 +105,15 @@ public class FieldValues {
 		}
 	}
 	
-	public void addValues(FieldValues values) {
+	public void add(FieldValues values) {
 		if (!FieldValues.isEmptyEx(values)) {
 			for (int i = 0; i < values.size(); i++) {
-				addValues(values.get(i));
+				add(values.get(i));
 			}
 		}
 	}
 	
-	public void clearValues() {
+	public void clear() {
 		singleV = null;
 		if (multiV != null) {
 			multiV.clear();
