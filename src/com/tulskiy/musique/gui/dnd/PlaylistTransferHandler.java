@@ -132,7 +132,11 @@ public class PlaylistTransferHandler extends TransferHandler {
 
                     playlist.removeAll(tracks);
                 } else {
-                    insertRow = table.getSelectedRow() + 1;
+                    int selectedRow = table.getSelectedRow();
+                    if (selectedRow != -1)
+                        insertRow = selectedRow + 1;
+                    else
+                        insertRow = -1;
                 }
 
                 if (insertRow == -1)
