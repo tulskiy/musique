@@ -22,8 +22,7 @@ import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.components.Separator;
-import com.tulskiy.musique.gui.dialogs.ColumnDialog;
-import com.tulskiy.musique.gui.dialogs.TracksInfoDialog;
+import com.tulskiy.musique.gui.dialogs.*;
 import com.tulskiy.musique.gui.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.gui.dnd.SongsSelection;
 import com.tulskiy.musique.gui.menu.TracksMenu;
@@ -43,6 +42,8 @@ import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -50,6 +51,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -580,13 +582,38 @@ public class PlaylistTable extends GroupTable {
         item.addActionListener(listener);
         item.setActionCommand((String) TransferHandler.getPasteAction().getValue(Action.NAME));
 
+        tableMenu.addSeparator();
         if (selectionNotEmpty) {
-            tableMenu.addSeparator();
             TracksMenu tracksMenu = new TracksMenu();
             JPopupMenu menu = tracksMenu.create(this, playlist, selectedTracks);
             for (Component component : menu.getComponents()) {
                 tableMenu.add(component);
             }
+        } else {
+            item = tableMenu.add("Add Files");
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    TreeFileChooser fc = new TreeFileChooser(PlaylistTable.this, "Add Files", true);
+                    File[] files = fc.showOpenDialog();
+
+                    if (files != null) {
+                        ProgressDialog dialog = new ProgressDialog(PlaylistTable.this, "Adding Files");
+                        dialog.show(new Task.FileAddingTask(getPlaylist(), files, getPlaylist().size()));
+                    }
+                }
+            });
+
+            item = tableMenu.add("Add Location");
+            item.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    String ret = JOptionPane.showInputDialog(getParentFrame(), "Enter URL", "Add Location", JOptionPane.QUESTION_MESSAGE);
+                    if (!Util.isEmpty(ret)) {
+                        getPlaylist().insertItem(ret, -1, false, null);
+                    }
+                }
+            });
         }
         Util.fixIconTextGap(tableMenu);
         return tableMenu;
