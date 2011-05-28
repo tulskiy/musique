@@ -99,7 +99,8 @@ public class TrackInfoItem {
 		if (updateTracks && getState().isUpdated()) {
 			for (Track track : tracks) {
 				track.getTrackData().setTagFieldValues(key, getState().getValues(track));
-				track.getTrackData().removeEmptyTagField(key);
+				// empty fields will be removed when file is actually written to disk
+//				track.getTrackData().removeEmptyTagField(key);
 			}
 		}
 	}
