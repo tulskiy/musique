@@ -523,17 +523,16 @@ public class TrackData implements Cloneable {
         this.lastModified = lastModified;
     }
 
-    public URI getLocation() {
-    	if (locationString == null) {
-    		return null;
-    	}
-        try {
-            return new URI(locationString);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+	public URI getLocation() {
+		if (locationString != null) {
+			try {
+				return new URI(locationString);
+			} catch (URISyntaxException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
 
     public void setLocation(String location) {
         locationString = location;
