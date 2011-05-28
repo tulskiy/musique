@@ -31,7 +31,7 @@ import java.util.ArrayList;
  */
 public class SongsSelection implements Transferable {
     private static DataFlavor[] flavor;
-    private static String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList";
+    private static final String mimeType = DataFlavor.javaJVMLocalObjectMimeType + ";class=java.util.ArrayList";
 
     private ArrayList<Track> tracks;
 
@@ -56,7 +56,7 @@ public class SongsSelection implements Transferable {
 
     @Override
     public boolean isDataFlavorSupported(DataFlavor flavor) {
-        return flavor.match(getFlavor());
+        return flavor.match(getFlavor()) && !tracks.isEmpty();
     }
 
     @Override

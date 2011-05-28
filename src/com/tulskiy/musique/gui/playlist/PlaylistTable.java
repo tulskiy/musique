@@ -25,6 +25,7 @@ import com.tulskiy.musique.gui.components.Separator;
 import com.tulskiy.musique.gui.dialogs.ColumnDialog;
 import com.tulskiy.musique.gui.dialogs.TracksInfoDialog;
 import com.tulskiy.musique.gui.dnd.PlaylistTransferHandler;
+import com.tulskiy.musique.gui.dnd.SongsSelection;
 import com.tulskiy.musique.gui.menu.TracksMenu;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Playlist;
@@ -410,6 +411,7 @@ public class PlaylistTable extends GroupTable {
             }
             return true;
         } else {
+            clearSelection();
             return false;
         }
     }
@@ -466,12 +468,11 @@ public class PlaylistTable extends GroupTable {
             }
 
             public void show(MouseEvent e) {
+                selectSongsAt(e.getPoint());
                 if (e.isPopupTrigger()) {
-                    if (selectSongsAt(e.getPoint())) {
-                        // trying to fix issue 6
-                        tablePopupMenu = buildTableMenu();
-                        tablePopupMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
+                    // trying to fix issue 6
+                    tablePopupMenu = buildTableMenu();
+                    tablePopupMenu.show(e.getComponent(), e.getX(), e.getY());
                 }
             }
         });
@@ -542,6 +543,7 @@ public class PlaylistTable extends GroupTable {
         final JPopupMenu tableMenu = new JPopupMenu();
         final JTable owner = this;
         JMenuItem item;
+        ArrayList<Track> selectedTracks = getSelectedSongs();
 
         ActionListener listener = new ActionListener() {
             @Override
@@ -554,25 +556,37 @@ public class PlaylistTable extends GroupTable {
                             null));
             }
         };
-        tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));
-        tableMenu.addSeparator();
+
+        boolean selectionNotEmpty = !selectedTracks.isEmpty();
+        if (selectionNotEmpty) {
+            tableMenu.add(aMap.get("removeSelected")).setAccelerator(KeyStroke.getKeyStroke("DELETE"));
+            tableMenu.addSeparator();
+        }
         item = tableMenu.add("Cut");
+        item.setEnabled(selectionNotEmpty);
+        item.setAccelerator(KeyStroke.getKeyStroke("ctrl X"));
         item.addActionListener(listener);
         item.setActionCommand((String) TransferHandler.getCutAction().getValue(Action.NAME));
 
         item = tableMenu.add("Copy");
+        item.setAccelerator(KeyStroke.getKeyStroke("ctrl C"));
+        item.setEnabled(selectionNotEmpty);
         item.addActionListener(listener);
         item.setActionCommand((String) TransferHandler.getCopyAction().getValue(Action.NAME));
 
         item = tableMenu.add("Paste");
+        item.setAccelerator(KeyStroke.getKeyStroke("ctrl V"));
+        item.setEnabled(Toolkit.getDefaultToolkit().getSystemClipboard().isDataFlavorAvailable(SongsSelection.getFlavor()));
         item.addActionListener(listener);
         item.setActionCommand((String) TransferHandler.getPasteAction().getValue(Action.NAME));
 
-        tableMenu.addSeparator();
-        TracksMenu tracksMenu = new TracksMenu();
-        JPopupMenu menu = tracksMenu.create(this, playlist, getSelectedSongs());
-        for (Component component : menu.getComponents()) {
-            tableMenu.add(component);
+        if (selectionNotEmpty) {
+            tableMenu.addSeparator();
+            TracksMenu tracksMenu = new TracksMenu();
+            JPopupMenu menu = tracksMenu.create(this, playlist, selectedTracks);
+            for (Component component : menu.getComponents()) {
+                tableMenu.add(component);
+            }
         }
         Util.fixIconTextGap(tableMenu);
         return tableMenu;
