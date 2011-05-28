@@ -524,6 +524,9 @@ public class TrackData implements Cloneable {
     }
 
     public URI getLocation() {
+    	if (locationString == null) {
+    		return null;
+    	}
         try {
             return new URI(locationString);
         } catch (URISyntaxException e) {
