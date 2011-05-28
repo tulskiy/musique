@@ -86,7 +86,6 @@ public class ControlPanel extends javax.swing.JPanel {
                 switch (e.getEventCode()) {
                     case PLAYING_STARTED:
                         timer.start();
-                        updateStatus();
                         break;
                     case PAUSED:
                         timer.stop();
@@ -109,6 +108,7 @@ public class ControlPanel extends javax.swing.JPanel {
                             }
                         }
                         progressSlider.setValue((int) player.getCurrentSample());
+                        updateStatus();
                         break;
                     case SEEK_FINISHED:
                         isSeeking = false;
