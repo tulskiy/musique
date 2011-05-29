@@ -589,13 +589,12 @@ public class TrackData implements Cloneable {
     
     public void removeEmptyCommonTagFields() {
     	for (FieldKey key : COMMON_TAG_FIELDS) {
-    		if (Util.isEmpty(getFirstTagFieldValue(key))) {
-    			removeTagField(key);
-    		}
+    		removeEmptyTagField(key);
     	}
     }
     
     public void removeEmptyTagField(FieldKey key) {
+    	removeEmptyTagFieldValues(key);
 		if (Util.isEmpty(getFirstTagFieldValue(key))) {
 			removeTagField(key);
 		}
@@ -604,6 +603,18 @@ public class TrackData implements Cloneable {
     public void removeEmptyTagFields() {
     	for (FieldKey key : FieldKey.values()) {
     		removeEmptyTagField(key);
+    	}
+    }
+    
+    public void removeEmptyTagFieldValues(FieldKey key) {
+    	FieldValues values = getTagFieldValues(key);
+    	if (values != null) {
+    		for (int i = 0; i < values.size(); i++) {
+    			String value = values.get(i);
+    			if (Util.isEmpty(value)) {
+    				values.remove(i);
+    			}
+    		}
     	}
     }
 

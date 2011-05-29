@@ -113,6 +113,17 @@ public class FieldValues {
 		}
 	}
 	
+	public void remove(int index) {
+		if (multiV != null) {
+			if (index < multiV.size()) {
+				multiV.remove(index);
+			}
+		}
+		else if (index == 0) {
+			singleV = null;
+		}
+	}
+	
 	public void clear() {
 		singleV = null;
 		if (multiV != null) {
