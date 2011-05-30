@@ -145,7 +145,7 @@ public class TrackInfoItemState {
 	}
 
 	public boolean isMultiple() {
-		return values.size() > 1;
+		return getValues().size() > 1;
 	}
 
 	public String toString() {
