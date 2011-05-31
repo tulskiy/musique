@@ -147,12 +147,6 @@ public class TracksInfoEditFieldDialog extends JDialog {
         table.setDefaultEditor(Object.class, new DefaultCellEditor(editor) {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-                TableModel tableModel = table.getModel();
-                if (tableModel instanceof SingleTagFieldModel) {
-                    if (((SingleTagFieldModel) tableModel).getTrackInfoItem().isMultiple()) {
-                        value = "";
-                    }
-                }
                 JTextField c = (JTextField) super.getTableCellEditorComponent(table, value, isSelected, row, column);
                 c.setBorder(BorderFactory.createEmptyBorder());
                 c.setFont(table.getFont());
