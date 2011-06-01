@@ -36,21 +36,21 @@ public class BufferTest {
         Track t = new Track();
         Arrays.fill(buf, (byte) 1);
         t.setBitrate(5);
-        buffer.addNextTrack(t, null, 0);
+        buffer.addNextTrack(t, null, 0, false);
         buffer.write(buf, 0, buf.length);
         buffer.write(buf, 0, buf.length);
 
         t = new Track();
         t.setBitrate(10);
-        buffer.addNextTrack(t, null, 0);
+        buffer.addNextTrack(t, null, 0, false);
         t = new Track();
         t.setBitrate(20);
 
-        buffer.addNextTrack(t, null, 0);
+        buffer.addNextTrack(t, null, 0, false);
         buffer.write(buf, 0, buf.length);
         t = new Track();
         t.setBitrate(30);
-        buffer.addNextTrack(t, null, 0);
+        buffer.addNextTrack(t, null, 0, false);
 
         assertEquals(-1, buffer.read(buf, 0, 100));
         Buffer.NextEntry nextTrack = buffer.pollNextTrack();

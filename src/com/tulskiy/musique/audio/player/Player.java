@@ -23,6 +23,7 @@ import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Track;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import static com.tulskiy.musique.audio.player.Actor.Message;
 
@@ -31,6 +32,7 @@ import static com.tulskiy.musique.audio.player.Actor.Message;
  * Date: Jan 21, 2010
  */
 public class Player {
+    public static final Logger logger = Logger.getLogger("musique");
     private static final int BUFFER_SIZE = (int) Math.pow(2, 18);
 
     private PlayingThread playingThread;
@@ -43,7 +45,7 @@ public class Player {
         Thread t1 = new Thread(playingThread, "Playing Thread");
         t1.setPriority(Thread.MAX_PRIORITY);
         t1.start();
-        bufferingThread = new BufferingThread(this, buffer);
+        bufferingThread = new BufferingThread(buffer);
         new Thread(bufferingThread, "Buffer Thread").start();
     }
 
@@ -144,6 +146,7 @@ public class Player {
     }
 
     synchronized void fireEvent(PlayerEvent.PlayerEventCode event) {
+        logger.fine("Player Event: " + event);
         PlayerEvent e = new PlayerEvent(event);
         for (PlayerListener listener : listeners) {
             listener.onEvent(e);

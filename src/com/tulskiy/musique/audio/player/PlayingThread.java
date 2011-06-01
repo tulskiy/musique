@@ -132,6 +132,9 @@ public class PlayingThread extends Actor implements Runnable {
             if (currentTrack == null) {
                 return false;
             }
+            if (nextEntry.forced) {
+                output.flush();
+            }
             format = nextEntry.format;
             output.init(format);
             if (nextEntry.startSample > 0) {

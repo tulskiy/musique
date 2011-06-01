@@ -47,7 +47,7 @@ public class Buffer {
         buffer.put(b, off, len);
     }
 
-    public void addNextTrack(Track track, AudioFormat format, long startSample) {
+    public void addNextTrack(Track track, AudioFormat format, long startSample, boolean forced) {
         int bytesLeft = available();
         for (Integer left : when) {
             bytesLeft -= left;
@@ -56,7 +56,7 @@ public class Buffer {
             this.bytesLeft = bytesLeft;
         else
             when.add(bytesLeft);
-        trackQueue.add(new NextEntry(track, format, startSample));
+        trackQueue.add(new NextEntry(track, format, startSample, forced));
     }
 
     public NextEntry pollNextTrack() {
@@ -104,11 +104,13 @@ public class Buffer {
         public Track track;
         public AudioFormat format;
         public long startSample;
+        public boolean forced;
 
-        NextEntry(Track track, AudioFormat format, long startSample) {
+        NextEntry(Track track, AudioFormat format, long startSample, boolean forced) {
             this.track = track;
             this.format = format;
             this.startSample = startSample;
+            this.forced = forced;
         }
     }
 }
