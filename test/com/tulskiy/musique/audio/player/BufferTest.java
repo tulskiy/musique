@@ -19,9 +19,15 @@ package com.tulskiy.musique.audio.player;
 
 import com.tulskiy.musique.audio.player.io.Buffer;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.util.AudioMath;
 import org.junit.Test;
+
+import javax.sound.sampled.AudioFormat;
+
 import static org.junit.Assert.*;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.Arrays;
 
 /**
@@ -36,21 +42,21 @@ public class BufferTest {
         Track t = new Track();
         Arrays.fill(buf, (byte) 1);
         t.getTrackData().setBitrate(5);
-        buffer.addNextTrack(t, null, 0);
+        buffer.addNextTrack(t, null, 0, false);
         buffer.write(buf, 0, buf.length);
         buffer.write(buf, 0, buf.length);
 
         t = new Track();
         t.getTrackData().setBitrate(10);
-        buffer.addNextTrack(t, null, 0);
+        buffer.addNextTrack(t, null, 0, false);
         t = new Track();
         t.getTrackData().setBitrate(20);
 
-        buffer.addNextTrack(t, null, 0);
+        buffer.addNextTrack(t, null, 0, false);
         buffer.write(buf, 0, buf.length);
         t = new Track();
         t.getTrackData().setBitrate(30);
-        buffer.addNextTrack(t, null, 0);
+        buffer.addNextTrack(t, null, 0, false);
 
         assertEquals(-1, buffer.read(buf, 0, 100));
         Buffer.NextEntry nextTrack = buffer.pollNextTrack();
@@ -70,5 +76,64 @@ public class BufferTest {
         assertEquals(20, nextTrack.track.getTrackData().getBitrate());
         assertEquals(100, buffer.read(buf, 0, 100));
         assertEquals(-1, buffer.read(buf, 0, 100));
+    }
+
+    @Test
+    public void testConvert() {
+        byte[] input = new byte[]{
+                (byte) 0xAB, (byte) 0xCD, (byte) 0xEF, (byte) 0xAB,
+                0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78
+        };
+
+        int[] output;
+        AudioFormat fmt;
+
+        output = new int[12];
+        fmt = new AudioFormat(44100, 8, 1, true, false);
+        assertEquals(AudioMath.convertBuffer(input, output, input.length, fmt), output.length);
+
+        assertArrayEquals(new int[]{
+                (byte) 0xAB, (byte) 0xCD, (byte) 0xEF, (byte) 0xAB,
+                0x12, 0x34, 0x56, 0x78,
+                0x12, 0x34, 0x56, 0x78
+        }, output);
+
+        output = new int[12];
+        fmt = new AudioFormat(44100, 8, 2, true, false);
+        assertEquals(AudioMath.convertBuffer(input, output, input.length, fmt), output.length);
+
+        assertArrayEquals(new int[]{
+                (byte) 0xAB, (byte) 0xCD, (byte) 0xEF, (byte) 0xAB,
+                0x12, 0x34, 0x56, 0x78,
+                0x12, 0x34, 0x56, 0x78
+        }, output);
+
+        output = new int[6];
+        fmt = new AudioFormat(44100, 16, 1, true, false);
+        assertEquals(AudioMath.convertBuffer(input, output, input.length, fmt), output.length);
+
+        assertArrayEquals(new int[]{
+                (short)0xCDAB, (short)0xABEF,
+                (short)0x3412, (short)0x7856,
+                (short)0x3412, (short)0x7856,
+        }, output);
+
+        output = new int[6];
+        fmt = new AudioFormat(44100, 16, 2, true, false);
+        assertEquals(AudioMath.convertBuffer(input, output, input.length, fmt), output.length);
+
+        assertArrayEquals(new int[]{
+                (short)0xCDAB, (short)0xABEF,
+                (short)0x3412, (short)0x7856,
+                (short)0x3412, (short)0x7856,
+        }, output);
+
+        output = new int[4];
+        fmt = new AudioFormat(44100, 24, 1, true, false);
+        assertEquals(AudioMath.convertBuffer(input, output, input.length, fmt), output.length);
+
+        assertArrayEquals(new int[]{
+                0xFFEFCDAB, 0x3412AB, 0x127856, 0x785634,
+        }, output);
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -39,5 +39,25 @@ public class AudioMath {
     public static double bytesToMillis(long bytes, AudioFormat fmt) {
         long l = AudioMath.bytesToSamples(bytes, fmt.getFrameSize());
         return samplesToMillis(l, (int) fmt.getSampleRate());
+    }
+
+    public static int convertBuffer(byte[] input, int[] output, int len, AudioFormat fmt) {
+        int bps = fmt.getSampleSizeInBits() / 8;
+        int target = 0;
+        int i = 0;
+        while (target < len) {
+            switch (bps) {
+                case 1:
+                    output[i++] = input[target++];
+                    break;
+                case 2:
+                    output[i++] = (short)((input[target++] & 0xFF) | (input[target++] << 8));
+                    break;
+                case 3:
+                    output[i++] = (input[target++] & 0xFF) | (input[target++] << 8 & 0xFF00) | (input[target++] << 16);
+                    break;
+            }
+        }
+        return i;
     }
 }

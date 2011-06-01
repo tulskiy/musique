@@ -23,6 +23,7 @@ import com.tulskiy.musique.audio.IcyInputStream;
 import com.tulskiy.musique.audio.formats.ape.APEDecoder;
 import com.tulskiy.musique.audio.formats.ape.APEEncoder;
 import com.tulskiy.musique.audio.formats.flac.FLACDecoder;
+import com.tulskiy.musique.audio.formats.flac.FLACEncoder;
 import com.tulskiy.musique.audio.formats.mp3.MP3Decoder;
 import com.tulskiy.musique.audio.formats.mp4.MP4Demuxer;
 import com.tulskiy.musique.audio.formats.ogg.VorbisDecoder;
@@ -68,6 +69,7 @@ public class Codecs {
         encoders.put("ape", new APEEncoder());
         encoders.put("ogg", new VorbisEncoder());
         encoders.put("wv", new WavPackEncoder());
+        encoders.put("flac", new FLACEncoder());
     }
 
     public static Decoder getDecoder(Track track) {

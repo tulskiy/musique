@@ -32,6 +32,7 @@ import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.TagField;
 import org.jaudiotagger.tag.id3.ID3v11Tag;
 import org.jaudiotagger.tag.id3.ID3v24Frame;
+import org.jaudiotagger.tag.id3.ID3v24Frames;
 import org.jaudiotagger.tag.id3.ID3v24Tag;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyTPOS;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyTRCK;
@@ -98,6 +99,9 @@ public class MP3TagWriter extends AudioTagWriter {
     // @see AudioTagWriter#copyTagFields(Tag, AbstractTag, Track) as source
     public void copyTagFields(ID3v24Tag tag, Track track) throws KeyNotFoundException, FieldDataInvalidException {
     	boolean firstValue;
+
+		tag.removeUnsupportedFrames();
+		tag.removeFrame(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO.toString());
 
     	Iterator<Entry<FieldKey, FieldValues>> entries = track.getTrackData().getAllTagFieldValuesIterator();
 		while (entries.hasNext()) {

@@ -138,6 +138,8 @@ public class ControlPanel extends javax.swing.JPanel {
     }
 
     private void updateStatus() {
+        if (player.getTrack() == null)
+            System.out.println("wtf");
         statusLabel.setText((String) statusExpression.eval(player.getTrack()));
     }
 

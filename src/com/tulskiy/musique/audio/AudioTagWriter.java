@@ -18,7 +18,6 @@
 package com.tulskiy.musique.audio;
 
 import java.util.Iterator;
-import java.util.Set;
 import java.util.Map.Entry;
 
 import org.jaudiotagger.audio.generic.AbstractTag;
@@ -80,6 +79,11 @@ public abstract class AudioTagWriter {
     	}
 		
 		track.getTrackData().removeEmptyTagFields();
+		tag.deleteField("M2_LABEL");
+		tag.deleteField("M2_CATALOG_ID");
+		tag.deleteField("M2_RATING");
+		tag.deleteField("TOTALTRACKS");
+		tag.deleteField("TOTALDISCS");
     }
 
 }

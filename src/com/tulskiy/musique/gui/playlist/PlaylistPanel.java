@@ -516,12 +516,21 @@ public class PlaylistPanel extends JPanel {
             }
         });
 
-        selected = config.getBoolean("player.stopAfterCurrent", false);
-        playbackMenu.add(new JCheckBoxMenuItem("Stop After Current", selected)).addActionListener(new ActionListener() {
+        final JCheckBoxMenuItem stopAfterCurrent = new JCheckBoxMenuItem("Stop After Current");
+        playbackMenu.add(stopAfterCurrent).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
-                config.setBoolean("player.stopAfterCurrent", item.isSelected());
+                app.getPlayer().setStopAfterCurrent(item.isSelected());
+            }
+        });
+
+        app.getPlayer().addListener(new PlayerListener() {
+            @Override
+            public void onEvent(PlayerEvent e) {
+                if (e.getEventCode() == PlayerEvent.PlayerEventCode.STOPPED) {
+                    stopAfterCurrent.setSelected(false);
+                }
             }
         });
     }
