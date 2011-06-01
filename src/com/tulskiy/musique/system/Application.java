@@ -121,6 +121,19 @@ public class Application {
         PluginLoader pluginLoader = new PluginLoader();
         pluginLoader.load();
 
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                saveSettings();
+                playlistManager.saveSettings();
+                try {
+                    configuration.save(new FileWriter(configFile));
+                } catch (IOException e) {
+                    logger.severe("Could not save configuration to " + configFile);
+                }
+            }
+        });
+
         loadSettings();
     }
 
@@ -269,16 +282,10 @@ public class Application {
     }
 
     public void exit() {
-        saveSettings();
         player.stop();
+
         if (mainWindow != null) {
             mainWindow.shutdown();
-        }
-        playlistManager.saveSettings();
-        try {
-            configuration.save(new FileWriter(configFile));
-        } catch (IOException e) {
-            logger.severe("Could not save configuration to " + configFile);
         }
         System.exit(0);
     }
