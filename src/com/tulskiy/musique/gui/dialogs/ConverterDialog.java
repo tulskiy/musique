@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -47,7 +47,7 @@ public class ConverterDialog extends JDialog {
         put("OGG Vorbis", "ogg");
         put("WavPack", "wv");
         put("Monkey's Audio", "ape");
-
+        put("FLAC", "flac");
     }};
 
     public ConverterDialog(final JComponent owner, final List<Track> tracks) {
@@ -57,6 +57,7 @@ public class ConverterDialog extends JDialog {
         coders.put("OGG Vorbis", createVorbisSettings());
         coders.put("WavPack", createWavpackSettings());
         coders.put("Monkey's Audio", createAPESettings());
+        coders.put("FLAC", null);
 
         final JComboBox encoder = new JComboBox(coders.keySet().toArray());
 

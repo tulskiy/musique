@@ -1,0 +1,26 @@
+<body>
+This package defines a FLAC encoder with a simple interface for enabling FLAC
+encoding support in an application. This class is appropriate for use in the
+case where you have raw pcm audio samples that you wish to encode. Currently,
+fixed-blocksize only is implemented, with the "Maximum Block Size" set in the
+StreamConfiguration object used as the actual block size.
+<br><br>
+To use this library, an application should primarily use the classes 
+FLACEncoder, EncodingConfiguration, StreamConfiguration, and 
+FLACOutputStream. If you're simply needing to encode a file(as opposed to 
+a stream), you may use FLAC_FileEncoder.
+<br><br><br>
+An encoding process is simple, and should follow these steps:<br>
+<BLOCKQUOTE>
+1) Set StreamConfiguration to appropriate values. After a stream is opened,
+this must not be altered until the stream is closed.<br>
+2) Set FLACOutputStream, object to write results to.<br>
+3) Open FLAC Stream<br>
+4) Set EncodingConfiguration(if defaults are insufficient).<br>
+5) Add samples to encoder<br>
+6) Encode Samples<br>
+7) Close stream<br>
+(note: steps 4,5, and 6 may be done repeatedly, in any order. However, see
+related method documentation for info on concurrent use)
+</BLOCKQUOTE><br><br>
+</body>
