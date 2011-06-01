@@ -79,11 +79,6 @@ public abstract class AudioTagWriter {
     	}
 		
 		track.getTrackData().removeEmptyTagFields();
-		tag.deleteField("M2_LABEL");
-		tag.deleteField("M2_CATALOG_ID");
-		tag.deleteField("M2_RATING");
-		tag.deleteField("TOTALTRACKS");
-		tag.deleteField("TOTALDISCS");
     }
 
 }

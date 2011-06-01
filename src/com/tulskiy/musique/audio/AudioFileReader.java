@@ -110,25 +110,7 @@ public abstract class AudioFileReader {
     }
     
     protected void copySpecificTagFields(Tag tag, Track track) {
-    	List<TagField> fields;
-		fields = tag.getFields("M2_LABEL");
-		if (fields != null) {
-			for (TagField field : fields) {
-				track.getTrackData().addTagFieldValues(FieldKey.RECORD_LABEL, field.toString());
-			}
-		}
-		fields = tag.getFields("M2_CATALOG_ID");
-		if (fields != null) {
-			for (TagField field : fields) {
-				track.getTrackData().addTagFieldValues(FieldKey.CATALOG_NO, field.toString());
-			}
-		}
-		fields = tag.getFields("M2_RATING");
-		if (fields != null) {
-			for (TagField field : fields) {
-				track.getTrackData().addTagFieldValues(FieldKey.RATING, field.toString());
-			}
-		}
+    	// Empty implementation, to be overridden
     }
 
     protected void copyHeaderFields(GenericAudioHeader header, Track track) {

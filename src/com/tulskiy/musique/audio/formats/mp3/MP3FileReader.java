@@ -131,30 +131,10 @@ public class MP3FileReader extends AudioFileReader {
 		}
 	}
 
-	@Override
-	protected void copySpecificTagFields(Tag tag, Track track) {
-		ID3v24Tag v24Tag = (ID3v24Tag) tag;
-		List<TagField> fields = v24Tag.getFields(ID3v24Frames.FRAME_ID_USER_DEFINED_INFO.toString());
-		for (TagField field : fields) {
-			ID3v24Frame frame = (ID3v24Frame) field;
-			FrameBodyTXXX body = (FrameBodyTXXX) frame.getBody();
-			if ("M2_LABEL".equalsIgnoreCase(body.getDescription())) {
-				track.getTrackData().addTagFieldValues(FieldKey.RECORD_LABEL, body.getFirstTextValue());
-			}
-			else if ("M2_CATALOG_ID".equalsIgnoreCase(body.getDescription())) {
-				track.getTrackData().addTagFieldValues(FieldKey.CATALOG_NO, body.getFirstTextValue());
-			}
-			else if ("M2_RATING".equalsIgnoreCase(body.getDescription())) {
-				track.getTrackData().addTagFieldValues(FieldKey.RATING, body.getFirstTextValue());
-			}
-			else if ("date".equalsIgnoreCase(body.getDescription())) {
-				track.getTrackData().addTagFieldValues(FieldKey.YEAR, body.getFirstTextValue());
-			}
-			else if ("album artist".equalsIgnoreCase(body.getDescription())) {
-				track.getTrackData().addTagFieldValues(FieldKey.ALBUM_ARTIST, body.getFirstTextValue());
-			}
-		}
-	}
+//	@Override
+//	protected void copySpecificTagFields(Tag tag, Track track) {
+//		ID3v24Tag v24Tag = (ID3v24Tag) tag;
+//	}
 
 	// TODO review (T?? [but not TXXX] are only supported at the moment)
 	private void setMusiqueTagFieldValues(Track track, FieldKey key, ID3v24Tag tag) {
