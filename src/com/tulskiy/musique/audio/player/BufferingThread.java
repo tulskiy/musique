@@ -91,13 +91,8 @@ public class BufferingThread extends Actor implements Runnable {
                     while (active) {
                         if (nextTrack != null) {
                             if (stopAfterCurrent) {
-                                buffer.addNextTrack(null, null, 0, false);
-                                active = false;
-                                if (decoder != null) {
-                                    decoder.close();
-                                    decoder = null;
-                                }
-                                nextTrack = null;
+                                stop(false);
+                                stopAfterCurrent = false;
                                 continue;
                             }
                             open(nextTrack, false);
@@ -144,6 +139,7 @@ public class BufferingThread extends Actor implements Runnable {
 
     public void stop(boolean flush) {
         logger.fine("Stop buffering");
+        nextTrack = null;
         pause(flush);
         buffer.addNextTrack(null, null, 0, false);
         if (decoder != null) {

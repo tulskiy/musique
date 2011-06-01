@@ -105,7 +105,6 @@ public class PlayingThread extends Actor implements Runnable {
                         int len = buffer.read(buf, 0, BUFFER_SIZE);
                         if (len == -1) {
                             if (!openNext()) {
-                                currentTrack = null;
                                 stop();
                                 break;
                             }
@@ -128,10 +127,10 @@ public class PlayingThread extends Actor implements Runnable {
         try {
             logger.fine("Getting next track");
             Buffer.NextEntry nextEntry = buffer.pollNextTrack();
-            currentTrack = nextEntry.track;
-            if (currentTrack == null) {
+            if (nextEntry.track == null) {
                 return false;
             }
+            currentTrack = nextEntry.track;
             if (nextEntry.forced) {
                 output.flush();
             }

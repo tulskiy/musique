@@ -168,12 +168,6 @@ public class Application {
                     return null;
             }
         });
-        configuration.addPropertyChangeListener("player.stopAfterCurrent", true, new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                player.setStopAfterCurrent(configuration.getBoolean("player.stopAfterCurrent", false));
-            }
-        });
         configuration.addPropertyChangeListener("player.playbackOrder", true, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {

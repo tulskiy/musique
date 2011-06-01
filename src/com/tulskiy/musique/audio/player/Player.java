@@ -75,7 +75,6 @@ public class Player {
     }
 
     public void stop() {
-        playingThread.send(Message.STOP);
         bufferingThread.send(Message.STOP);
     }
 
