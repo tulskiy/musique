@@ -17,10 +17,12 @@
 
 package com.tulskiy.musique.playlist.formatting.tokens;
 
-import com.tulskiy.musique.playlist.Track;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Set;
+
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 
 /**
  * @Author: Denis Tulskiy
@@ -31,25 +33,26 @@ public class ParameterExpression implements Expression {
 
     public ParameterExpression(String name) {
         try {
-            method = Track.class.getDeclaredMethod("get" + name);
+            method = TrackData.class.getDeclaredMethod("get" + name);
         } catch (NoSuchMethodException e) {
 //            e.printStackTrace();
             try {
-                method = Track.class.getDeclaredMethod("is" + name);
+                method = TrackData.class.getDeclaredMethod("is" + name);
             } catch (NoSuchMethodException e1) {
 //                e.printStackTrace();
             }
         }
     }
 
-    public String eval(Track track) {
+    public Object eval(Track track) {
         if (method == null)
             return null;
         try {
-            Object o = method.invoke(track);
+            Object o = method.invoke(track.getTrackData());
             if (o == null)
                 return null;
-            return o.toString();
+            // hack for multi-valued tag fields
+            return o instanceof Set ? o : o.toString();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

@@ -214,8 +214,8 @@ public class FileOperations extends JDialog {
             Expression expression = Parser.parse(text);
             for (Track track : tracks) {
                 Object key;
-                if (track.isFile() && !track.isCue()) {
-                    File file = track.getFile();
+                if (track.getTrackData().isFile() && !track.getTrackData().isCue()) {
+                    File file = track.getTrackData().getFile();
                     key = file.getName();
                     StringBuilder sb = new StringBuilder();
                     Object o = expression.eval(track);
@@ -277,7 +277,7 @@ public class FileOperations extends JDialog {
         public void start() {
             totalSize = 0;
             for (Track track : paths.keySet()) {
-                totalSize += track.getFile().length();
+                totalSize += track.getTrackData().getFile().length();
             }
 
             ArrayList<String> log = new ArrayList<String>();
@@ -285,7 +285,7 @@ public class FileOperations extends JDialog {
             for (Map.Entry<Track, File> entry : paths.entrySet()) {
                 if (abort)
                     break;
-                src = entry.getKey().getFile();
+                src = entry.getKey().getTrackData().getFile();
                 dest = entry.getValue();
                 dest.getParentFile().mkdirs();
 
@@ -299,7 +299,7 @@ public class FileOperations extends JDialog {
 
                         if (src.renameTo(dest)) {
                             processed += src.length();
-                            entry.getKey().setLocation(dest.toURI().toString());
+                            entry.getKey().getTrackData().setLocation(dest.toURI().toString());
                             continue;
                         }
                     }
@@ -342,7 +342,7 @@ public class FileOperations extends JDialog {
 
                 if ((mode == Operation.Move || mode == Operation.Rename)
                         && dest.exists()) {
-                    entry.getKey().setLocation(dest.toURI().toString());
+                    entry.getKey().getTrackData().setLocation(dest.toURI().toString());
                 }
             }
         }

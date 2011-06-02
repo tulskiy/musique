@@ -99,13 +99,13 @@ public class AlbumArtPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 image = null;
-                if (track != null && track.isFile()) {
+                if (track != null && track.getTrackData().isFile()) {
                     for (Expression stub : stubs) {
                         try {
                             String path = stub.eval(track).toString();
                             File file = new File(path);
                             if (!file.isAbsolute()) {
-                                String parentFile = track.getFile().getParentFile().getAbsolutePath();
+                                String parentFile = track.getTrackData().getFile().getParentFile().getAbsolutePath();
                                 file = new File(parentFile, path);
                             }
                             if (!file.exists())

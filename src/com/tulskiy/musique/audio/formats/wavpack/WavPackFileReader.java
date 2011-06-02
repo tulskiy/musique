@@ -20,6 +20,7 @@ package com.tulskiy.musique.audio.formats.wavpack;
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.formats.ape.APETagProcessor;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 import com.wavpack.decoder.WavPackUtils;
 import com.wavpack.decoder.WavpackContext;
 
@@ -33,18 +34,19 @@ public class WavPackFileReader extends AudioFileReader {
     private static APETagProcessor apeTagProcessor = new APETagProcessor();
 
     public Track readSingle(Track track) {
+    	TrackData trackData = track.getTrackData();
         try {
             apeTagProcessor.readAPEv2Tag(track);
-            RandomAccessFile raf = new RandomAccessFile(track.getFile(), "r");
+            RandomAccessFile raf = new RandomAccessFile(trackData.getFile(), "r");
             WavpackContext wpc = WavPackUtils.WavpackOpenFileInput(raf);
-            track.setTotalSamples(WavPackUtils.WavpackGetNumSamples(wpc));
-            track.setSampleRate((int) WavPackUtils.WavpackGetSampleRate(wpc));
-            track.setChannels(WavPackUtils.WavpackGetReducedChannels(wpc));
-            track.setBitrate((int) (raf.length() / track.getTotalSamples() / 1000 * 8));
-            track.setCodec("WavPack");
+            trackData.setTotalSamples(WavPackUtils.WavpackGetNumSamples(wpc));
+            trackData.setSampleRate((int) WavPackUtils.WavpackGetSampleRate(wpc));
+            trackData.setChannels(WavPackUtils.WavpackGetReducedChannels(wpc));
+            trackData.setBitrate((int) (raf.length() / trackData.getTotalSamples() / 1000 * 8));
+            trackData.setCodec("WavPack");
             raf.close();
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + track.getFile());
+            System.out.println("Couldn't read file: " + trackData.getFile());
         }
         return track;
     }

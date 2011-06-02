@@ -99,7 +99,7 @@ public class ControlPanel extends javax.swing.JPanel {
                     case FILE_OPENED:
                         Track track = player.getTrack();
                         if (track != null) {
-                            int max = (int) track.getTotalSamples();
+                            int max = (int) track.getTrackData().getTotalSamples();
                             if (max == -1) {
                                 progressEnabled = false;
                             } else {
@@ -217,7 +217,7 @@ public class ControlPanel extends javax.swing.JPanel {
     private void showToolTip(MouseEvent e) {
         Track s = player.getTrack();
         if (s != null) {
-            toolTip.setTipText(Util.samplesToTime(progressSlider.getValue() - progressSlider.getMinimum(), s.getSampleRate(), 1));
+            toolTip.setTipText(Util.samplesToTime(progressSlider.getValue() - progressSlider.getMinimum(), s.getTrackData().getSampleRate(), 1));
             int x = e.getXOnScreen();
             x = Math.max(x, progressSlider.getLocationOnScreen().x);
             x = Math.min(x, progressSlider.getLocationOnScreen().x + progressSlider.getWidth() - toolTip.getWidth());

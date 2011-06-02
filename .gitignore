@@ -8,3 +8,4 @@ dist
 .idea/workspace.xml
 src/com/tulskiy/musique/Test.java
 nbproject/private/**/*
+/.metadata

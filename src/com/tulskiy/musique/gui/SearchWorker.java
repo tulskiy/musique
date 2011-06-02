@@ -17,21 +17,28 @@
 
 package com.tulskiy.musique.gui;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javax.swing.SwingWorker;
+
+import org.jaudiotagger.tag.FieldKey;
+
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
-
-import javax.swing.*;
-import java.util.ArrayList;
 
 /**
 * Author: Denis Tulskiy
 * Date: 11/12/10
 */
 public abstract class SearchWorker extends SwingWorker<Playlist, Integer> {
-    private final String[] fields = {
-            "artist", "title", "album", "albumArtist", "fileName"
-    };
+    private final FieldKey[] fields = FieldKey.values();
+    // TODO apply correct search metas, looking through all fields at the moment
+//    {
+//            "artist", "title", "album", "albumArtist", "fileName"
+//    };
     private Playlist playlist;
     private String search;
     private boolean fillEmpty;
@@ -54,19 +61,24 @@ public abstract class SearchWorker extends SwingWorker<Playlist, Integer> {
                 Track track = playlist.get(i);
 
                 boolean hasText[] = new boolean[text.length];
-                for (String field : fields) {
-                    String value = track.getMeta(field);
-                    if (!Util.isEmpty(value)) {
-                        value = value.toLowerCase();
-                        String[] vals = value.split("\\s+");
-                        for (String val : vals) {
-                            for (int j = 0, textLength = text.length; j < textLength; j++) {
-                                String s = text[j];
-                                if (val.startsWith(s)) {
-                                    hasText[j] = true;
-                                }
-                            }
-                        }
+                for (FieldKey field : fields) {
+                    FieldValues values = track.getTrackData().getTagFieldValues(field);
+                    if (values != null) {
+        				for (int k = 0; k < values.size(); k++) {
+        					String value = values.get(k);
+		                    if (!Util.isEmpty(value)) {
+		                        value = value.toLowerCase();
+		                        String[] vals = value.split("\\s+");
+		                        for (String val : vals) {
+		                            for (int j = 0, textLength = text.length; j < textLength; j++) {
+		                                String s = text[j];
+		                                if (val.startsWith(s)) {
+		                                    hasText[j] = true;
+		                                }
+		                            }
+		                        }
+		                    }
+		                }
                     }
                 }
 

@@ -17,6 +17,20 @@
 
 package com.tulskiy.musique.gui.menu;
 
+import java.awt.Desktop;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.swing.ActionMap;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.KeyStroke;
+
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.gui.dialogs.ConverterDialog;
@@ -27,17 +41,10 @@ import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Author: Denis Tulskiy
@@ -78,13 +85,14 @@ public class TracksMenu extends Menu {
                     public void start() {
                         for (int i = 0; i < tracks.size(); i++) {
                             Track track = tracks.get(i);
+                            TrackData trackData = track.getTrackData();
                             if (abort)
                                 break;
-                            if (track.isFile() && track.getSubsongIndex() == 0) {
-                                currentTrack = track.getFile().getName();
+                            if (trackData.isFile() && trackData.getSubsongIndex() == 0) {
+                                currentTrack = trackData.getFile().getName();
                                 progress = (float) i / tracks.size();
-                                AudioFileReader reader = TrackIO.getAudioFileReader(track.getFile().getName());
-                                track.clearTags();
+                                AudioFileReader reader = TrackIO.getAudioFileReader(trackData.getFile().getName());
+                                trackData.clearTags();
                                 reader.reload(track);
                             }
                         }
@@ -117,8 +125,8 @@ public class TracksMenu extends Menu {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for (Track track : tracks) {
-                    if (track.isFile()) {
-                        File file = track.getFile().getParentFile();
+                    if (track.getTrackData().isFile()) {
+                        File file = track.getTrackData().getFile().getParentFile();
                         try {
                             Desktop.getDesktop().open(file);
                         } catch (IOException e1) {
@@ -142,12 +150,31 @@ public class TracksMenu extends Menu {
                 int ret = JOptionPane.showConfirmDialog(null, "This will delete file(s) permanently. Are you sure?", "Delete File(s)?", JOptionPane.YES_NO_OPTION);
                 if (ret == JOptionPane.YES_OPTION) {
                     for (Track track : tracks) {
-                        if (track.isFile() && !track.isCue()) {
+                        if (track.getTrackData().isFile() && !track.getTrackData().isCue()) {
                             if (player.getTrack() == track) {
                                 player.stop();
                             }
 
-                            if (track.getFile().delete()) {
+                            if (track.getTrackData().getFile().delete()) {
+                            	File current = track.getTrackData().getFile().getParentFile();
+                            	File parent;
+                            	File[] files = current.listFiles();
+                            	if (files != null && files.length == 0) {
+                            		ret = JOptionPane.showConfirmDialog(null, "Do you want delete empty folder(s) as well?", "Delete File(s)?", JOptionPane.YES_NO_OPTION);
+                            		if (ret == JOptionPane.YES_OPTION) {
+                            			while (current != null) {
+                            				parent = current.getParentFile();
+                            				current.delete();
+                                        	files = parent.listFiles();
+                                        	if (files != null && files.length == 0) {
+                                        		current = parent;
+                                        	}
+                                        	else {
+                                        		current = null;
+                                        	}
+                            			}
+                            		}
+                            	}
                                 playlist.remove(track);
                             }
                         }

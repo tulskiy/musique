@@ -73,11 +73,11 @@ public class Codecs {
     }
 
     public static Decoder getDecoder(Track track) {
-        URI location = track.getLocation();
+        URI location = track.getTrackData().getLocation();
         if (location == null) {
             return null;
         }
-        if (track.isStream()) {
+        if (track.getTrackData().isStream()) {
             IcyInputStream inputStream = IcyInputStream.create(track);
             String contentType = inputStream.getContentType().trim();
             try {

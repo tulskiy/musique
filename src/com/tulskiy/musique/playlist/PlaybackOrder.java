@@ -137,7 +137,7 @@ public class PlaybackOrder {
             Track track = playlist.get(index);
             // technically, separator can not be the last track
             // so we just get the next track
-            if (track.getLocation() == null)
+            if (track.getTrackData().getLocation() == null)
                 return playlist.get(index + 1);
             return track;
         } else {
@@ -151,7 +151,7 @@ public class PlaybackOrder {
             Track track = playlist.get(index);
             // technically, separator can not be the last track
             // so we just get the next track
-            if (track.getLocation() == null)
+            if (track.getTrackData().getLocation() == null)
                 return next(index);
             return track;
         } else {
@@ -163,7 +163,7 @@ public class PlaybackOrder {
         index--;
         if (index >= 0) {
             Track track = playlist.get(index);
-            if (track.getLocation() == null)
+            if (track.getTrackData().getLocation() == null)
                 return prev(index);
             return track;
         } else {
@@ -216,13 +216,13 @@ public class PlaybackOrder {
                 case REPEAT_GROUP:
                     if (index + 1 < playlist.size()) {
                         Track tr = playlist.get(index + 1);
-                        if (tr.getLocation() != null) {
+                        if (tr.getTrackData().getLocation() != null) {
                             return tr;
                         }
                     }
 
                     for (int i = index; i >= 0; i--) {
-                        if (playlist.get(i).getLocation() == null) {
+                        if (playlist.get(i).getTrackData().getLocation() == null) {
                             return playlist.get(i + 1);
                         }
                     }
@@ -232,14 +232,14 @@ public class PlaybackOrder {
                 case SHUFFLE_GROUPS:
                     if (index + 1 < playlist.size()) {
                         Track tr = playlist.get(index + 1);
-                        if (tr.getLocation() != null) {
+                        if (tr.getTrackData().getLocation() != null) {
                             return tr;
                         }
                     }
 
                     for (int i = index; i >= 0; i--) {
                         Track separator = playlist.get(i);
-                        if (separator.getLocation() == null) {
+                        if (separator.getTrackData().getLocation() == null) {
                             separator = nextShuffle(separator, true, null);
 
                             return next(playlist.indexOf(separator));
@@ -307,13 +307,13 @@ public class PlaybackOrder {
             case REPEAT_GROUP:
                 if (index > 0) {
                     Track tr = playlist.get(index - 1);
-                    if (tr.getLocation() != null) {
+                    if (tr.getTrackData().getLocation() != null) {
                         return tr;
                     }
                 }
 
                 for (int i = index + 1; i < size; i++) {
-                    if (playlist.get(i).getLocation() == null) {
+                    if (playlist.get(i).getTrackData().getLocation() == null) {
                         return playlist.get(i - 1);
                     }
                 }
@@ -324,14 +324,14 @@ public class PlaybackOrder {
             case SHUFFLE_GROUPS:
                 if (index > 0) {
                     Track tr = playlist.get(index - 1);
-                    if (tr.getLocation() != null) {
+                    if (tr.getTrackData().getLocation() != null) {
                         return tr;
                     }
                 }
 
                 for (int i = index; i >= 0; i--) {
                     Track separator = playlist.get(i);
-                    if (separator.getLocation() == null) {
+                    if (separator.getTrackData().getLocation() == null) {
                         separator = prevShuffle(separator, true, null);
 
                         return next(playlist.indexOf(separator));
@@ -387,8 +387,8 @@ public class PlaybackOrder {
         Object patternValue = null;
         for (Track track : playlist) {
             if (track == currentTrack
-                    || (searchSeparators && track.getLocation() != null)
-                    || (!searchSeparators && track.getLocation() == null))
+                    || (searchSeparators && track.getTrackData().getLocation() != null)
+                    || (!searchSeparators && track.getTrackData().getLocation() == null))
                 continue;
 
             if (pattern != null) {
@@ -420,8 +420,8 @@ public class PlaybackOrder {
 
         for (Track track: playlist) {
             if (track == currentTrack
-                    || (searchSeparators && track.getLocation() != null)
-                    || (!searchSeparators && track.getLocation() == null))
+                    || (searchSeparators && track.getTrackData().getLocation() != null)
+                    || (!searchSeparators && track.getTrackData().getLocation() == null))
                 continue;
 
             if (pattern != null) {

@@ -17,12 +17,6 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.audio.formats.cue.CUEParser;
-import com.tulskiy.musique.playlist.Track;
-import org.jaudiotagger.audio.generic.GenericAudioHeader;
-import org.jaudiotagger.tag.FieldKey;
-import org.jaudiotagger.tag.Tag;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -31,6 +25,18 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.jaudiotagger.audio.generic.GenericAudioHeader;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.KeyNotFoundException;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagField;
+import org.jaudiotagger.tag.mp4.field.Mp4DiscNoField;
+import org.jaudiotagger.tag.mp4.field.Mp4TrackField;
+
+import com.tulskiy.musique.audio.formats.cue.CUEParser;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 
 /**
  * @Author: Denis Tulskiy
@@ -44,7 +50,7 @@ public abstract class AudioFileReader {
     public void read(File file, List<Track> list) {
         logger.log(Level.FINEST, "Reading file : {0}", file);
         Track track = read(file);
-        String cueSheet = track.getCueSheet();
+        String cueSheet = track.getTrackData().getCueSheet();
         if (cueSheet != null && cueSheet.length() > 0) {
             if (cueParser == null)
                 cueParser = new CUEParser();
@@ -59,46 +65,65 @@ public abstract class AudioFileReader {
 
     public Track reload(Track track) {
         Track res = readSingle(track);
-        if (res.isFile())
-            res.setLastModified(res.getFile().lastModified());
+        if (res.getTrackData().isFile())
+            res.getTrackData().setLastModified(res.getTrackData().getFile().lastModified());
         return res;
     }
 
     public Track read(File file) {
         Track track = new Track();
-        track.setLocation(file.toURI().toString());
+        track.getTrackData().setLocation(file.toURI().toString());
         return reload(track);
     }
 
     public abstract boolean isFileSupported(String ext);
 
-    protected void copyTagFields(Tag abstractTag, Track track) throws IOException {
-        if (abstractTag != null && track != null) {
-            track.addMeta("album", abstractTag.getFirst(FieldKey.ALBUM));
-            track.addMeta("artist", abstractTag.getFirst(FieldKey.ARTIST));
-            track.addMeta("comment", abstractTag.getFirst(FieldKey.COMMENT));
-            track.addMeta("title", abstractTag.getFirst(FieldKey.TITLE));
-            track.addMeta("year", abstractTag.getFirst(FieldKey.YEAR));
-            track.setCueSheet(abstractTag.getFirst("CUESHEET"));
-            track.addMeta("genre", abstractTag.getFirst(FieldKey.GENRE));
-            track.addMeta("albumArtist", abstractTag.getFirst(FieldKey.ALBUM_ARTIST));
-            track.setTrackNumber(abstractTag.getFirst(FieldKey.TRACK));
-            track.setTotalTracks(abstractTag.getFirst(FieldKey.TRACK_TOTAL));
-            track.setDiscNumber(abstractTag.getFirst(FieldKey.DISC_NO));
-            track.setTotalDiscs(abstractTag.getFirst(FieldKey.DISC_TOTAL));
+    // in case of logic change, review MP3TagReader and APETagProcessor
+    protected void copyCommonTagFields(Tag tag, Track track) throws IOException {
+    	TrackData trackData = track.getTrackData();
+        if (tag != null && track != null) {
+    		for (FieldKey key : FieldKey.values()) {
+    			List<TagField> fields;
+    			try {
+    				fields = tag.getFields(key);
+    			}
+    			catch (KeyNotFoundException knfe) {
+    				// TODO review
+    				continue;
+    			}
+    			catch (NullPointerException npe) {
+    				// TODO review workaround for mp4tag (throws nullpointer if no mapping found for generic key)
+    				continue;
+    			}
+    			for (TagField field : fields) {
+    				// TODO think how to minimize custom check impact
+    				if (field instanceof Mp4TrackField || field instanceof Mp4DiscNoField) {
+    					break;
+    				}
+    				track.getTrackData().addTagFieldValues(key, field.toString());
+    			}
+    		}
+
+    		// TODO think about the way
+        	trackData.setCueSheet(tag.getFirst("CUESHEET"));
         }
+    }
+    
+    protected void copySpecificTagFields(Tag tag, Track track) {
+    	// Empty implementation, to be overridden
     }
 
     protected void copyHeaderFields(GenericAudioHeader header, Track track) {
+    	TrackData trackData = track.getTrackData();
         if (header != null && track != null) {
-            track.setChannels(header.getChannelNumber());
-            track.setTotalSamples(header.getTotalSamples());
+        	trackData.setChannels(header.getChannelNumber());
+        	trackData.setTotalSamples(header.getTotalSamples());
 
-//            track.setTotalSamples((long) (header.getPreciseLength() * header.getSampleRateAsNumber()));
-            track.setSampleRate(header.getSampleRateAsNumber());
-            track.setStartPosition(0);
-            track.setMeta("codec", header.getFormat());
-            track.setBitrate((int) header.getBitRateAsNumber());
+//            trackData.setTotalSamples((long) (header.getPreciseLength() * header.getSampleRateAsNumber()));
+        	trackData.setSampleRate(header.getSampleRateAsNumber());
+        	trackData.setStartPosition(0);
+        	trackData.setCodec(header.getFormat());
+            trackData.setBitrate((int) header.getBitRateAsNumber());
         }
     }
 

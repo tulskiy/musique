@@ -17,13 +17,16 @@
 
 package com.tulskiy.musique.playlist.formatting;
 
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.playlist.formatting.tokens.Expression;
-
 import static org.junit.Assert.assertEquals;
 
+import java.io.File;
+
+import org.jaudiotagger.tag.FieldKey;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 
 /**
  * @Author: Denis Tulskiy
@@ -35,16 +38,18 @@ public class ParserTest {
     @Before
     public void setUp() {
         s = new Track();
+        File file = new File("testfiles/ogg/sample.ogg");
+        s.getTrackData().setLocation(file.toURI().toString());
     }
 
     @Test
     public void testBrackets() {
         Expression t = Parser.parse("[%artist% - ]%title%");
 
-        s.setMeta("title", "title");
+        s.getTrackData().addTitle("title");
         assertEquals("title", t.eval(s));
 
-        s.setMeta("artist", "artist");
+        s.getTrackData().addArtist("artist");
         assertEquals("artist - title", t.eval(s));
     }
 
@@ -52,16 +57,24 @@ public class ParserTest {
     public void testIf3() {
         Expression t = Parser.parse("$if3(%artist%, %title%, %albumArtist%, unknown)");
 
-        s.setMeta("artist", "artist");
+        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, "artist");
         assertEquals("artist", t.eval(s));
-        s.setMeta("artist", null);
-        s.setMeta("title", ("title"));
+        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, (String) null);
+        s.getTrackData().setTagFieldValues(FieldKey.TITLE, "title");
         assertEquals("title", t.eval(s));
-        s.setMeta("title", "");
-        s.setMeta("albumArtist", "album artist");
+        s.getTrackData().setTagFieldValues(FieldKey.TITLE, "");
+        s.getTrackData().setTagFieldValues(FieldKey.ALBUM_ARTIST, "album artist");
         assertEquals("album artist", t.eval(s));
-        s.setMeta("albumArtist", null);
-
+        s.getTrackData().setTagFieldValues(FieldKey.ALBUM_ARTIST, (String) null);
+        // file name is taken once title is empty
+        assertEquals("sample", t.eval(s));
+        
+        t = Parser.parse("$if3(%genre%, unknown)");
+        s.getTrackData().setTagFieldValues(FieldKey.GENRE, "genre");
+        assertEquals("genre", t.eval(s));
+        s.getTrackData().setTagFieldValues(FieldKey.GENRE, "");
+        assertEquals("unknown", t.eval(s));
+        s.getTrackData().setTagFieldValues(FieldKey.GENRE, (String) null);
         assertEquals("unknown", t.eval(s));
     }
 
@@ -69,11 +82,11 @@ public class ParserTest {
     public void testIf1() {
         Expression t = Parser.parse("$if1(%artist%,%artist%,%title%)");
 
-        s.setMeta("artist", "artist");
-        s.setMeta("title", ("title"));
+        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, "artist");
+        s.getTrackData().setTagFieldValues(FieldKey.TITLE, "title");
         assertEquals("artist", t.eval(s));
 
-        s.setMeta("artist", null);
+        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, (String) null);
         assertEquals("title", t.eval(s));
     }
 
@@ -81,8 +94,8 @@ public class ParserTest {
     public void testQuot() {
         Expression t = Parser.parse("'%artist%'%title%");
 
-        s.setMeta("artist", "artist here");
-        s.setMeta("title", "title here");
+        s.getTrackData().addArtist("artist here");
+        s.getTrackData().addTitle("title here");
 
         assertEquals("%artist%title here", t.eval(s));
     }
@@ -91,13 +104,13 @@ public class ParserTest {
     public void testSmth() {
         Expression t = Parser.parse("$if1($strcmp(%albumArtist%,%artist%),%artist%,$if3(%album%,Unknown))");
 
-        s.setMeta("albumArtist", "album artist");
-        s.setMeta("year", "year");
-        s.setMeta("album", "album");
-        s.setDiscNumber("1");
-        s.setTrackNumber("10");
-        s.setMeta("artist", "artist");
-        s.setMeta("title", ("title"));
+        s.getTrackData().addAlbumArtist("album artist");
+        s.getTrackData().addYear("year");
+        s.getTrackData().addAlbum("album");
+        s.getTrackData().addDisc("1");
+        s.getTrackData().addTrack("10");
+        s.getTrackData().addArtist("artist");
+        s.getTrackData().addTitle("title");
 
 //        System.out.println(t.eval(s));
     }

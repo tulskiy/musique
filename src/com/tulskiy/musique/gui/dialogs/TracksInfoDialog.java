@@ -17,25 +17,61 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.tulskiy.musique.gui.components.GroupTable;
-import com.tulskiy.musique.gui.playlist.PlaylistTable;
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.TrackIO;
-import com.tulskiy.musique.util.Util;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.*;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.KeyStroke;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
+
+import com.tulskiy.musique.gui.components.GroupTable;
+import com.tulskiy.musique.gui.cpp.TrackInfoItemSelection;
+import com.tulskiy.musique.gui.model.FileInfoModel;
+import com.tulskiy.musique.gui.model.MultiTagFieldModel;
+import com.tulskiy.musique.gui.model.SingleTagFieldModel;
+import com.tulskiy.musique.gui.model.TrackInfoItem;
+import com.tulskiy.musique.gui.playlist.PlaylistTable;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
+import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.util.Util;
 
 /**
  * Author: Denis Tulskiy
@@ -51,8 +87,8 @@ public class TracksInfoDialog extends JDialog {
         setTitle("Properties");
         setModal(false);
 
-        final MetadataModel metaModel = new MetadataModel(tracks);
-        JComponent tagsTable = createTable(metaModel);
+        final MultiTagFieldModel tagFieldsModel = new MultiTagFieldModel(tracks);
+        JComponent tagsTable = createTable(tagFieldsModel);
         JComponent propsTable = createTable(new FileInfoModel(tracks));
 
         JTabbedPane tp = new JTabbedPane();
@@ -69,14 +105,16 @@ public class TracksInfoDialog extends JDialog {
         write.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                writeTracks(metaModel, tracks);
+            	tagFieldsModel.approveModel();
+                writeTracks(tagFieldsModel, tracks);
             }
         });
         cancel = new JButton("Cancel");
         cancel.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                setVisible(false);
+            	tagFieldsModel.rejectModel();
+            	setVisible(false);
                 dispose();
                 parent.requestFocus();
             }
@@ -92,7 +130,7 @@ public class TracksInfoDialog extends JDialog {
         setLocationRelativeTo(SwingUtilities.windowForComponent(parent));
     }
 
-    private void writeTracks(final MetadataModel metaModel, final List<Track> tracks) {
+    private void writeTracks(final MultiTagFieldModel tagFieldsModel, final List<Track> tracks) {
         ProgressDialog dialog = new ProgressDialog(this, "Writing tags");
         dialog.show(new Task() {
             String status;
@@ -124,7 +162,8 @@ public class TracksInfoDialog extends JDialog {
                 HashMap<File, ArrayList<Track>> cues = new HashMap<File, ArrayList<Track>>();
 
                 for (Track track : tracks) {
-                    if (!track.isFile()) {
+                	TrackData trackData = track.getTrackData();
+                    if (!trackData.isFile()) {
                         processed++;
                         continue;
                     }
@@ -132,12 +171,12 @@ public class TracksInfoDialog extends JDialog {
                     if (abort)
                         break;
 
-                    if (track.isCue()) {
+                    if (trackData.isCue()) {
                         File file;
-                        if (track.isCueEmbedded()) {
-                            file = track.getFile();
+                        if (trackData.isCueEmbedded()) {
+                            file = trackData.getFile();
                         } else {
-                            file = new File(track.getCueLocation());
+                            file = new File(trackData.getCueLocation());
                         }
 
                         if (!cues.containsKey(file)) {
@@ -147,15 +186,7 @@ public class TracksInfoDialog extends JDialog {
                         cues.get(file).add(track);
                         continue;
                     }
-                    status = track.getFile().getName();
-                    String[] writeValues = metaModel.writeValues;
-                    for (int i = 0; i < writeValues.length; i++) {
-                        String value = writeValues[i];
-                        if (value != null) {
-                            String key = metaModel.tagsMeta[i];
-                            track.setMeta(key, value);
-                        }
-                    }
+                    status = trackData.getFile().getName();
                     TrackIO.write(track);
                     processed++;
                 }
@@ -204,15 +235,15 @@ public class TracksInfoDialog extends JDialog {
         table.setShowVerticalLines(true);
         table.setIntercellSpacing(new Dimension(1, 1));
         table.setGridColor(Color.lightGray);
-        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         table.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
         final JTextField editor = new JTextField();
         table.setDefaultEditor(Object.class, new DefaultCellEditor(editor) {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof MetadataModel) {
-                    if (((MetadataModel) tableModel).isMultiple[row]) {
+                if (tableModel instanceof MultiTagFieldModel) {
+                    if (((MultiTagFieldModel) tableModel).getTrackInfoItems().get(row).isMultiple()) {
                         value = "";
                     }
                 }
@@ -231,9 +262,9 @@ public class TracksInfoDialog extends JDialog {
             @Override
             protected void fireEditingStopped() {
                 TableModel tableModel = table.getModel();
-                if (tableModel instanceof MetadataModel) {
+                if (tableModel instanceof MultiTagFieldModel) {
                     String value = (String) table.getCellEditor().getCellEditorValue();
-                    if (Util.isEmpty(value) && ((MetadataModel) tableModel).isMultiple[table.getEditingRow()]) {
+                    if (Util.isEmpty(value) && ((MultiTagFieldModel) tableModel).getTrackInfoItems().get(table.getEditingRow()).isMultiple()) {
                         super.fireEditingCanceled();
                         return;
                     }
@@ -276,6 +307,34 @@ public class TracksInfoDialog extends JDialog {
                 }
             }
         });
+        
+        buildActions(table);
+        
+        table.addMouseListener(new MouseAdapter() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				show(e);
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				show(e);
+			}
+
+            public void show(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                	int index = table.rowAtPoint(e.getPoint());
+                	if (index != -1) {
+                        if (!table.isRowSelected(index)) {
+                        	table.setRowSelectionInterval(index, index);
+                        }
+	                    JPopupMenu contextMenu = buildContextMenu(parent, table);
+	                    contextMenu.show(e.getComponent(), e.getX(), e.getY());
+                	}
+                }
+            }
+		});
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -283,205 +342,170 @@ public class TracksInfoDialog extends JDialog {
         return scrollPane;
     }
 
-    private class FileInfoModel extends MetadataModel {
-        class Entry {
-            String key;
-            Object value;
-
-            Entry(String key, Object value) {
-                this.key = key;
-                this.value = value;
-            }
-        }
-
-        private ArrayList<Entry> list;
-
-        private FileInfoModel(List<Track> tracks) {
-            super(tracks);
-        }
-
-        @Override
-        protected void loadTracks(List<Track> tracks) {
-            list = new ArrayList<Entry>();
-            if (tracks.size() == 1) {
-                fillSingleTrack(tracks.get(0));
-            } else {
-                fillMultipleTracks(tracks);
-            }
-        }
-
-        private void fillMultipleTracks(List<Track> tracks) {
-            list.add(new Entry("Tracks selected", tracks.size()));
-            long fileSize = 0;
-            double length = 0;
-            HashMap<String, Integer> formats = new HashMap<String, Integer>();
-            HashMap<String, Integer> channels = new HashMap<String, Integer>();
-            HashMap<String, Integer> sampleRate = new HashMap<String, Integer>();
-            HashSet<String> files = new HashSet<String>();
-            for (Track track : tracks) {
-                if (track.isFile()) {
-                    fileSize += track.getFile().length();
-                    length += track.getTotalSamples() / (double) track.getSampleRate();
-                    files.add(track.getFile().getAbsolutePath());
-                    increment(formats, track.getCodec());
-                    increment(channels, track.getChannelsAsString());
-                    increment(sampleRate, track.getSampleRate() + " Hz");
-                }
-            }
-
-            list.add(new Entry("Files", files.toString()));
-            list.add(new Entry("Total size", fileSize + " bytes"));
-            list.add(new Entry("Total Length", Util.formatSeconds(length, 3)));
-            list.add(new Entry("Format", calcPercentage(formats)));
-            list.add(new Entry("Channels", calcPercentage(channels)));
-            list.add(new Entry("Sample Rate", calcPercentage(sampleRate)));
-        }
-
-        private Object calcPercentage(Map<String, Integer> map) {
-            double total = 0;
-            for (Integer val : map.values()) {
-                total += val;
-            }
-            ArrayList<Map.Entry<String, Integer>> list = new ArrayList<Map.Entry<String, Integer>>(map.entrySet());
-            Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-                @Override
-                public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                    return o2.getValue().compareTo(o1.getValue());
-                }
-            });
-
-            boolean single = map.size() == 1;
-            StringBuilder sb = new StringBuilder();
-            for (Map.Entry<String, Integer> entry : list) {
-                sb.append(entry.getKey());
-                if (!single) {
-                    sb.append(" (").append(String.format("%.2f", entry.getValue() / total * 100))
-                            .append("%), ");
-                }
-            }
-
-            return sb.toString().replaceAll(", $", "");
-        }
-
-        private void increment(Map<String, Integer> map, String key) {
-            Integer val = map.get(key);
-            if (val == null) {
-                map.put(key, 1);
-            } else {
-                map.put(key, val + 1);
-            }
-        }
-
-        private void fillSingleTrack(Track track) {
-            list.add(new Entry("Location", track.getLocation().toString().replaceAll("%\\d\\d", " ")));
-            if (track.isFile())
-                list.add(new Entry("File Size (bytes)", track.getFile().length()));
-            if (track.getTotalSamples() >= 0)
-                list.add(new Entry("Length", Util.samplesToTime(track.getTotalSamples(), track.getSampleRate(), 3) +
-                                             " (" + track.getTotalSamples() + " samples)"));
-            list.add(new Entry("Subsong Index", track.getSubsongIndex()));
-            if (track.isCue()) {
-                list.add(new Entry("Cue Embedded", track.isCueEmbedded()));
-                if (!track.isCueEmbedded()) {
-                    list.add(new Entry("Cue Path", track.getCueLocation()));
-                }
-            }
-            if (track.getSampleRate() > 0)
-                list.add(new Entry("Sample Rate", track.getSampleRate() + " Hz"));
-            list.add(new Entry("Channels", track.getChannels()));
-        }
-
-        @Override
-        public int getRowCount() {
-            return list.size();
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            Entry entry = list.get(rowIndex);
-            if (columnIndex == 0)
-                return entry.key;
-            else
-                return String.valueOf(entry.value);
-        }
-
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return false;
-        }
+    private MultiTagFieldModel getTagFieldModel(final GroupTable properties) {
+    	return (MultiTagFieldModel) properties.getModel();
     }
 
-    private class MetadataModel extends AbstractTableModel {
-        private final String[] tagsMeta = {
-                "artist", "title", "album", "year", "genre",
-                "albumArtist", "track", "totalTracks",
-                "discNumber", "totalDiscs"
-        };
+    private List<TrackInfoItem> getSelectedItems(final GroupTable properties) {
+    	final List<TrackInfoItem> trackInfoItemsSelected = new LinkedList<TrackInfoItem>();
 
-        private String[] readValues = new String[tagsMeta.length];
-        private String[] writeValues = new String[tagsMeta.length];
-        private boolean[] isMultiple = new boolean[tagsMeta.length];
-
-        private MetadataModel(List<Track> tracks) {
-            loadTracks(tracks);
-        }
-
-        protected void loadTracks(List<Track> tracks) {
-            for (int i = 0; i < tagsMeta.length; i++) {
-                String meta = tagsMeta[i];
-                LinkedHashSet<String> set = new LinkedHashSet<String>();
-
-                for (Track track : tracks) {
-                    set.add(track.getMeta(meta));
-                }
-                set.remove(null);
-
-                isMultiple[i] = false;
-                if (set.size() > 1) {
-                    readValues[i] = "<multiple values> " + set.toString();
-                    isMultiple[i] = true;
-                } else if (set.size() == 1) {
-                    readValues[i] = set.iterator().next();
-                }
-            }
-        }
-
-        @Override
-        public int getRowCount() {
-            return tagsMeta.length;
-        }
-
-        @Override
-        public int getColumnCount() {
-            return 2;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            if (rowIndex < 0 || rowIndex > tagsMeta.length)
-                return null;
-
-            if (columnIndex == 0)
-                return Util.humanize(tagsMeta[rowIndex]);
-            else
-                return readValues[rowIndex];
-        }
-
-        @Override
-        public String getColumnName(int column) {
-            return column == 0 ? "Key" : "Value";
-        }
-
-        @Override
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            writeValues[rowIndex] = (String) aValue;
-            readValues[rowIndex] = (String) aValue;
-            isMultiple[rowIndex] = false;
-        }
-
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 1;
-        }
+    	if (properties.getSelectedRowCount() > 0) {
+	    	for (int row : properties.getSelectedRows()) {
+	    		trackInfoItemsSelected.add(getTagFieldModel(properties).getTrackInfoItems().get(row));
+	    	}
+    	}
+    	
+    	return trackInfoItemsSelected;
     }
+    
+    private void buildActions(final GroupTable table) {
+        ActionMap aMap = table.getActionMap();
+        InputMap iMap = table.getInputMap(table.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        aMap.put("edit", new AbstractAction("Edit") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	TrackInfoItem firstItem = selectedItems.get(0);
+            	if (!selectedItems.isEmpty()) {
+		        	final SingleTagFieldModel tagFieldModel = firstItem.getTracks().size() == 1 ?
+		        			new SingleTagFieldModel(firstItem, firstItem.getTracks().get(0)) :
+		       				new SingleTagFieldModel(firstItem);
+					TracksInfoEditFieldDialog dialog = new TracksInfoEditFieldDialog(table, tagFieldModel);
+					dialog.setVisible(true);
+            	}
+            }
+        });
+
+        aMap.put("cut", new AbstractAction("Cut fields") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	if (!selectedItems.isEmpty()) {
+					TrackInfoItemSelection selection = new TrackInfoItemSelection(selectedItems);
+					getToolkit().getSystemClipboard().setContents(selection, selection);
+					getTagFieldModel(table).removeTrackInfoItems(selectedItems);
+					refreshTable(table);
+            	}
+            }
+        });
+
+        aMap.put("copy", new AbstractAction("Copy fields") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	if (!selectedItems.isEmpty()) {
+					TrackInfoItemSelection selection = new TrackInfoItemSelection(selectedItems);
+					getToolkit().getSystemClipboard().setContents(selection, selection);
+            	}
+            }
+        });
+
+        aMap.put("paste", new AbstractAction("Paste fields") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+				List<TrackInfoItem> items = null;
+				try {
+					items = (List<TrackInfoItem>) getToolkit().getSystemClipboard().getContents(null).
+							getTransferData(TrackInfoItemSelection.objectFlavor);
+				}
+				catch (IOException ioe) {
+					// ignore, treating as the clipboard is empty
+				}
+				catch (UnsupportedFlavorException ufe) {
+					// ignore since we already checked at menu construction that flavor is supported
+				}
+				if (items != null) {
+					MultiTagFieldModel model = getTagFieldModel(table);
+					model.mergeTrackInfoItems(items);
+					model.sort();
+					refreshTable(table);
+				}
+            }
+        });
+
+        aMap.put("add", new AbstractAction("Add") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+				TracksInfoAddFieldDialog dialog = new TracksInfoAddFieldDialog(table, getTagFieldModel(table));
+				dialog.setVisible(true);
+				refreshTable(table);
+            }
+        });
+
+        aMap.put("remove", new AbstractAction("Remove") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	if (!selectedItems.isEmpty()) {
+					getTagFieldModel(table).removeTrackInfoItems(selectedItems);
+					refreshTable(table);
+            	}
+            }
+        });
+
+        iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK), "cut");
+        iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK), "copy");
+        iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK), "paste");
+    }
+
+    private JPopupMenu buildContextMenu(final PlaylistTable playlist, final GroupTable properties) {
+    	boolean isAnyRowSelected = properties.getSelectedRowCount() > 0;
+        Transferable clipboardContent = getToolkit().getSystemClipboard().getContents(null);
+    	
+    	ImageIcon emptyIcon = new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
+
+        final JPopupMenu menu = new JPopupMenu();
+
+        JMenuItem menuItemEdit = new JMenuItem("Edit");
+        menuItemEdit.setIcon(emptyIcon);
+        menuItemEdit.setEnabled(isAnyRowSelected);
+        menu.add(menuItemEdit).addActionListener(properties.getActionMap().get("edit"));
+        
+        menu.addSeparator();
+
+        JMenuItem menuItemCut = new JMenuItem("Cut fields");
+        menuItemCut.setIcon(emptyIcon);
+        menuItemCut.setEnabled(isAnyRowSelected);
+        menuItemCut.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+        menu.add(menuItemCut).addActionListener(properties.getActionMap().get("cut"));
+
+        JMenuItem menuItemCopy = new JMenuItem("Copy fields");
+        menuItemCopy.setIcon(emptyIcon);
+        menuItemCopy.setEnabled(isAnyRowSelected);
+        menuItemCopy.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+        menu.add(menuItemCopy).addActionListener(properties.getActionMap().get("copy"));
+
+        JMenuItem menuItemPaste = new JMenuItem("Paste fields");
+        menuItemPaste.setIcon(emptyIcon);
+        menuItemPaste.setEnabled(clipboardContent != null && clipboardContent.isDataFlavorSupported(TrackInfoItemSelection.objectFlavor));
+        menuItemPaste.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
+        		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK));
+        menu.add(menuItemPaste).addActionListener(properties.getActionMap().get("paste"));
+
+        menu.addSeparator();
+
+        JMenuItem menuItemAdd = new JMenuItem("Add");
+        menuItemAdd.setIcon(emptyIcon);
+        menu.add(menuItemAdd).addActionListener(properties.getActionMap().get("add"));
+        
+        JMenuItem menuItemRemove = new JMenuItem("Remove");
+        menuItemRemove.setIcon(emptyIcon);
+        menuItemRemove.setEnabled(isAnyRowSelected);
+        menu.add(menuItemRemove).addActionListener(properties.getActionMap().get("remove"));
+        
+        return menu;
+    }
+    
+    private void refreshTable(JTable table) {
+    	table.clearSelection();
+    	table.revalidate();
+    	table.repaint();
+    }
+
 }

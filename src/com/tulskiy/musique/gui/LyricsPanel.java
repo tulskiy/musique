@@ -70,8 +70,8 @@ public class LyricsPanel extends JPanel {
                 try {
                     textPane.setText("");
                     StyledDocument doc = textPane.getStyledDocument();
-                    doc.insertString(doc.getLength(), track.getArtist() + "\n", textPane.getStyle("artist"));
-                    doc.insertString(doc.getLength(), track.getTitle() + "\n\n", textPane.getStyle("title"));
+                    doc.insertString(doc.getLength(), track.getTrackData().getArtist() + "\n", textPane.getStyle("artist"));
+                    doc.insertString(doc.getLength(), track.getTrackData().getTitle() + "\n\n", textPane.getStyle("title"));
                 } catch (BadLocationException e1) {
                     e1.printStackTrace();
                 }
@@ -165,8 +165,8 @@ public class LyricsPanel extends JPanel {
 
         @Override
         protected String doInBackground() throws Exception {
-            String artist = track.getArtist();
-            String title = track.getTitle();
+            String artist = track.getTrackData().getArtist();
+            String title = track.getTrackData().getTitle();
             if (track != null && !Util.isEmpty(artist) && !Util.isEmpty(title)) {
                 try {
                     Scanner fi;
@@ -206,8 +206,8 @@ public class LyricsPanel extends JPanel {
                 if (result != null) {
                     textPane.setText("");
                     StyledDocument doc = textPane.getStyledDocument();
-                    doc.insertString(doc.getLength(), track.getArtist() + "\n", textPane.getStyle("artist"));
-                    doc.insertString(doc.getLength(), track.getTitle() + "\n\n", textPane.getStyle("title"));
+                    doc.insertString(doc.getLength(), track.getTrackData().getArtist() + "\n", textPane.getStyle("artist"));
+                    doc.insertString(doc.getLength(), track.getTrackData().getTitle() + "\n\n", textPane.getStyle("title"));
                     doc.insertString(doc.getLength(), Util.htmlToString(result), null);
                     textPane.setCaretPosition(0);
                 }

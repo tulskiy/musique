@@ -45,8 +45,8 @@ public class DecoderSeekTester {
         this.decoder = decoder;
         assertNotNull("Decoder is null", decoder);
         assertTrue("Decoder returned an error", this.decoder.open(track));
-        totalSamples = track.getTotalSamples();
-        System.out.println("File: " + track.getLocation().getPath() + ", Total samples: " + totalSamples);
+        totalSamples = track.getTrackData().getTotalSamples();
+        System.out.println("File: " + track.getTrackData().getLocation().getPath() + ", Total samples: " + totalSamples);
     }
 
     public void start() {

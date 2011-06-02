@@ -43,8 +43,8 @@ public class APEDecoder implements Decoder {
     public boolean open(Track track) {
         this.track = track;
         try {
-            logger.fine("Opening file: " + track.getFile());
-            File apeInputFile = File.createFile(track.getFile().getAbsolutePath(), "r");
+            logger.fine("Opening file: " + track.getTrackData().getFile());
+            File apeInputFile = File.createFile(track.getTrackData().getFile().getAbsolutePath(), "r");
             decoder = IAPEDecompress.CreateIAPEDecompress(apeInputFile);
             blockAlign = decoder.getApeInfoBlockAlign();
             return true;
@@ -76,7 +76,7 @@ public class APEDecoder implements Decoder {
     public int decode(byte[] buf) {
         try {
             int blocksDecoded = decoder.GetData(buf, BLOCKS_PER_DECODE);
-            track.setBitrate(decoder.getApeInfoDecompressCurrentBitRate());
+            track.getTrackData().setBitrate(decoder.getApeInfoDecompressCurrentBitRate());
             if (blocksDecoded <= 0)
                 return -1;
             return blocksDecoded * blockAlign;
@@ -91,7 +91,7 @@ public class APEDecoder implements Decoder {
     public void close() {
         try {
             if (decoder != null) {
-                track.setBitrate(decoder.getApeInfoAverageBitrate());
+                track.getTrackData().setBitrate(decoder.getApeInfoAverageBitrate());
                 decoder.getApeInfoIoSource().close();
             }
         } catch (IOException e) {

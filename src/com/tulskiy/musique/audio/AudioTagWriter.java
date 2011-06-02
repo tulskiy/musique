@@ -17,40 +17,68 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.util.Util;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
+import org.jaudiotagger.audio.generic.AbstractTag;
 import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
+
+import com.tulskiy.musique.gui.model.FieldValues;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.util.Util;
 
 /**
  * @Author: Denis Tulskiy
  * @Date: Oct 9, 2009
  */
 public abstract class AudioTagWriter {
-    public abstract void write(Track track) throws TagWriteException;
+
+	public abstract void write(Track track) throws TagWriteException;
 
     public abstract boolean isFileSupported(String ext);
 
-    protected void copyCommonFields(Tag abstractTag, Track track) throws TagWriteException {
-        try {
-            abstractTag.setField(FieldKey.ALBUM, track.getMeta("album"));
-            abstractTag.setField(FieldKey.ARTIST, track.getMeta("artist"));
-            abstractTag.setField(FieldKey.COMMENT, track.getMeta("comment"));
-            abstractTag.setField(FieldKey.GENRE, track.getMeta("genre"));
-            abstractTag.setField(FieldKey.TITLE, track.getMeta("title"));
-            abstractTag.setField(FieldKey.YEAR, track.getMeta("year"));
-            abstractTag.setField(FieldKey.ALBUM_ARTIST, track.getMeta("albumArtist"));
-            if (!Util.isEmpty(track.getDiscNumber()))
-                abstractTag.setField(FieldKey.DISC_NO, track.getDiscNumber());
-            if (!Util.isEmpty(track.getTotalDiscs()))
-                abstractTag.setField(FieldKey.DISC_TOTAL, track.getTotalDiscs());
-            if (!Util.isEmpty(track.getMeta("trackNumber")))
-                abstractTag.setField(FieldKey.TRACK, track.getMeta("trackNumber"));
-            if (!Util.isEmpty(track.getTotalTracks()))
-                abstractTag.setField(FieldKey.TRACK_TOTAL, track.getTotalTracks());
-        } catch (FieldDataInvalidException e) {
-            throw new TagWriteException(e);
-        }
+    /**
+     * Copies Musique track tag field values to destination format specific container.
+     * 
+     * @param tag destination format specific container
+     * @param abstractTag destination format specific container implementation (just to create specific TagFields)
+     * @param track Musique track
+     * @throws KeyNotFoundException
+     * @throws FieldDataInvalidException
+     */
+    // in case of logic change, review MP3TagWriter and APETagProcessor
+    // TODO take a look if refactoring to AbstractTag only fits (in format specific writers)
+    public void copyTagFields(Tag tag, AbstractTag abstractTag, Track track) throws TagWriteException {
+    	boolean firstValue;
+
+    	Iterator<Entry<FieldKey, FieldValues>> entries = track.getTrackData().getAllTagFieldValuesIterator();
+    	try {
+			while (entries.hasNext()) {
+				Entry<FieldKey, FieldValues> entry = entries.next();
+				firstValue = true;
+				for (int i = 0; i < entry.getValue().size(); i++) {
+					String value = entry.getValue().get(i);
+					if (firstValue) {
+						tag.deleteField(entry.getKey());
+						firstValue = false;
+					}
+					if (!Util.isEmpty(value)) {
+						tag.addField(abstractTag.createField(entry.getKey(), value));
+					}
+				}
+			}
+    	}
+    	catch (KeyNotFoundException knfe) {
+    		throw new TagWriteException(knfe);
+    	}
+    	catch (FieldDataInvalidException fdie) {
+    		throw new TagWriteException(fdie);
+    	}
+		
+		track.getTrackData().removeEmptyTagFields();
     }
+
 }

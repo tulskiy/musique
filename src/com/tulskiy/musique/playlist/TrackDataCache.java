@@ -38,7 +38,9 @@ public class TrackDataCache {
         if (trackData == null) {
             cache.put(key, key);
         } else {
-            track.setTrackData(trackData.merge(key));
+        	// TrackData.merge overrides filled values with uninitialized ones (zeroes, etc.)
+        	// TODO review if removal is right choice
+            track.setTrackData(trackData);
         }
     }
 }

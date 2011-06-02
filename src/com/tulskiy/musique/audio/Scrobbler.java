@@ -21,6 +21,7 @@ import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.AudioMath;
@@ -106,17 +107,18 @@ public class Scrobbler {
     }
 
     private void initNowPlaying(Track track) {
-        String artist = track.getArtist();
-        String title = track.getTitle();
-        String album = track.getAlbum();
+    	TrackData trackData = track.getTrackData();
+        String artist = trackData.getArtist();
+        String title = trackData.getTitle();
+        String album = trackData.getAlbum();
         long start = System.currentTimeMillis() / 1000;
         int trackNumber = -1;
         try {
-            trackNumber = Integer.valueOf(track.getTrackNumber());
+            trackNumber = Integer.valueOf(trackData.getTrackNumber());
         } catch (NumberFormatException ignored) {
         }
 
-        nowPlayingLength = (int) (AudioMath.samplesToMillis(track.getTotalSamples(), track.getSampleRate()) / 1000);
+        nowPlayingLength = (int) (AudioMath.samplesToMillis(trackData.getTotalSamples(), trackData.getSampleRate()) / 1000);
 
         if (Util.isEmpty(artist) || Util.isEmpty(title) || nowPlayingLength < 30) {
             // do not submit this
