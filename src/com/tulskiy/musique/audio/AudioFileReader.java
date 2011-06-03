@@ -108,7 +108,7 @@ public abstract class AudioFileReader {
         	trackData.setCueSheet(tag.getFirst("CUESHEET"));
         }
     }
-    
+
     protected void copySpecificTagFields(Tag tag, Track track) {
     	// Empty implementation, to be overridden
     }

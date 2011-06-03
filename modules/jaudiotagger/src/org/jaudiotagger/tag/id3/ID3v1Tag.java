@@ -754,7 +754,7 @@ public class ID3v1Tag extends AbstractID3v1Tag implements Tag {
         byte[] dataBuffer = new byte[TAG_LENGTH];
         byteBuffer.position(0);
         byteBuffer.get(dataBuffer, 0, TAG_LENGTH);
-        String encoding = Charset.defaultCharset().displayName();
+        String encoding = TextEncoding.CHARSET_ISO_8859_1;
         title = Utils.getString(dataBuffer, FIELD_TITLE_POS, this.FIELD_TITLE_LENGTH, encoding).trim();
         Matcher m = endofStringPattern.matcher(title);
         if (m.find()) {

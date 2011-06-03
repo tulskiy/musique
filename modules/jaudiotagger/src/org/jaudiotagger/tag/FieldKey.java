@@ -83,5 +83,7 @@ public enum FieldKey {
     PRODUCER,
     DJMIXER,
     MIXER,
-    ARRANGER,;
+    ARRANGER,
+    CUESHEET
+    ;
 }

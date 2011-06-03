@@ -28,9 +28,7 @@ import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.KeyNotFoundException;
 import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.TagField;
-import org.jaudiotagger.tag.id3.ID3v24Frame;
-import org.jaudiotagger.tag.id3.ID3v24Frames;
-import org.jaudiotagger.tag.id3.ID3v24Tag;
+import org.jaudiotagger.tag.id3.*;
 import org.jaudiotagger.tag.id3.framebody.AbstractFrameBodyTextInfo;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyCOMM;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyPOPM;
@@ -69,6 +67,11 @@ public class MP3FileReader extends AudioFileReader {
         ID3v24Tag v24Tag = null;
         if (mp3File != null) {
             try {
+                ID3v1Tag id3v1Tag = mp3File.getID3v1Tag();
+                if (id3v1Tag != null) {
+                    copyCommonTagFields(id3v1Tag, track);
+                }
+
                 v24Tag = mp3File.getID3v2TagAsv24();
                 if (v24Tag != null) {
                     copyCommonTagFields(v24Tag, track);
@@ -125,11 +128,16 @@ public class MP3FileReader extends AudioFileReader {
 
 	@Override
 	protected void copyCommonTagFields(Tag tag, Track track) throws IOException {
-		ID3v24Tag v24Tag = (ID3v24Tag) tag;
-		for (FieldKey key : FieldKey.values()) {
-			setMusiqueTagFieldValues(track, key, v24Tag);
-		}
-	}
+        if (tag instanceof ID3v24Tag) {
+            ID3v24Tag v24Tag = (ID3v24Tag) tag;
+            for (FieldKey key : FieldKey.values()) {
+                setMusiqueTagFieldValues(track, key, v24Tag);
+            }
+        } else if (tag instanceof ID3v1Tag) {
+            ID3v1Tag id3v1Tag = (ID3v1Tag) tag;
+            super.copyCommonTagFields(id3v1Tag, track);
+        }
+    }
 
 //	@Override
 //	protected void copySpecificTagFields(Tag tag, Track track) {
