@@ -14,7 +14,6 @@ fi
 JVM_ARGS=$(tr '\n' ' ' < musique.vmoptions)
 CLASSPATH=musique.jar
 CLASSPATH=$CLASSPATH:lib/last.fm-bindings.jar
-CLASSPATH=$CLASSPATH:lib/gtkjfilechooser.jar
 
 export CLASSPATH
 exec $DSP $JAVA_PATH $JVM_ARGS com.tulskiy.musique.system.Main
