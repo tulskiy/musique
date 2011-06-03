@@ -239,6 +239,7 @@ public class PlaylistTable extends GroupTable {
                         final int col = model.getColumn(index).getModelIndex();
                         final PlaylistColumn pc = columns.get(col);
                         playlist.sort(pc.getExpression(), true);
+                        playlist.firePlaylistChanged();
                     }
                 }
             }

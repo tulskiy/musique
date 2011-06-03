@@ -39,7 +39,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Set;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
@@ -516,7 +515,6 @@ public class Playlist extends ArrayList<Track> {
     }
 
     public void sort(String expression, boolean toggle) {
-        cleanUp();
         logger.fine("Sorting playlist with expression: " + expression);
         if (toggle && expression.equals(sortBy)) {
             sortAscending = !sortAscending;
@@ -526,25 +524,11 @@ public class Playlist extends ArrayList<Track> {
         }
 
         final Expression e = Parser.parse(expression);
-        Collections.sort(this, new Comparator<Track>() {
-            @Override
-            public int compare(Track o1, Track o2) {
-                try {
-                    Object v1 = e.eval(o1);
-                    Object v2 = e.eval(o2);
-                    if (v1 != null && v2 != null) {
-                        int i = v1.toString().compareToIgnoreCase(v2.toString());
-                        if (!sortAscending)
-                            i = -i;
-                        return i;
-                    }
-                } catch (Exception ignored) {
-                }
-                return 0;
-            }
-        });
-
-        firePlaylistChanged();
+        TrackComparator trackComparator = new TrackComparator(e);
+        if (sortAscending)
+            Collections.sort(this, trackComparator);
+        else
+            Collections.sort(this, Collections.reverseOrder(trackComparator));
     }
 
     public void setGroupBy(String expression) {
@@ -671,5 +655,6 @@ public class Playlist extends ArrayList<Track> {
     public void removeChangeListener(PlaylistListener listener) {
         listeners.remove(listener);
     }
+
 }
 
