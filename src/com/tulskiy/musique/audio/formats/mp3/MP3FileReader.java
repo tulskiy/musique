@@ -61,7 +61,7 @@ public class MP3FileReader extends AudioFileReader {
         ID3Tag.setDefaultEncoding(defaultCharset.name());
         MP3File mp3File = null;
         try {
-            mp3File = new MP3File(trackData.getFile(), MP3File.LOAD_IDV2TAG, true);
+            mp3File = new MP3File(trackData.getFile(), MP3File.LOAD_ALL, true);
         } catch (Exception ignored) {
             System.out.println("Couldn't read file: " + trackData.getFile());
         }

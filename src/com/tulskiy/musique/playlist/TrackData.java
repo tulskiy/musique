@@ -238,10 +238,22 @@ public class TrackData implements Cloneable {
     // ------------------- common methods ------------------- //
 
     public String getArtist() {
-        return Util.firstNotEmpty(getFirstTagFieldValue(FieldKey.ARTIST),
-        		getFirstTagFieldValue(FieldKey.ALBUM_ARTIST));
+        return firstNotEmpty(FieldKey.ARTIST,
+                FieldKey.ALBUM_ARTIST,
+                FieldKey.BAND,
+                FieldKey.COMPOSER
+        );
     }
-    
+
+    private String firstNotEmpty(FieldKey... keys) {
+        for (FieldKey key : keys) {
+            String value = getFirstTagFieldValue(key);
+            if (!Util.isEmpty(value))
+                return value;
+        }
+        return null;
+    }
+
     public void addArtist(String value) {
     	addTagFieldValues(FieldKey.ARTIST, value);
     }
@@ -263,8 +275,11 @@ public class TrackData implements Cloneable {
     }
 
     public String getAlbumArtist() {
-        return Util.firstNotEmpty(getFirstTagFieldValue(FieldKey.ALBUM_ARTIST),
-        		getFirstTagFieldValue(FieldKey.ARTIST));
+        return firstNotEmpty(FieldKey.ALBUM_ARTIST,
+                FieldKey.ARTIST,
+                FieldKey.BAND,
+                FieldKey.COMPOSER
+        );
     }
     
     public void addAlbumArtist(String value) {

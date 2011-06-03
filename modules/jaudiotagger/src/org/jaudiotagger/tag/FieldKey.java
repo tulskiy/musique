@@ -18,6 +18,7 @@ public enum FieldKey {
     ARTIST_SORT,
     BARCODE,
     BPM,
+    BAND,
     CATALOG_NO,
     COMMENT,
     COMPOSER,

@@ -38,6 +38,8 @@ public class FieldKeyMetaHelper {
 
 		keyMeta = instance.new FieldKeyMeta(FieldKey.ARTIST, "Artist", ++i);
 		meta.put(keyMeta.getKey(), keyMeta);
+        keyMeta = instance.new FieldKeyMeta(FieldKey.BAND, "Band", ++i);
+		meta.put(keyMeta.getKey(), keyMeta);
 		keyMeta = instance.new FieldKeyMeta(FieldKey.ALBUM_ARTIST, "Album Artist", ++i);
 		meta.put(keyMeta.getKey(), keyMeta);
 		keyMeta = instance.new FieldKeyMeta(FieldKey.TITLE, "Title", ++i);
