@@ -59,13 +59,13 @@ public class ParserTest {
 
         s.getTrackData().setTagFieldValues(FieldKey.ARTIST, "artist");
         assertEquals("artist", t.eval(s));
-        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, (String) null);
+        s.getTrackData().removeTagField(FieldKey.ARTIST);
         s.getTrackData().setTagFieldValues(FieldKey.TITLE, "title");
         assertEquals("title", t.eval(s));
         s.getTrackData().setTagFieldValues(FieldKey.TITLE, "");
         s.getTrackData().setTagFieldValues(FieldKey.ALBUM_ARTIST, "album artist");
         assertEquals("album artist", t.eval(s));
-        s.getTrackData().setTagFieldValues(FieldKey.ALBUM_ARTIST, (String) null);
+        s.getTrackData().removeTagField(FieldKey.ALBUM_ARTIST);
         // file name is taken once title is empty
         assertEquals("sample", t.eval(s));
         
@@ -86,7 +86,7 @@ public class ParserTest {
         s.getTrackData().setTagFieldValues(FieldKey.TITLE, "title");
         assertEquals("artist", t.eval(s));
 
-        s.getTrackData().setTagFieldValues(FieldKey.ARTIST, (String) null);
+        s.getTrackData().removeTagField(FieldKey.ARTIST);
         assertEquals("title", t.eval(s));
     }
 
