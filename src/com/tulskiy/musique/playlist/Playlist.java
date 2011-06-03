@@ -145,7 +145,9 @@ public class Playlist extends ArrayList<Track> {
                 dos.writeLong(trackData.getLastModified());
 
                 meta.clear();
-                meta.add(new Pair(META_KEY_CODEC, trackData.getCodec()));
+                if (!Util.isEmpty(trackData.getCodec()))
+                    meta.add(new Pair(META_KEY_CODEC, trackData.getCodec()));
+
                 if (!Util.isEmpty(trackData.getEncoder())) {
                 	meta.add(new Pair(META_KEY_ENCODER, trackData.getEncoder()));
                 }
