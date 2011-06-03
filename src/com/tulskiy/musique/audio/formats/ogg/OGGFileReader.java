@@ -17,12 +17,14 @@
 
 package com.tulskiy.musique.audio.formats.ogg;
 
-import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.playlist.Track;
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.ogg.OggFileReader;
 import org.jaudiotagger.tag.Tag;
+
+import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 
 /**
  * @Author: Denis Tulskiy
@@ -32,14 +34,16 @@ public class OGGFileReader extends AudioFileReader {
     private static VorbisDecoder vorbisdecoder = new VorbisDecoder();
 
     public Track readSingle(Track track) {
+    	TrackData trackData = track.getTrackData();
         try {
             OggFileReader reader = new OggFileReader();
-            AudioFile af1 = reader.read(track.getFile());
+            AudioFile af1 = reader.read(trackData.getFile());
             Tag tag = af1.getTag();
-            copyTagFields(tag, track);
+            copyCommonTagFields(tag, track);
+            copySpecificTagFields(tag, track);
             copyHeaderFields((GenericAudioHeader) af1.getAudioHeader(), track);
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + track.getFile());
+            System.out.println("Couldn't read file: " + trackData.getFile());
         }
         return track;
     }
@@ -47,5 +51,10 @@ public class OGGFileReader extends AudioFileReader {
     public boolean isFileSupported(String ext) {
         return ext.equalsIgnoreCase("ogg");
     }
+    
+//    @Override
+//    public void copySpecificTagFields(Tag tag, Track track) {
+//    	VorbisCommentTag vcTag = (VorbisCommentTag) tag;
+//    }
 
 }

@@ -17,8 +17,12 @@
 
 package com.tulskiy.musique.audio.formats.ape;
 
+import org.jaudiotagger.tag.Tag;
+
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
+
 import davaguine.jmac.info.APEFileInfo;
 import davaguine.jmac.info.APEHeader;
 import davaguine.jmac.info.ID3Tag;
@@ -34,7 +38,7 @@ public class APEFileReader extends AudioFileReader {
     public Track readSingle(Track track) {
         try {
             ID3Tag.setDefaultEncoding(defaultCharset.name());
-            RandomAccessFile ras = new RandomAccessFile(track.getFile(), "r");
+            RandomAccessFile ras = new RandomAccessFile(track.getTrackData().getFile(), "r");
             APEHeader header = new APEHeader(ras);
             APEFileInfo fileInfo = new APEFileInfo();
             header.Analyze(fileInfo);
@@ -44,7 +48,7 @@ public class APEFileReader extends AudioFileReader {
             ras.close();
             return track;
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + track.getFile());
+            System.out.println("Couldn't read file: " + track.getTrackData().getFile());
         }
         return null;
     }
@@ -54,11 +58,13 @@ public class APEFileReader extends AudioFileReader {
     }
 
     private void parseInfo(Track track, APEFileInfo fileInfo) {
-        track.setChannels(fileInfo.nChannels);
-        track.setSampleRate(fileInfo.nSampleRate);
-        track.setTotalSamples(fileInfo.nTotalBlocks);
-        track.setStartPosition(0);
-        track.setCodec("Monkey's Audio");
-        track.setBitrate(fileInfo.nAverageBitrate);
+    	TrackData trackData = track.getTrackData();
+    	trackData.setChannels(fileInfo.nChannels);
+    	trackData.setSampleRate(fileInfo.nSampleRate);
+    	trackData.setTotalSamples(fileInfo.nTotalBlocks);
+    	trackData.setStartPosition(0);
+    	trackData.setCodec("Monkey's Audio");
+    	trackData.setBitrate(fileInfo.nAverageBitrate);
     }
+
 }

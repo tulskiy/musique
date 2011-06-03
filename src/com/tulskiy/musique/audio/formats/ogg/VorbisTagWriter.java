@@ -17,11 +17,13 @@
 
 package com.tulskiy.musique.audio.formats.ogg;
 
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
+
 import com.tulskiy.musique.audio.AudioTagWriter;
 import com.tulskiy.musique.audio.TagWriteException;
 import com.tulskiy.musique.playlist.Track;
-import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.tag.Tag;
 
 /**
  * @Author: Denis Tulskiy
@@ -31,9 +33,9 @@ public class VorbisTagWriter extends AudioTagWriter {
     @Override
     public void write(Track track) throws TagWriteException {
         try {
-            org.jaudiotagger.audio.AudioFile af1 = AudioFileIO.read(track.getFile());
-            Tag abstractTag = af1.getTag();
-            copyCommonFields(abstractTag, track);
+            org.jaudiotagger.audio.AudioFile af1 = AudioFileIO.read(track.getTrackData().getFile());
+            Tag abstractTag = af1.getTagOrCreateDefault();
+            copyTagFields(abstractTag, new VorbisCommentTag(), track);
             AudioFileIO.write(af1);
         } catch (Exception e) {
             throw new TagWriteException(e);
@@ -44,4 +46,5 @@ public class VorbisTagWriter extends AudioTagWriter {
     public boolean isFileSupported(String ext) {
         return ext.equalsIgnoreCase("flac") || ext.equalsIgnoreCase("ogg");
     }
+
 }

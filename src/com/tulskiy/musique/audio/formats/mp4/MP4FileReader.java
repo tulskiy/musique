@@ -17,10 +17,20 @@
 
 package com.tulskiy.musique.audio.formats.mp4;
 
-import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.playlist.Track;
+import java.util.List;
+
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.audio.mp4.Mp4FileReader;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagField;
+import org.jaudiotagger.tag.mp4.Mp4FieldKey;
+import org.jaudiotagger.tag.mp4.Mp4Tag;
+import org.jaudiotagger.tag.mp4.field.Mp4DiscNoField;
+import org.jaudiotagger.tag.mp4.field.Mp4TrackField;
+
+import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 
 /**
  * @Author: Denis Tulskiy
@@ -31,13 +41,14 @@ public class MP4FileReader extends AudioFileReader {
     public Track readSingle(Track track) {
         Mp4FileReader reader = new Mp4FileReader();
         try {
-            org.jaudiotagger.audio.AudioFile audioFile = reader.read(track.getFile());
+            org.jaudiotagger.audio.AudioFile audioFile = reader.read(track.getTrackData().getFile());
             copyHeaderFields((GenericAudioHeader) audioFile.getAudioHeader(), track);
             org.jaudiotagger.tag.Tag tag = audioFile.getTag();
-            copyTagFields(tag, track);
+            copyCommonTagFields(tag, track);
+            copySpecificTagFields(tag, track);
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println("Couldn't read file: " + track.getFile());
+            System.out.println("Couldn't read file: " + track.getTrackData().getFile());
         }
 
         return track;
@@ -47,4 +58,38 @@ public class MP4FileReader extends AudioFileReader {
     public boolean isFileSupported(String ext) {
         return (ext.equalsIgnoreCase("mp4") || ext.equalsIgnoreCase("m4a"));
     }
+
+    @Override
+    protected void copySpecificTagFields(Tag tag, Track track) {
+    	Mp4Tag mp4Tag = (Mp4Tag) tag;
+    	TrackData trackData = track.getTrackData();
+    	
+    	Mp4TrackField trackField = (Mp4TrackField) mp4Tag.getFirstField(Mp4FieldKey.TRACK);
+    	if (trackField != null) {
+	    	if (trackField.getTrackNo() != null) {
+	    		trackData.addTrack(trackField.getTrackNo().intValue());
+	    	}
+	    	if (trackField.getTrackTotal() != null) {
+	    		trackData.addTrackTotal(trackField.getTrackTotal().intValue());
+	    	}
+    	}
+    	
+    	Mp4DiscNoField discField = (Mp4DiscNoField) mp4Tag.getFirstField(Mp4FieldKey.DISCNUMBER);
+    	if (discField != null) {
+	    	if (discField.getDiscNo() != null) {
+	    		trackData.addDisc(discField.getDiscNo().intValue());
+	    	}
+	    	if (discField.getDiscTotal() != null) {
+	    		trackData.addDiscTotal(discField.getDiscTotal().intValue());
+	    	}
+    	}
+
+    	List<TagField> genreFields = mp4Tag.get(Mp4FieldKey.GENRE_CUSTOM);
+    	if (genreFields != null) {
+    		for (TagField genreField : genreFields) {
+    			trackData.addGenre(genreField.toString());
+    		}
+    	}
+    }
+
 }

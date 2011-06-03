@@ -17,15 +17,19 @@
 
 package com.tulskiy.musique.audio.formats.uncompressed;
 
-import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.Decoder;
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.util.Util;
+import java.io.File;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
-import java.io.File;
+
+import org.jaudiotagger.tag.FieldKey;
+
+import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.audio.Decoder;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
+import com.tulskiy.musique.util.Util;
 
 /**
  * @Author: Denis Tulskiy
@@ -35,22 +39,23 @@ public class PCMFileReader extends AudioFileReader {
     private static Decoder decoder = new PCMDecoder();
 
     public Track readSingle(Track track) {
-        File file = track.getFile();
+    	TrackData trackData = track.getTrackData();
+        File file = trackData.getFile();
 
         String title = Util.removeExt(file.getName());
-        track.setMeta("title", title);
+        trackData.setTagFieldValues(FieldKey.TITLE, title);
         try {
             AudioFileFormat format = AudioSystem.getAudioFileFormat(file);
-            track.setStartPosition(0);
+            trackData.setStartPosition(0);
             AudioFormat audioFormat = format.getFormat();
-            track.setSampleRate((int) audioFormat.getSampleRate());
-            track.setTotalSamples(format.getFrameLength());
-            track.setChannels(audioFormat.getChannels());
-            track.setCodec(Util.getFileExt(file).toUpperCase());
+            trackData.setSampleRate((int) audioFormat.getSampleRate());
+            trackData.setTotalSamples(format.getFrameLength());
+            trackData.setChannels(audioFormat.getChannels());
+            trackData.setCodec(Util.getFileExt(file).toUpperCase());
             if (format.getFrameLength() > 0)
-                track.setBitrate((int) (format.getByteLength() / format.getFrameLength() * audioFormat.getSampleRate() / 100));
+            	trackData.setBitrate((int) (format.getByteLength() / format.getFrameLength() * audioFormat.getSampleRate() / 100));
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + track.getFile());
+            System.out.println("Couldn't read file: " + trackData.getFile());
         }
         return track;
     }

@@ -41,13 +41,13 @@ import java.util.List;
 public class CUEWriter {
     public void write(File file, ArrayList<Track> tracks) {
         try {
-            boolean cueEmbedded = tracks.get(0).isCueEmbedded();
+            boolean cueEmbedded = tracks.get(0).getTrackData().isCueEmbedded();
             LineNumberReader numberReader;
 
             if (cueEmbedded) {
                 Track track = TrackIO.getAudioFileReader(file.getName()).read(file);
-                numberReader = new LineNumberReader(new StringReader(track.getCueSheet()));
-                System.out.println(track.getCueSheet());
+                numberReader = new LineNumberReader(new StringReader(track.getTrackData().getCueSheet()));
+                System.out.println(track.getTrackData().getCueSheet());
             } else {
                 numberReader = new LineNumberReader(new InputStreamReader(
                         new FileInputStream(file), AudioFileReader.getDefaultCharset()));

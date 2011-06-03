@@ -107,8 +107,8 @@ public class Library {
                     TrackData trackData = new TrackData(file.toURI(), 0);
                     Track track = trackDatas.get(trackData);
                     if (track != null) {
-                        if (track.getLastModified() != file.lastModified()) {
-                            track.clearTags();
+                        if (track.getTrackData().getLastModified() != file.lastModified()) {
+                            track.getTrackData().clearTags();
                             TrackIO.getAudioFileReader(file.getName()).reload(track);
                         }
                         processed.add(track);

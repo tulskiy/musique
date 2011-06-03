@@ -17,22 +17,25 @@
 
 package com.tulskiy.musique.audio.formats.flac;
 
-import com.tulskiy.musique.audio.AudioFileReader;
-import com.tulskiy.musique.audio.formats.flac.oggflac.OggFlacDecoder;
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.util.Util;
+import java.io.RandomAccessFile;
+import java.util.HashMap;
+
 import org.jaudiotagger.audio.AudioFile;
 import org.jaudiotagger.audio.flac.FlacFileReader;
 import org.jaudiotagger.audio.generic.GenericAudioHeader;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.flac.FlacTag;
 import org.jaudiotagger.tag.vorbiscomment.VorbisCommentFieldKey;
 import org.jaudiotagger.tag.vorbiscomment.VorbisCommentTag;
 import org.kc7bfi.jflac.metadata.Metadata;
 import org.kc7bfi.jflac.metadata.StreamInfo;
 import org.kc7bfi.jflac.metadata.VorbisComment;
 
-import java.io.RandomAccessFile;
-import java.util.HashMap;
+import com.tulskiy.musique.audio.AudioFileReader;
+import com.tulskiy.musique.audio.formats.flac.oggflac.OggFlacDecoder;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
+import com.tulskiy.musique.util.Util;
 
 /**
  * @Author: Denis Tulskiy
@@ -40,15 +43,16 @@ import java.util.HashMap;
  */
 public class FLACFileReader extends AudioFileReader {
     public Track readSingle(Track track) {
+    	TrackData trackData = track.getTrackData();
         try {
-            /*if (Util.getFileExt(track.getFile()).equalsIgnoreCase("oga")) {
+            /*if (Util.getFileExt(trackData.getFile()).equalsIgnoreCase("oga")) {
                 OggFlacDecoder dec = new OggFlacDecoder();
-                dec.open(new RandomAccessFile(track.getFile(), "r"));
+                dec.open(new RandomAccessFile(trackData.getFile(), "r"));
                 StreamInfo streamInfo = dec.getStreamInfo();
-                track.setSampleRate(streamInfo.getSampleRate());
-                track.setBps(streamInfo.getBitsPerSample());
-                track.setChannels(streamInfo.getChannels());
-                track.setTotalSamples(streamInfo.getTotalSamples());
+                trackData.setSampleRate(streamInfo.getSampleRate());
+                trackData.setBps(streamInfo.getBitsPerSample());
+                trackData.setChannels(streamInfo.getChannels());
+                trackData.setTotalSamples(streamInfo.getTotalSamples());
 
                 for (Metadata m : dec.getMetadata()) {
                     if (m instanceof VorbisComment) {
@@ -63,19 +67,20 @@ public class FLACFileReader extends AudioFileReader {
                                 vorbisTag.add(vorbisTag.createTagField(key, map.get(key)));
                             }
                         }
-                        copyTagFields(vorbisTag, track);
+                        copyCommonTagFields(vorbisTag, track);
                     }
                 }
             } else*/ {
                 FlacFileReader reader = new FlacFileReader();
-                AudioFile af1 = reader.read(track.getFile());
+                AudioFile af1 = reader.read(trackData.getFile());
                 Tag tag = af1.getTag();
-                copyTagFields(tag, track);
+                copyCommonTagFields(tag, track);
+                copySpecificTagFields(tag, track);
                 GenericAudioHeader audioHeader = (GenericAudioHeader) af1.getAudioHeader();
                 copyHeaderFields(audioHeader, track);
             }
         } catch (Exception e) {
-            System.out.println("Couldn't read file: " + track.getFile());
+            System.out.println("Couldn't read file: " + trackData.getFile());
         }
         return track;
     }
@@ -84,5 +89,10 @@ public class FLACFileReader extends AudioFileReader {
         //todo fix seeking with oga and uncomment
         return ext.equalsIgnoreCase("flac")/* || ext.equalsIgnoreCase("oga")*/;
     }
+    
+//    @Override
+//    public void copySpecificTagFields(Tag tag, Track track) {
+//    	FlacTag flacTag = (FlacTag) tag;
+//    }
 
 }

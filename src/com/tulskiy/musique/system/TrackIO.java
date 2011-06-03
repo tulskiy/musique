@@ -83,8 +83,8 @@ public class TrackIO {
     }
 
     public static void write(Track track) {
-        if (track.isFile()) {
-            AudioTagWriter writer = TrackIO.getAudioFileWriter(track.getFile().getName());
+        if (track.getTrackData().isFile()) {
+            AudioTagWriter writer = TrackIO.getAudioFileWriter(track.getTrackData().getFile().getName());
             if (writer != null)
                 try {
                     writer.write(track);

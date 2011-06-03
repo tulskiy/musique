@@ -17,9 +17,18 @@
 
 package com.tulskiy.musique.util;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 import java.io.File;
+import java.util.List;
+import java.util.Set;
+
+import javax.swing.AbstractButton;
+import javax.swing.JComponent;
+import javax.swing.JMenu;
+import javax.swing.UIManager;
+
+import com.tulskiy.musique.gui.model.FieldValues;
 
 /**
  * @Author: Denis Tulskiy
@@ -103,8 +112,16 @@ public class Util {
         return null;
     }
 
-    public static boolean isEmpty(String s) {
-        return s == null || s.isEmpty();
+    public static boolean isEmpty(String value) {
+        return value == null || value.isEmpty();
+    }
+
+    public static boolean isEmpty(List values) {
+        return values == null || values.isEmpty();
+    }
+
+    public static boolean isEmpty(Set values) {
+        return values == null || values.isEmpty();
     }
 
     public static String humanize(String property) {
@@ -182,4 +199,46 @@ public class Util {
         return String.format("%1$#" + n + "s", s);
     }
 
+    public static String formatFieldValues(Object values) {
+		String result = null;
+
+		if (values != null) {
+        	if (values instanceof String) {
+        		result = (String) values;
+        	}
+        	else if (values instanceof FieldValues) {
+        		FieldValues vs = (FieldValues) values;
+        		if (vs.size() > 1) {
+        			result = "<multiple values> " + vs.toString();
+        		}
+        		else {
+        			result = vs.toString();
+        		}
+        	}
+        }
+        
+        return result;
+    }
+
+    public static String formatFieldValues(Object values, String separator) {
+        if (values != null && separator != null) {
+        	if (values instanceof String) {
+        		return (String) values;
+        	}
+        	else if (values instanceof FieldValues) {
+            	StringBuilder sb = new StringBuilder();
+            	FieldValues vs = (FieldValues) values;
+            	for (int i = 0; i < vs.size(); i++) {
+            		String value = vs.get(i);
+            		if (sb.length() != 0) {
+            			sb.append(separator);
+            		}
+            		sb.append(value == null ? "" : value.toString());
+            	}
+            	return sb.toString();
+        	}
+        }
+        
+        return null;
+    }
 }

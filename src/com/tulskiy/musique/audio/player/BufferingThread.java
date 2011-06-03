@@ -17,14 +17,15 @@
 
 package com.tulskiy.musique.audio.player;
 
+import java.util.logging.Logger;
+
 import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.audio.player.io.Buffer;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.system.Codecs;
 import com.tulskiy.musique.util.AudioMath;
-
-import java.util.logging.Logger;
 
 /**
  * Author: Denis Tulskiy
@@ -111,7 +112,7 @@ public class BufferingThread extends Actor implements Runnable {
                             continue;
                         }
 
-                        if (currentTrack.isCue()) {
+                        if (currentTrack.getTrackData().isCue()) {
                             if (cueTotalBytes <= currentByte + len) {
                                 Track s = null;
                                 if (order != null)
@@ -164,18 +165,19 @@ public class BufferingThread extends Actor implements Runnable {
     }
 
     public synchronized void open(Track track, boolean forced) {
+		TrackData trackData = track.getTrackData();
         if (decoder != null) {
             decoder.close();
         }
 
         if (track != null) {
-            logger.fine("Opening track " + track.getLocation());
+            logger.fine("Opening track " + trackData.getLocation());
 
-            if (track.isFile() && !track.getFile().exists()) {
+            if (trackData.isFile() && !trackData.getFile().exists()) {
                 //try to get the next one
                 track = order.next(track);
                 if (track == null || (
-                        track.isFile() && !track.getFile().exists())) {
+                		trackData.isFile() && !trackData.getFile().exists())) {
                     decoder = null;
                     return;
                 }
@@ -192,10 +194,10 @@ public class BufferingThread extends Actor implements Runnable {
 
             buffer.addNextTrack(currentTrack, decoder.getAudioFormat(), 0, forced);
 
-            if (track.getStartPosition() > 0)
-                decoder.seekSample(track.getStartPosition());
-            if (track.getSubsongIndex() > 0) {
-                cueTotalBytes = AudioMath.samplesToBytes(track.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
+            if (trackData.getStartPosition() > 0)
+                decoder.seekSample(trackData.getStartPosition());
+            if (trackData.getSubsongIndex() > 0) {
+                cueTotalBytes = AudioMath.samplesToBytes(trackData.getTotalSamples(), decoder.getAudioFormat().getFrameSize());
             } else {
                 cueTotalBytes = 0;
             }
@@ -210,7 +212,7 @@ public class BufferingThread extends Actor implements Runnable {
         pause(true);
 
         if (decoder != null) {
-            decoder.seekSample(currentTrack.getStartPosition() + sample);
+            decoder.seekSample(currentTrack.getTrackData().getStartPosition() + sample);
             currentByte = AudioMath.samplesToBytes(sample, decoder.getAudioFormat().getFrameSize());
             buffer.addNextTrack(currentTrack, decoder.getAudioFormat(), sample, false);
             if (oldState) {
