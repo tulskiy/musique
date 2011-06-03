@@ -53,7 +53,7 @@ public class TagTest {
 	private final String ALBUM = "album";
 	private final String YEAR = "2000";
 	private final String GENRE = "genre";
-	private final String[] GENRES = {"genre1", "genre2", "genre3"};
+	private final String[] GENRES = {"Rock", "Blues", "Jazz"};
 	private final String TRACK = "1";
 	private final String TRACK_TOTAL = "2";
 	private final String DISC_NO = "3";
