@@ -19,12 +19,16 @@ package com.tulskiy.musique.audio.player;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Author: Denis Tulskiy
  * Date: 1/15/11
  */
 public abstract class Actor {
+    private Logger logger = Logger.getLogger("musique");
+
     public enum Message {
         // player messages
         PLAY, PAUSE, STOP,
@@ -53,14 +57,18 @@ public abstract class Actor {
         Thread messageThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
                     while (true) {
-                        Message message = queue.take();
-                        process(message);
+                        Message message = null;
+                        try {
+                            message = queue.take();
+                            process(message);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            break;
+                        } catch (Exception e) {
+                            logger.log(Level.WARNING, "Error processing message " + message, e);
+                        }
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
             }
         }, "Actor Thread");
         messageThread.start();
