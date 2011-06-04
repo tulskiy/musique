@@ -103,7 +103,7 @@ public class PlayingThread extends Actor implements Runnable {
                     player.fireEvent(PlayerEventCode.PLAYING_STARTED);
                     while (active) {
                         int len = buffer.read(buf, 0, BUFFER_SIZE);
-                        if (len == -1) {
+                        while (len == -1) {
                             if (!openNext()) {
                                 stop();
                                 break;
