@@ -155,6 +155,8 @@ public class BufferingThread extends Actor implements Runnable {
             buffer.flush();
         synchronized (lock) {
         }
+        if (flush)
+            buffer.flush();
     }
 
     private void start() {
@@ -214,7 +216,7 @@ public class BufferingThread extends Actor implements Runnable {
         if (decoder != null) {
             decoder.seekSample(currentTrack.getTrackData().getStartPosition() + sample);
             currentByte = AudioMath.samplesToBytes(sample, decoder.getAudioFormat().getFrameSize());
-            buffer.addNextTrack(currentTrack, decoder.getAudioFormat(), sample, false);
+            buffer.addNextTrack(currentTrack, decoder.getAudioFormat(), sample, true);
             if (oldState) {
                 start();
             }
