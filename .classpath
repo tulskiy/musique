@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="modules/cuelib/src"/>
+	<classpathentry kind="src" path="modules/tta/src"/>
 	<classpathentry kind="src" path="modules/aac/src"/>
 	<classpathentry kind="src" path="modules/alac/src"/>
 	<classpathentry kind="src" path="modules/jaudiotagger/src"/>

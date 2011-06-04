@@ -33,6 +33,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -61,11 +62,15 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
+import org.jaudiotagger.tag.FieldKey;
+
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.cpp.TrackInfoItemSelection;
+import com.tulskiy.musique.gui.model.Album;
 import com.tulskiy.musique.gui.model.FileInfoModel;
 import com.tulskiy.musique.gui.model.MultiTagFieldModel;
 import com.tulskiy.musique.gui.model.SingleTagFieldModel;
+import com.tulskiy.musique.gui.model.Tools;
 import com.tulskiy.musique.gui.model.TrackInfoItem;
 import com.tulskiy.musique.gui.playlist.PlaylistTable;
 import com.tulskiy.musique.playlist.Track;
@@ -88,8 +93,8 @@ public class TracksInfoDialog extends JDialog {
         setModal(false);
 
         final MultiTagFieldModel tagFieldsModel = new MultiTagFieldModel(tracks);
-        JComponent tagsTable = createTable(tagFieldsModel);
-        JComponent propsTable = createTable(new FileInfoModel(tracks));
+        final JComponent tagsTable = createTable(tagFieldsModel);
+        final JComponent propsTable = createTable(new FileInfoModel(tracks));
 
         JTabbedPane tp = new JTabbedPane();
         tp.setFocusable(false);
@@ -99,6 +104,29 @@ public class TracksInfoDialog extends JDialog {
         add(tp, BorderLayout.CENTER);
 
         Box b1 = new Box(BoxLayout.X_AXIS);
+        b1.add(Box.createHorizontalStrut(10));
+        final JButton tools = new JButton("Tools");
+        b1.add(tools);
+        tools.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                final JPopupMenu menu = new JPopupMenu();
+
+                JMenuItem menuItemEdit = new JMenuItem("Auto track number");
+                menu.add(menuItemEdit).addActionListener(new ActionListener() {
+    				@Override
+    				public void actionPerformed(ActionEvent e) {
+    					Tools.autoTrackNumber(tagFieldsModel);
+    					tagFieldsModel.sort();
+    					
+    			    	tagsTable.revalidate();
+    			    	tagsTable.repaint();
+    				}
+    	        });
+                
+                menu.show(tools, 0, tools.getBounds().height);
+            }
+        });
         b1.add(Box.createHorizontalGlue());
         JButton write = new JButton("Write");
         b1.add(write);
@@ -450,6 +478,8 @@ public class TracksInfoDialog extends JDialog {
         		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK), "copy");
         iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_V,
         		ActionEvent.CTRL_MASK + ActionEvent.SHIFT_MASK), "paste");
+        iMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+        		ActionEvent.CTRL_MASK), "add");
     }
 
     private JPopupMenu buildContextMenu(final PlaylistTable playlist, final GroupTable properties) {
@@ -492,6 +522,8 @@ public class TracksInfoDialog extends JDialog {
 
         JMenuItem menuItemAdd = new JMenuItem("Add");
         menuItemAdd.setIcon(emptyIcon);
+        menuItemAdd.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
+        		ActionEvent.CTRL_MASK));
         menu.add(menuItemAdd).addActionListener(properties.getActionMap().get("add"));
         
         JMenuItem menuItemRemove = new JMenuItem("Remove");
