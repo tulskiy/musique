@@ -115,7 +115,7 @@ public class PlayingThread extends Actor implements Runnable {
                         output.write(buf, 0, len);
                     }
                 } catch (Exception e) {
-                    logger.log(Level.WARNING, "Exception while playing. Stopping now");
+                    logger.log(Level.WARNING, "Exception while playing. Stopping now", e);
                     currentTrack = null;
                     stop();
                 }
