@@ -36,9 +36,11 @@ public class TTADecoder implements Decoder {
     private TTA_Decoder decoder;
     private AudioFormat fmt;
     private TTA_info info;
+    private Track track;
 
     @Override
     public boolean open(Track track) {
+        this.track = track;
         try {
             decoder = new TTA_Decoder(new FileInputStream(track.getTrackData().getFile()));
 
@@ -65,6 +67,7 @@ public class TTADecoder implements Decoder {
     @Override
     public int decode(byte[] buf) {
         try {
+            track.getTrackData().setBitrate(decoder.get_current_bitrate());
             return decoder.process_stream(buf);
         } catch (Exception e) {
             logger.log(Level.WARNING, "Decoder Error", e);
@@ -74,6 +77,7 @@ public class TTADecoder implements Decoder {
 
     @Override
     public void close() {
+        track.getTrackData().setBitrate(info.bitrate);
         if (decoder != null)
             try {
                 decoder.close();

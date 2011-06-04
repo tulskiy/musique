@@ -18,4 +18,5 @@ public class TTA_info {
     public int bps;         // bits per sample
     public int sps;         // samplerate (sps)
     public int samples;     // data length in samples
+    public int bitrate;
 }

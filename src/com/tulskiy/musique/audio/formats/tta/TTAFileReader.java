@@ -46,6 +46,7 @@ public class TTAFileReader extends AudioFileReader{
             trackData.setChannels(info.nch);
             trackData.setSampleRate(info.sps);
             trackData.setTotalSamples(info.samples);
+            trackData.setBitrate(info.bitrate);
             return track;
         } catch (Exception e) {
             logger.log(Level.WARNING, "Error reading file " + trackData.getFile(), e);

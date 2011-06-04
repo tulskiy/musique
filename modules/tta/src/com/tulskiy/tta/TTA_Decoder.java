@@ -41,7 +41,7 @@ public class TTA_Decoder {
     boolean password_set;    // password protection flag
     long[] seek_table; // the playing position table
     int format;    // tta data format
-    int rate;    // bitrate (kbps)
+    int bitrate;    // bitrate (kbps)
     long offset;    // data start position (header size, bytes)
     long frames;    // total count of frames
     int depth;    // bytes per sample
@@ -90,7 +90,7 @@ public class TTA_Decoder {
         frames = info.samples / flen_std + (flen_last > 0 ? 1 : 0);
         smp_size = depth * info.nch;
         if (flen_last == 0) flen_last = flen_std;
-        rate = 0;
+        bitrate = info.bitrate;
 
         // allocate memory for seek table data
         seek_table = new long[(int) frames];
@@ -124,6 +124,16 @@ public class TTA_Decoder {
             throw new tta_exception(TTA_FILE_ERROR);
 
         size += 22; // sizeof TTA header
+
+        try {
+            int datasize = (int) (fifo.io.available() - size);
+            int origsize = info.samples * info.bps / 8 * info.nch;
+            double compress = (double) datasize / origsize;
+            info.bitrate = (int) (compress * info.sps *
+                info.nch * info.bps / 1000);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return size;
     } // read_tta_header
@@ -296,6 +306,7 @@ public class TTA_Decoder {
                 fnum++;
 
                 // update dynamic info
+                bitrate = (fifo.count << 3) / 1070;
 //			if (tta_callback)
 //				tta_callback(rate, fnum, frames);
                 if (fnum == frames) break;
@@ -320,6 +331,10 @@ public class TTA_Decoder {
 
         return ret;
     } // process_stream
+
+    public int get_current_bitrate() {
+        return bitrate;
+    }
 
     public void set_position(int sample) {
         int frame = (int) (sample / flen_std);

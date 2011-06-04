@@ -25,6 +25,7 @@ class TTA_fifo {
     private int bcount; // count of bits in cache
     private int bcache; // bit cache
     private int crc;
+    int count;
     FileInputStream io;
 
     void reader_reset() {
@@ -32,6 +33,7 @@ class TTA_fifo {
         crc = 0xffffffff;
         bcache = 0;
         bcount = 0;
+        count = 0;
     }
 
     final short read_byte() {
@@ -47,6 +49,7 @@ class TTA_fifo {
             short val = (short) (buffer[pos++] & 0xFF);
             // update crc32 and statistics
             crc = (int) (crc32_table[((crc ^ val) & 0xFF)] ^ ((crc >> 8) & 0x0FFFFFFF));
+            count++;
 
             return val;
         } catch (IOException e) {
