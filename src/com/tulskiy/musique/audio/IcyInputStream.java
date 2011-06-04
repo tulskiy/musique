@@ -145,7 +145,9 @@ public class IcyInputStream extends FilterInputStream {
             int bytesToMeta = metaInt - bytesRead;
             if (bytesToMeta == 0) {
                 readMeta();
-            } else if (bytesToMeta > 0 && bytesToMeta < len) {
+            }
+
+            if (bytesToMeta >= 0 && bytesToMeta < len) {
                 len = bytesToMeta;
             }
         }
@@ -160,9 +162,6 @@ public class IcyInputStream extends FilterInputStream {
         if (size > 1) {
             byte[] meta = new byte[size];
             int i = super.read(meta, 0, size);
-            if (i != size) {
-                throw new RuntimeException("WTF");
-            }
             String metaString = new String(meta, 0, i, "UTF-8");
             String title = "StreamTitle='";
             if (metaString.startsWith(title)) {
