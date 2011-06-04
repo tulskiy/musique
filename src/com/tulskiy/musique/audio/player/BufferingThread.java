@@ -142,7 +142,7 @@ public class BufferingThread extends Actor implements Runnable {
         logger.fine("Stop buffering");
         nextTrack = null;
         pause(flush);
-        buffer.addNextTrack(null, null, 0, false);
+        buffer.addNextTrack(null, null, -1, false);
         if (decoder != null) {
             decoder.close();
         }
@@ -167,12 +167,12 @@ public class BufferingThread extends Actor implements Runnable {
     }
 
     public synchronized void open(Track track, boolean forced) {
-		TrackData trackData = track.getTrackData();
         if (decoder != null) {
             decoder.close();
         }
 
         if (track != null) {
+            TrackData trackData = track.getTrackData();
             logger.fine("Opening track " + trackData.getLocation());
 
             if (trackData.isFile() && !trackData.getFile().exists()) {
@@ -194,7 +194,7 @@ public class BufferingThread extends Actor implements Runnable {
                 return;
             }
 
-            buffer.addNextTrack(currentTrack, decoder.getAudioFormat(), 0, forced);
+            buffer.addNextTrack(currentTrack, decoder.getAudioFormat(), -1, forced);
 
             if (trackData.getStartPosition() > 0)
                 decoder.seekSample(trackData.getStartPosition());

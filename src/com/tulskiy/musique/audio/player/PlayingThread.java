@@ -136,7 +136,7 @@ public class PlayingThread extends Actor implements Runnable {
             }
             format = nextEntry.format;
             output.init(format);
-            if (nextEntry.startSample > 0) {
+            if (nextEntry.startSample >= 0) {
                 currentByte = AudioMath.samplesToBytes(nextEntry.startSample, format.getFrameSize());
                 player.fireEvent(PlayerEventCode.SEEK_FINISHED);
             } else {
