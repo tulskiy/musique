@@ -267,7 +267,14 @@ public class TrackData implements Cloneable {
     }
 
     public String getTitle() {
-        return Util.firstNotEmpty(getFirstTagFieldValue(FieldKey.TITLE), getFileName());
+        String title = getFirstTagFieldValue(FieldKey.TITLE);
+        if (Util.isEmpty(title))
+            if (isFile())
+                return getFileName();
+            else
+                return locationString;
+        else
+            return title;
     }
     
     public void addTitle(String value) {
