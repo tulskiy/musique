@@ -22,6 +22,7 @@ import com.tulskiy.musique.audio.formats.flac.FLACFileReader;
 import com.tulskiy.musique.audio.formats.mp3.MP3FileReader;
 import com.tulskiy.musique.audio.formats.mp4.MP4FileReader;
 import com.tulskiy.musique.audio.formats.ogg.OGGFileReader;
+import com.tulskiy.musique.audio.formats.tta.TTAFileReader;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMFileReader;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackFileReader;
 import com.tulskiy.musique.playlist.Track;
@@ -99,6 +100,11 @@ public class DecoderTest {
     public void testALAC() {
         test(new MP4FileReader(), "testfiles/alac/sample_ffmpeg.m4a");
         test(new MP4FileReader(), "testfiles/alac/sample_dbpoweramp.m4a");
+    }
+
+    @Test
+    public void testTTA() {
+        test(new TTAFileReader(), "testfiles/tta/sample.tta");
     }
 
     private void test(AudioFileReader reader, String fileName) {

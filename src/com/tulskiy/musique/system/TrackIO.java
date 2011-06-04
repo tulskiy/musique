@@ -29,6 +29,7 @@ import com.tulskiy.musique.audio.formats.mp3.MP3TagWriter;
 import com.tulskiy.musique.audio.formats.mp4.MP4TagWriter;
 import com.tulskiy.musique.audio.formats.ogg.OGGFileReader;
 import com.tulskiy.musique.audio.formats.ogg.VorbisTagWriter;
+import com.tulskiy.musique.audio.formats.tta.TTAFileReader;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMFileReader;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackFileReader;
 import com.tulskiy.musique.playlist.Track;
@@ -54,6 +55,7 @@ public class TrackIO {
         readers.add(new PCMFileReader());
         readers.add(new WavPackFileReader());
         readers.add(new MP4FileReader());
+        readers.add(new TTAFileReader());
 
         writers = new ArrayList<AudioTagWriter>();
         writers.add(new MP3TagWriter());

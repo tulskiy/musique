@@ -30,6 +30,7 @@
     <orderEntry type="library" name="lastfm" level="project" />
     <orderEntry type="module" module-name="alac" />
     <orderEntry type="module" module-name="aac" />
+    <orderEntry type="module" module-name="tta" />
   </component>
 </module>
 

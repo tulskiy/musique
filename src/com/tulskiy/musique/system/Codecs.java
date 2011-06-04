@@ -28,6 +28,7 @@ import com.tulskiy.musique.audio.formats.mp3.MP3Decoder;
 import com.tulskiy.musique.audio.formats.mp4.MP4Demuxer;
 import com.tulskiy.musique.audio.formats.ogg.VorbisDecoder;
 import com.tulskiy.musique.audio.formats.ogg.VorbisEncoder;
+import com.tulskiy.musique.audio.formats.tta.TTADecoder;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMDecoder;
 import com.tulskiy.musique.audio.formats.uncompressed.PCMEncoder;
 import com.tulskiy.musique.audio.formats.wavpack.WavPackDecoder;
@@ -64,6 +65,7 @@ public class Codecs {
         MP4Demuxer mp4Demuxer = new MP4Demuxer();
         decoders.put("mp4", mp4Demuxer);
         decoders.put("m4a", mp4Demuxer);
+        decoders.put("tta", new TTADecoder());
 
         encoders.put("wav", new PCMEncoder());
         encoders.put("ape", new APEEncoder());
