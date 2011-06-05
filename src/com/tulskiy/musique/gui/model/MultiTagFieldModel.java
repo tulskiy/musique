@@ -66,9 +66,14 @@ public class MultiTagFieldModel extends AbstractTableModel implements TagFieldMo
 	}
 
 	public void addTrackInfoItem(TrackInfoItem item) {
-		for (TrackInfoItem tii : trackInfoItemsRemoved) {
+		int i = 0;
+		while (i < trackInfoItemsRemoved.size()) {
+			TrackInfoItem tii = trackInfoItemsRemoved.get(i);
 			if (tii.getKey().equals(item.getKey())) {
 				trackInfoItemsRemoved.remove(tii);
+			}
+			else {
+				i++;
 			}
 		}
 		trackInfoItems.add(item);

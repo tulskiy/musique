@@ -335,6 +335,16 @@ public class TrackData implements Cloneable {
     	}
     }
 
+    public void setTrack(String value) {
+    	setTagFieldValues(FieldKey.TRACK, value);
+    }
+
+    public void setTrack(Integer value) {
+    	if (value != null) {
+    		setTrack(value.toString());
+    	}
+    }
+
     /**
      * @return track number formatted to two digits
      */
@@ -356,6 +366,16 @@ public class TrackData implements Cloneable {
     	}
     }
 
+    public void setTrackTotal(String value) {
+    	setTagFieldValues(FieldKey.TRACK_TOTAL, value);
+    }
+
+    public void setTrackTotal(Integer value) {
+    	if (value != null) {
+    		setTrackTotal(value.toString());
+    	}
+    }
+
     public String getDisc() {
     	return getFirstTagFieldValue(FieldKey.DISC_NO);
     }
@@ -370,6 +390,16 @@ public class TrackData implements Cloneable {
     	}
     }
 
+    public void setDisc(String value) {
+    	setTagFieldValues(FieldKey.DISC_NO, value);
+    }
+
+    public void setDisc(Integer value) {
+    	if (value != null) {
+    		setDisc(value.toString());
+    	}
+    }
+
     public String getDiscTotal() {
     	return getFirstTagFieldValue(FieldKey.DISC_TOTAL);
     }
@@ -381,6 +411,16 @@ public class TrackData implements Cloneable {
     public void addDiscTotal(Integer value) {
     	if (value != null) {
     		addDiscTotal(value.toString());
+    	}
+    }
+
+    public void setDiscTotal(String value) {
+    	setTagFieldValues(FieldKey.DISC_TOTAL, value);
+    }
+
+    public void setDiscTotal(Integer value) {
+    	if (value != null) {
+    		setDiscTotal(value.toString());
     	}
     }
 
