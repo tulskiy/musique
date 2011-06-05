@@ -106,7 +106,13 @@ public class TracksInfoAddFieldDialog extends JDialog {
     
     private List<FieldKey> getAvailableFieldKeys(final MultiTagFieldModel tagFieldsModel) {
     	List<FieldKey> result = new ArrayList<FieldKey>(Arrays.asList(FieldKey.values()));
+
+    	// remove already used fields
     	result.removeAll(tagFieldsModel.getAllUsedFieldKeys());
+    	// remove technical fields
+    	result.remove(FieldKey.ENCODER);
+    	result.remove(FieldKey.CUESHEET);
+
     	return result;
     }
     
