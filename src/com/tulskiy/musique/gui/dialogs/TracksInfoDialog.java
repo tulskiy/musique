@@ -33,7 +33,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,11 +61,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 
-import org.jaudiotagger.tag.FieldKey;
-
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.cpp.TrackInfoItemSelection;
-import com.tulskiy.musique.gui.model.Album;
 import com.tulskiy.musique.gui.model.FileInfoModel;
 import com.tulskiy.musique.gui.model.MultiTagFieldModel;
 import com.tulskiy.musique.gui.model.SingleTagFieldModel;
