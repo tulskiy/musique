@@ -130,7 +130,7 @@ public class TracksInfoDialog extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
             	tagFieldsModel.approveModel();
-                writeTracks(tagFieldsModel, tracks);
+                writeTracks(tracks);
             }
         });
         cancel = new JButton("Cancel");
@@ -154,7 +154,7 @@ public class TracksInfoDialog extends JDialog {
         setLocationRelativeTo(SwingUtilities.windowForComponent(parent));
     }
 
-    private void writeTracks(final MultiTagFieldModel tagFieldsModel, final List<Track> tracks) {
+    private void writeTracks(final List<Track> tracks) {
         ProgressDialog dialog = new ProgressDialog(this, "Writing tags");
         dialog.show(new Task() {
             String status;
