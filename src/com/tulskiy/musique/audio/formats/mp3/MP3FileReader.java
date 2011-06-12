@@ -20,6 +20,8 @@ package com.tulskiy.musique.audio.formats.mp3;
 import java.io.IOException;
 import java.util.List;
 
+import com.tulskiy.musique.gui.model.FieldValues;
+import com.tulskiy.musique.util.Util;
 import org.jaudiotagger.audio.mp3.LameFrame;
 import org.jaudiotagger.audio.mp3.MP3AudioHeader;
 import org.jaudiotagger.audio.mp3.MP3File;
@@ -34,7 +36,6 @@ import org.jaudiotagger.tag.id3.framebody.FrameBodyCOMM;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyPOPM;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyTPOS;
 import org.jaudiotagger.tag.id3.framebody.FrameBodyTRCK;
-import org.jaudiotagger.tag.id3.framebody.FrameBodyTXXX;
 import org.jaudiotagger.tag.id3.valuepair.TextEncoding;
 
 import com.tulskiy.musique.audio.AudioFileReader;
@@ -67,15 +68,15 @@ public class MP3FileReader extends AudioFileReader {
         ID3v24Tag v24Tag = null;
         if (mp3File != null) {
             try {
-                ID3v1Tag id3v1Tag = mp3File.getID3v1Tag();
-                if (id3v1Tag != null) {
-                    copyCommonTagFields(id3v1Tag, track);
-                }
-
                 v24Tag = mp3File.getID3v2TagAsv24();
                 if (v24Tag != null) {
                     copyCommonTagFields(v24Tag, track);
                     copySpecificTagFields(v24Tag, track);
+                }
+
+                ID3v1Tag id3v1Tag = mp3File.getID3v1Tag();
+                if (id3v1Tag != null) {
+                    copyCommonTagFields(id3v1Tag, track);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -135,7 +136,15 @@ public class MP3FileReader extends AudioFileReader {
             }
         } else if (tag instanceof ID3v1Tag) {
             ID3v1Tag id3v1Tag = (ID3v1Tag) tag;
-            super.copyCommonTagFields(id3v1Tag, track);
+            TrackData trackData = track.getTrackData();
+            for (FieldKey key : FieldKey.values()) {
+                String val = id3v1Tag.getFirst(key);
+                if (!Util.isEmpty(val)) {
+                    FieldValues tagFieldValues = trackData.getTagFieldValues(key);
+                    if (tagFieldValues == null || tagFieldValues.isEmpty())
+                        trackData.setTagFieldValues(key, val);
+                }
+            }
         }
     }
 
