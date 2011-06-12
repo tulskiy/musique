@@ -18,6 +18,7 @@
 package com.tulskiy.musique.audio;
 
 import com.tulskiy.musique.playlist.Track;
+import org.jaudiotagger.tag.FieldKey;
 
 import java.io.BufferedInputStream;
 import java.io.FilterInputStream;
@@ -143,29 +144,10 @@ public class IcyInputStream extends FilterInputStream {
         if (metaInt > 0) {
             int bytesToMeta = metaInt - bytesRead;
             if (bytesToMeta == 0) {
-                int size = read() * 16;
-                if (size > 1) {
-                    byte[] meta = new byte[size];
-                    int i = super.read(meta, 0, size);
-                    if (i != size) {
-                        throw new RuntimeException("WTF");
-                    }
-                    String metaString = new String(meta, 0, i, "UTF-8");
-                    String title = "StreamTitle='";
-                    if (metaString.startsWith(title)) {
-                        String[] ss = metaString.substring(title.length(), metaString.indexOf(";") - 1).split(" - ");
-                        if (ss.length > 0) {
-                            if (ss.length > 1) {
-                                System.out.println("artist " + ss[0]);
-                                System.out.println("title " + ss[1]);
-                            } else {
-                                System.out.println("title " + ss[0]);
-                            }
-                        }
-                    }
-                }
-                bytesRead = 0;
-            } else if (bytesToMeta > 0 && bytesToMeta < len) {
+                readMeta();
+            }
+
+            if (bytesToMeta >= 0 && bytesToMeta < len) {
                 len = bytesToMeta;
             }
         }
@@ -173,5 +155,27 @@ public class IcyInputStream extends FilterInputStream {
         int read = super.read(b, off, len);
         bytesRead += read;
         return read;
+    }
+
+    private void readMeta() throws IOException {
+        int size = read() * 16;
+        if (size > 1) {
+            byte[] meta = new byte[size];
+            int i = super.read(meta, 0, size);
+            String metaString = new String(meta, 0, i, "UTF-8");
+            String title = "StreamTitle='";
+            if (metaString.startsWith(title)) {
+                String[] ss = metaString.substring(title.length(), metaString.indexOf(";") - 1).split(" - ");
+                if (ss.length > 0) {
+                    if (ss.length > 1) {
+                        track.getTrackData().setTagFieldValues(FieldKey.ARTIST, ss[0]);
+                        track.getTrackData().setTagFieldValues(FieldKey.TITLE, ss[1]);
+                    } else {
+                        track.getTrackData().setTagFieldValues(FieldKey.TITLE, ss[1]);
+                    }
+                }
+            }
+        }
+        bytesRead = 0;
     }
 }
