@@ -1,0 +1,829 @@
+package com.tulskiy.musique.plugins.discogs.dialog;
+
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.DefaultListModel;
+import javax.swing.GroupLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JSplitPane;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import org.discogs.model.Artist;
+import org.discogs.model.ArtistRelease;
+import org.discogs.model.LabelRelease;
+import org.discogs.model.Release;
+import org.jaudiotagger.tag.FieldKey;
+
+import com.tulskiy.musique.gui.dialogs.ProgressDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.TrackData;
+import com.tulskiy.musique.plugins.discogs.DiscogsCaller;
+import com.tulskiy.musique.plugins.discogs.DiscogsListener;
+import com.tulskiy.musique.plugins.discogs.model.DiscogsArtistListModel;
+import com.tulskiy.musique.plugins.discogs.model.DiscogsReleaseListModel;
+import com.tulskiy.musique.plugins.discogs.model.DiscogsTrackListModel;
+import com.tulskiy.musique.plugins.discogs.model.MusiqueTrackListModel;
+import com.tulskiy.musique.plugins.discogs.util.DiscogsModelUtil;
+import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.util.Util;
+
+public class DiscogsDialog extends JDialog implements DiscogsListener {
+	private static final String CARD_RELEASE = "name_58493966786713";
+	private static final String CARD_ARTIST = "name_58558508937237";
+
+	private Thread thread;
+	private ArrayList<Track> tracks;
+	private Playlist playlist;
+	private Release release;
+
+	private JTextField txtArtist;
+	private JTextField txtFilter;
+	private JTextField txtReleaseartist;
+	private JTextField txtReleasealbum;
+	private JTextField txtReleaselabel;
+	private JTextField txtReleasecatalogno;
+	private JTextField txtReleaseformat;
+	private JTextField txtReleasecountry;
+	private JTextField txtReleasegenre;
+	private JTextField txtReleasestatus;
+	private JTextField txtReleaseyear;
+
+	private DiscogsDialog me;
+	private JProgressBar progressBarArtist = new JProgressBar();
+	private JProgressBar progressBarRelease = new JProgressBar();
+	private JSplitPane splitPaneArtist = new JSplitPane();
+	private JSplitPane splitPaneRelease = new JSplitPane();
+	private JPanel panelReleaseInfo = new JPanel();
+	private JList lstArtists = new JList();
+	private JList lstReleases = new JList();
+	private JList lstDiscogsTracks = new JList();
+	private JList lstMusiqueTracks = new JList();
+	private JButton btnQuery = new JButton("Query");
+	private JButton btnSelect = new JButton("Select");
+	private JButton btnWrite = new JButton("Write");
+	private JCheckBox chckbxUseanv = new JCheckBox("Use ANV");
+
+	/**
+	 * Create the dialog.
+	 */
+	public DiscogsDialog(final ArrayList<Track> tracks, final Playlist playlist) {
+		me = this;
+		this.tracks = tracks;
+		this.playlist = playlist;
+
+		setTitle("Discogs");
+		setBounds(100, 100, 700, 550);
+		getContentPane().setLayout(new CardLayout(0, 0));
+		
+		JPanel panelArtist = new JPanel();
+		getContentPane().add(panelArtist, CARD_ARTIST);
+		panelArtist.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panelArtistControls = new JPanel();
+		panelArtistControls.setPreferredSize(new Dimension(10, 50));
+		panelArtist.add(panelArtistControls, BorderLayout.SOUTH);
+		panelArtistControls.setLayout(new BoxLayout(panelArtistControls, BoxLayout.X_AXIS));
+		
+		Component horizontalStrut_1 = Box.createHorizontalStrut(20);
+		panelArtistControls.add(horizontalStrut_1);
+		
+		Component horizontalGlue_1 = Box.createHorizontalGlue();
+		panelArtistControls.add(horizontalGlue_1);
+		
+		progressBarArtist.setVisible(false);
+		progressBarArtist.setString("Querying Discogs...");
+		progressBarArtist.setIndeterminate(true);
+		panelArtistControls.add(progressBarArtist);
+		
+		Component horizontalGlue = Box.createHorizontalGlue();
+		panelArtistControls.add(horizontalGlue);
+		
+		btnSelect.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ListSelectionModel selectionModel = lstReleases.getSelectionModel();
+				DiscogsReleaseListModel model = (DiscogsReleaseListModel) lstReleases.getModel();
+
+				thread = new Thread(new DiscogsCaller(
+						DiscogsCaller.CallMode.RELEASE, model.getEx(selectionModel.getMinSelectionIndex()).getId(), me), "");
+				thread.start();
+
+				CardLayout cl = (CardLayout) getContentPane().getLayout();
+			    cl.show(getContentPane(), CARD_RELEASE);
+			}
+		});
+		btnSelect.setEnabled(false);
+		panelArtistControls.add(btnSelect);
+		
+		Component horizontalStrut = Box.createHorizontalStrut(20);
+		horizontalStrut.setPreferredSize(new Dimension(10, 0));
+		horizontalStrut.setMinimumSize(new Dimension(10, 0));
+		panelArtistControls.add(horizontalStrut);
+		
+		JButton btnCancelArtist = new JButton("Cancel");
+		btnCancelArtist.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				close();
+			}
+		});
+		panelArtistControls.add(btnCancelArtist);
+		
+		Component horizontalStrut_3 = Box.createHorizontalStrut(20);
+		panelArtistControls.add(horizontalStrut_3);
+		
+		splitPaneArtist.setResizeWeight(0.3);
+		panelArtist.add(splitPaneArtist, BorderLayout.CENTER);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		splitPaneArtist.setLeftComponent(scrollPane);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setPreferredSize(new Dimension(10, 40));
+		scrollPane.setColumnHeaderView(panel_1);
+		panel_1.setLayout(new BoxLayout(panel_1, BoxLayout.X_AXIS));
+		
+		Component horizontalStrut_5 = Box.createHorizontalStrut(20);
+		panel_1.add(horizontalStrut_5);
+		
+		JLabel lblArtist = new JLabel("Artist");
+		panel_1.add(lblArtist);
+		
+		Component horizontalStrut_6 = Box.createHorizontalStrut(20);
+		horizontalStrut_6.setPreferredSize(new Dimension(10, 0));
+		panel_1.add(horizontalStrut_6);
+		
+		txtArtist = new JTextField();
+		txtArtist.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (KeyEvent.VK_ENTER  == e.getKeyCode()) {
+					btnQuery.doClick();
+				}
+			}
+		});
+		txtArtist.setMaximumSize(new Dimension(2147483647, 24));
+		txtArtist.setText("Artist");
+		panel_1.add(txtArtist);
+		txtArtist.setColumns(10);
+		txtArtist.setText(tracks.get(0).getTrackData().getArtist());
+		txtArtist.setCaretPosition(0);
+		
+		JScrollPane scrollPane_1 = new JScrollPane();
+		splitPaneArtist.setRightComponent(scrollPane_1);
+		
+		JPanel panel_2 = new JPanel();
+		panel_2.setPreferredSize(new Dimension(10, 40));
+		scrollPane_1.setColumnHeaderView(panel_2);
+		
+		lstReleases.setModel(new DiscogsReleaseListModel());
+		lstReleases.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (!arg0.getValueIsAdjusting()) {
+					ListSelectionModel selectionModel = lstReleases.getSelectionModel();
+					btnSelect.setEnabled(!selectionModel.isSelectionEmpty());
+				}
+			}
+		});
+		scrollPane_1.setViewportView(lstReleases);
+		
+		lstArtists.setModel(new DiscogsArtistListModel());
+		lstArtists.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				DiscogsArtistListModel artistModel = (DiscogsArtistListModel) lstArtists.getModel();
+				ListSelectionModel selectionModel = lstArtists.getSelectionModel();
+				if (!selectionModel.isSelectionEmpty() && !arg0.getValueIsAdjusting()) {
+					Artist artist = artistModel.getEx(arg0.getFirstIndex());
+					if (artist != null) {
+						DiscogsReleaseListModel releaseModel = (DiscogsReleaseListModel) lstReleases.getModel();
+
+						releaseModel.clear();
+						for (ArtistRelease release : artist.getReleases()) {
+							releaseModel.addElement(release);
+						}
+
+						lstReleases.revalidate();
+						lstReleases.clearSelection();
+						lstReleases.repaint();
+					}
+				}
+			}
+		});
+		scrollPane.setViewportView(lstArtists);
+		
+		btnQuery.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				if (!Util.isEmpty(txtArtist.getText())) {
+					thread = new Thread(new DiscogsCaller(
+							DiscogsCaller.CallMode.ARTIST, txtArtist.getText(), me), "");
+					thread.start();
+				}
+			}
+		});
+		
+		Component horizontalStrut_7 = Box.createHorizontalStrut(20);
+		horizontalStrut_7.setPreferredSize(new Dimension(10, 0));
+		panel_1.add(horizontalStrut_7);
+		panel_1.add(btnQuery);
+		
+		Component horizontalStrut_8 = Box.createHorizontalStrut(20);
+		panel_1.add(horizontalStrut_8);
+		panel_2.setLayout(new BoxLayout(panel_2, BoxLayout.X_AXIS));
+		
+		Component horizontalStrut_9 = Box.createHorizontalStrut(20);
+		panel_2.add(horizontalStrut_9);
+		
+		JLabel lblFilter = new JLabel("Filter");
+		panel_2.add(lblFilter);
+		
+		txtFilter = new JTextField();
+		txtFilter.setMaximumSize(new Dimension(2147483647, 24));
+		txtFilter.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				filterReleases(lstReleases);
+			}
+			public void removeUpdate(DocumentEvent e) {
+				filterReleases(lstReleases);
+			}
+			public void insertUpdate(DocumentEvent e) {
+				filterReleases(lstReleases);
+			}
+		});
+		
+		Component horizontalStrut_10 = Box.createHorizontalStrut(20);
+		horizontalStrut_10.setPreferredSize(new Dimension(10, 0));
+		panel_2.add(horizontalStrut_10);
+		txtFilter.setText("Filter");
+		panel_2.add(txtFilter);
+		txtFilter.setColumns(10);
+		txtFilter.setText(tracks.get(0).getTrackData().getAlbum());
+		txtFilter.setCaretPosition(0);
+		DiscogsReleaseListModel model = (DiscogsReleaseListModel) lstReleases.getModel();
+		model.setFilter(txtFilter.getText());
+		
+		JButton btnClear = new JButton("Clear");
+		btnClear.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				txtFilter.setText("");
+			}
+		});
+		
+		Component horizontalStrut_11 = Box.createHorizontalStrut(20);
+		horizontalStrut_11.setPreferredSize(new Dimension(10, 0));
+		panel_2.add(horizontalStrut_11);
+		panel_2.add(btnClear);
+		
+		Component horizontalStrut_12 = Box.createHorizontalStrut(20);
+		panel_2.add(horizontalStrut_12);
+		
+		JPanel panelRelease = new JPanel();
+		getContentPane().add(panelRelease, CARD_RELEASE);
+		panelRelease.setLayout(new BorderLayout(0, 0));
+		
+		JPanel panelReleaseControls = new JPanel();
+		panelReleaseControls.setPreferredSize(new Dimension(10, 50));
+		panelRelease.add(panelReleaseControls, BorderLayout.SOUTH);
+		panelReleaseControls.setLayout(new BoxLayout(panelReleaseControls, BoxLayout.X_AXIS));
+		
+		Component horizontalStrut_2 = Box.createHorizontalStrut(20);
+		panelReleaseControls.add(horizontalStrut_2);
+		
+		JButton btnBack = new JButton("Back");
+		btnBack.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			    CardLayout cardLayout = (CardLayout) getContentPane().getLayout();
+			    cardLayout.show(getContentPane(), CARD_ARTIST);
+			}
+		});
+		panelReleaseControls.add(btnBack);
+		
+		Component horizontalGlue_2 = Box.createHorizontalGlue();
+		panelReleaseControls.add(horizontalGlue_2);
+		
+		progressBarRelease.setVisible(false);
+		progressBarRelease.setString("Querying Discogs...");
+		progressBarRelease.setIndeterminate(true);
+		panelReleaseControls.add(progressBarRelease);
+		
+		Component horizontalGlue2 = Box.createHorizontalGlue();
+		panelReleaseControls.add(horizontalGlue2);
+		btnWrite.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				updateTracks();
+				writeTracks();
+			}
+		});
+		
+		btnWrite.setEnabled(false);
+		panelReleaseControls.add(btnWrite);
+		
+		Component horizontalStrut2 = Box.createHorizontalStrut(20);
+		horizontalStrut2.setPreferredSize(new Dimension(10, 0));
+		horizontalStrut2.setMinimumSize(new Dimension(10, 0));
+		panelReleaseControls.add(horizontalStrut2);
+		
+		JButton btnCancelRelease = new JButton("Cancel");
+		btnCancelRelease.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+            	close();
+			}
+		});
+		panelReleaseControls.add(btnCancelRelease);
+		
+		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
+		panelReleaseControls.add(horizontalStrut_4);
+		
+		panelReleaseInfo.setBorder(new TitledBorder(null, "General Info", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelRelease.add(panelReleaseInfo, BorderLayout.NORTH);
+		
+		JLabel lblReleaseartist = new JLabel("Artist");
+		
+		JLabel lblReleasealbum = new JLabel("Album");
+		
+		JLabel lblReleaselabel = new JLabel("Label");
+		
+		JLabel lblReleasecatalogno = new JLabel("Catalog #");
+		
+		txtReleaseartist = new JTextField();
+		txtReleaseartist.setEnabled(false);
+		txtReleaseartist.setEditable(false);
+		txtReleaseartist.setColumns(10);
+		
+		txtReleasealbum = new JTextField();
+		txtReleasealbum.setEnabled(false);
+		txtReleasealbum.setEditable(false);
+		txtReleasealbum.setColumns(10);
+		
+		txtReleaselabel = new JTextField();
+		txtReleaselabel.setEnabled(false);
+		txtReleaselabel.setEditable(false);
+		txtReleaselabel.setColumns(10);
+		
+		txtReleasecatalogno = new JTextField();
+		txtReleasecatalogno.setEnabled(false);
+		txtReleasecatalogno.setEditable(false);
+		txtReleasecatalogno.setColumns(10);
+		
+		JLabel lblReleaseyear = new JLabel("Year");
+		
+		txtReleaseformat = new JTextField();
+		txtReleaseformat.setEnabled(false);
+		txtReleaseformat.setEditable(false);
+		txtReleaseformat.setColumns(10);
+		
+		txtReleasecountry = new JTextField();
+		txtReleasecountry.setEnabled(false);
+		txtReleasecountry.setEditable(false);
+		txtReleasecountry.setColumns(10);
+		
+		txtReleasegenre = new JTextField();
+		txtReleasegenre.setEnabled(false);
+		txtReleasegenre.setEditable(false);
+		txtReleasegenre.setColumns(10);
+		
+		txtReleasestatus = new JTextField();
+		txtReleasestatus.setEnabled(false);
+		txtReleasestatus.setEditable(false);
+		txtReleasestatus.setColumns(10);
+		
+		txtReleaseyear = new JTextField();
+		txtReleaseyear.setEnabled(false);
+		txtReleaseyear.setEditable(false);
+		txtReleaseyear.setColumns(10);
+		
+		JLabel lblReleasestatus = new JLabel("Status");
+		lblReleasestatus.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		JLabel lblReleaseformat = new JLabel("Format");
+		lblReleaseformat.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		JLabel lblReleasecountry = new JLabel("Country");
+		lblReleasecountry.setHorizontalAlignment(SwingConstants.RIGHT);
+		
+		JLabel lblReleasegenre = new JLabel("Genre");
+		lblReleasegenre.setHorizontalAlignment(SwingConstants.RIGHT);
+		GroupLayout gl_panelReleaseInfo = new GroupLayout(panelReleaseInfo);
+		gl_panelReleaseInfo.setHorizontalGroup(
+			gl_panelReleaseInfo.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelReleaseInfo.createSequentialGroup()
+					.addGap(20)
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.TRAILING)
+						.addComponent(lblReleaseyear)
+						.addComponent(lblReleaseartist)
+						.addComponent(lblReleaselabel)
+						.addComponent(lblReleasealbum)
+						.addComponent(lblReleasecatalogno))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.LEADING)
+						.addComponent(txtReleaseyear, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+						.addComponent(txtReleasealbum, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+						.addComponent(txtReleaselabel, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+						.addComponent(txtReleaseartist, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+						.addComponent(txtReleasecatalogno, GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.TRAILING)
+						.addComponent(lblReleasestatus)
+						.addComponent(lblReleaseformat)
+						.addComponent(lblReleasegenre)
+						.addComponent(lblReleasecountry, GroupLayout.PREFERRED_SIZE, 71, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.LEADING)
+						.addComponent(txtReleaseformat, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+						.addComponent(txtReleasecountry, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+						.addComponent(txtReleasegenre, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+						.addComponent(txtReleasestatus, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE)
+						.addComponent(chckbxUseanv, GroupLayout.DEFAULT_SIZE, 226, Short.MAX_VALUE))
+					.addContainerGap())
+		);
+		gl_panelReleaseInfo.setVerticalGroup(
+			gl_panelReleaseInfo.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panelReleaseInfo.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblReleaseartist)
+						.addComponent(txtReleaseartist, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(txtReleasestatus, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblReleasestatus))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblReleasealbum)
+						.addComponent(txtReleasealbum, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(txtReleaseformat, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblReleaseformat))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblReleaselabel)
+						.addComponent(txtReleaselabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(txtReleasecountry, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblReleasecountry))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblReleasecatalogno)
+						.addComponent(txtReleasegenre, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(txtReleasecatalogno, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lblReleasegenre))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_panelReleaseInfo.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblReleaseyear)
+						.addComponent(txtReleaseyear, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(chckbxUseanv))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		panelReleaseInfo.setLayout(gl_panelReleaseInfo);
+		
+		JPanel panelTracklisting = new JPanel();
+		panelTracklisting.setBorder(new TitledBorder(null, "Tracklisting", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelTracklisting.setLayout(new BorderLayout(0, 0));
+		panelRelease.add(panelTracklisting, BorderLayout.CENTER);
+
+		splitPaneRelease.setResizeWeight(0.5);
+		panelTracklisting.add(splitPaneRelease);
+		
+		JScrollPane scrollPane_2 = new JScrollPane();
+		splitPaneRelease.setLeftComponent(scrollPane_2);
+		
+		JPanel panel = new JPanel();
+		scrollPane_2.setColumnHeaderView(panel);
+		
+		JButton btnDiscogstrackdown = new JButton("Down");
+		panel.add(btnDiscogstrackdown);
+		
+		JButton btnDiscogstrackremove = new JButton("Remove");
+		btnDiscogstrackremove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				removeSelectedTracklistingItems(lstDiscogsTracks);
+			}
+		});
+		panel.add(btnDiscogstrackremove);
+		
+		JButton btnDiscogstrackup = new JButton("Up");
+		panel.add(btnDiscogstrackup);
+
+		lstDiscogsTracks.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		lstDiscogsTracks.setModel(new DiscogsTrackListModel());
+		scrollPane_2.setViewportView(lstDiscogsTracks);
+		
+		JScrollPane scrollPane_3 = new JScrollPane();
+		splitPaneRelease.setRightComponent(scrollPane_3);
+		
+		JPanel panel_3 = new JPanel();
+		scrollPane_3.setColumnHeaderView(panel_3);
+		
+		JButton btnMusiquetrackremove = new JButton("Remove");
+		btnMusiquetrackremove.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				removeSelectedTracklistingItems(lstMusiqueTracks);
+			}
+		});
+		panel_3.add(btnMusiquetrackremove);
+
+		lstMusiqueTracks.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		lstMusiqueTracks.setModel(new MusiqueTrackListModel());
+		scrollPane_3.setViewportView(lstMusiqueTracks);
+
+		chckbxUseanv.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent arg0) {
+				fillReleaseInfo(release);
+
+				updateDiscogsTracklistingWithUseAnv();
+				lstDiscogsTracks.revalidate();
+				lstDiscogsTracks.repaint();
+			}
+		});
+		chckbxUseanv.setToolTipText("Use artist variation name");
+		chckbxUseanv.setSelected(true);
+	}
+	
+	private void filterReleases(JList list) {
+		DiscogsReleaseListModel model = (DiscogsReleaseListModel) list.getModel();
+		model.setFilter(txtFilter.getText());
+		list.clearSelection();
+		list.revalidate();
+		list.repaint();
+	}
+
+	@Override
+	public void onRetrieveStart(DiscogsCaller.CallMode callMode) {
+		switch (callMode) {
+			case ARTIST:
+				clearReleaseInfo();
+				btnSelect.setEnabled(false);
+				progressBarArtist.setVisible(true);
+				setComponentChildrenState(splitPaneArtist, false);
+				break;
+			case RELEASE:
+				btnWrite.setEnabled(false);
+				progressBarRelease.setVisible(true);
+				setComponentChildrenState(panelReleaseInfo, false);
+				setComponentChildrenState(splitPaneRelease, false);
+				break;
+			default:
+				break;
+		}
+	}
+
+	@Override
+	public void onRetrieveFinish(Object data) {
+		if (data instanceof DiscogsCaller.CallMode) {
+			switch ((DiscogsCaller.CallMode) data) {
+				case ARTIST:
+					progressBarArtist.setVisible(false);
+					setComponentChildrenState(splitPaneArtist, true);
+					break;
+				case RELEASE:
+					progressBarRelease.setVisible(false);
+					setComponentChildrenState(panelReleaseInfo, true);
+					setComponentChildrenState(splitPaneRelease, true);
+					break;
+				default:
+					break;
+			}
+		}
+		else if (data instanceof Artist) {
+			Artist artist = (Artist) data;
+			if (lstArtists != null && artist != null) {
+				DefaultListModel listModel = (DefaultListModel) lstArtists.getModel();
+
+				listModel.clear();
+				listModel.addElement(artist);
+
+				lstArtists.revalidate();
+				lstArtists.setSelectedIndex(0);
+				lstArtists.repaint();
+			}
+
+			progressBarArtist.setVisible(false);
+			setComponentChildrenState(splitPaneArtist, true);
+		}
+		else if ((data instanceof DiscogsCaller.CallMode && DiscogsCaller.CallMode.RELEASE.equals(data)) || data instanceof Release) {
+			release = (Release) data;
+			if (lstDiscogsTracks != null && release != null) {
+				fillReleaseInfo(release);
+				updateDiscogsTracklistingWithUseAnv();
+				fillTracklisting(lstDiscogsTracks, release.getTracks());
+				fillTracklisting(lstMusiqueTracks, tracks);
+				
+				btnWrite.setEnabled(true);
+			}
+
+			progressBarRelease.setVisible(false);
+			setComponentChildrenState(panelReleaseInfo, true);
+			setComponentChildrenState(splitPaneRelease, true);
+		}
+	}
+	
+	private void setComponentChildrenState(JComponent component, boolean state) {
+		component.setEnabled(state);
+		for (Component child : component.getComponents()) {
+			child.setEnabled(state);
+			if (child instanceof JComponent) {
+				setComponentChildrenState((JComponent) child, state);
+			}
+		}
+	}
+	
+	private void fillReleaseInfo(Release release) {
+		if (release != null) {
+			txtReleaseartist.setText(DiscogsModelUtil.getReleaseArtistDescription(
+					release.getArtists(), chckbxUseanv.isSelected(), true));
+			txtReleasealbum.setText(release.getTitle());
+			txtReleaselabel.setText(DiscogsModelUtil.getReleaseLabelDescription(release));
+			txtReleasecatalogno.setText(DiscogsModelUtil.getReleaseCatalogNoDescription(release));
+			txtReleaseyear.setText(DiscogsModelUtil.getReleaseDateDescription(release));
+			txtReleasestatus.setText(release.getStatus());
+			txtReleaseformat.setText(DiscogsModelUtil.getReleaseFormatDescription(release));
+			txtReleasecountry.setText(release.getCountry());
+			txtReleasegenre.setText(Util.formatFieldValues(release.getStyles(), ", "));
+		}
+	}
+	
+	private void fillTracklisting(JList list, List<?> tracks) {
+		DefaultListModel listModel = (DefaultListModel) list.getModel();
+
+		listModel.clear();
+		for (Object track : tracks) {
+			listModel.addElement(track);
+		}
+
+		list.revalidate();
+		list.repaint();
+	}
+	
+	private void removeSelectedTracklistingItems(JList list) {
+		DefaultListModel listModel = (DefaultListModel) list.getModel();
+
+		listModel.removeRange(list.getSelectedIndices()[0],
+				list.getSelectedIndices()[list.getSelectedIndices().length - 1]);
+
+		list.revalidate();
+		list.repaint();
+	}
+	
+	private void clearReleaseInfo() {
+		txtReleaseartist.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+		txtReleasealbum.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+		txtReleaselabel.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+		txtReleasecatalogno.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+		txtReleaseformat.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+		txtReleasecountry.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+		txtReleasegenre.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+		txtReleasestatus.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+		txtReleaseyear.setText(DiscogsModelUtil.DEFAULT_RELEASE_INFO_TEXT);
+	}
+	
+	private void updateDiscogsTracklistingWithUseAnv() {
+		((DiscogsTrackListModel) lstDiscogsTracks.getModel()).setUseAnv(chckbxUseanv.isSelected());
+	}
+	
+	private void close() {
+		if (thread != null && thread.isAlive()) {
+			thread.interrupt();
+		}
+    	setVisible(false);
+        dispose();
+	}
+
+	private void updateTracks() {
+		MusiqueTrackListModel musiqueModel = (MusiqueTrackListModel) lstMusiqueTracks.getModel();
+		DiscogsTrackListModel discogsModel = (DiscogsTrackListModel) lstDiscogsTracks.getModel();
+		
+		for (int i = 0; i < musiqueModel.getSize() && i < discogsModel.getSize(); i++) {
+			Track musiqueTrack = musiqueModel.getEx(i);
+			org.discogs.model.Track discogsTrack = discogsModel.getEx(i);
+			
+			TrackData trackData = musiqueTrack.getTrackData();
+			
+			String albumArtist = DiscogsModelUtil.getReleaseArtistDescription(
+					release.getArtists(), chckbxUseanv.isSelected(), false);
+			String trackArtist = DiscogsModelUtil.getReleaseArtistDescription(
+					discogsTrack.getArtists(), chckbxUseanv.isSelected(), false);
+
+			trackData.setTagFieldValues(FieldKey.ALBUM_ARTIST, albumArtist);
+			trackData.setTagFieldValues(FieldKey.ALBUM, release.getTitle());
+			trackData.setTagFieldValues(FieldKey.RECORD_LABEL, "");
+			trackData.setTagFieldValues(FieldKey.CATALOG_NO, "");
+			for (LabelRelease label : release.getLabelReleases()) {
+				trackData.addRecordLabel(label.getLabelName());
+				trackData.addCatalogNo(label.getCatalogNumber());
+			}
+			trackData.setTagFieldValues(FieldKey.YEAR, DiscogsModelUtil.getReleaseDateDescription(release));
+			trackData.setTagFieldValues(FieldKey.GENRE, "");
+			for (String style : release.getStyles()) {
+				trackData.addGenre(style);
+			}
+			
+			trackData.setTagFieldValues(FieldKey.ARTIST, Util.firstNotEmpty(trackArtist, albumArtist));
+			trackData.setTagFieldValues(FieldKey.TITLE, discogsTrack.getTitle());
+			trackData.setTagFieldValues(FieldKey.TRACK, Integer.toString(i));
+			trackData.setTagFieldValues(FieldKey.TRACK_TOTAL, Integer.toString(release.getTracks().size()));
+		}
+	}
+
+	private void writeTracks() {
+        ProgressDialog dialog = new ProgressDialog(this, "Writing tags");
+        dialog.show(new Task() {
+            String status;
+            boolean abort = false;
+            public int processed;
+
+            @Override
+            public boolean isIndeterminate() {
+                return false;
+            }
+
+            @Override
+            public float getProgress() {
+                return (float) processed / tracks.size();
+            }
+
+            @Override
+            public String getStatus() {
+                return "Writing Tags to: " + status;
+            }
+
+            @Override
+            public void abort() {
+                abort = true;
+            }
+
+            @Override
+            public void start() {
+                HashMap<File, ArrayList<Track>> cues =
+                	new HashMap<File, ArrayList<Track>>();
+
+                for (Track track : tracks) {
+                	TrackData trackData = track.getTrackData();
+                    if (!trackData.isFile()) {
+                        processed++;
+                        continue;
+                    }
+
+                    if (abort)
+                        break;
+
+                    if (trackData.isCue()) {
+                        File file;
+                        if (trackData.isCueEmbedded()) {
+                            file = trackData.getFile();
+                        } else {
+                            file = new File(trackData.getCueLocation());
+                        }
+
+                        if (!cues.containsKey(file)) {
+                            cues.put(file, new ArrayList<Track>());
+                        }
+
+                        cues.get(file).add(track);
+                        continue;
+                    }
+                    status = trackData.getFile().getName();
+                    TrackIO.write(track);
+                    processed++;
+                }
+
+                // now let's write cue files
+                // not implemented for now
+//                CUEWriter writer = new CUEWriter();
+//                for (File file : cues.keySet()) {
+//                    status = file.getName();
+//                    writer.write(file, cues.get(file));
+//                }
+
+                playlist.firePlaylistChanged();
+                close();
+            }
+        });
+    }
+}
