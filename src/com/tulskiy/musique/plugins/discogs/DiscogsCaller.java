@@ -74,7 +74,7 @@ public class DiscogsCaller implements Runnable {
 			return;
 		}
 
-		callback.onRetrieveFinish(result == null ? mode : result);
+		callback.onRetrieveFinish(mode, result);
 	}
 
 }

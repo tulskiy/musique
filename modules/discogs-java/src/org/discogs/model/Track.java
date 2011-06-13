@@ -69,4 +69,15 @@ public class Track extends XMLAccessor {
     return results;
   }
 
+	@Override
+	public int hashCode() {
+		return new StringBuilder("").append(getPositionRaw()).append(getTitle()).append(getDuration()).
+				toString().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj != null && obj.hashCode() == hashCode();
+	}
+
 }

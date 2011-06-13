@@ -595,52 +595,47 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 	}
 
 	@Override
-	public void onRetrieveFinish(Object data) {
-		if (data instanceof DiscogsCaller.CallMode) {
-			switch ((DiscogsCaller.CallMode) data) {
-				case ARTIST:
-					progressBarArtist.setVisible(false);
-					setComponentChildrenState(splitPaneArtist, true);
-					break;
-				case RELEASE:
-					progressBarRelease.setVisible(false);
-					setComponentChildrenState(panelReleaseInfo, true);
-					setComponentChildrenState(splitPaneRelease, true);
-					break;
-				default:
-					break;
-			}
-		}
-		else if (data instanceof Artist) {
-			Artist artist = (Artist) data;
-			if (lstArtists != null && artist != null) {
-				DefaultListModel listModel = (DefaultListModel) lstArtists.getModel();
+	public void onRetrieveFinish(DiscogsCaller.CallMode callMode, Object data) {
+		switch (callMode) {
+			case ARTIST:
+				if (lstArtists != null) {
+					synchronized (lstArtists) {
+						if (data != null) {
+							Artist artist = (Artist) data;
+							DefaultListModel listModel = (DefaultListModel) lstArtists.getModel();
+	
+							listModel.clear();
+							listModel.addElement(artist);
+	
+							lstArtists.revalidate();
+							lstArtists.setSelectedIndex(0);
+							lstArtists.repaint();
+						}
+					}
+				}
 
-				listModel.clear();
-				listModel.addElement(artist);
+				progressBarArtist.setVisible(false);
+				setComponentChildrenState(splitPaneArtist, true);
+				break;
+			case RELEASE:
+				if (data != null) {
+					release = (Release) data;
+					if (lstDiscogsTracks != null) {
+						fillReleaseInfo(release);
+						updateDiscogsTracklistingWithUseAnv();
+						fillTracklisting(lstDiscogsTracks, release.getTracks());
+						fillTracklisting(lstMusiqueTracks, tracks);
+						
+						btnWrite.setEnabled(true);
+					}
+				}
 
-				lstArtists.revalidate();
-				lstArtists.setSelectedIndex(0);
-				lstArtists.repaint();
-			}
-
-			progressBarArtist.setVisible(false);
-			setComponentChildrenState(splitPaneArtist, true);
-		}
-		else if ((data instanceof DiscogsCaller.CallMode && DiscogsCaller.CallMode.RELEASE.equals(data)) || data instanceof Release) {
-			release = (Release) data;
-			if (lstDiscogsTracks != null && release != null) {
-				fillReleaseInfo(release);
-				updateDiscogsTracklistingWithUseAnv();
-				fillTracklisting(lstDiscogsTracks, release.getTracks());
-				fillTracklisting(lstMusiqueTracks, tracks);
-				
-				btnWrite.setEnabled(true);
-			}
-
-			progressBarRelease.setVisible(false);
-			setComponentChildrenState(panelReleaseInfo, true);
-			setComponentChildrenState(splitPaneRelease, true);
+				progressBarRelease.setVisible(false);
+				setComponentChildrenState(panelReleaseInfo, true);
+				setComponentChildrenState(splitPaneRelease, true);
+				break;
+			default:
+				break;
 		}
 	}
 	
@@ -746,7 +741,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 			
 			trackData.setTagFieldValues(FieldKey.ARTIST, Util.firstNotEmpty(trackArtist, albumArtist));
 			trackData.setTagFieldValues(FieldKey.TITLE, discogsTrack.getTitle());
-			trackData.setTagFieldValues(FieldKey.TRACK, Integer.toString(i));
+			// TODO make it more intelligent (parse getPositionRaw, try to guess disc numbers, auto track numbering then)
+			trackData.setTagFieldValues(FieldKey.TRACK, Integer.toString(release.getTracks().indexOf(discogsTrack) + 1));
 			trackData.setTagFieldValues(FieldKey.TRACK_TOTAL, Integer.toString(release.getTracks().size()));
 		}
 	}

@@ -112,8 +112,10 @@ public class DiscogsModelUtil {
 			if (result.length() > 0) {
 				result.append(" + ");
 			}
-			result.append(format.getQuantity()).append(" x ").append(format.getName())
-					.append(", ").append(format.getDescription());
+			result.append(format.getQuantity()).append(" x ").append(format.getName());
+			if (!Util.isEmpty(format.getDescription())) {
+				result.append(", ").append(format.getDescription());
+			}
 		}
 		
 		return result.toString();

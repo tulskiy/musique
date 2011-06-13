@@ -24,6 +24,6 @@ public interface DiscogsListener {
 	
 	void onRetrieveStart(DiscogsCaller.CallMode callMode);
 
-	void onRetrieveFinish(Object data);
+	void onRetrieveFinish(DiscogsCaller.CallMode callMode, Object data);
 	
 }
