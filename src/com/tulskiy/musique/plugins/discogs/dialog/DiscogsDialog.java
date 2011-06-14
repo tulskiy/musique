@@ -18,6 +18,7 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
+import javax.swing.DefaultListSelectionModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -54,6 +55,7 @@ import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.plugins.discogs.DiscogsCaller;
 import com.tulskiy.musique.plugins.discogs.DiscogsListener;
 import com.tulskiy.musique.plugins.discogs.model.DiscogsArtistListModel;
+import com.tulskiy.musique.plugins.discogs.model.DiscogsDefaultListModel;
 import com.tulskiy.musique.plugins.discogs.model.DiscogsReleaseListModel;
 import com.tulskiy.musique.plugins.discogs.model.DiscogsTrackListModel;
 import com.tulskiy.musique.plugins.discogs.model.MusiqueTrackListModel;
@@ -95,6 +97,10 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 	private JButton btnQuery = new JButton("Query");
 	private JButton btnSelect = new JButton("Select");
 	private JButton btnWrite = new JButton("Write");
+	private JButton btnDiscogstrackup = new JButton("Up");
+	private JButton btnDiscogstrackremove = new JButton("Remove");
+	private JButton btnDiscogstrackdown = new JButton("Down");
+	private JButton btnMusiquetrackremove = new JButton("Remove");
 	private JCheckBox chckbxUseanv = new JCheckBox("Use ANV");
 
 	/**
@@ -516,23 +522,45 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		
 		JPanel panel = new JPanel();
 		scrollPane_2.setColumnHeaderView(panel);
-		
-		JButton btnDiscogstrackdown = new JButton("Down");
-		panel.add(btnDiscogstrackdown);
-		
-		JButton btnDiscogstrackremove = new JButton("Remove");
+
+		btnDiscogstrackup.setEnabled(false);
+		btnDiscogstrackup.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				moveSelectedTracklistingItems(lstDiscogsTracks, -1);
+			}
+		});
+		panel.add(btnDiscogstrackup);
+
+		btnDiscogstrackremove.setEnabled(false);
 		btnDiscogstrackremove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				removeSelectedTracklistingItems(lstDiscogsTracks);
 			}
 		});
 		panel.add(btnDiscogstrackremove);
-		
-		JButton btnDiscogstrackup = new JButton("Up");
-		panel.add(btnDiscogstrackup);
+
+		btnDiscogstrackdown.setEnabled(false);
+		btnDiscogstrackdown.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				moveSelectedTracklistingItems(lstDiscogsTracks, 1);
+			}
+		});
+		panel.add(btnDiscogstrackdown);
 
 		lstDiscogsTracks.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		lstDiscogsTracks.setModel(new DiscogsTrackListModel());
+		lstDiscogsTracks.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (!arg0.getValueIsAdjusting()) {
+					ListSelectionModel lsm = lstDiscogsTracks.getSelectionModel();
+					btnDiscogstrackup.setEnabled(!lsm.isSelectionEmpty() &&
+							lsm.getMinSelectionIndex() > 0);
+					btnDiscogstrackremove.setEnabled(!lsm.isSelectionEmpty());
+					btnDiscogstrackdown.setEnabled(!lsm.isSelectionEmpty() &&
+							lsm.getMaxSelectionIndex() < lstDiscogsTracks.getModel().getSize() - 1);
+				}
+			}
+		});
 		scrollPane_2.setViewportView(lstDiscogsTracks);
 		
 		JScrollPane scrollPane_3 = new JScrollPane();
@@ -541,13 +569,21 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		JPanel panel_3 = new JPanel();
 		scrollPane_3.setColumnHeaderView(panel_3);
 		
-		JButton btnMusiquetrackremove = new JButton("Remove");
+		btnMusiquetrackremove.setEnabled(false);
 		btnMusiquetrackremove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				removeSelectedTracklistingItems(lstMusiqueTracks);
 			}
 		});
 		panel_3.add(btnMusiquetrackremove);
+		lstMusiqueTracks.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent arg0) {
+				if (!arg0.getValueIsAdjusting()) {
+					ListSelectionModel lsm = lstMusiqueTracks.getSelectionModel();
+					btnMusiquetrackremove.setEnabled(!lsm.isSelectionEmpty());
+				}
+			}
+		});
 
 		lstMusiqueTracks.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		lstMusiqueTracks.setModel(new MusiqueTrackListModel());
@@ -599,6 +635,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		switch (callMode) {
 			case ARTIST:
 				if (lstArtists != null) {
+					// syncronized in order to prevent list events occur during model update
+					// frankly, not sure but it seems works
 					synchronized (lstArtists) {
 						if (data != null) {
 							Artist artist = (Artist) data;
@@ -633,6 +671,12 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 				progressBarRelease.setVisible(false);
 				setComponentChildrenState(panelReleaseInfo, true);
 				setComponentChildrenState(splitPaneRelease, true);
+				// to set proper up/remove/down buttons state
+				// i know it's bad bad bad, fix if you can
+				lstDiscogsTracks.getSelectionModel().setSelectionInterval(0, 0);
+				lstDiscogsTracks.getSelectionModel().clearSelection();
+				lstMusiqueTracks.getSelectionModel().setSelectionInterval(0, 0);
+				lstMusiqueTracks.getSelectionModel().clearSelection();
 				break;
 			default:
 				break;
@@ -670,6 +714,39 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		listModel.clear();
 		for (Object track : tracks) {
 			listModel.addElement(track);
+		}
+
+		list.revalidate();
+		list.repaint();
+	}
+	
+	private void moveSelectedTracklistingItems(JList list, int direction) {
+		DiscogsDefaultListModel listModel = (DiscogsDefaultListModel) list.getModel();
+		ListSelectionModel lsm = list.getSelectionModel();
+
+		int indexStart = list.getSelectedIndices()[0];
+		int indexEnd = list.getSelectedIndices()[list.getSelectedIndices().length - 1];
+		int indexObj;
+		Object obj;
+
+		if (direction < 0) {
+			indexObj = indexStart - 1;
+			obj = listModel.getEx(indexObj);
+			listModel.remove(indexObj);
+			if (listModel.size() == indexEnd) {
+				listModel.addElement(obj);
+			}
+			else {
+				listModel.add(indexEnd, obj);
+			}
+			lsm.setSelectionInterval(indexStart - 1, indexEnd - 1);
+		}
+		else if (direction > 0) {
+			indexObj = indexEnd + 1;
+			obj = listModel.getEx(indexObj);
+			listModel.remove(indexObj);
+			listModel.add(indexStart, obj);
+			lsm.setSelectionInterval(indexStart + 1, indexEnd + 1);
 		}
 
 		list.revalidate();

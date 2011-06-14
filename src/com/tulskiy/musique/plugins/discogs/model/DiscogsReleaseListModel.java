@@ -20,8 +20,6 @@ package com.tulskiy.musique.plugins.discogs.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.DefaultListModel;
-
 import org.discogs.model.ArtistRelease;
 
 import com.tulskiy.musique.util.Util;
@@ -29,7 +27,7 @@ import com.tulskiy.musique.util.Util;
 /**
  * @author mliauchuk
  */
-public class DiscogsReleaseListModel extends DefaultListModel {
+public class DiscogsReleaseListModel extends DiscogsDefaultListModel {
 	
 	private List<ArtistRelease> releasesOriginal = new LinkedList<ArtistRelease>();
 	private String filter = "";
@@ -56,16 +54,6 @@ public class DiscogsReleaseListModel extends DefaultListModel {
 	public Object get(int index) {
 		ArtistRelease release = getEx(index);
 		return release == null ? null : getReleaseDescription(release);
-	}
-
-	@Override
-	public Object elementAt(int index) {
-		return get(index);
-	}
-
-	@Override
-	public Object getElementAt(int index) {
-		return get(index);
 	}
 
 	@Override

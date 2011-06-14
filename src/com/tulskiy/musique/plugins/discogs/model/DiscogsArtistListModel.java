@@ -17,14 +17,12 @@
 
 package com.tulskiy.musique.plugins.discogs.model;
 
-import javax.swing.DefaultListModel;
-
 import org.discogs.model.Artist;
 
 /**
  * @author mliauchuk
  */
-public class DiscogsArtistListModel extends DefaultListModel {
+public class DiscogsArtistListModel extends DiscogsDefaultListModel {
 
 	public Artist getEx(int index) {
 		Object item = super.get(index);
@@ -39,16 +37,6 @@ public class DiscogsArtistListModel extends DefaultListModel {
 	public Object get(int index) {
 		Artist artist = getEx(index);
 		return artist == null ? null : artist.getName();
-	}
-
-	@Override
-	public Object elementAt(int index) {
-		return get(index);
-	}
-
-	@Override
-	public Object getElementAt(int index) {
-		return get(index);
 	}
 
 }

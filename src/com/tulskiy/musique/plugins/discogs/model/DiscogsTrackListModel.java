@@ -17,8 +17,6 @@
 
 package com.tulskiy.musique.plugins.discogs.model;
 
-import javax.swing.DefaultListModel;
-
 import org.discogs.model.Track;
 
 import com.tulskiy.musique.plugins.discogs.util.DiscogsModelUtil;
@@ -27,7 +25,7 @@ import com.tulskiy.musique.util.Util;
 /**
  * @author mliauchuk
  */
-public class DiscogsTrackListModel extends DefaultListModel {
+public class DiscogsTrackListModel extends DiscogsDefaultListModel {
 	
 	private boolean useAnv;
 	
@@ -48,16 +46,6 @@ public class DiscogsTrackListModel extends DefaultListModel {
 	public Object get(int index) {
 		Track track = getEx(index);
 		return track == null ? null : getTrackDescription(track);
-	}
-
-	@Override
-	public Object elementAt(int index) {
-		return get(index);
-	}
-
-	@Override
-	public Object getElementAt(int index) {
-		return get(index);
 	}
 
 	private String getTrackDescription(Track track) {

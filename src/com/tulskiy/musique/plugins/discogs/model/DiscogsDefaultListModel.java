@@ -17,30 +17,23 @@
 
 package com.tulskiy.musique.plugins.discogs.model;
 
-import com.tulskiy.musique.playlist.Track;
+import javax.swing.DefaultListModel;
 
 /**
  * @author mliauchuk
  */
-public class MusiqueTrackListModel extends DiscogsDefaultListModel {
+public abstract class DiscogsDefaultListModel extends DefaultListModel {
 
-	public Track getEx(int index) {
-		Object item = super.get(index);
-		if (item instanceof Track) {
-			return (Track) item;
-		}
-		
-		return null;
+	public abstract Object getEx(int index);
+
+	@Override
+	public Object elementAt(int index) {
+		return get(index);
 	}
 
 	@Override
-	public Object get(int index) {
-		Track track = getEx(index);
-		return track == null ? null : getTrackDescription(track);
-	}
-
-	private static String getTrackDescription(Track track) {
-		return track.getTrackData().getFileName();
+	public Object getElementAt(int index) {
+		return get(index);
 	}
 
 }
