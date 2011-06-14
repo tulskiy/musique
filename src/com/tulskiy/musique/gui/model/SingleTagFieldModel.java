@@ -25,6 +25,9 @@ import javax.swing.table.AbstractTableModel;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
+/**
+ * @author mliauchuk
+ */
 public class SingleTagFieldModel extends AbstractTableModel implements TagFieldModel {
 
 	private TrackInfoItem trackInfoItem;
