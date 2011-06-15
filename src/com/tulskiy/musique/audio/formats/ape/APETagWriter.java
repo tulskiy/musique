@@ -41,6 +41,6 @@ public class APETagWriter extends AudioTagWriter {
 
     @Override
     public boolean isFileSupported(String ext) {
-        return ext.equalsIgnoreCase("ape") || ext.equalsIgnoreCase("wv");
+        return ext.equalsIgnoreCase("ape") || ext.equalsIgnoreCase("wv") || ext.equalsIgnoreCase("tta");
     }
 }
