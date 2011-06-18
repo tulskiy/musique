@@ -18,7 +18,6 @@ import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
-import javax.swing.DefaultListSelectionModel;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -137,6 +136,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		
 		Component horizontalGlue = Box.createHorizontalGlue();
 		panelArtistControls.add(horizontalGlue);
+		btnSelect.setPreferredSize(new Dimension(81, 0));
 		
 		btnSelect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -160,6 +160,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panelArtistControls.add(horizontalStrut);
 		
 		JButton btnCancelArtist = new JButton("Cancel");
+		btnCancelArtist.setPreferredSize(new Dimension(81, 0));
 		btnCancelArtist.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				close();
@@ -248,6 +249,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 			}
 		});
 		scrollPane.setViewportView(lstArtists);
+		btnQuery.setPreferredSize(new Dimension(81, 0));
 		
 		btnQuery.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -300,6 +302,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		model.setFilter(txtFilter.getText());
 		
 		JButton btnClear = new JButton("Clear");
+		btnClear.setPreferredSize(new Dimension(81, 0));
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				txtFilter.setText("");
@@ -327,6 +330,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panelReleaseControls.add(horizontalStrut_2);
 		
 		JButton btnBack = new JButton("Back");
+		btnBack.setPreferredSize(new Dimension(81, 0));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 			    CardLayout cardLayout = (CardLayout) getContentPane().getLayout();
@@ -345,6 +349,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		
 		Component horizontalGlue2 = Box.createHorizontalGlue();
 		panelReleaseControls.add(horizontalGlue2);
+		btnWrite.setPreferredSize(new Dimension(81, 0));
 		btnWrite.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				updateTracks();
@@ -361,6 +366,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panelReleaseControls.add(horizontalStrut2);
 		
 		JButton btnCancelRelease = new JButton("Cancel");
+		btnCancelRelease.setPreferredSize(new Dimension(81, 0));
 		btnCancelRelease.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
             	close();
@@ -521,6 +527,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		splitPaneRelease.setLeftComponent(scrollPane_2);
 		
 		JPanel panel = new JPanel();
+		panel.setPreferredSize(new Dimension(10, 40));
 		scrollPane_2.setColumnHeaderView(panel);
 
 		btnDiscogstrackup.setEnabled(false);
@@ -567,6 +574,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		splitPaneRelease.setRightComponent(scrollPane_3);
 		
 		JPanel panel_3 = new JPanel();
+		panel_3.setPreferredSize(new Dimension(10, 40));
 		scrollPane_3.setColumnHeaderView(panel_3);
 		
 		btnMusiquetrackremove.setEnabled(false);
