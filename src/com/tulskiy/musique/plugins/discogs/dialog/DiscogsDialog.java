@@ -10,7 +10,12 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -214,13 +219,37 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		JPanel panel_2 = new JPanel();
 		panel_2.setPreferredSize(new Dimension(10, 40));
 		scrollPane_1.setColumnHeaderView(panel_2);
-		
+
 		lstReleases.setModel(new DiscogsReleaseListModel());
 		lstReleases.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()) {
 					ListSelectionModel selectionModel = lstReleases.getSelectionModel();
 					btnSelect.setEnabled(!selectionModel.isSelectionEmpty());
+				}
+			}
+		});
+		lstReleases.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() > 1) {
+					ListSelectionModel selectionModel = lstReleases.getSelectionModel();
+					if (!selectionModel.isSelectionEmpty()) {
+						DiscogsReleaseListModel releaseModel = (DiscogsReleaseListModel) lstReleases.getModel();
+						ArtistRelease release = releaseModel.getEx(selectionModel.getMinSelectionIndex());
+				        if(java.awt.Desktop.isDesktopSupported()) {
+				        	java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
+				        	if(desktop.isSupported(java.awt.Desktop.Action.BROWSE)) {
+				        		try {
+									desktop.browse(new URI("http://www.discogs.com/release/" + release.getId()));
+								}
+				        		catch (Exception exc) {
+									// ignore any exception since it's absolutely optional feature
+								}
+				        	}
+				        }
+						
+					}
 				}
 			}
 		});
