@@ -17,7 +17,13 @@
 
 package com.tulskiy.musique.plugins.discogs;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import org.discogs.model.Artist;
 import org.discogs.ws.Discogs;
+import org.discogs.ws.search.ArtistSearchResult;
+import org.discogs.ws.search.SearchResult;
 
 /**
  * @author mliauchuk
@@ -32,7 +38,8 @@ public class DiscogsCaller implements Runnable {
 	
 	public static enum CallMode {
 		ARTIST,
-		RELEASE;
+		RELEASE,
+		SEARCH_ARTISTS;
 	}
 
 	public DiscogsCaller(CallMode mode, String query, DiscogsListener callback) {
@@ -60,6 +67,16 @@ public class DiscogsCaller implements Runnable {
 					break;
 				case RELEASE:
 					result = DISCOGS.getRelease(query);
+					break;
+				case SEARCH_ARTISTS:
+					List<Artist> artists = new LinkedList<Artist>();
+					List<SearchResult> srs = DISCOGS.search("artists", query).getSearchResults();
+					for (SearchResult sr : srs) {
+						if (sr instanceof ArtistSearchResult) {
+							artists.add(((ArtistSearchResult) sr).getArtist());
+						}
+					}
+					result = artists.isEmpty() ? null : artists;
 					break;
 				default:
 					break;

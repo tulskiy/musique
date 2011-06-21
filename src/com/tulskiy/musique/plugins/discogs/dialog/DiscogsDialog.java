@@ -13,9 +13,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -261,7 +259,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 				DiscogsArtistListModel artistModel = (DiscogsArtistListModel) lstArtists.getModel();
 				ListSelectionModel selectionModel = lstArtists.getSelectionModel();
 				if (!selectionModel.isSelectionEmpty() && !arg0.getValueIsAdjusting()) {
-					Artist artist = artistModel.getEx(arg0.getFirstIndex());
+					Artist artist = artistModel.getEx(selectionModel.getMinSelectionIndex());
 					if (artist != null) {
 						DiscogsReleaseListModel releaseModel = (DiscogsReleaseListModel) lstReleases.getModel();
 
@@ -284,7 +282,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 			public void actionPerformed(ActionEvent arg0) {
 				if (!Util.isEmpty(txtArtist.getText())) {
 					thread = new Thread(new DiscogsCaller(
-							DiscogsCaller.CallMode.ARTIST, txtArtist.getText(), me), "");
+							DiscogsCaller.CallMode.SEARCH_ARTISTS, txtArtist.getText(), me), "");
 					thread.start();
 				}
 			}
@@ -651,6 +649,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 	public void onRetrieveStart(DiscogsCaller.CallMode callMode) {
 		switch (callMode) {
 			case ARTIST:
+			case SEARCH_ARTISTS:
 				clearReleaseInfo();
 				btnSelect.setEnabled(false);
 				progressBarArtist.setVisible(true);
@@ -671,16 +670,25 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 	public void onRetrieveFinish(DiscogsCaller.CallMode callMode, Object data) {
 		switch (callMode) {
 			case ARTIST:
+			case SEARCH_ARTISTS:
 				if (lstArtists != null) {
 					// syncronized in order to prevent list events occur during model update
 					// frankly, not sure but it seems works
 					synchronized (lstArtists) {
 						if (data != null) {
-							Artist artist = (Artist) data;
 							DefaultListModel listModel = (DefaultListModel) lstArtists.getModel();
 	
 							listModel.clear();
-							listModel.addElement(artist);
+							if (callMode == DiscogsCaller.CallMode.ARTIST) {
+								Artist artist = (Artist) data;
+								listModel.addElement(artist);
+							}
+							else if (callMode == DiscogsCaller.CallMode.SEARCH_ARTISTS) {
+								List<Artist> artists = (List<Artist>) data;
+								for (Artist artist : artists) {
+									listModel.addElement(artist);
+								}
+							}
 	
 							lstArtists.revalidate();
 							lstArtists.setSelectedIndex(0);
