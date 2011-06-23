@@ -23,6 +23,7 @@ import java.util.List;
 import org.discogs.model.Artist;
 import org.discogs.ws.Discogs;
 import org.discogs.ws.search.ArtistSearchResult;
+import org.discogs.ws.search.Search;
 import org.discogs.ws.search.SearchResult;
 
 /**
@@ -70,17 +71,31 @@ public class DiscogsCaller implements Runnable {
 					break;
 				case SEARCH_ARTISTS:
 					List<Artist> artists = new LinkedList<Artist>();
-					List<SearchResult> srs = DISCOGS.search("artists", query).getSearchResults();
+
+					Search s = DISCOGS.search("artists", query);
+
+					List<SearchResult> srs = null;
+					if (!s.getExactResults().isEmpty()) {
+						srs = s.getExactResults();
+					}
+					else {
+						srs = s.getSearchResults();
+					}
+
 					for (SearchResult sr : srs) {
 						if (sr instanceof ArtistSearchResult) {
 							try {
-								artists.add(((ArtistSearchResult) sr).getArtist());
+								ArtistSearchResult asr = (ArtistSearchResult) sr;
+								if (!artistAlreadyFound(asr.getTitle(), artists)) {
+									artists.add(asr.getArtist());
+								}
 							}
 							catch (Exception e) {
 								// failed to retrieve, don't bother
 							}
 						}
 					}
+
 					result = artists.isEmpty() ? null : artists;
 					break;
 				default:
@@ -97,6 +112,16 @@ public class DiscogsCaller implements Runnable {
 		}
 
 		callback.onRetrieveFinish(mode, result);
+	}
+	
+	private boolean artistAlreadyFound(String artistName, List<Artist> artists) {
+		for (Artist artist : artists) {
+			if (artist.getName().equalsIgnoreCase(artistName)) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 }
