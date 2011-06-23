@@ -10,6 +10,10 @@ public class ArtistSearchResult extends SearchResult {
     super(element, client);
   }
 
+  public String getAnv() {
+    return getStringByPath("anv");
+  }
+
   public Artist getArtist() {
     return client.getArtist(getTitle());
   }
