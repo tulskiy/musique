@@ -108,7 +108,7 @@ public class PlayingThread extends Actor implements Runnable {
                                 stop();
                                 break;
                             }
-                            len = buffer.read(buf, 0, BUFFER_SIZE / 4);
+                            len = buffer.read(buf, 0, BUFFER_SIZE);
                         }
                         currentByte += len;
                         playbackBytes += len;
