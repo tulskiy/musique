@@ -73,7 +73,12 @@ public class DiscogsCaller implements Runnable {
 					List<SearchResult> srs = DISCOGS.search("artists", query).getSearchResults();
 					for (SearchResult sr : srs) {
 						if (sr instanceof ArtistSearchResult) {
-							artists.add(((ArtistSearchResult) sr).getArtist());
+							try {
+								artists.add(((ArtistSearchResult) sr).getArtist());
+							}
+							catch (Exception e) {
+								// failed to retrieve, don't bother
+							}
 						}
 					}
 					result = artists.isEmpty() ? null : artists;

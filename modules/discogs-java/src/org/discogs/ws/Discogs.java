@@ -144,7 +144,7 @@ public class Discogs {
       String convTerm = URLEncoder.encode(term, "UTF-8");
       Element resultE = loadResult("/search?" + (type == null ? "" : "type=" + type + "&") + "q=" + convTerm);
     if (resultE != null)
-    return new Search(resultE,
+    return new Search((Element) resultE.getParentNode(),
       this);
     return null;
     } catch (UnsupportedEncodingException e) {
