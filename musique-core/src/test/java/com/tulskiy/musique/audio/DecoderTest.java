@@ -30,10 +30,11 @@ import com.tulskiy.musique.system.Codecs;
 import org.junit.Test;
 
 import java.io.File;
+import java.net.URISyntaxException;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 15.07.2009
+ * Author: Denis Tulskiy
+ * Date: 15.07.2009
  */
 
 public class DecoderTest {
@@ -108,8 +109,12 @@ public class DecoderTest {
     }
 
     private void test(AudioFileReader reader, String fileName) {
-        Track file = reader.read(new File(fileName));
-        DecoderSeekTester test = new DecoderSeekTester(file, Codecs.getDecoder(file));
-        test.start();
+        try {
+            Track file = reader.read(new File(getClass().getClassLoader().getResource(fileName).toURI()));
+            DecoderSeekTester test = new DecoderSeekTester(file, Codecs.getDecoder(file));
+            test.start();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
     }
 }

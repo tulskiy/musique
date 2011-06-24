@@ -2,6 +2,8 @@
 !testfiles/*/sample.*
 temp
 /.idea
+*.iml
+*.tmp
 /.metadata
 /.nbproject
 musique-core/main/javasrc/com/tulskiy/musique/Test.java

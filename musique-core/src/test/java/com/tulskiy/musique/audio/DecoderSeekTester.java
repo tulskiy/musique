@@ -30,8 +30,8 @@ import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 15.07.2009
+ * Author: Denis Tulskiy
+ * Date: 15.07.2009
  */
 
 public class DecoderSeekTester {
@@ -56,7 +56,7 @@ public class DecoderSeekTester {
             refB = ByteBuffer.allocate((int) (totalSamples * frameSize) + 10000);
             refB.position(0);
             ref.saveReference = true;
-            ref.oFile = "testfiles/" + decoder.getClass().getCanonicalName() + ".dat";
+            ref.oFile = "tmp/" + decoder.getClass().getCanonicalName() + ".tmp";
             checkSeek(ref, 0);
             ref.waveFile.Close();
             System.out.println("Done first decoder pass. Samples decoded: " + ref.currentSample);
@@ -122,11 +122,13 @@ public class DecoderSeekTester {
         String oFile;
         WaveFile waveFile = null;
 
+        @SuppressWarnings({"ResultOfMethodCallIgnored"})
         public void write(byte[] b, int off, int len) {
             if (saveReference) {
                 if (waveFile == null) {
                     waveFile = new WaveFile();
                     File f = new File(oFile);
+                    f.mkdirs();
                     if (f.exists()) {
                         f.delete();
                     }
