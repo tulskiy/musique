@@ -17,4 +17,3 @@
 -XX:MaxTenuringThreshold=5
 -XX:TargetSurvivorRatio=90
 -XX:+UseStringCache
--XX:+UseStringCache

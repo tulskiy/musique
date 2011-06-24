@@ -3,7 +3,7 @@ MUSIQUE_HOME=$(dirname "$0")
 cd "$MUSIQUE_HOME"
 
 # uncomment to use OSS emulation, fixes sound problems with Sun JRE's
-DSP="padsp"
+#DSP="padsp"
 
 # change this to use alternative JRE. If you are using 64-bit JRE,
 # it is recommended to install ia32-sun-java6-jre to reduce memory
@@ -12,8 +12,4 @@ if [ -z "$JAVA_PATH" ]; then
     JAVA_PATH="java"
 fi
 JVM_ARGS=$(tr '\n' ' ' < musique.vmoptions)
-CLASSPATH=musique.jar
-CLASSPATH=$CLASSPATH:lib/last.fm-bindings.jar
-
-export CLASSPATH
-exec $DSP $JAVA_PATH $JVM_ARGS com.tulskiy.musique.system.Main
+exec $DSP $JAVA_PATH $JVM_ARGS -jar ../${project.build.finalName}.jar
