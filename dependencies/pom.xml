@@ -14,7 +14,7 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>alac</module>
+        <module>alacdecoder</module>
         <module>cuelib</module>
         <module>jaad</module>
         <module>jaudiotagger</module>
@@ -23,7 +23,7 @@
         <module>jflac</module>
         <module>jmac</module>
         <module>jorbis</module>
-        <module>lastfm</module>
+        <module>last.fm-bindings</module>
         <module>tta</module>
         <module>vorbis-java</module>
         <module>wavpack</module>
