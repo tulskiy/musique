@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="lastfm">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/last.fm-bindings.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
