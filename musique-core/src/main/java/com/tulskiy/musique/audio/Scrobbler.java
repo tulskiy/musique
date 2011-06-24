@@ -26,9 +26,9 @@ import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.AudioMath;
 import com.tulskiy.musique.util.Util;
-import net.roarsoftware.lastfm.scrobble.ResponseStatus;
-import net.roarsoftware.lastfm.scrobble.Source;
-import net.roarsoftware.lastfm.scrobble.SubmissionData;
+import de.umass.lastfm.scrobble.ResponseStatus;
+import de.umass.lastfm.scrobble.Source;
+import de.umass.lastfm.scrobble.SubmissionData;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -37,7 +37,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.logging.Logger;
 
-import static net.roarsoftware.lastfm.scrobble.Scrobbler.newScrobbler;
+import static de.umass.lastfm.scrobble.Scrobbler.newScrobbler;
 
 /**
  * Author: Denis Tulskiy
@@ -48,7 +48,7 @@ public class Scrobbler {
     private static final String CLIENT_VERSION = "1.0";
 
     private Logger logger = Logger.getLogger("musique");
-    private net.roarsoftware.lastfm.scrobble.Scrobbler scrobbler;
+    private de.umass.lastfm.scrobble.Scrobbler scrobbler;
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private boolean authorized;

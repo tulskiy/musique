@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>musique</artifactId>
+        <groupId>com.tulskiy</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tulskiy.musique</groupId>
+    <artifactId>dependencies</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>alac</module>
+        <module>cuelib</module>
+        <module>jaad</module>
+        <module>jaudiotagger</module>
+        <module>javaFlacEncoder</module>
+        <module>javalayer</module>
+        <module>jflac</module>
+        <module>jmac</module>
+        <module>jorbis</module>
+        <module>lastfm</module>
+        <module>tta</module>
+        <module>vorbis-java</module>
+        <module>wavpack</module>
+    </modules>
+</project>
