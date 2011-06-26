@@ -1,6 +1,7 @@
 package org.discogs.ws;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
@@ -48,7 +49,7 @@ public class Discogs {
 
   public static final String SEARCH_TYPE_RELEASE = "release";
   public static final String SEARCH_TYPE_LABEL = "label";
-  public static final String SEARCH_TYPE_ARTIST = "artist";
+  public static final String SEARCH_TYPE_ARTIST = "artists";
 
   public final DocumentLoader loader;
   private final String apiKey;
@@ -68,6 +69,15 @@ public class Discogs {
    * See <a href="https://www.discogs.com/users/api_key">discogs</a> to get an api key.  
    */
   public Discogs(String apiKey) {
+    this(apiKey, true, System.getProperty("java.io.tmpdir", ""));
+  }
+
+  /**
+   * Create client with a given api key.
+   * <p/>
+   * See <a href="https://www.discogs.com/users/api_key">discogs</a> to get an api key.  
+   */
+  public Discogs(String apiKey, boolean cacheEnabled, String cacheDir) {
     super();
     if (apiKey == null)
       throw new NullPointerException("Error, an apiKey must be given.  Specify directly in constructor, set the API_KEY field or provide an apiKey system property (-DapiKey=1234)");
@@ -77,6 +87,9 @@ public class Discogs {
       loader.setCharset(Charset.forName("UTF-8"));
       loader.setLoadInterval(1000);
       loader.setUserAgent("discogs-java/0.01 +http://benow.ca/projects/discogs-java");
+
+      setCacheEnabled(cacheEnabled);
+      setCacheDir(cacheDir);
     } catch (MalformedURLException e) {
       throw new RuntimeException("Impossible",
         e);
@@ -194,6 +207,14 @@ public class Discogs {
     }
     in.close();
     return inStr;
+  }
+  
+  public void setCacheEnabled(boolean b) {
+	  loader.setCacheEnabled(b);
+  }
+  
+  public void setCacheDir(String s) {
+	  loader.setCacheDir(new File(s));
   }
 
   public static void main(

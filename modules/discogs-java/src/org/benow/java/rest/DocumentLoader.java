@@ -264,6 +264,10 @@ public class DocumentLoader {
   public void disableCaching() {
     cacheDisabled = true;
   }
+  
+  public void setCacheEnabled(boolean b) {
+	  cacheDisabled = !b;
+  }
 
   public String loadString(
       String urlStr) throws IOException {

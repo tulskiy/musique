@@ -28,7 +28,9 @@ import com.tulskiy.musique.gui.menu.Menu;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.plugins.discogs.dialog.DiscogsDialog;
+import com.tulskiy.musique.plugins.discogs.dialog.SettingsDialog;
 import com.tulskiy.musique.spi.Plugin;
+import com.tulskiy.musique.system.Application;
 
 /**
  * @author mliauchuk
@@ -36,6 +38,13 @@ import com.tulskiy.musique.spi.Plugin;
 public class DiscogsPlugin extends Plugin {
 	
 	public static final String API_KEY = "09ff0d5c2b";
+
+	public static final String DEFAULT_CACHE_ROOT_DIR = System.getProperty("java.io.tmpdir", "");
+	public static final String CACHE_SUB_DIR = "musique-discogs-cache/";
+
+	public static final String CONF_PARAM_CACHE_ENABLED = "discogs.cache.enabled";
+	public static final String CONF_PARAM_CACHE_LOC_TYPE = "discogs.cache.location.type";
+	public static final String CONF_PARAM_CACHE_LOC_DIR = "discogs.cache.location.dir";
 	
     @Override
     public boolean init() {
@@ -44,36 +53,11 @@ public class DiscogsPlugin extends Plugin {
     }
 
     private void createMenu() {
+    	// TODO think about case when no tracks selected but context menu with Discogs setting is to be appeared
         registerMenu(MenuType.TRACKS, new Menu.MenuCallback() {
             @Override
             public JMenu create(final ArrayList<Track> tracks, final Playlist playlist) {
-                if (tracks.size() > 0) {
-                    JMenu menu = new JMenu("Discogs");
-                    
-                    JMenuItem retrieve = new JMenuItem("Query");
-                    retrieve.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							new DiscogsDialog(tracks, playlist).setVisible(true);
-						}
-                    });
-                    menu.add(retrieve);
-                    
-                    JMenuItem settings = new JMenuItem("Settings");
-                    settings.setVisible(false);
-                    settings.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent arg0) {
-							// TODO Auto-generated method stub
-							
-						}
-                    });
-                    menu.add(settings);
-
-                    return menu;
-                }
-
-                return null;
+            	return createMenu(tracks, playlist);
             }
         });
     }
@@ -87,4 +71,75 @@ public class DiscogsPlugin extends Plugin {
     public Description getDescription() {
         return new Description("Last.fm plugin", "1.0");
     }
+    
+    private JMenu createMenu(final ArrayList<Track> tracks, final Playlist playlist) {
+        JMenu menu = new JMenu("Discogs");
+        
+        if (tracks.size() > 0) {
+            JMenuItem retrieve = new JMenuItem("Query");
+            retrieve.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
+					new DiscogsDialog(tracks, playlist).setVisible(true);
+				}
+            });
+            menu.add(retrieve);
+        }
+        
+        JMenuItem settings = new JMenuItem("Settings");
+        settings.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new SettingsDialog().setVisible(true);
+			}
+        });
+        menu.add(settings);
+
+        return menu;
+    }
+    
+    // Configuration settings
+    public static void setCacheEnabled(boolean b) {
+    	Application.getInstance().getConfiguration().setBoolean(
+    			DiscogsPlugin.CONF_PARAM_CACHE_ENABLED, b);
+    }
+
+	public static boolean isCacheEnabled() {
+		return Application.getInstance().getConfiguration().getBoolean(
+				DiscogsPlugin.CONF_PARAM_CACHE_ENABLED, true);
+	}
+    
+    public static void setCacheDirType(int n) {
+    	Application.getInstance().getConfiguration().setInt(
+    			DiscogsPlugin.CONF_PARAM_CACHE_LOC_TYPE, n);
+    }
+	
+	public static int getCacheDirType() {
+		return Application.getInstance().getConfiguration().getInt(
+				DiscogsPlugin.CONF_PARAM_CACHE_LOC_TYPE, 1);
+	}
+    
+    public static void setCacheRootDir(String s) {
+    	Application.getInstance().getConfiguration().setString(
+    			DiscogsPlugin.CONF_PARAM_CACHE_LOC_DIR, s);
+    }
+	
+	public static String getCacheRootDir() {
+		return Application.getInstance().getConfiguration().getString(
+				DiscogsPlugin.CONF_PARAM_CACHE_LOC_DIR, DiscogsPlugin.DEFAULT_CACHE_ROOT_DIR);
+	}
+	
+	public static String getCacheDir() {
+		String cacheRoot = getCacheRootDir();
+
+	    if (cacheRoot == null) {
+	    	cacheRoot = "";
+	    }
+	    else if (!"".equals(cacheRoot) && cacheRoot.charAt(cacheRoot.length() - 1) != '/') {
+	    	cacheRoot += '/';
+	    }
+
+	    return cacheRoot + CACHE_SUB_DIR;
+	}
+
 }

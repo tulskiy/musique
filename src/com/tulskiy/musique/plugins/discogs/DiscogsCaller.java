@@ -42,12 +42,23 @@ public class DiscogsCaller implements Runnable {
 		RELEASE,
 		SEARCH_ARTISTS;
 	}
+	
+	public static void updateCachingConfiguration() {
+		updateCachingConfiguration(DiscogsPlugin.isCacheEnabled(), DiscogsPlugin.getCacheDir());
+	}
+	
+	public static void updateCachingConfiguration(boolean cacheEnabled, String cacheDir) {
+		if (DISCOGS != null) {
+			DISCOGS.setCacheEnabled(cacheEnabled);
+			DISCOGS.setCacheDir(cacheDir);
+		}
+	}
 
 	public DiscogsCaller(CallMode mode, String query, DiscogsListener callback) {
 		super();
-
+		
 		if (DISCOGS == null) {
-			DISCOGS = new Discogs(DiscogsPlugin.API_KEY);
+			DISCOGS = new Discogs(DiscogsPlugin.API_KEY, DiscogsPlugin.isCacheEnabled(), DiscogsPlugin.getCacheDir());
 		}
 
 		this.mode = mode;
@@ -72,7 +83,7 @@ public class DiscogsCaller implements Runnable {
 				case SEARCH_ARTISTS:
 					List<Artist> artists = new LinkedList<Artist>();
 
-					Search s = DISCOGS.search("artists", query);
+					Search s = DISCOGS.search(Discogs.SEARCH_TYPE_ARTIST, query);
 
 					List<SearchResult> srs = null;
 					if (!s.getExactResults().isEmpty()) {
