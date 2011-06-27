@@ -19,6 +19,7 @@ package com.tulskiy.musique.plugins.discogs;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 
 import javax.swing.JMenu;
@@ -40,7 +41,7 @@ public class DiscogsPlugin extends Plugin {
 	public static final String API_KEY = "09ff0d5c2b";
 
 	public static final String DEFAULT_CACHE_ROOT_DIR = System.getProperty("java.io.tmpdir", "");
-	public static final String CACHE_SUB_DIR = "musique-discogs-cache/";
+	public static final String CACHE_SUB_DIR = "musique-discogs-cache" + File.separator;
 
 	public static final String CONF_PARAM_CACHE_ENABLED = "discogs.cache.enabled";
 	public static final String CONF_PARAM_CACHE_LOC_TYPE = "discogs.cache.location.type";
@@ -135,8 +136,8 @@ public class DiscogsPlugin extends Plugin {
 	    if (cacheRoot == null) {
 	    	cacheRoot = "";
 	    }
-	    else if (!"".equals(cacheRoot) && cacheRoot.charAt(cacheRoot.length() - 1) != '/') {
-	    	cacheRoot += '/';
+	    else if (!"".equals(cacheRoot) && !cacheRoot.endsWith(File.separator)) {
+	    	cacheRoot += File.separator;
 	    }
 
 	    return cacheRoot + CACHE_SUB_DIR;
