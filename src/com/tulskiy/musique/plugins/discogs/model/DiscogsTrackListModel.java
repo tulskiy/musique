@@ -48,6 +48,14 @@ public class DiscogsTrackListModel extends DiscogsDefaultListModel {
 		return track == null ? null : getTrackDescription(track);
 	}
 
+	@Override
+	public void addElement(Object obj) {
+		if (obj instanceof Track && Util.isEmpty(((Track) obj).getPositionRaw())) {
+			return;
+		}
+		super.addElement(obj);
+	}
+
 	private String getTrackDescription(Track track) {
 		StringBuilder result = new StringBuilder("");
 
