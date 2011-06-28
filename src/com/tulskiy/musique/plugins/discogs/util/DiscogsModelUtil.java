@@ -30,6 +30,7 @@ import com.tulskiy.musique.util.Util;
  * @author mliauchuk
  */
 public class DiscogsModelUtil {
+
 	public static final String DEFAULT_RELEASE_INFO_TEXT = "N/A";
 
 	private DiscogsModelUtil() {
@@ -113,8 +114,10 @@ public class DiscogsModelUtil {
 				result.append(" + ");
 			}
 			result.append(format.getQuantity()).append(" x ").append(format.getName());
-			if (!Util.isEmpty(format.getDescription())) {
-				result.append(", ").append(format.getDescription());
+			List<String> descriptions = format.getDescriptions();
+			if (!Util.isEmpty(descriptions)) {
+				for (String description : descriptions)
+				result.append(", ").append(description);
 			}
 		}
 		
