@@ -17,13 +17,16 @@
 
 package com.tulskiy.musique.audio.player.dsp;
 
+import org.junit.Test;
+
 import java.util.ArrayList;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 26.07.2009
+ * Author: Denis Tulskiy
+ * Date: 26.07.2009
  */
 public class DSPSpeedTest {
+    @Test public void dummy(){}
     //    @Test
     public void test() {
         ArrayList<String> l = new ArrayList<String>();

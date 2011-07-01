@@ -8,6 +8,9 @@
     <description>Audio Tagging library</description>
     <url>http://www.jthink.net/jaudiotagger/</url>
     <version>2.0.4</version>
+    <properties>
+        <project.build.sourceEncoding>latin1</project.build.sourceEncoding>
+    </properties>
     <build>
         <plugins>
             <plugin>

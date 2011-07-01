@@ -17,9 +17,11 @@
 
 package com.tulskiy.musique.audio;
 
+import com.tulskiy.musique.audio.formats.uncompressed.PCMEncoder;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.AudioMath;
-import javazoom.jl.converter.WaveFile;
+
+import javax.sound.sampled.AudioFormat;
 
 import static org.junit.Assert.*;
 
@@ -56,9 +58,9 @@ public class DecoderSeekTester {
             refB = ByteBuffer.allocate((int) (totalSamples * frameSize) + 10000);
             refB.position(0);
             ref.saveReference = true;
-            ref.oFile = "tmp/" + decoder.getClass().getCanonicalName() + ".tmp";
+            ref.oFile = File.createTempFile(decoder.getClass().getCanonicalName(), null);
             checkSeek(ref, 0);
-            ref.waveFile.Close();
+            ref.encoder.close();
             System.out.println("Done first decoder pass. Samples decoded: " + ref.currentSample);
 //            assertTrue(totalSamples >= ref.currentSample);
 //            assertEquals(totalSamples, ref.currentSample);
@@ -95,6 +97,9 @@ public class DecoderSeekTester {
                     throw e;
                 }
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
         } finally {
             refB = null;
             decoder.close();
@@ -119,22 +124,18 @@ public class DecoderSeekTester {
     private class SeekTestBuffer {
         int currentSample = 0;
         boolean saveReference = false;
-        String oFile;
-        WaveFile waveFile = null;
+        File oFile;
+        private PCMEncoder encoder;
 
         @SuppressWarnings({"ResultOfMethodCallIgnored"})
         public void write(byte[] b, int off, int len) {
             if (saveReference) {
-                if (waveFile == null) {
-                    waveFile = new WaveFile();
-                    File f = new File(oFile);
-                    f.mkdirs();
-                    if (f.exists()) {
-                        f.delete();
-                    }
-                    waveFile.OpenForWrite(oFile, 44100, (short) 16, (short) 2);
+                if (encoder == null) {
+                    encoder = new PCMEncoder();
+                    encoder.open(oFile, new AudioFormat(44100f, 16, 2, true, false), null);
+                    oFile.deleteOnExit();
                 }
-                waveFile.Write(b, off, len);
+                encoder.encode(b, len);
                 try {
                     refB.put(b, off, len);
                 } catch (BufferOverflowException e) {

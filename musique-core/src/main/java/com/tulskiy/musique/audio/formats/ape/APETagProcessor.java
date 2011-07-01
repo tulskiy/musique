@@ -30,8 +30,8 @@ import java.io.IOException;
 import org.jaudiotagger.tag.FieldKey;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 26.06.2009
+ * Author: Denis Tulskiy
+ * Date: 26.06.2009
  */
 public class APETagProcessor {
 
@@ -52,10 +52,9 @@ public class APETagProcessor {
             	setMusiqueTagFieldValue(tag, trackData, FieldKey.YEAR, APETag.APE_TAG_FIELD_YEAR);
             	setMusiqueTagFieldValue(tag, trackData, FieldKey.GENRE, APETag.APE_TAG_FIELD_GENRE);
             	setMusiqueTagFieldValue(tag, trackData, FieldKey.COMMENT, APETag.APE_TAG_FIELD_COMMENT);
-            	
+            	setMusiqueTagFieldValue(tag, trackData, FieldKey.ALBUM_ARTIST, "album artist");
             	handleTrackDiscFields(tag, trackData);
 
-            	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.ALBUM_ARTIST);
             	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.RECORD_LABEL);
             	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.CATALOG_NO);
             	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.RATING);
@@ -87,11 +86,11 @@ public class APETagProcessor {
             setApeTagFieldValue(tag, trackData, FieldKey.GENRE, APETag.APE_TAG_FIELD_GENRE);
             setApeTagFieldValue(tag, trackData, FieldKey.COMMENT, APETag.APE_TAG_FIELD_COMMENT);
             setApeTagFieldValue(tag, trackData, FieldKey.TRACK, APETag.APE_TAG_FIELD_TRACK);
+            setApeTagFieldValue(tag, trackData, FieldKey.ALBUM_ARTIST, "Album Artist");
 
             setCustomApeTagFieldValue(tag, trackData, FieldKey.DISC_NO);
             setCustomApeTagFieldValue(tag, trackData, FieldKey.TRACK_TOTAL);
             setCustomApeTagFieldValue(tag, trackData, FieldKey.DISC_TOTAL);
-            setCustomApeTagFieldValue(tag, trackData, FieldKey.ALBUM_ARTIST);
             setCustomApeTagFieldValue(tag, trackData, FieldKey.RECORD_LABEL);
             setCustomApeTagFieldValue(tag, trackData, FieldKey.CATALOG_NO);
             setCustomApeTagFieldValue(tag, trackData, FieldKey.RATING);
@@ -136,7 +135,7 @@ public class APETagProcessor {
     private void handleTrackDiscFields(APETag tag, TrackData trackData) throws IOException {
     	String value = tag.GetFieldString(APETag.APE_TAG_FIELD_TRACK);
     	if (!Util.isEmpty(value)) {
-	    	if (value.indexOf("/") == -1) {
+	    	if (!value.contains("/")) {
 	    		setMusiqueTagFieldValue(tag, trackData, FieldKey.TRACK, APETag.APE_TAG_FIELD_TRACK);
 	        	setCustomMusiqueTagFieldValue(tag, trackData, FieldKey.TRACK_TOTAL);
 	    	}

@@ -17,6 +17,7 @@
 
 package com.tulskiy.musique.audio.formats.flac.oggflac;
 
+import org.junit.Test;
 import org.kc7bfi.jflac.metadata.Padding;
 import org.kc7bfi.jflac.metadata.VorbisComment;
 
@@ -27,11 +28,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 22.07.2009
+ * Author: Denis Tulskiy
+ * Date: 22.07.2009
  */
 public class OggFlacDecoderTest {
     OggFlacDecoder oggFlacDecoder;
+    @Test
+    public void dummy(){}
 
     //    @Before
     public void setUp() {
