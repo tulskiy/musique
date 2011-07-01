@@ -27,6 +27,8 @@ import com.tulskiy.musique.util.Util;
  */
 public class DiscogsTrackListModel extends DiscogsDefaultListModel {
 	
+	private StringBuilder sb = new StringBuilder();
+	
 	private boolean useAnv;
 	
 	public void setUseAnv(boolean useAnv) {
@@ -57,20 +59,21 @@ public class DiscogsTrackListModel extends DiscogsDefaultListModel {
 	}
 
 	private String getTrackDescription(Track track) {
-		StringBuilder result = new StringBuilder("");
+		sb.setLength(0);
+		sb.trimToSize();
 
 		String artistName = DiscogsModelUtil.getReleaseArtistDescription(track.getArtists(), useAnv, true);
 
-		result.append(track.getPositionRaw());
+		sb.append(track.getPositionRaw());
 		if (!Util.isEmpty(artistName)) {
-			result.append(" - ").append(artistName);
+			sb.append(" - ").append(artistName);
 		}
-		result.append(" - ").append(track.getTitle());
+		sb.append(" - ").append(track.getTitle());
 		if (track.getDuration() != null) {
-			result.append(" (").append(track.getDuration()).append(')');
+			sb.append(" (").append(track.getDuration()).append(')');
 		}
 		
-		return result.toString();
+		return sb.toString();
 	}
 
 }

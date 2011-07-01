@@ -29,6 +29,10 @@ import com.tulskiy.musique.util.Util;
  */
 public class DiscogsReleaseListModel extends DiscogsDefaultListModel {
 	
+	private static final String SEPARATOR = ", ";
+
+	private StringBuilder sb = new StringBuilder();
+	
 	private List<ArtistRelease> releasesOriginal = new LinkedList<ArtistRelease>();
 	private String filter = "";
 	
@@ -71,12 +75,18 @@ public class DiscogsReleaseListModel extends DiscogsDefaultListModel {
 		releasesOriginal.clear();
 	}
 
-	private static String getReleaseDescription(ArtistRelease release) {
-		return String.format("%s, %d, %s, %s",
-				release.getTitle(),
-				release.getYear(),
-				Util.formatFieldValues(release.getLabelNames(), ","),
-				release.getFormatString());
+	private String getReleaseDescription(ArtistRelease release) {
+		sb.setLength(0);
+		sb.trimToSize();
+		
+		sb.append(release.getTitle()).append(SEPARATOR);
+		if (release.getYear() > 0) {
+			sb.append(release.getYear()).append(SEPARATOR);
+		}
+		sb.append(Util.formatFieldValues(release.getLabelNames(), ",")).append(SEPARATOR);
+		sb.append(release.getFormatString());
+		
+		return sb.toString();
 	}
 
 	private void filterRelease(ArtistRelease release) {
