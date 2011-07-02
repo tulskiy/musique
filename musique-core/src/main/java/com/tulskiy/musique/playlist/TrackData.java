@@ -21,12 +21,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.EnumMap;
-import java.util.Formatter;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.jaudiotagger.tag.FieldKey;
@@ -41,7 +36,7 @@ import com.tulskiy.musique.util.Util;
 public class TrackData implements Cloneable {
 
 	// generic jaudiotagger tag field values
-	private Map<FieldKey, FieldValues> tagFields = new EnumMap<FieldKey, FieldValues>(FieldKey.class);
+	private Map<FieldKey, FieldValues> tagFields = new HashMap<FieldKey, FieldValues>(5, 1f);
 	
 	// common tag fields (to be displayed in TrackInfoDialog even if missed)
 	private static final FieldKey[] COMMON_TAG_FIELDS = {
