@@ -61,6 +61,7 @@ import com.tulskiy.musique.plugins.discogs.model.DiscogsDefaultListModel;
 import com.tulskiy.musique.plugins.discogs.model.DiscogsReleaseListModel;
 import com.tulskiy.musique.plugins.discogs.model.DiscogsTrackListModel;
 import com.tulskiy.musique.plugins.discogs.model.MusiqueTrackListModel;
+import com.tulskiy.musique.plugins.discogs.model.ReleaseTracklistingModel;
 import com.tulskiy.musique.plugins.discogs.util.DiscogsModelUtil;
 import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.util.Util;
@@ -836,6 +837,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		MusiqueTrackListModel musiqueModel = (MusiqueTrackListModel) lstMusiqueTracks.getModel();
 		DiscogsTrackListModel discogsModel = (DiscogsTrackListModel) lstDiscogsTracks.getModel();
 		
+		ReleaseTracklistingModel rtm = DiscogsModelUtil.getReleaseTracklistingModel(release);
 		for (int i = 0; i < musiqueModel.getSize() && i < discogsModel.getSize(); i++) {
 			Track musiqueTrack = musiqueModel.getEx(i);
 			org.discogs.model.Track discogsTrack = discogsModel.getEx(i);
@@ -863,9 +865,11 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 			
 			trackData.setTagFieldValues(FieldKey.ARTIST, Util.firstNotEmpty(trackArtist, albumArtist));
 			trackData.setTagFieldValues(FieldKey.TITLE, discogsTrack.getTitle());
-			// TODO make it more intelligent (parse getPositionRaw, try to guess disc numbers, auto track numbering then)
-			trackData.setTagFieldValues(FieldKey.TRACK, Integer.toString(release.getTracks().indexOf(discogsTrack) + 1));
-			trackData.setTagFieldValues(FieldKey.TRACK_TOTAL, Integer.toString(release.getTracks().size()));
+
+			trackData.setTagFieldValues(FieldKey.TRACK, rtm.getTrackTrack(discogsTrack));
+			trackData.setTagFieldValues(FieldKey.TRACK_TOTAL, rtm.getTrackTrackTotal(discogsTrack));
+			trackData.setTagFieldValues(FieldKey.DISC_NO, rtm.getTrackDisc(discogsTrack));
+			trackData.setTagFieldValues(FieldKey.DISC_TOTAL, rtm.getTrackDiscTotal(discogsTrack));
 		}
 	}
 

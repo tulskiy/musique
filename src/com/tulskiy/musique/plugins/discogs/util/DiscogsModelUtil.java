@@ -18,11 +18,13 @@
 package com.tulskiy.musique.plugins.discogs.util;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.discogs.model.Format;
 import org.discogs.model.Release;
 import org.discogs.model.ReleaseArtist;
 
+import com.tulskiy.musique.plugins.discogs.model.ReleaseTracklistingModel;
 import com.tulskiy.musique.util.Util;
 
 
@@ -33,11 +35,17 @@ public class DiscogsModelUtil {
 
 	public static final String DEFAULT_RELEASE_INFO_TEXT = "N/A";
 
+	public static final Pattern[] trackPositionPatterns = {
+			Pattern.compile("(\\d+)\\.(\\d+).+"),
+			Pattern.compile("(\\d+)-(\\d+).+"),
+			Pattern.compile("CD(\\d+)\\.(\\d+).+"),
+			Pattern.compile("CD(\\d+)-(\\d+).+")
+	};
+
 	private DiscogsModelUtil() {
 		// prevent instantiation for util class
 	}
-	
-	
+
 	public static String getReleaseArtistDescription(List<ReleaseArtist> artists,
 			boolean useAnv, boolean addAnvChar) {
 		StringBuilder result = new StringBuilder("");
@@ -136,6 +144,10 @@ public class DiscogsModelUtil {
 		}
 		
 		return result;
+	}
+	
+	public static ReleaseTracklistingModel getReleaseTracklistingModel(Release release) {
+		return new ReleaseTracklistingModel(release);
 	}
 
 }

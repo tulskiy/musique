@@ -55,7 +55,7 @@ public class SettingsDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public SettingsDialog() {
-		setMinimumSize(new Dimension(500, 0));
+		setMinimumSize(new Dimension(500, 300));
 		final FilenameFilter filter = new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {
@@ -64,7 +64,7 @@ public class SettingsDialog extends JDialog {
 		};
 		
 		setTitle("Settings");
-		setBounds(100, 100, 600, 310);
+		setBounds(100, 100, 600, 300);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
