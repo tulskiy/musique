@@ -79,16 +79,20 @@ public class SettingsDialog extends JDialog {
 		tabCache.setLayout(new BorderLayout(0, 0));
 
 		JPanel panelLocation = new JPanel();
+		panelLocation.setToolTipText("Location where cache folder is.");
 		panelLocation.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Location", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 		tabCache.add(panelLocation, BorderLayout.CENTER);
 
 		rdbtnSystemTempFolder = new JRadioButton("System temp folder");
+		rdbtnSystemTempFolder.setToolTipText("Path to system temp files folder. Can't be edited.");
 		rdbtnSystemTempFolder.setSelected(DiscogsPlugin.getCacheDirType() == 1);
 
 		rdbtnApplicationFolder = new JRadioButton("Application folder");
+		rdbtnApplicationFolder.setToolTipText("Path to application configuration files folder. Can't be edited.");
 		rdbtnApplicationFolder.setSelected(DiscogsPlugin.getCacheDirType() == 2);
 
 		rdbtnCustomFolder = new JRadioButton("Custom folder");
+		rdbtnCustomFolder.setToolTipText("Path to any user chosen folder.");
 		rdbtnCustomFolder.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent arg0) {
 				txtCustomFolder.setEnabled(rdbtnCustomFolder.isSelected());
@@ -102,22 +106,26 @@ public class SettingsDialog extends JDialog {
 	    group.add(rdbtnCustomFolder);
 	    
 	    txtSystemTempFolder = new JTextField();
+	    txtSystemTempFolder.setToolTipText("Path to system temp files folder. Can't be edited.");
 	    txtSystemTempFolder.setEnabled(false);
 	    txtSystemTempFolder.setColumns(10);
 	    txtSystemTempFolder.setText(DiscogsPlugin.DEFAULT_CACHE_ROOT_DIR);
 	    
 	    txtApplicationFolder = new JTextField();
+	    txtApplicationFolder.setToolTipText("Path to application configuration files folder. Can't be edited.");
 	    txtApplicationFolder.setEnabled(false);
 	    txtApplicationFolder.setColumns(10);
 	    txtApplicationFolder.setText(Application.getInstance().CONFIG_HOME.getPath());
 	    
 	    txtCustomFolder = new JTextField();
+	    txtCustomFolder.setToolTipText("Path to any user chosen folder.");
 	    txtCustomFolder.setMinimumSize(new Dimension(120, 19));
 	    txtCustomFolder.setEnabled(rdbtnCustomFolder.isSelected());
 	    txtCustomFolder.setColumns(10);
 	    txtCustomFolder.setText(DiscogsPlugin.getCacheRootDir());
 	    
 	    final JButton btnBrowse = new JButton("Browse...");
+	    btnBrowse.setToolTipText("Choose custom folder via File Chooser dialog.");
 	    btnBrowse.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent arg0) {
 	            TreeFileChooser fc = new TreeFileChooser(btnBrowse, "Open folder", false);
@@ -180,9 +188,11 @@ public class SettingsDialog extends JDialog {
 	    tabCache.add(panelGeneral, BorderLayout.NORTH);
 
 		chckbxCacheenabled = new JCheckBox("Cache query results");
+		chckbxCacheenabled.setToolTipText("If checked, caching of Discogs query results is enabled. One file per particular artist or release.");
 		chckbxCacheenabled.setSelected(DiscogsPlugin.isCacheEnabled());
 		
 		final JLabel lblCacheStats = new JLabel(getLabelStats(filter));
+		lblCacheStats.setToolTipText("Number of files already presented in cache and total size of cache.");
 		lblCacheStats.setHorizontalAlignment(SwingConstants.TRAILING);
 		lblCacheStats.setPreferredSize(new Dimension(140, 15));
 		

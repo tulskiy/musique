@@ -132,7 +132,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		
 		Component horizontalGlue_1 = Box.createHorizontalGlue();
 		panelArtistControls.add(horizontalGlue_1);
-		
+
+		progressBarArtist.setToolTipText("Indicates that Discogs is querying at the moment.");
 		progressBarArtist.setVisible(false);
 		progressBarArtist.setString("Querying Discogs...");
 		progressBarArtist.setIndeterminate(true);
@@ -140,6 +141,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		
 		Component horizontalGlue = Box.createHorizontalGlue();
 		panelArtistControls.add(horizontalGlue);
+		btnSelect.setToolTipText("Go to release details page.");
 		btnSelect.setPreferredSize(new Dimension(81, 0));
 		
 		btnSelect.addActionListener(new ActionListener() {
@@ -164,6 +166,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panelArtistControls.add(horizontalStrut);
 		
 		JButton btnCancelArtist = new JButton("Cancel");
+		btnCancelArtist.setToolTipText("Abort querying and/or close Discogs dialog.");
 		btnCancelArtist.setPreferredSize(new Dimension(81, 0));
 		btnCancelArtist.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -197,6 +200,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panel_1.add(horizontalStrut_6);
 		
 		txtArtist = new JTextField();
+		txtArtist.setToolTipText("Artist query string.");
 		txtArtist.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -219,6 +223,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panel_2.setPreferredSize(new Dimension(10, 40));
 		scrollPane_1.setColumnHeaderView(panel_2);
 
+		lstReleases.setToolTipText("List of releases belong to selected artist. One is to be selected to continue.");
 		lstReleases.setModel(new DiscogsReleaseListModel());
 		lstReleases.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
@@ -253,7 +258,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 			}
 		});
 		scrollPane_1.setViewportView(lstReleases);
-		
+
+		lstArtists.setToolTipText("List of artists fit query string.");
 		lstArtists.setModel(new DiscogsArtistListModel());
 		lstArtists.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
@@ -277,8 +283,9 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 			}
 		});
 		scrollPane.setViewportView(lstArtists);
+
+		btnQuery.setToolTipText("Query Discogs database.");
 		btnQuery.setPreferredSize(new Dimension(81, 0));
-		
 		btnQuery.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				if (!Util.isEmpty(txtArtist.getText())) {
@@ -305,6 +312,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panel_2.add(lblFilter);
 		
 		txtFilter = new JTextField();
+		txtFilter.setToolTipText("Release filter string.");
 		txtFilter.setMaximumSize(new Dimension(2147483647, 24));
 		txtFilter.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
@@ -330,6 +338,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		model.setFilter(txtFilter.getText());
 		
 		JButton btnClear = new JButton("Clear");
+		btnClear.setToolTipText("Clear release filter field.");
 		btnClear.setPreferredSize(new Dimension(81, 0));
 		btnClear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -358,6 +367,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panelReleaseControls.add(horizontalStrut_2);
 		
 		JButton btnBack = new JButton("Back");
+		btnBack.setToolTipText("Return back to artist/release page.");
 		btnBack.setPreferredSize(new Dimension(81, 0));
 		btnBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -369,7 +379,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		
 		Component horizontalGlue_2 = Box.createHorizontalGlue();
 		panelReleaseControls.add(horizontalGlue_2);
-		
+
+		progressBarRelease.setToolTipText("Indicates that Discogs is querying at the moment.");
 		progressBarRelease.setVisible(false);
 		progressBarRelease.setString("Querying Discogs...");
 		progressBarRelease.setIndeterminate(true);
@@ -377,6 +388,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		
 		Component horizontalGlue2 = Box.createHorizontalGlue();
 		panelReleaseControls.add(horizontalGlue2);
+
+		btnWrite.setToolTipText("Write tags to files.");
 		btnWrite.setPreferredSize(new Dimension(81, 0));
 		btnWrite.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -394,6 +407,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panelReleaseControls.add(horizontalStrut2);
 		
 		JButton btnCancelRelease = new JButton("Cancel");
+		btnCancelRelease.setToolTipText("Abort querying and/or close Discogs dialog.");
 		btnCancelRelease.setPreferredSize(new Dimension(81, 0));
 		btnCancelRelease.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -404,7 +418,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		
 		Component horizontalStrut_4 = Box.createHorizontalStrut(20);
 		panelReleaseControls.add(horizontalStrut_4);
-		
+
+		panelReleaseInfo.setToolTipText("General release information. Same for all tracks.");
 		panelReleaseInfo.setBorder(new TitledBorder(null, "General Info", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panelRelease.add(panelReleaseInfo, BorderLayout.NORTH);
 		
@@ -417,21 +432,25 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		JLabel lblReleasecatalogno = new JLabel("Catalog #");
 		
 		txtReleaseartist = new JTextField();
+		txtReleaseartist.setToolTipText("Release artist(s).");
 		txtReleaseartist.setEnabled(false);
 		txtReleaseartist.setEditable(false);
 		txtReleaseartist.setColumns(10);
 		
 		txtReleasealbum = new JTextField();
+		txtReleasealbum.setToolTipText("Release title.");
 		txtReleasealbum.setEnabled(false);
 		txtReleasealbum.setEditable(false);
 		txtReleasealbum.setColumns(10);
 		
 		txtReleaselabel = new JTextField();
+		txtReleaselabel.setToolTipText("Release record label.");
 		txtReleaselabel.setEnabled(false);
 		txtReleaselabel.setEditable(false);
 		txtReleaselabel.setColumns(10);
 		
 		txtReleasecatalogno = new JTextField();
+		txtReleasecatalogno.setToolTipText("Release record label catalog number.");
 		txtReleasecatalogno.setEnabled(false);
 		txtReleasecatalogno.setEditable(false);
 		txtReleasecatalogno.setColumns(10);
@@ -439,26 +458,31 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		JLabel lblReleaseyear = new JLabel("Year");
 		
 		txtReleaseformat = new JTextField();
+		txtReleaseformat.setToolTipText("Release format(s).");
 		txtReleaseformat.setEnabled(false);
 		txtReleaseformat.setEditable(false);
 		txtReleaseformat.setColumns(10);
 		
 		txtReleasecountry = new JTextField();
+		txtReleasecountry.setToolTipText("Release country.");
 		txtReleasecountry.setEnabled(false);
 		txtReleasecountry.setEditable(false);
 		txtReleasecountry.setColumns(10);
 		
 		txtReleasegenre = new JTextField();
+		txtReleasegenre.setToolTipText("Release genre(s).");
 		txtReleasegenre.setEnabled(false);
 		txtReleasegenre.setEditable(false);
 		txtReleasegenre.setColumns(10);
 		
 		txtReleasestatus = new JTextField();
+		txtReleasestatus.setToolTipText("Release status.");
 		txtReleasestatus.setEnabled(false);
 		txtReleasestatus.setEditable(false);
 		txtReleasestatus.setColumns(10);
 		
 		txtReleaseyear = new JTextField();
+		txtReleaseyear.setToolTipText("Release date.");
 		txtReleaseyear.setEnabled(false);
 		txtReleaseyear.setEditable(false);
 		txtReleaseyear.setColumns(10);
@@ -558,6 +582,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panel.setPreferredSize(new Dimension(10, 40));
 		scrollPane_2.setColumnHeaderView(panel);
 
+		btnDiscogstrackup.setToolTipText("Move selected items up.");
 		btnDiscogstrackup.setEnabled(false);
 		btnDiscogstrackup.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -566,6 +591,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		});
 		panel.add(btnDiscogstrackup);
 
+		btnDiscogstrackremove.setToolTipText("Remove selected items.");
 		btnDiscogstrackremove.setEnabled(false);
 		btnDiscogstrackremove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -574,6 +600,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		});
 		panel.add(btnDiscogstrackremove);
 
+		btnDiscogstrackdown.setToolTipText("Move selected items down.");
 		btnDiscogstrackdown.setEnabled(false);
 		btnDiscogstrackdown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -582,6 +609,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		});
 		panel.add(btnDiscogstrackdown);
 
+		lstDiscogsTracks.setToolTipText("List of tracks read from Discogs database.");
 		lstDiscogsTracks.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		lstDiscogsTracks.setModel(new DiscogsTrackListModel());
 		lstDiscogsTracks.addListSelectionListener(new ListSelectionListener() {
@@ -604,7 +632,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		JPanel panel_3 = new JPanel();
 		panel_3.setPreferredSize(new Dimension(10, 40));
 		scrollPane_3.setColumnHeaderView(panel_3);
-		
+
+		btnMusiquetrackremove.setToolTipText("Remove selected items.");
 		btnMusiquetrackremove.setEnabled(false);
 		btnMusiquetrackremove.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -612,6 +641,8 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 			}
 		});
 		panel_3.add(btnMusiquetrackremove);
+
+		lstMusiqueTracks.setToolTipText("List of playlist tracks to be tagged.");
 		lstMusiqueTracks.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent arg0) {
 				if (!arg0.getValueIsAdjusting()) {
@@ -634,7 +665,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 				lstDiscogsTracks.repaint();
 			}
 		});
-		chckbxUseanv.setToolTipText("Use artist variation name");
+		chckbxUseanv.setToolTipText("Use artist variation name.");
 		chckbxUseanv.setSelected(true);
 	}
 	
