@@ -19,7 +19,6 @@ package com.tulskiy.musique.gui.model;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jaudiotagger.tag.FieldKey;
@@ -27,6 +26,9 @@ import org.jaudiotagger.tag.FieldKey;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
+/**
+ * @author mliauchuk
+ */
 public class Tools {
 
 	private Tools() {

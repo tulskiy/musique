@@ -237,6 +237,30 @@ public class Util {
             	}
             	return sb.toString();
         	}
+        	else if (values instanceof Object[]) {
+            	StringBuilder sb = new StringBuilder();
+            	Object[] vs = (Object[]) values;
+            	for (int i = 0; i < vs.length; i++) {
+            		String value = vs[i].toString();
+            		if (sb.length() != 0) {
+            			sb.append(separator);
+            		}
+            		sb.append(value == null ? "" : value.toString());
+            	}
+            	return sb.toString();
+        	}
+        	else if (values instanceof List) {
+            	StringBuilder sb = new StringBuilder();
+            	List<Object> vs = (List<Object>) values;
+            	for (Object obj : vs) {
+            		String value = obj.toString();
+            		if (sb.length() != 0) {
+            			sb.append(separator);
+            		}
+            		sb.append(value == null ? "" : value.toString());
+            	}
+            	return sb.toString();
+        	}
         }
         
         return null;

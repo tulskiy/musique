@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.tulskiy.musique.gui.model;
 
 import java.util.Iterator;
@@ -29,6 +28,9 @@ import org.jaudiotagger.tag.FieldKey;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.Util;
 
+/**
+ * @author mliauchuk
+ */
 public class TrackInfoItemState {
 
 	private Map<Track, FieldValues> values;

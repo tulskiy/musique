@@ -130,14 +130,16 @@ Title formatting help:
     Currently the following tags are supported:
 
     %artist%, %title%, %album%, %year%, %genre%, %comment%, %length% - Don't need to explain these
+    %genres% - multi-valued version of %genre%
     %albumArtist% - Album Artist (returns %artist% if album artist is not set)
                     for MP3 I use album artist from TXXX
     %fileName% - filename without extension
     %file% - full file path
-    %trackNumber%, %totalTracks% - track number formatted as a two-digit number and total tracks
-    %track% - convenience method that returns trackNumber/totalTrack, eg. 1/12
-    %discNumber%, %totalDiscs% - disc number and total discs
+    %trackNumber%, %trackTotal% - track number formatted as a two-digit number and total tracks
+    %track% - convenience method that returns raw track number as it is stored in tags
+    %disc%, %discTotal% - disc number and total discs
     %codec% - returns codec (MPEG-1 Layer 3, FLAC, WavPack, Ogg Vorbis, Monkey's Audio, PCM)
+    %recordLabels%, %catalogNos% - set of record label and catalog number values
 
     some technical info fields like
     %bitrate%, %totalSamples%, %bps%, %channels%, %songIndex%, %sampleRate%,
@@ -149,6 +151,7 @@ Title formatting help:
     $if3(arg1, arg2, ...) - returns first non-empty argument
     $strcmp(arg1, arg2) - returns 1 if arg1=arg2, empty string otherwise
     $isPlaying() - used to idicate that the song is currently playing, paused or in playback queue
+    $combine(arg1, arg2) - formatter for multi-valued fields, where arg1 is values and arg2 is format separator
     
 
     '' - Regular strings are enclosed in single quotation marks
@@ -163,3 +166,5 @@ Title formatting help:
         otherwise returns just 'Title'
 
     $if3(%title%, %fileName%) - returns file name without extension if title is empty
+    
+    $combine(%genres%, ', ') - returns genre list separated by comma (for example, "heavy metal, hard rock")

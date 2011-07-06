@@ -33,6 +33,9 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.util.FieldKeyMetaHelper;
 
+/**
+ * @author mliauchuk
+ */
 public class MultiTagFieldModel extends AbstractTableModel implements TagFieldModel {
 
 	private List<TrackInfoItem> trackInfoItems = new LinkedList<TrackInfoItem>();

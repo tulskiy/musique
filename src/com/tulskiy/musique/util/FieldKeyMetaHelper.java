@@ -146,7 +146,7 @@ public class FieldKeyMetaHelper {
 		meta.put(keyMeta.getKey(), keyMeta);
 		keyMeta = instance.new FieldKeyMeta(FieldKey.ORIGINAL_ARTIST, "Original Artist", ++i);
 		meta.put(keyMeta.getKey(), keyMeta);
-		keyMeta = instance.new FieldKeyMeta(FieldKey.ORIGINAL_ALBUM, "Original ALbum", ++i);
+		keyMeta = instance.new FieldKeyMeta(FieldKey.ORIGINAL_ALBUM, "Original Album", ++i);
 		meta.put(keyMeta.getKey(), keyMeta);
 		keyMeta = instance.new FieldKeyMeta(FieldKey.ORIGINAL_YEAR, "Original Year", ++i);
 		meta.put(keyMeta.getKey(), keyMeta);
@@ -162,7 +162,7 @@ public class FieldKeyMetaHelper {
 		meta.put(keyMeta.getKey(), keyMeta);
 		keyMeta = instance.new FieldKeyMeta(FieldKey.TEMPO, "Tempo", ++i);
 		meta.put(keyMeta.getKey(), keyMeta);
-		keyMeta = instance.new FieldKeyMeta(FieldKey.URL_DISCOGS_ARTIST_SITE, "URL Discogs Artist Sire", ++i);
+		keyMeta = instance.new FieldKeyMeta(FieldKey.URL_DISCOGS_ARTIST_SITE, "URL Discogs Artist Site", ++i);
 		meta.put(keyMeta.getKey(), keyMeta);
 		keyMeta = instance.new FieldKeyMeta(FieldKey.URL_DISCOGS_RELEASE_SITE, "URL Discogs Release Site", ++i);
 		meta.put(keyMeta.getKey(), keyMeta);

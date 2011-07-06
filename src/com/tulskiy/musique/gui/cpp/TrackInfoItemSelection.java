@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.tulskiy.musique.gui.cpp;
 
 import java.awt.datatransfer.Clipboard;
@@ -30,6 +29,9 @@ import com.tulskiy.musique.gui.model.TrackInfoItem;
 import com.tulskiy.musique.util.FieldKeyMetaHelper;
 import com.tulskiy.musique.util.Util;
 
+/**
+ * @author mliauchuk
+ */
 public class TrackInfoItemSelection implements Transferable, ClipboardOwner {
 	
 	public static final DataFlavor objectFlavor = new DataFlavor(List.class, "Musique.TrackInfoItem object");

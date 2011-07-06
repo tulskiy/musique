@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 
+import com.tulskiy.musique.gui.model.FieldValues;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 
@@ -52,7 +53,7 @@ public class ParameterExpression implements Expression {
             if (o == null)
                 return null;
             // hack for multi-valued tag fields
-            return o instanceof Set ? o : o.toString();
+            return o instanceof FieldValues ? o : o.toString();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {

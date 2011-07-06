@@ -1,0 +1,21 @@
+<html>
+<head>
+<title>Discogs Dump File Iterators</title>
+</head>
+<body>
+The classes in this package can be used to iterate through <a href="http://discogs.com/data">discogs xml dump files</a>.
+These monthly dump files contain artist, release and label information, which can
+be iterated through for local persistence (or other reasons).
+<p/>
+An example of iteration over Artists is:
+<pre>
+Iterator&lt;Artist&gt; aIter=new ArtistIterator(new File("discogs_20110107_artists.xml.gz"));
+for (Artist curr: aIter) {
+  System.out.println("Artist:\n"+curr);
+  doSomethingWithTheArtist(curr);
+}
+</pre>
+Precalculation is done within the iterator, so progress information is available,
+if required.  Precalculation may also be disabled if a couple seconds wait is too long.
+</body>
+</html>

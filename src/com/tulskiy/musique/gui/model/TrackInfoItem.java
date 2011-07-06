@@ -24,6 +24,9 @@ import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.playlist.Track;
 
+/**
+ * @author mliauchuk
+ */
 public class TrackInfoItem {
 
 	private FieldKey key;

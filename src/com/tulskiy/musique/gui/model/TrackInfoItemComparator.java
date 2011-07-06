@@ -23,6 +23,9 @@ import org.jaudiotagger.tag.KeyNotFoundException;
 
 import com.tulskiy.musique.util.FieldKeyMetaHelper;
 
+/**
+ * @author mliauchuk
+ */
 public class TrackInfoItemComparator implements Comparator<TrackInfoItem> {
 
 	@Override
