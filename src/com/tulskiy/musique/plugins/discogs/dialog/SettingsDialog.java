@@ -8,7 +8,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.io.IOException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -17,25 +16,24 @@ import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.tulskiy.musique.gui.dialogs.TreeFileChooser;
 import com.tulskiy.musique.plugins.discogs.DiscogsCaller;
 import com.tulskiy.musique.plugins.discogs.DiscogsPlugin;
 import com.tulskiy.musique.system.Application;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
 
 public class SettingsDialog extends JDialog {
 	
@@ -147,18 +145,19 @@ public class SettingsDialog extends JDialog {
 	    		.addGroup(gl_panelLocation.createSequentialGroup()
 	    			.addContainerGap()
 	    			.addGroup(gl_panelLocation.createParallelGroup(Alignment.LEADING)
+	    				.addComponent(rdbtnCustomFolder, GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+	    				.addComponent(rdbtnApplicationFolder, GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE)
+	    				.addComponent(rdbtnSystemTempFolder, GroupLayout.DEFAULT_SIZE, 163, Short.MAX_VALUE))
+	    			.addGroup(gl_panelLocation.createParallelGroup(Alignment.LEADING)
 	    				.addGroup(gl_panelLocation.createSequentialGroup()
-	    					.addComponent(rdbtnSystemTempFolder)
 	    					.addGap(18)
 	    					.addComponent(txtSystemTempFolder, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
 	    				.addGroup(gl_panelLocation.createSequentialGroup()
-	    					.addComponent(rdbtnApplicationFolder)
-	    					.addGap(31)
+	    					.addGap(18)
 	    					.addComponent(txtApplicationFolder, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE))
 	    				.addGroup(gl_panelLocation.createSequentialGroup()
-	    					.addComponent(rdbtnCustomFolder)
-	    					.addGap(57)
-	    					.addComponent(txtCustomFolder, GroupLayout.DEFAULT_SIZE, 368, Short.MAX_VALUE)
+	    					.addGap(18)
+	    					.addComponent(txtCustomFolder, GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
 	    					.addPreferredGap(ComponentPlacement.RELATED)
 	    					.addComponent(btnBrowse)))
 	    			.addContainerGap())
@@ -176,8 +175,8 @@ public class SettingsDialog extends JDialog {
 	    			.addPreferredGap(ComponentPlacement.UNRELATED)
 	    			.addGroup(gl_panelLocation.createParallelGroup(Alignment.BASELINE)
 	    				.addComponent(rdbtnCustomFolder)
-	    				.addComponent(txtCustomFolder, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-	    				.addComponent(btnBrowse))
+	    				.addComponent(btnBrowse)
+	    				.addComponent(txtCustomFolder, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
 	    			.addGap(135))
 	    );
 	    gl_panelLocation.setAutoCreateGaps(true);

@@ -2,6 +2,7 @@ package com.tulskiy.musique.plugins.discogs.dialog;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -37,6 +38,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.border.LineBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -420,7 +422,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panelReleaseControls.add(horizontalStrut_4);
 
 		panelReleaseInfo.setToolTipText("General release information. Same for all tracks.");
-		panelReleaseInfo.setBorder(new TitledBorder(null, "General Info", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelReleaseInfo.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "General Info", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 		panelRelease.add(panelReleaseInfo, BorderLayout.NORTH);
 		
 		JLabel lblReleaseartist = new JLabel("Artist");
@@ -444,13 +446,13 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		txtReleasealbum.setColumns(10);
 		
 		txtReleaselabel = new JTextField();
-		txtReleaselabel.setToolTipText("Release record label.");
+		txtReleaselabel.setToolTipText("Release record label(s).");
 		txtReleaselabel.setEnabled(false);
 		txtReleaselabel.setEditable(false);
 		txtReleaselabel.setColumns(10);
 		
 		txtReleasecatalogno = new JTextField();
-		txtReleasecatalogno.setToolTipText("Release record label catalog number.");
+		txtReleasecatalogno.setToolTipText("Release record label catalog number(s).");
 		txtReleasecatalogno.setEnabled(false);
 		txtReleasecatalogno.setEditable(false);
 		txtReleasecatalogno.setColumns(10);
@@ -568,7 +570,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		panelReleaseInfo.setLayout(gl_panelReleaseInfo);
 		
 		JPanel panelTracklisting = new JPanel();
-		panelTracklisting.setBorder(new TitledBorder(null, "Tracklisting", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panelTracklisting.setBorder(new TitledBorder(new LineBorder(new Color(184, 207, 229)), "Tracklisting", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(51, 51, 51)));
 		panelTracklisting.setLayout(new BorderLayout(0, 0));
 		panelRelease.add(panelTracklisting, BorderLayout.CENTER);
 
