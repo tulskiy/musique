@@ -24,8 +24,10 @@ import java.util.Map;
 import java.util.Set;
 
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.util.Util;
 
+/**
+ * @author mliauchuk
+ */
 public class Album {
 	
 	private static final Integer DEFAULT_DISC = 1; 

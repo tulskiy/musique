@@ -17,6 +17,9 @@
 
 package com.tulskiy.musique.gui.model;
 
+/**
+ * @author mliauchuk
+ */
 public interface TagFieldModel {
 
 	public void approveModel();

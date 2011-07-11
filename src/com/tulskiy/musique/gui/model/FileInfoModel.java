@@ -29,6 +29,9 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.util.Util;
 
+/**
+ * @author mliauchuk
+ */
 public class FileInfoModel extends MultiTagFieldModel {
 
 	class Entry {

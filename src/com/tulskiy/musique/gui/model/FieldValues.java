@@ -22,6 +22,9 @@ import java.util.List;
 
 import com.tulskiy.musique.util.Util;
 
+/**
+ * @author mliauchuk
+ */
 public class FieldValues {
 
 	private String singleV;
