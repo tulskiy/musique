@@ -401,6 +401,18 @@ public class TracksInfoDialog extends JDialog {
             }
         });
 
+        aMap.put("capitalize", new AbstractAction("Capitalize") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            	List<TrackInfoItem> selectedItems = getSelectedItems(table);
+            	if (!selectedItems.isEmpty()) {
+                	Tools.capitalize(selectedItems);
+                	table.revalidate();
+                	table.repaint();
+            	}
+            }
+        });
+
         aMap.put("cut", new AbstractAction("Cut fields") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -490,6 +502,11 @@ public class TracksInfoDialog extends JDialog {
         menuItemEdit.setIcon(emptyIcon);
         menuItemEdit.setEnabled(isAnyRowSelected);
         menu.add(menuItemEdit).addActionListener(properties.getActionMap().get("edit"));
+
+        JMenuItem menuItemCapitalize = new JMenuItem("Capitalize");
+        menuItemCapitalize.setIcon(emptyIcon);
+        menuItemCapitalize.setEnabled(isAnyRowSelected);
+        menu.add(menuItemCapitalize).addActionListener(properties.getActionMap().get("capitalize"));
         
         menu.addSeparator();
 

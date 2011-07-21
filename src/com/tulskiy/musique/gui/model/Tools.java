@@ -19,6 +19,7 @@ package com.tulskiy.musique.gui.model;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jaudiotagger.tag.FieldKey;
@@ -84,6 +85,33 @@ public class Tools {
 			}
 		}
 	}
+	
+	public static void capitalize(List<TrackInfoItem> items) {
+		FieldValues valuesOld;
+		FieldValues valuesNew;
+		String value;
+		char[] chars;
+
+		for (TrackInfoItem item : items) {
+			for (Track track : item.getTracks()) {
+				valuesNew = new FieldValues();
+				valuesOld = item.getState().getValues(track);
+				for (int i = 0; i < valuesOld.size(); i++) {
+					value = valuesOld.get(i);
+					chars = value.toCharArray();
+					if (!Util.isEmpty(value)) {
+						chars[0] = Character.toUpperCase(chars[0]);
+						for (int j = 1; j < chars.length; j++) {
+							chars[j] = isCharacterToBeUpperCased(chars[j], chars[j-1]) ?
+									Character.toUpperCase(chars[j]) : Character.toLowerCase(chars[j]);
+						}
+					}
+					valuesNew.add(String.valueOf(chars));
+				}
+				item.getState().setValues(valuesNew, track);
+			}
+		}
+	}
     
     private static TrackInfoItem getTrackInfoItem(FieldKey key, MultiTagFieldModel model) {
     	for (TrackInfoItem item : model.getTrackInfoItems()) {
@@ -106,5 +134,10 @@ public class Tools {
 		}
 
 		return item;
+    }
+    
+    private static boolean isCharacterToBeUpperCased(char curr, char prev) {
+    	String uccs = "`~!@#$%^&*()_+[]{};:\"\\|/,.<>?";
+    	return Character.isWhitespace(prev) || uccs.indexOf(prev) > -1;
     }
 }
