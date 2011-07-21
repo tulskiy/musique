@@ -47,5 +47,13 @@
                 <role>developer</role>
             </roles>
         </developer>
+		<developer>
+			<id>bassstorm</id>
+			<name>Maksim Liauchuk</name>
+			<url>https://github.com/bassstorm</url>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
     </developers>
 </project>
