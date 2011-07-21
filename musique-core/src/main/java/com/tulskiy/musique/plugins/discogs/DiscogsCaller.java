@@ -114,7 +114,7 @@ public class DiscogsCaller implements Runnable {
 			}
 		}
 		catch (Exception e) {
-			// failed to retrieve, don't bother
+			e.printStackTrace();
 		}
 
 		// TODO investigate how to avoid this ugly hack (Cancel button pressed while querying Discogs)

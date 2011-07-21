@@ -27,5 +27,6 @@
         <module>tta</module>
         <module>vorbis-java</module>
         <module>wavpack</module>
+        <module>discogs</module>
     </modules>
 </project>

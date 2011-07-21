@@ -53,7 +53,7 @@ public class XML {
         e.printStackTrace();
         throw new IOException("Unexpected error: " + e.getMessage());
       }
-      return builder.parse(new ByteArrayInputStream(xml.getBytes()));
+      return builder.parse(new ByteArrayInputStream(xml.getBytes("utf8")));
     } catch (SAXException sxe) {
       System.err.println("Error parsing:\n"+xml);
       // Error generated during parsing

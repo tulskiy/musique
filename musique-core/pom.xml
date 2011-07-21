@@ -144,5 +144,10 @@
             <artifactId>last.fm-bindings</artifactId>
             <version>0.1.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.benow</groupId>
+            <artifactId>discogs</artifactId>
+            <version>0.1</version>
+        </dependency>
     </dependencies>
 </project>
