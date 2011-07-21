@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.tulskiy</groupId>
+    <name>musique</name>
+    <description>Cross-platform Java audio player</description>
+    <url>https://github.com/tulskiy/musique</url>
+
+    <modules>
+        <module>dependencies</module>
+        <module>musique-core</module>
+    </modules>
+
+    <artifactId>musique</artifactId>
+    <version>0.2-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <licenses>
+        <license>
+            <name>LGPL 3</name>
+            <url>http://www.gnu.org/licenses/lgpl-3.0.txt</url>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git://github.com/tulskiy/musique.git</connection>
+        <developerConnection>scm:git@github.com:tulskiy/musique.git</developerConnection>
+        <url>https://github.com/tulskiy/musique</url>
+    </scm>
+
+    <issueManagement>
+        <system>github</system>
+        <url>https://github.com/tulskiy/musique/issues</url>
+    </issueManagement>
+
+    <developers>
+        <developer>
+            <id>tulskiy</id>
+            <name>Denis Tulskiy</name>
+            <url>https://github.com/tulskiy</url>
+            <roles>
+                <role>developer</role>
+            </roles>
+        </developer>
+    </developers>
+</project>
