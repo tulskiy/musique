@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/modules/aac/aac.iml" filepath="$PROJECT_DIR$/modules/aac/aac.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/alac/alac.iml" filepath="$PROJECT_DIR$/modules/alac/alac.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/cuelib/cuelib.iml" filepath="$PROJECT_DIR$/modules/cuelib/cuelib.iml" />
+      <module fileurl="file://$PROJECT_DIR$/modules/discogs-java/discogs-java.iml" filepath="$PROJECT_DIR$/modules/discogs-java/discogs-java.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/jaudiotagger/jaudiotagger.iml" filepath="$PROJECT_DIR$/modules/jaudiotagger/jaudiotagger.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/javalayer/javalayer.iml" filepath="$PROJECT_DIR$/modules/javalayer/javalayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/modules/jflac/jflac.iml" filepath="$PROJECT_DIR$/modules/jflac/jflac.iml" />
