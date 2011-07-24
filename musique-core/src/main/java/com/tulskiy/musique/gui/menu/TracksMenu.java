@@ -44,6 +44,7 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.util.FileUtils;
 import com.tulskiy.musique.util.Util;
 
 /**
@@ -156,25 +157,7 @@ public class TracksMenu extends Menu {
                             }
 
                             if (track.getTrackData().getFile().delete()) {
-                            	File current = track.getTrackData().getFile().getParentFile();
-                            	File parent;
-                            	File[] files = current.listFiles();
-                            	if (files != null && files.length == 0) {
-                            		ret = JOptionPane.showConfirmDialog(null, "Do you want delete empty folder(s) as well?", "Delete File(s)?", JOptionPane.YES_NO_OPTION);
-                            		if (ret == JOptionPane.YES_OPTION) {
-                            			while (current != null) {
-                            				parent = current.getParentFile();
-                            				current.delete();
-                                        	files = parent.listFiles();
-                                        	if (files != null && files.length == 0) {
-                                        		current = parent;
-                                        	}
-                                        	else {
-                                        		current = null;
-                                        	}
-                            			}
-                            		}
-                            	}
+                                FileUtils.deleteEmptyParentFolders(track.getTrackData().getFile(), true);
                                 playlist.remove(track);
                             }
                         }

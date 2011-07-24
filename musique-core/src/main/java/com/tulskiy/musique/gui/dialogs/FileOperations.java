@@ -25,6 +25,7 @@ import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.util.FileUtils;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
@@ -300,6 +301,8 @@ public class FileOperations extends JDialog {
                         if (src.renameTo(dest)) {
                             processed += src.length();
                             entry.getKey().getTrackData().setLocation(dest.toURI().toString());
+                            // TODO "delete yes/no" decision to be remembered
+                            FileUtils.deleteEmptyParentFolders(src, true);
                             continue;
                         }
                     }
@@ -333,8 +336,13 @@ public class FileOperations extends JDialog {
                     if (abort) {
                         dest.delete();
                     } else if (mode == Operation.Move) {
-                        if (!src.delete())
+                        if (src.delete()) {
+                            // TODO "delete yes/no" decision to be remembered
+                            FileUtils.deleteEmptyParentFolders(src, true);
+                        }
+                        else {
                             log.add("Failed to remove " + src);
+                        }
                     }
 
 
