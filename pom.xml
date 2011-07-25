@@ -15,10 +15,11 @@
     </modules>
 
     <artifactId>musique</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>${project.version}</version>
     <packaging>pom</packaging>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.version>0.3-SNAPSHOT</project.version>
     </properties>
     <licenses>
         <license>
