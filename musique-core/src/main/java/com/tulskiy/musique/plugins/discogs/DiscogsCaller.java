@@ -29,6 +29,7 @@ import org.discogs.ws.search.SearchResult;
 /**
  * @author mliauchuk
  */
+// TODO rewrite using SwingWorker way
 public class DiscogsCaller implements Runnable {
 	
 	private static Discogs DISCOGS = null;

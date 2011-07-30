@@ -19,23 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.GroupLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JProgressBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.LineBorder;
@@ -671,95 +655,100 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		chckbxUseanv.setSelected(true);
 	}
 	
-	private void filterReleases(JList list) {
-		DiscogsReleaseListModel model = (DiscogsReleaseListModel) list.getModel();
-		model.setFilter(txtFilter.getText());
-		list.clearSelection();
-		list.revalidate();
-		list.repaint();
+	private void filterReleases(final JList list) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                DiscogsReleaseListModel model = (DiscogsReleaseListModel) list.getModel();
+                model.setFilter(txtFilter.getText());
+                list.clearSelection();
+            }
+        });
 	}
 
 	@Override
-	public void onRetrieveStart(DiscogsCaller.CallMode callMode) {
-		switch (callMode) {
-			case ARTIST:
-			case SEARCH_ARTISTS:
-				clearReleaseInfo();
-				btnSelect.setEnabled(false);
-				progressBarArtist.setVisible(true);
-				setComponentChildrenState(splitPaneArtist, false);
-				break;
-			case RELEASE:
-				btnWrite.setEnabled(false);
-				progressBarRelease.setVisible(true);
-				setComponentChildrenState(panelReleaseInfo, false);
-				setComponentChildrenState(splitPaneRelease, false);
-				break;
-			default:
-				break;
-		}
+	public void onRetrieveStart(final DiscogsCaller.CallMode callMode) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                switch (callMode) {
+                    case ARTIST:
+                    case SEARCH_ARTISTS:
+                        clearReleaseInfo();
+                        btnSelect.setEnabled(false);
+                        progressBarArtist.setVisible(true);
+                        setComponentChildrenState(splitPaneArtist, false);
+                        break;
+                    case RELEASE:
+                        btnWrite.setEnabled(false);
+                        progressBarRelease.setVisible(true);
+                        setComponentChildrenState(panelReleaseInfo, false);
+                        setComponentChildrenState(splitPaneRelease, false);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
 	}
 
 	@Override
-	public void onRetrieveFinish(DiscogsCaller.CallMode callMode, Object data) {
-		switch (callMode) {
-			case ARTIST:
-			case SEARCH_ARTISTS:
-				if (lstArtists != null) {
-					// syncronized in order to prevent list events occur during model update
-					// frankly, not sure but it seems works
-					synchronized (lstArtists) {
-						if (data != null) {
-							DefaultListModel listModel = (DefaultListModel) lstArtists.getModel();
-	
-							listModel.clear();
-							if (callMode == DiscogsCaller.CallMode.ARTIST) {
-								Artist artist = (Artist) data;
-								listModel.addElement(artist);
-							}
-							else if (callMode == DiscogsCaller.CallMode.SEARCH_ARTISTS) {
-								List<Artist> artists = (List<Artist>) data;
-								for (Artist artist : artists) {
-									listModel.addElement(artist);
-								}
-							}
-	
-							lstArtists.revalidate();
-							lstArtists.setSelectedIndex(0);
-							lstArtists.repaint();
-						}
-					}
-				}
+	public void onRetrieveFinish(final DiscogsCaller.CallMode callMode, final Object data) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                switch (callMode) {
+                    case ARTIST:
+                    case SEARCH_ARTISTS:
+                        if (lstArtists != null && data != null) {
+                            DefaultListModel listModel = (DefaultListModel) lstArtists.getModel();
 
-				progressBarArtist.setVisible(false);
-				setComponentChildrenState(splitPaneArtist, true);
-				break;
-			case RELEASE:
-				if (data != null) {
-					release = (Release) data;
-					if (lstDiscogsTracks != null) {
-						fillReleaseInfo(release);
-						updateDiscogsTracklistingWithUseAnv();
-						fillTracklisting(lstDiscogsTracks, release.getTracks());
-						fillTracklisting(lstMusiqueTracks, tracks);
-						
-						btnWrite.setEnabled(true);
-					}
-				}
+                            listModel.clear();
+                            if (callMode == DiscogsCaller.CallMode.ARTIST) {
+                                Artist artist = (Artist) data;
+                                listModel.addElement(artist);
+                            }
+                            else if (callMode == DiscogsCaller.CallMode.SEARCH_ARTISTS) {
+                                List<Artist> artists = (List<Artist>) data;
+                                for (Artist artist : artists) {
+                                    listModel.addElement(artist);
+                                }
+                            }
 
-				progressBarRelease.setVisible(false);
-				setComponentChildrenState(panelReleaseInfo, true);
-				setComponentChildrenState(splitPaneRelease, true);
-				// to set proper up/remove/down buttons state
-				// i know it's bad bad bad, fix if you can
-				lstDiscogsTracks.getSelectionModel().setSelectionInterval(0, 0);
-				lstDiscogsTracks.getSelectionModel().clearSelection();
-				lstMusiqueTracks.getSelectionModel().setSelectionInterval(0, 0);
-				lstMusiqueTracks.getSelectionModel().clearSelection();
-				break;
-			default:
-				break;
-		}
+                            lstArtists.setSelectedIndex(0);
+                        }
+
+                        progressBarArtist.setVisible(false);
+                        setComponentChildrenState(splitPaneArtist, true);
+                        break;
+                    case RELEASE:
+                        if (data != null) {
+                            release = (Release) data;
+                            if (lstDiscogsTracks != null) {
+                                fillReleaseInfo(release);
+                                updateDiscogsTracklistingWithUseAnv();
+                                fillTracklisting(lstDiscogsTracks, release.getTracks());
+                                fillTracklisting(lstMusiqueTracks, tracks);
+
+                                btnWrite.setEnabled(true);
+                            }
+                        }
+
+                        progressBarRelease.setVisible(false);
+                        setComponentChildrenState(panelReleaseInfo, true);
+                        setComponentChildrenState(splitPaneRelease, true);
+                        // to set proper up/remove/down buttons state
+                        // i know it's bad bad bad, fix if you can
+                        lstDiscogsTracks.getSelectionModel().setSelectionInterval(0, 0);
+                        lstDiscogsTracks.getSelectionModel().clearSelection();
+                        lstMusiqueTracks.getSelectionModel().setSelectionInterval(0, 0);
+                        lstMusiqueTracks.getSelectionModel().clearSelection();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
 	}
 	
 	private void setComponentChildrenState(JComponent component, boolean state) {
@@ -787,59 +776,58 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 		}
 	}
 	
-	private void fillTracklisting(JList list, List<?> tracks) {
-		DefaultListModel listModel = (DefaultListModel) list.getModel();
-
-		listModel.clear();
-		for (Object track : tracks) {
-			listModel.addElement(track);
-		}
-
-		list.revalidate();
-		list.repaint();
+	private void fillTracklisting(final JList list, final List<?> tracks) {
+        DefaultListModel listModel = (DefaultListModel) list.getModel();
+        listModel.clear();
+        for (Object track : tracks) {
+            listModel.addElement(track);
+        }
 	}
 	
-	private void moveSelectedTracklistingItems(JList list, int direction) {
-		DiscogsDefaultListModel listModel = (DiscogsDefaultListModel) list.getModel();
-		ListSelectionModel lsm = list.getSelectionModel();
+	private void moveSelectedTracklistingItems(final JList list, final int direction) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                DiscogsDefaultListModel listModel = (DiscogsDefaultListModel) list.getModel();
+                ListSelectionModel lsm = list.getSelectionModel();
 
-		int indexStart = list.getSelectedIndices()[0];
-		int indexEnd = list.getSelectedIndices()[list.getSelectedIndices().length - 1];
-		int indexObj;
-		Object obj;
+                int indexStart = list.getSelectedIndices()[0];
+                int indexEnd = list.getSelectedIndices()[list.getSelectedIndices().length - 1];
+                int indexObj;
+                Object obj;
 
-		if (direction < 0) {
-			indexObj = indexStart - 1;
-			obj = listModel.getEx(indexObj);
-			listModel.remove(indexObj);
-			if (listModel.size() == indexEnd) {
-				listModel.addElement(obj);
-			}
-			else {
-				listModel.add(indexEnd, obj);
-			}
-			lsm.setSelectionInterval(indexStart - 1, indexEnd - 1);
-		}
-		else if (direction > 0) {
-			indexObj = indexEnd + 1;
-			obj = listModel.getEx(indexObj);
-			listModel.remove(indexObj);
-			listModel.add(indexStart, obj);
-			lsm.setSelectionInterval(indexStart + 1, indexEnd + 1);
-		}
-
-		list.revalidate();
-		list.repaint();
+                if (direction < 0) {
+                    indexObj = indexStart - 1;
+                    obj = listModel.getEx(indexObj);
+                    listModel.remove(indexObj);
+                    if (listModel.size() == indexEnd) {
+                        listModel.addElement(obj);
+                    }
+                    else {
+                        listModel.add(indexEnd, obj);
+                    }
+                    lsm.setSelectionInterval(indexStart - 1, indexEnd - 1);
+                }
+                else if (direction > 0) {
+                    indexObj = indexEnd + 1;
+                    obj = listModel.getEx(indexObj);
+                    listModel.remove(indexObj);
+                    listModel.add(indexStart, obj);
+                    lsm.setSelectionInterval(indexStart + 1, indexEnd + 1);
+                }
+            }
+        });
 	}
 	
-	private void removeSelectedTracklistingItems(JList list) {
-		DefaultListModel listModel = (DefaultListModel) list.getModel();
-
-		listModel.removeRange(list.getSelectedIndices()[0],
-				list.getSelectedIndices()[list.getSelectedIndices().length - 1]);
-
-		list.revalidate();
-		list.repaint();
+	private void removeSelectedTracklistingItems(final JList list) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                DefaultListModel listModel = (DefaultListModel) list.getModel();
+                listModel.removeRange(list.getSelectedIndices()[0],
+                        list.getSelectedIndices()[list.getSelectedIndices().length - 1]);
+            }
+        });
 	}
 	
 	private void clearReleaseInfo() {
