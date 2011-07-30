@@ -5,7 +5,7 @@
     <parent>
         <artifactId>musique</artifactId>
         <groupId>com.tulskiy</groupId>
-        <version>0.2-SNAPSHOT</version>
+        <version>${project.version}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -43,6 +43,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
+                    <jarPath>${project.parent.relativePath}</jarPath>
                     <archive>
                         <manifest>
                             <mainClass>com.tulskiy.musique.system.Main</mainClass>

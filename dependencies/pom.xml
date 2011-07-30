@@ -5,7 +5,7 @@
     <parent>
         <artifactId>musique</artifactId>
         <groupId>com.tulskiy</groupId>
-        <version>0.2-SNAPSHOT</version>
+        <version>${project.version}</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
