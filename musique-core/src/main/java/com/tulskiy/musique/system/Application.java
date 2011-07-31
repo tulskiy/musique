@@ -250,7 +250,7 @@ public class Application {
 
     private void saveSettings() {
         AudioOutput audioOutput = player.getAudioOutput();
-        configuration.setFloat("player.volume", audioOutput.getVolume(true));
+        configuration.setFloat("player.volume", audioOutput.getVolume(false));
         Mixer.Info mixer = audioOutput.getMixer();
         if (mixer != null)
             configuration.setString("player.mixer", mixer.getName());
