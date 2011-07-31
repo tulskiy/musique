@@ -60,4 +60,8 @@ public class AudioMath {
         }
         return i;
     }
+
+    public static int millisToSamples(int millis, int sampleRate) {
+        return millis / 1000 * sampleRate;
+    }
 }

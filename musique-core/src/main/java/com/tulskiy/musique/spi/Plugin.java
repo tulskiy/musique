@@ -32,10 +32,10 @@ import java.awt.*;
  * Date: 2/27/11
  */
 public abstract class Plugin {
-    protected Application application = Application.getInstance();
-    protected Player player = application.getPlayer();
-    protected Configuration config = application.getConfiguration();
-    protected PlaylistManager playlistManager = application.getPlaylistManager();
+    protected static final Application application = Application.getInstance();
+    protected static final Player player = application.getPlayer();
+    protected static final Configuration config = application.getConfiguration();
+    protected static final PlaylistManager playlistManager = application.getPlaylistManager();
 
     public abstract boolean init();
 

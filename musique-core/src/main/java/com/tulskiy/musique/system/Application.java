@@ -57,6 +57,7 @@ public class Application {
     public final String VERSION = "Musique 0.2";
     public File CONFIG_HOME;
     private File configFile;
+    private PluginLoader pluginLoader;
 
     public static Application getInstance() {
         return ourInstance;
@@ -118,7 +119,7 @@ public class Application {
         playlistManager = new PlaylistManager();
         playlistManager.loadPlaylists();
 
-        PluginLoader pluginLoader = new PluginLoader();
+        pluginLoader = new PluginLoader();
         pluginLoader.load();
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -287,6 +288,8 @@ public class Application {
         if (mainWindow != null) {
             mainWindow.shutdown();
         }
+
+        pluginLoader.shutdown();
         System.exit(0);
     }
 

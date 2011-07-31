@@ -21,6 +21,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,6 +32,7 @@ import java.util.logging.Logger;
  */
 public class PluginLoader {
     private static final Logger logger = Logger.getLogger("musique");
+    private ArrayList<Plugin> activePlugins = new ArrayList<Plugin>();
 
     public void load() {
         try {
@@ -42,7 +44,9 @@ public class PluginLoader {
             for (Plugin plugin : loader) {
                 try {
                     System.out.println(plugin);
-                    plugin.init();
+                    if (plugin.init()) {
+                        activePlugins.add(plugin);
+                    }
                 } catch (Exception e) {
                     logger.log(Level.FINE, "Error loading " + plugin.getDescription(), e);
                 }
@@ -50,6 +54,12 @@ public class PluginLoader {
             logger.fine("Finished loading plugins");
         } catch (MalformedURLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void shutdown() {
+        for (Plugin plugin : activePlugins) {
+            plugin.shutdown();
         }
     }
 }
