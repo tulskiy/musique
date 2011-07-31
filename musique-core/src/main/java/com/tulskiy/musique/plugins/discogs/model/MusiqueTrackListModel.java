@@ -40,7 +40,12 @@ public class MusiqueTrackListModel extends DiscogsDefaultListModel {
 	}
 
 	private static String getTrackDescription(Track track) {
-		return track.getTrackData().getFileName();
+        StringBuilder sb = new StringBuilder();
+        sb.append(track.getTrackData().getFileName())
+                .append(" (")
+                .append(track.getTrackData().getLength())
+                .append(')');
+        return sb.toString();
 	}
 
 }
