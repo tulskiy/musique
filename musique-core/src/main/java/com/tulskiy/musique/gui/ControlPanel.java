@@ -368,7 +368,7 @@ public class ControlPanel extends javax.swing.JPanel {
         nextRandomButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         jToolBar1.add(nextRandomButton);
 
-        volumeSlider.setValue((int) (output.getVolume() * 100));
+        volumeSlider.setValue((int) (output.getVolume(true) * 100));
         volumeSlider.setFocusable(false);
 
         progressSlider.setValue(0);

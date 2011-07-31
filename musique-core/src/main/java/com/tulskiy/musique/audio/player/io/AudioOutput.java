@@ -106,8 +106,8 @@ public class AudioOutput {
         }
     }
 
-    public float getVolume() {
-        if (volumeControl != null) {
+    public float getVolume(boolean actual) {
+        if (actual && volumeControl != null) {
             if (linearVolume)
                 return this.volumeControl.getValue() / volumeControl.getMaximum();
             else
