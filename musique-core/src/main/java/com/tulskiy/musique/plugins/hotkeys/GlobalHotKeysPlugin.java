@@ -14,7 +14,7 @@ import java.util.ArrayList;
  * Author: Denis Tulskiy
  * Date: 7/31/11
  */
-public class GlobalHotKeys extends Plugin {
+public class GlobalHotKeysPlugin extends Plugin {
     private static final int SEEK_DISTANCE = 3000;
 
     enum HotKeyEvent {
