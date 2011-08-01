@@ -125,7 +125,6 @@ public class Application {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                saveSettings();
                 playlistManager.saveSettings();
                 try {
                     configuration.save(new FileWriter(configFile));
@@ -247,21 +246,6 @@ public class Application {
 //                UIManager.put("TextArea.font", defaultFont);
             }
         });
-    }
-
-    private void saveSettings() {
-        AudioOutput audioOutput = player.getAudioOutput();
-        configuration.setFloat("player.volume", audioOutput.getVolume(false));
-        Mixer.Info mixer = audioOutput.getMixer();
-        if (mixer != null)
-            configuration.setString("player.mixer", mixer.getName());
-        else
-            configuration.remove("player.mixer");
-        Charset value = AudioFileReader.getDefaultCharset();
-        if (value != null)
-            configuration.setString("tag.defaultEncoding", value.name());
-        else
-            configuration.remove("tag.defaultEncoding");
     }
 
     public void start() {

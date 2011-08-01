@@ -115,10 +115,14 @@ public class OptionsDialog extends JDialog {
                 if (index > 0) {
                     Mixer.Info info = mixerInfo[index - 1];
                     output.setMixer(info);
+                    config.setString("player.mixer", info.getName());
                 } else {
                     output.setMixer(null);
+                    config.remove("player.mixer");
                 }
-                AudioFileReader.setDefaultCharset((Charset) defaultEncoding.getSelectedItem());
+                Charset defaultCharset = (Charset) defaultEncoding.getSelectedItem();
+                AudioFileReader.setDefaultCharset(defaultCharset);
+                config.setString("tag.defaultEncoding", defaultCharset.name());
                 config.setBoolean("system.oneInstance", singleInstance.isSelected());
             }
         });

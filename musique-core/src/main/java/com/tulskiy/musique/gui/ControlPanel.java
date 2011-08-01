@@ -148,7 +148,9 @@ public class ControlPanel extends javax.swing.JPanel {
 
         volumeSlider.addChangeListener(new ChangeListener() {
             public void stateChanged(ChangeEvent e) {
-                output.setVolume(volumeSlider.getValue() / 100f);
+                float volume = volumeSlider.getValue() / 100f;
+                output.setVolume(volume);
+                config.setFloat("player.volume", volume);
             }
         });
 
