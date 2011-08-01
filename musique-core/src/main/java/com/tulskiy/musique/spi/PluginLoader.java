@@ -39,16 +39,21 @@ public class PluginLoader {
 //            URLClassLoader classLoader = new URLClassLoader(new URL[]{
 //                    new File("musique.jar").toURI().toURL(),
 //            });
-        ServiceLoader<Plugin> loader = ServiceLoader.load(Plugin.class, getClass().getClassLoader());
-        for (Plugin plugin : loader) {
+        try {
+            ServiceLoader<Plugin> loader = ServiceLoader.load(Plugin.class, getClass().getClassLoader());
+            for (Plugin plugin : loader) {
             try {
                 System.out.println(plugin);
                 if (plugin.init()) {
                     activePlugins.add(plugin);
                 }
-            } catch (Exception e) {
-                logger.log(Level.FINE, "Error loading " + plugin.getDescription(), e);
+            } catch (Throwable e) {
+                logger.log(Level.WARNING, "Error loading " + plugin.getDescription(), e);
             }
+        }
+        } catch (Throwable e) {
+            e.printStackTrace();
+            logger.log(Level.WARNING, "Error loading plugins", e);
         }
         logger.fine("Finished loading plugins");
     }
