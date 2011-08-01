@@ -35,26 +35,22 @@ public class PluginLoader {
     private ArrayList<Plugin> activePlugins = new ArrayList<Plugin>();
 
     public void load() {
-        try {
-            logger.fine("Loading plugins");
-            URLClassLoader classLoader = new URLClassLoader(new URL[]{
-                    new File("musique.jar").toURI().toURL(),
-            });
-            ServiceLoader<Plugin> loader = ServiceLoader.load(Plugin.class, classLoader);
-            for (Plugin plugin : loader) {
-                try {
-                    System.out.println(plugin);
-                    if (plugin.init()) {
-                        activePlugins.add(plugin);
-                    }
-                } catch (Exception e) {
-                    logger.log(Level.FINE, "Error loading " + plugin.getDescription(), e);
+        logger.fine("Loading plugins");
+//            URLClassLoader classLoader = new URLClassLoader(new URL[]{
+//                    new File("musique.jar").toURI().toURL(),
+//            });
+        ServiceLoader<Plugin> loader = ServiceLoader.load(Plugin.class, getClass().getClassLoader());
+        for (Plugin plugin : loader) {
+            try {
+                System.out.println(plugin);
+                if (plugin.init()) {
+                    activePlugins.add(plugin);
                 }
+            } catch (Exception e) {
+                logger.log(Level.FINE, "Error loading " + plugin.getDescription(), e);
             }
-            logger.fine("Finished loading plugins");
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
         }
+        logger.fine("Finished loading plugins");
     }
 
     public void shutdown() {
