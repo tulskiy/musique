@@ -506,12 +506,12 @@ public class Playlist extends ArrayList<Track> {
         for (Track track : temp) {
             cache.cache(track);
         }
+        int sizeOld = size();
         addAll(location, temp);
         firePlaylistChanged();
-        int size = temp.size();
         queue.clear();
         temp.clear();
-        return size;
+        return size() - sizeOld;
     }
 
     public void sort(String expression, boolean toggle) {
