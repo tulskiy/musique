@@ -30,7 +30,6 @@ import javax.swing.table.AbstractTableModel;
 import org.jaudiotagger.tag.FieldKey;
 
 import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.playlist.TrackData;
 import com.tulskiy.musique.util.FieldKeyMetaHelper;
 
 /**
@@ -48,10 +47,10 @@ public class MultiTagFieldModel extends AbstractTableModel implements TagFieldMo
 	protected void loadTracks(List<Track> tracks) {
 		Set<FieldKey> usedKeys = new LinkedHashSet<FieldKey>();
 		for (int i = 0; i < tracks.size(); i++) {
-			TrackData trackData = tracks.get(i).getTrackData();
-			trackData.populateWithEmptyCommonTagFields();
-
-			Iterator<Entry<FieldKey, FieldValues>> entries = trackData
+			tracks.get(i).getTrackData().populateWithEmptyCommonTagFields();
+		}
+		for (int i = 0; i < tracks.size(); i++) {
+			Iterator<Entry<FieldKey, FieldValues>> entries = tracks.get(i).getTrackData()
 					.getAllTagFieldValuesIterator();
 			while (entries.hasNext()) {
 				Entry<FieldKey, FieldValues> entry = entries.next();
