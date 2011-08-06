@@ -84,7 +84,16 @@ public class SingleTagFieldModel extends AbstractTableModel implements TagFieldM
 	}
 	
 	private void updateState() {
-		if (!isMultiTrackEditMode()) {
+		if (isMultiTrackEditMode()) {
+			for (int i = 0; i < newValues.size(); i++) {
+				Track track = trackInfoItem.getTracks().get(i);
+				String oldValue = Util.formatFieldValues(trackInfoItem.getState().getValues(track));
+				if (!oldValue.equals(newValues.get(i))) {
+					trackInfoItem.getState().setValue(newValues.get(i), track);
+				}
+			}
+		}
+		else {			
 			if (newValues.isEmpty()) {
 				trackInfoItem.getState().setValue("", selectedTrack);
 			}
@@ -97,10 +106,24 @@ public class SingleTagFieldModel extends AbstractTableModel implements TagFieldM
 		}
 	}
 	
-	public void approveModel() {
-		updateState();
+	public void approveState() {
 		trackInfoItem.approveState(false);
 		initValues();
+	}
+	
+	public void approveModel() {
+		updateState();
+		approveState();
+	}
+	
+	public void approveModel(String singleValue) {
+		if (isMultiTrackEditMode()) {
+			trackInfoItem.getState().setValue(singleValue);
+		}
+		else {
+			trackInfoItem.getState().setValue(singleValue, selectedTrack);
+		}
+		approveState();
 	}
 	
 	public void refreshModel() {
@@ -145,13 +168,11 @@ public class SingleTagFieldModel extends AbstractTableModel implements TagFieldM
 
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		if (!isMultiTrackEditMode()) {
-			newValues.set(rowIndex, (String) aValue);
-		}
+		newValues.set(rowIndex, (String) aValue);
 	}
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return columnIndex == 1 && !isMultiTrackEditMode();
+		return columnIndex == 1;
 	}
 }

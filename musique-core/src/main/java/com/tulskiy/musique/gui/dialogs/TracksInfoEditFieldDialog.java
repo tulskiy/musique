@@ -41,8 +41,10 @@ import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -57,6 +59,8 @@ import com.tulskiy.musique.gui.model.MultiTagFieldModel;
 import com.tulskiy.musique.gui.model.SingleTagFieldModel;
 import com.tulskiy.musique.gui.model.TagFieldModel;
 import com.tulskiy.musique.util.Util;
+import javax.swing.JTextPane;
+import javax.swing.border.LineBorder;
 
 /**
  * Author: Denis Tulskiy
@@ -70,9 +74,22 @@ public class TracksInfoEditFieldDialog extends JDialog {
         setTitle(tagFieldModel.isMultiTrackEditMode() ? "Edit multiple files" : "Edit single file");
         setModal(false);
 
+        JPanel singleValuePanel = new JPanel();
+        singleValuePanel.setLayout(new BoxLayout(singleValuePanel, BoxLayout.X_AXIS));
+        
+        final JTextPane textPane = new JTextPane();
+        textPane.setBorder(new LineBorder(new Color(0, 0, 0)));
+        singleValuePanel.add(textPane);
+
         JComponent tagsTable = createTable(properties, tagFieldModel);
 
-        add(tagsTable, BorderLayout.CENTER);
+        final JTabbedPane tp = new JTabbedPane();
+        tp.setFocusable(false);
+        tp.addTab("Single value", singleValuePanel);
+        tp.addTab("Multi value", tagsTable);
+        tp.setSelectedIndex(tp.getTabCount() - 1);
+
+        getContentPane().add(tp, BorderLayout.CENTER);
 
         Box b1 = new Box(BoxLayout.X_AXIS);
         b1.add(Box.createHorizontalGlue());
@@ -81,8 +98,14 @@ public class TracksInfoEditFieldDialog extends JDialog {
         update.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	// update state with this dialog values
-            	tagFieldModel.approveModel();
+            	if (tp.getSelectedIndex() == 0) {
+            		// update state with single value (multi value model is not taken into account)
+            		tagFieldModel.approveModel(textPane.getText());
+            	}
+            	else {
+	            	// update state with this dialog values
+	            	tagFieldModel.approveModel();
+            	}
             	// sync parent dialog values with approved state
             	((TagFieldModel) properties.getModel()).refreshModel();
             	properties.revalidate();
@@ -107,7 +130,7 @@ public class TracksInfoEditFieldDialog extends JDialog {
         b1.add(cancel);
         b1.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 10));
 
-        add(b1, BorderLayout.SOUTH);
+        getContentPane().add(b1, BorderLayout.SOUTH);
 
         setSize(600, 380);
         setLocationRelativeTo(SwingUtilities.windowForComponent(properties));
@@ -147,6 +170,12 @@ public class TracksInfoEditFieldDialog extends JDialog {
         table.setDefaultEditor(Object.class, new DefaultCellEditor(editor) {
             @Override
             public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
+                TableModel tableModel = table.getModel();
+                if (tableModel instanceof SingleTagFieldModel) {
+                    if (((SingleTagFieldModel) tableModel).isMultiTrackEditMode()) {//.get(row).isMultiple()) {
+                        value = "";
+                    }
+                }
                 JTextField c = (JTextField) super.getTableCellEditorComponent(table, value, isSelected, row, column);
                 c.setBorder(BorderFactory.createEmptyBorder());
                 c.setFont(table.getFont());
