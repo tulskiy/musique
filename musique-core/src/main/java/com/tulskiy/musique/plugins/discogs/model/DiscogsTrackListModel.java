@@ -68,7 +68,7 @@ public class DiscogsTrackListModel extends DiscogsDefaultListModel {
 		if (!Util.isEmpty(artistName)) {
 			sb.append(" - ").append(artistName);
 		}
-		sb.append(" - ").append(track.getTitle());
+		sb.append(" - ").append(DiscogsModelUtil.getTrackTitleCleared(track.getTitle()));
 		if (track.getDuration() != null) {
 			sb.append(" (").append(track.getDuration()).append(')');
 		}

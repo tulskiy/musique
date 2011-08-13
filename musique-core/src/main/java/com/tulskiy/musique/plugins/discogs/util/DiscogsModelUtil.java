@@ -145,6 +145,22 @@ public class DiscogsModelUtil {
 		
 		return result;
 	}
+
+	/**
+	 * Strips any extra spaces from track title.
+	 * Practice shows that Discogs strips extra spaces on its pages,
+	 * but query results come with extra spaces as originally submitted.
+	 * 
+	 * @param trackTitle track title to clear up
+	 * @return cleared track title
+	 */
+	public static String getTrackTitleCleared(String trackTitle) {
+		if (Util.isEmpty(trackTitle)) {
+			return trackTitle;
+		}
+
+		return trackTitle.trim().replaceAll(" +", " ");
+	}
 	
 	public static ReleaseTracklistingModel getReleaseTracklistingModel(Release release) {
 		return new ReleaseTracklistingModel(release);

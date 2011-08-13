@@ -885,7 +885,7 @@ public class DiscogsDialog extends JDialog implements DiscogsListener {
 			}
 			
 			trackData.setTagFieldValues(FieldKey.ARTIST, Util.firstNotEmpty(trackArtist, albumArtist));
-			trackData.setTagFieldValues(FieldKey.TITLE, discogsTrack.getTitle());
+			trackData.setTagFieldValues(FieldKey.TITLE, DiscogsModelUtil.getTrackTitleCleared(discogsTrack.getTitle()));
 
 			trackData.setTagFieldValues(FieldKey.TRACK, rtm.getTrackTrack(discogsTrack));
 			trackData.setTagFieldValues(FieldKey.TRACK_TOTAL, rtm.getTrackTrackTotal(discogsTrack));
