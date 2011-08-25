@@ -52,7 +52,7 @@ import java.util.regex.Pattern;
 public class LyricsPanel extends JPanel {
     private static Application app = Application.getInstance();
     private static Configuration config = app.getConfiguration();
-    private static Logger logger = Logger.getLogger("musique");
+    private Logger logger = Logger.getLogger(getClass().getName());
     private final File lyricsDir = new File(app.CONFIG_HOME, "lyrics");
     private final Timer timer;
     private Search search;
@@ -273,7 +273,7 @@ public class LyricsPanel extends JPanel {
                         StringBuffer buffer = new StringBuffer();
                         while (m.find()) {
                             String group = m.group(1);
-                            char ch = (char) (int) Integer.valueOf(group);
+                            char ch = (char) Integer.valueOf(group);
                             m.appendReplacement(buffer, String.valueOf(ch));
                         }
                         m.appendTail(buffer);

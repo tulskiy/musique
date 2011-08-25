@@ -23,11 +23,11 @@ import javax.sound.sampled.AudioFormat;
 import java.util.logging.Logger;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 12.06.2009
+ * Author: Denis Tulskiy
+ * Date: 12.06.2009
  */
 public interface Decoder {
-    final Logger logger = Logger.getLogger("musique");
+    final Logger logger = Logger.getLogger(Decoder.class.getName());
 
     /**
      * Open the file and prepare for decoding.

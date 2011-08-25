@@ -47,7 +47,7 @@ public class Scrobbler {
     private static final String CLIENT_ID = "mqe";
     private static final String CLIENT_VERSION = "1.0";
 
-    private Logger logger = Logger.getLogger("musique");
+    private Logger logger = Logger.getLogger(getClass().getName());
     private de.umass.lastfm.scrobble.Scrobbler scrobbler;
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();

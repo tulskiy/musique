@@ -37,7 +37,7 @@ public class ConfigTest {
 
     @Before
     public void setUp() {
-        Logger.getLogger("musique").setLevel(Level.OFF);
+        Logger.getLogger(getClass().getName()).setLevel(Level.OFF);
         config = new Configuration();
         config.load(new StringReader(
                 "font: Serif, 0, 14\n" +

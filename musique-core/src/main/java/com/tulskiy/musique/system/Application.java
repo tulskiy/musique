@@ -48,7 +48,7 @@ import java.util.logging.Formatter;
 
 public class Application {
     private static Application ourInstance = new Application();
-    private final Logger logger = Logger.getLogger("musique");
+    private final Logger logger = Logger.getLogger("com.tulskiy");
 
     private Player player;
     private Configuration configuration;

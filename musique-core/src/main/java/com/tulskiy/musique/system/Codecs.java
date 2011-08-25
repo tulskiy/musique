@@ -38,19 +38,18 @@ import com.tulskiy.musique.util.Util;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.logging.Logger;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 24.06.2009
+ * Author: Denis Tulskiy
+ * Date: 24.06.2009
  */
 public class Codecs {
     private static HashMap<String, Decoder> decoders = new HashMap<String, Decoder>();
     private static HashMap<String, Encoder> encoders = new HashMap<String, Encoder>();
-    private static final Logger logger = Logger.getLogger("musique");
+    private static final Logger logger = Logger.getLogger(Codecs.class.getName());
 
     static {
         decoders.put("mp3", new MP3Decoder());

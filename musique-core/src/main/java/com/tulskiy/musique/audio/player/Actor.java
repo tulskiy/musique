@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  * Date: 1/15/11
  */
 public abstract class Actor {
-    private Logger logger = Logger.getLogger("musique");
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     public enum Message {
         // player messages

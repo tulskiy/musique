@@ -36,7 +36,7 @@ import java.util.logging.Logger;
  * Date: Jul 27, 2010
  */
 public class Converter {
-    private Logger logger = Logger.getLogger("musique");
+    private Logger logger = Logger.getLogger(getClass().getName());
     private Configuration config = Application.getInstance().getConfiguration();
     private Expression fileNameFormat;
     private Encoder encoder;

@@ -23,7 +23,6 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.util.AudioMath;
 
 import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.LineUnavailableException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +33,7 @@ import static com.tulskiy.musique.audio.player.PlayerEvent.PlayerEventCode;
  * Date: 1/15/11
  */
 public class PlayingThread extends Actor implements Runnable {
-    public static final Logger logger = Logger.getLogger("musique");
+    public final Logger logger = Logger.getLogger(getClass().getName());
     private static final int BUFFER_SIZE = AudioOutput.BUFFER_SIZE;
 
     private AudioFormat format;

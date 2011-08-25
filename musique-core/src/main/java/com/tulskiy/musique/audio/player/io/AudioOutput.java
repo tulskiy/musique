@@ -26,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class AudioOutput {
     public static final int BUFFER_SIZE = (int) (Math.pow(2, 15) / 24) * 24;
-    private final Logger logger = Logger.getLogger("musique");
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     private SourceDataLine line;
     private FloatControl volumeControl;

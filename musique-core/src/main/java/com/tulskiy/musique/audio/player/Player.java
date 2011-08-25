@@ -32,7 +32,7 @@ import static com.tulskiy.musique.audio.player.Actor.Message;
  * Date: Jan 21, 2010
  */
 public class Player {
-    public static final Logger logger = Logger.getLogger("musique");
+    public final Logger logger = Logger.getLogger(getClass().getName());
     private static final int BUFFER_SIZE = (int) Math.pow(2, 18);
 
     private PlayingThread playingThread;

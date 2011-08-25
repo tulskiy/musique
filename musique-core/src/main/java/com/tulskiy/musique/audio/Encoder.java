@@ -28,7 +28,7 @@ import java.util.logging.Logger;
  * Date: Jul 25, 2010
  */
 public interface Encoder {
-    final Logger logger = Logger.getLogger("musique");
+    final Logger logger = Logger.getLogger(Encoder.class.getName());
 
     public boolean open(File outputFile, AudioFormat fmt, Configuration options);
 

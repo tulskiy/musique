@@ -44,7 +44,7 @@ import java.util.logging.Logger;
  * Date: Jul 19, 2010
  */
 public class AlbumArtPanel extends JPanel {
-    private static Logger logger = Logger.getLogger("musique");
+    private Logger logger = Logger.getLogger(getClass().getName());
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();

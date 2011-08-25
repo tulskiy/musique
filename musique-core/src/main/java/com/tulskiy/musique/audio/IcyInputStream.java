@@ -33,7 +33,7 @@ import java.util.logging.Logger;
  * Date: 4/10/11
  */
 public class IcyInputStream extends FilterInputStream {
-    private static final Logger logger = Logger.getLogger("musique");
+    private static final Logger logger = Logger.getLogger(IcyInputStream.class.getName());
 
     private Track track;
     private int metaInt = 0;

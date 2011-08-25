@@ -55,8 +55,8 @@ import com.tulskiy.musique.util.AudioMath;
 import com.tulskiy.musique.util.Util;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: Dec 30, 2009
+ * Author: Denis Tulskiy
+ * Date: Dec 30, 2009
  */
 public class Playlist extends ArrayList<Track> {
 
@@ -79,7 +79,7 @@ public class Playlist extends ArrayList<Track> {
     private static final int VERSION = 3;
     private static final byte[] MAGIC = "BARABASHKA".getBytes();
 
-    private static final Logger logger = Logger.getLogger("musique");
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private ArrayList<PlaylistListener> listeners = new ArrayList<PlaylistListener>();
     private String name;
     private boolean sortAscending = true;

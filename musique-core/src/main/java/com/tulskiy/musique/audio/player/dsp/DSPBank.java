@@ -21,12 +21,12 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 26.07.2009
+ * Author: Denis Tulskiy
+ * Date: 26.07.2009
  */
 public class DSPBank {
     private static final int DEFAULT_SAMPLES_SIZE = (int) (44100 * 4 * 0.2);
-    private static final Logger logger = Logger.getLogger("musique");
+    private final Logger logger = Logger.getLogger(getClass().getName());
 
     private ArrayList<Processor> processors = new ArrayList<Processor>();
     private int count;

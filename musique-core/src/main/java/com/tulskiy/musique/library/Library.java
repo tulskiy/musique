@@ -39,7 +39,7 @@ import java.util.logging.Logger;
  * Date: 10/30/10
  */
 public class Library {
-    private final Logger logger = Logger.getLogger("musique");
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'?')|$if1(%album%,[[%year% - ]%album%],'?')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
     private Configuration config = Application.getInstance().getConfiguration();
     private Playlist data;

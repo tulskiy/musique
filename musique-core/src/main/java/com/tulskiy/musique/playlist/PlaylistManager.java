@@ -16,8 +16,8 @@
  */
 
 /**
- * @Author: Denis Tulskiy
- * @Date: Dec 30, 2009
+ * Author: Denis Tulskiy
+ * Date: Dec 30, 2009
  */
 package com.tulskiy.musique.playlist;
 
@@ -36,7 +36,7 @@ public class PlaylistManager {
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
     private File PLAYLIST_PATH = new File(app.CONFIG_HOME, "playlists");
-    private Logger logger = Logger.getLogger("musique");
+    private Logger logger = Logger.getLogger(getClass().getName());
     private ArrayList<Playlist> playlists = new ArrayList<Playlist>();
     private Playlist activePlaylist;
     private Playlist visiblePlaylist;

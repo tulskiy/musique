@@ -17,10 +17,6 @@
 
 package com.tulskiy.musique.spi;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +29,7 @@ import java.util.logging.Logger;
  * Date: 2/27/11
  */
 public class PluginLoader {
-    private static final Logger logger = Logger.getLogger("musique");
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private ArrayList<Plugin> activePlugins = new ArrayList<Plugin>();
 
     public void load() {

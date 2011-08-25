@@ -31,7 +31,7 @@ import java.util.logging.Logger;
  * Date: Jun 15, 2010
  */
 public class Configuration {
-    private Logger logger = Logger.getLogger("musique");
+    private Logger logger = Logger.getLogger(getClass().getName());
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     private Map<String, Object> map = new TreeMap<String, Object>();

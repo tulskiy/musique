@@ -39,13 +39,13 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.TrackData;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: 25.06.2009
+ * Author: Denis Tulskiy
+ * Date: 25.06.2009
  */
 public abstract class AudioFileReader {
     private static CUEParser cueParser;
     protected static Charset defaultCharset = Charset.forName("iso8859-1");
-    protected final Logger logger = Logger.getLogger("musique");
+    protected final Logger logger = Logger.getLogger(getClass().getName());
 
     public void read(File file, List<Track> list) {
         logger.log(Level.FINEST, "Reading file : {0}", file);
@@ -114,8 +114,8 @@ public abstract class AudioFileReader {
     }
 
     protected void copyHeaderFields(GenericAudioHeader header, Track track) {
-    	TrackData trackData = track.getTrackData();
         if (header != null && track != null) {
+            TrackData trackData = track.getTrackData();
         	trackData.setChannels(header.getChannelNumber());
         	trackData.setTotalSamples(header.getTotalSamples());
 

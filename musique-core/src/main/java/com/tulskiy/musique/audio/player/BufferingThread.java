@@ -32,7 +32,7 @@ import com.tulskiy.musique.util.AudioMath;
  * Date: 1/15/11
  */
 public class BufferingThread extends Actor implements Runnable {
-    private static final Logger logger = Logger.getLogger("musique");
+    private final Logger logger = Logger.getLogger(getClass().getName());
     private PlaybackOrder order;
 
     private final Object lock = new Object();
