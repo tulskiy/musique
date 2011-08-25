@@ -75,7 +75,14 @@ public class DiscogsPlugin extends Plugin {
 
     @Override
     public boolean isConfigurable() {
-        return false;
+        return true;
+    }
+
+    @Override
+    public void configure() {
+        SettingsDialog settingsDialog = new SettingsDialog();
+        settingsDialog.setLocationRelativeTo(null);
+        settingsDialog.setVisible(true);
     }
 
     private JMenu createMenu(final ArrayList<Track> tracks, final Playlist playlist) {
