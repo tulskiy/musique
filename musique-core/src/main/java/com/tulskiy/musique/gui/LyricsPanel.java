@@ -273,7 +273,7 @@ public class LyricsPanel extends JPanel {
                         StringBuffer buffer = new StringBuffer();
                         while (m.find()) {
                             String group = m.group(1);
-                            char ch = (char) Integer.valueOf(group);
+                            char ch = (char) Integer.valueOf(group).shortValue();
                             m.appendReplacement(buffer, String.valueOf(ch));
                         }
                         m.appendTail(buffer);
