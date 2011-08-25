@@ -22,6 +22,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -43,7 +45,7 @@ public class PluginLoader {
             ServiceLoader<Plugin> loader = ServiceLoader.load(Plugin.class, getClass().getClassLoader());
             for (Plugin plugin : loader) {
             try {
-                System.out.println(plugin);
+                logger.fine("Loading plugin: " + plugin);
                 if (plugin.init()) {
                     activePlugins.add(plugin);
                 }
@@ -62,5 +64,9 @@ public class PluginLoader {
         for (Plugin plugin : activePlugins) {
             plugin.shutdown();
         }
+    }
+
+    public List<Plugin> getActivePlugins() {
+        return Collections.unmodifiableList(activePlugins);
     }
 }

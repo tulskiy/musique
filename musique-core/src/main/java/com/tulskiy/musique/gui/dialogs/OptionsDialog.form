@@ -1,6 +1,6 @@
 <?xml version="1.1" encoding="UTF-8" ?>
 
-<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+<Form version="1.6" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
   <NonVisualComponents>
     <Component class="javax.swing.ButtonGroup" name="buttonGroup1">
       <AuxValues>
@@ -41,7 +41,7 @@
               <Component id="applyButton" linkSize="1" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
-          <Component id="tabbedPane" alignment="0" pref="666" max="32767" attributes="0"/>
+          <Component id="tabbedPane" alignment="0" pref="668" max="32767" attributes="0"/>
       </Group>
     </DimensionLayout>
     <DimensionLayout dim="1">
@@ -95,7 +95,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="audioMixer" pref="480" max="32767" attributes="0"/>
+                              <Component id="audioMixer" pref="454" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
@@ -123,7 +123,7 @@
                       </Group>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
                       <Component id="singleInstance" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="360" max="32767" attributes="0"/>
+                      <EmptySpace pref="339" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -194,7 +194,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="enableHttpProxy" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="separatorLabel5" pref="519" max="32767" attributes="0"/>
+                              <Component id="separatorLabel5" pref="498" max="32767" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" max="-2" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -218,7 +218,7 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="enableLastFmScrobbling" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="separatorLabel6" pref="519" max="32767" attributes="0"/>
+                              <Component id="separatorLabel6" pref="498" max="32767" attributes="0"/>
                           </Group>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -270,7 +270,7 @@
                               </Group>
                           </Group>
                       </Group>
-                      <EmptySpace pref="227" max="32767" attributes="0"/>
+                      <EmptySpace pref="186" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -385,9 +385,9 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
-                          <Component id="jScrollPane4" alignment="0" pref="540" max="32767" attributes="0"/>
+                          <Component id="jScrollPane4" alignment="0" pref="532" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="jScrollPane3" min="-2" pref="458" max="32767" attributes="0"/>
+                              <Component id="jScrollPane3" min="-2" pref="464" max="32767" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                                   <Component id="removeMusicFolder" max="32767" attributes="1"/>
@@ -395,8 +395,8 @@
                               </Group>
                               <EmptySpace min="5" pref="5" max="5" attributes="0"/>
                           </Group>
-                          <Component id="separatorLabel7" alignment="0" pref="540" max="32767" attributes="0"/>
-                          <Component id="separatorLabel9" alignment="0" pref="540" max="32767" attributes="0"/>
+                          <Component id="separatorLabel7" alignment="0" pref="532" max="32767" attributes="0"/>
+                          <Component id="separatorLabel9" alignment="0" pref="532" max="32767" attributes="0"/>
                           <Component id="enableLibraryView" alignment="0" min="-2" pref="198" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -409,7 +409,7 @@
                                   <Component id="libraryDoubleClickAction" alignment="0" min="-2" pref="221" max="-2" attributes="1"/>
                               </Group>
                           </Group>
-                          <Component id="separatorLabel10" alignment="0" pref="540" max="32767" attributes="0"/>
+                          <Component id="separatorLabel10" alignment="0" pref="532" max="32767" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="addView" linkSize="9" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
@@ -457,7 +457,7 @@
                           <Component id="removeView" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="addView" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <EmptySpace pref="43" max="32767" attributes="0"/>
+                      <EmptySpace pref="15" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -631,13 +631,13 @@
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="statusBarFormat" pref="475" max="32767" attributes="0"/>
-                                          <Component id="windowTitleFormat" alignment="0" pref="475" max="32767" attributes="0"/>
+                                          <Component id="statusBarFormat" pref="447" max="32767" attributes="0"/>
+                                          <Component id="windowTitleFormat" alignment="0" pref="447" max="32767" attributes="0"/>
                                       </Group>
                                   </Group>
-                                  <Component id="separatorLabel4" alignment="0" pref="540" max="32767" attributes="0"/>
-                                  <Component id="jScrollPane2" alignment="0" pref="540" max="32767" attributes="0"/>
-                                  <Component id="separatorLabel3" alignment="1" pref="540" max="32767" attributes="0"/>
+                                  <Component id="separatorLabel4" alignment="0" pref="532" max="32767" attributes="0"/>
+                                  <Component id="jScrollPane2" alignment="0" pref="532" max="32767" attributes="0"/>
+                                  <Component id="separatorLabel3" alignment="1" pref="532" max="32767" attributes="0"/>
                               </Group>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
@@ -721,7 +721,7 @@
                       <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jScrollPane2" min="-2" pref="101" max="-2" attributes="0"/>
-                      <EmptySpace pref="82" max="32767" attributes="0"/>
+                      <EmptySpace pref="34" max="32767" attributes="0"/>
                   </Group>
               </Group>
             </DimensionLayout>
@@ -892,7 +892,7 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="separatorLabel1" alignment="0" pref="540" max="32767" attributes="0"/>
+                          <Component id="separatorLabel1" alignment="0" pref="532" max="32767" attributes="0"/>
                           <Group type="102" alignment="0" max="-2" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="jLabel14" min="-2" max="-2" attributes="0"/>
@@ -916,7 +916,7 @@
                                   <Component id="defaultFont" linkSize="7" alignment="0" min="-2" pref="221" max="-2" attributes="0"/>
                               </Group>
                           </Group>
-                          <Component id="separatorLabel2" alignment="0" pref="540" max="32767" attributes="0"/>
+                          <Component id="separatorLabel2" alignment="0" pref="532" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
@@ -1059,6 +1059,90 @@
             <Component class="com.tulskiy.musique.gui.components.SeparatorLabel" name="separatorLabel2">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Fonts"/>
+              </Properties>
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
+                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+              </AuxValues>
+            </Component>
+          </SubComponents>
+        </Container>
+        <Container class="javax.swing.JPanel" name="jPanel2">
+          <AuxValues>
+            <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
+            <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+          </AuxValues>
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Plugins">
+                <Property name="tabTitle" type="java.lang.String" value="Plugins"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="separatorLabel8" pref="532" max="32767" attributes="0"/>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="jScrollPane5" min="-2" pref="448" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="12" max="-2" attributes="0"/>
+                              <Component id="pluginsConfigButton" max="32767" attributes="0"/>
+                              <EmptySpace min="-2" pref="16" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Group type="102" alignment="1" attributes="0">
+                      <EmptySpace max="32767" attributes="0"/>
+                      <Component id="separatorLabel8" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="pluginsConfigButton" min="-2" max="-2" attributes="0"/>
+                          <Component id="jScrollPane5" min="-2" pref="392" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace min="-2" pref="41" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Component class="javax.swing.JButton" name="pluginsConfigButton">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Configure"/>
+                <Property name="enabled" type="boolean" value="false"/>
+              </Properties>
+            </Component>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane5">
+              <AuxValues>
+                <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>
+                <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="0"/>
+              </AuxValues>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JList" name="pluginsList">
+                  <Properties>
+                    <Property name="model" type="javax.swing.ListModel" editor="org.netbeans.modules.form.editors2.ListModelEditor">
+                      <StringArray count="0"/>
+                    </Property>
+                    <Property name="selectionMode" type="int" value="0"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+            <Component class="com.tulskiy.musique.gui.components.SeparatorLabel" name="separatorLabel8">
+              <Properties>
+                <Property name="text" type="java.lang.String" value="Plugins"/>
               </Properties>
               <AuxValues>
                 <AuxValue name="JavaCodeGenerator_VariableLocal" type="java.lang.Boolean" value="true"/>

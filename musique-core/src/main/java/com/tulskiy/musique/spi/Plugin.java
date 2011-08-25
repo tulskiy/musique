@@ -43,10 +43,6 @@ public abstract class Plugin {
 
     public abstract Description getDescription();
 
-    public Container getConfigurationPanel() {
-        return null;
-    }
-
     public void registerMenu(MenuType type, Menu.MenuCallback menu) {
         if (menu != null)
             switch (type) {
@@ -65,19 +61,32 @@ public abstract class Plugin {
 
     public class Description {
         public String name;
-        public String version;
+        public String author;
 
-        public Description(String name, String version) {
+        public Description(String name, String author) {
             this.name = name;
-            this.version = version;
+            this.author = author;
         }
 
         @Override
         public String toString() {
-            return "Plugin {" +
-                    "name='" + name + '\'' +
-                    ", version='" + version + '\'' +
-                    '}';
+            final StringBuilder sb = new StringBuilder();
+            sb.append(name);
+            sb.append(", Author: ").append(author);
+            return sb.toString();
         }
+    }
+
+    public abstract boolean isConfigurable();
+    public void configure() {}
+
+    @Override
+    public String toString() {
+        Description description = getDescription();
+        if (description != null) {
+            return description.toString();
+        }
+
+        return null;
     }
 }

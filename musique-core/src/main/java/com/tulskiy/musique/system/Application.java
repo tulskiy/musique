@@ -289,4 +289,7 @@ public class Application {
         return playlistManager;
     }
 
+    public PluginLoader getPluginLoader() {
+        return pluginLoader;
+    }
 }

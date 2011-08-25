@@ -122,6 +122,16 @@ public class GlobalHotKeysPlugin extends Plugin {
 
     @Override
     public Description getDescription() {
-        return new Description("Global hotkeys", "1.0");
+        return new Description("Global HotKeys Plugin", "Denis Tulskiy");
+    }
+
+    @Override
+    public boolean isConfigurable() {
+        return true;
+    }
+
+    @Override
+    public void configure() {
+
     }
 }

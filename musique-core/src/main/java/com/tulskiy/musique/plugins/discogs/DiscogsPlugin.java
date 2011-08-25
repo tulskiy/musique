@@ -70,9 +70,14 @@ public class DiscogsPlugin extends Plugin {
 
     @Override
     public Description getDescription() {
-        return new Description("Discogs", "1.0");
+        return new Description("Discogs Plugin", "Maksim Liauchuk");
     }
-    
+
+    @Override
+    public boolean isConfigurable() {
+        return false;
+    }
+
     private JMenu createMenu(final ArrayList<Track> tracks, final Playlist playlist) {
         JMenu menu = new JMenu("Discogs");
         
