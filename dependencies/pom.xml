@@ -5,12 +5,13 @@
     <parent>
         <artifactId>musique</artifactId>
         <groupId>com.tulskiy</groupId>
-        <version>${project.version}</version>
+        <version>0.3-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.tulskiy.musique</groupId>
     <artifactId>dependencies</artifactId>
+    <name>dependencies</name>
     <packaging>pom</packaging>
 
     <modules>
