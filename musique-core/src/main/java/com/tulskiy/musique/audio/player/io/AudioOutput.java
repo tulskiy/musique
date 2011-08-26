@@ -87,6 +87,10 @@ public class AudioOutput {
         }
     }
 
+    public boolean isOpen() {
+        return line != null && line.isOpen();
+    }
+
     public void flush() {
         if (line != null && line.isOpen())
             line.flush();
