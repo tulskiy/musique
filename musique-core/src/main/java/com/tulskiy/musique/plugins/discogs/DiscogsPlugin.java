@@ -17,13 +17,13 @@
 
 package com.tulskiy.musique.plugins.discogs;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
+import javax.swing.*;
 
 import com.tulskiy.musique.gui.menu.Menu;
 import com.tulskiy.musique.playlist.Playlist;
@@ -79,7 +79,7 @@ public class DiscogsPlugin extends Plugin {
     }
 
     @Override
-    public void configure() {
+    public void configure(Window parent) {
         SettingsDialog settingsDialog = new SettingsDialog();
         settingsDialog.setLocationRelativeTo(null);
         settingsDialog.setVisible(true);

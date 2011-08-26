@@ -25,6 +25,7 @@ import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
+import java.awt.*;
 import java.util.logging.Logger;
 
 /**
@@ -79,7 +80,7 @@ public abstract class Plugin {
     }
 
     public abstract boolean isConfigurable();
-    public void configure() {}
+    public void configure(Window parent) {}
 
     @Override
     public String toString() {

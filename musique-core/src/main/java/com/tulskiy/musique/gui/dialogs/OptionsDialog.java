@@ -21,7 +21,6 @@ import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.gui.library.LibraryAction;
 import com.tulskiy.musique.spi.Plugin;
-import com.tulskiy.musique.spi.PluginLoader;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 
@@ -31,9 +30,6 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.metal.MetalLookAndFeel;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -355,7 +351,7 @@ public class OptionsDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 Plugin plugin = (Plugin) pluginsList.getSelectedValue();
                 if (plugin != null)
-                    plugin.configure();
+                    plugin.configure(SwingUtilities.getWindowAncestor(OptionsDialog.this));
             }
         });
     }
