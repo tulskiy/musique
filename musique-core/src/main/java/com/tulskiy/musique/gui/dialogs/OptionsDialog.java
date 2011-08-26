@@ -23,6 +23,7 @@ import com.tulskiy.musique.gui.library.LibraryAction;
 import com.tulskiy.musique.spi.Plugin;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.util.Util;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
@@ -343,15 +344,30 @@ public class OptionsDialog extends JDialog {
             public void valueChanged(ListSelectionEvent e) {
                 Plugin plugin = (Plugin) pluginsList.getSelectedValue();
 
-                pluginsConfigButton.setEnabled(plugin != null && plugin.isConfigurable());
+                configPluginButton.setEnabled(plugin != null && plugin.isConfigurable());
+                aboutPluginButton.setEnabled(plugin != null);
             }
         });
-        pluginsConfigButton.addActionListener(new ActionListener() {
+        configPluginButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Plugin plugin = (Plugin) pluginsList.getSelectedValue();
                 if (plugin != null)
                     plugin.configure(SwingUtilities.getWindowAncestor(OptionsDialog.this));
+            }
+        });
+
+        aboutPluginButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                StringBuilder sb = new StringBuilder();
+                Plugin.Description description = ((Plugin) pluginsList.getSelectedValue()).getDescription();
+                sb.append(description.name).append("\n");
+                if (!Util.isEmpty(description.description))
+                    sb.append(description.description).append("\n");
+                sb.append("Author: ").append(description.author);
+
+                JOptionPane.showMessageDialog(OptionsDialog.this, sb.toString());
             }
         });
     }
@@ -441,10 +457,11 @@ public class OptionsDialog extends JDialog {
         com.tulskiy.musique.gui.components.SeparatorLabel separatorLabel1 = new com.tulskiy.musique.gui.components.SeparatorLabel();
         com.tulskiy.musique.gui.components.SeparatorLabel separatorLabel2 = new com.tulskiy.musique.gui.components.SeparatorLabel();
         javax.swing.JPanel jPanel2 = new javax.swing.JPanel();
-        pluginsConfigButton = new javax.swing.JButton();
+        configPluginButton = new javax.swing.JButton();
         javax.swing.JScrollPane jScrollPane5 = new javax.swing.JScrollPane();
         pluginsList = new javax.swing.JList();
         com.tulskiy.musique.gui.components.SeparatorLabel separatorLabel8 = new com.tulskiy.musique.gui.components.SeparatorLabel();
+        aboutPluginButton = new javax.swing.JButton();
         applyButton = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         okButton = new javax.swing.JButton();
@@ -942,13 +959,16 @@ public class OptionsDialog extends JDialog {
 
         tabbedPane.addTab("Colors and Fonts", jPanel8);
 
-        pluginsConfigButton.setText("Configure");
-        pluginsConfigButton.setEnabled(false);
+        configPluginButton.setText("Configure");
+        configPluginButton.setEnabled(false);
 
         pluginsList.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         jScrollPane5.setViewportView(pluginsList);
 
         separatorLabel8.setText("Plugins");
+
+        aboutPluginButton.setText("About");
+        aboutPluginButton.setEnabled(false);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -963,7 +983,9 @@ public class OptionsDialog extends JDialog {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 448, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(12, 12, 12)
-                        .addComponent(pluginsConfigButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(aboutPluginButton, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
+                            .addComponent(configPluginButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(16, 16, 16))))
         );
         jPanel2Layout.setVerticalGroup(
@@ -973,7 +995,10 @@ public class OptionsDialog extends JDialog {
                 .addComponent(separatorLabel8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(pluginsConfigButton)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(configPluginButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(aboutPluginButton))
                     .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(41, 41, 41))
         );
@@ -1039,6 +1064,7 @@ public class OptionsDialog extends JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton aboutPluginButton;
     private javax.swing.JButton addMusicFolder;
     private javax.swing.JButton addView;
     private javax.swing.JRadioButton albumArtPlaying;
@@ -1048,6 +1074,7 @@ public class OptionsDialog extends JDialog {
     private javax.swing.JComboBox audioMixer;
     private com.tulskiy.musique.gui.components.ColorChooser backgroundColor;
     private javax.swing.JButton cancelButton;
+    private javax.swing.JButton configPluginButton;
     private javax.swing.JComboBox defaultEncoding;
     private com.tulskiy.musique.gui.components.FontChooser defaultFont;
     private javax.swing.JCheckBox enableHttpProxy;
@@ -1068,7 +1095,6 @@ public class OptionsDialog extends JDialog {
     private javax.swing.JCheckBox minimizeOnClose;
     private javax.swing.JList musicFolders;
     private javax.swing.JButton okButton;
-    private javax.swing.JButton pluginsConfigButton;
     private javax.swing.JList pluginsList;
     private javax.swing.JButton removeMusicFolder;
     private javax.swing.JButton removeView;

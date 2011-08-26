@@ -70,7 +70,7 @@ public class DiscogsPlugin extends Plugin {
 
     @Override
     public Description getDescription() {
-        return new Description("Discogs Plugin", "Maksim Liauchuk");
+        return new Description("Discogs", "Maksim Liauchuk", null);
     }
 
     @Override

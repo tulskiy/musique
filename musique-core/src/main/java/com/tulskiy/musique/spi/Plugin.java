@@ -64,18 +64,17 @@ public abstract class Plugin {
     public class Description {
         public String name;
         public String author;
+        public String description;
 
-        public Description(String name, String author) {
+        public Description(String name, String author, String description) {
             this.name = name;
             this.author = author;
+            this.description = description;
         }
 
         @Override
         public String toString() {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(name);
-            sb.append(", Author: ").append(author);
-            return sb.toString();
+            return name;
         }
     }
 

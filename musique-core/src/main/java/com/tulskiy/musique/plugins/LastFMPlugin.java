@@ -60,7 +60,7 @@ public class LastFMPlugin extends Plugin {
 
     @Override
     public Description getDescription() {
-        return new Description("Last.fm Plugin", "Denis Tulskiy");
+        return new Description("Last.fm", "Denis Tulskiy", "Last.fm scrobbling using 2.0 API");
     }
 
     @Override

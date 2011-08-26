@@ -138,7 +138,7 @@ public class GlobalHotKeysPlugin extends Plugin {
 
     @Override
     public Description getDescription() {
-        return new Description("Global HotKeys Plugin", "Denis Tulskiy");
+        return new Description("Global HotKeys", "Denis Tulskiy", "Provides Global HotKeys functionality, including Media keys");
     }
 
     @Override
