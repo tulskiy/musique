@@ -31,7 +31,7 @@ public abstract class Actor {
 
     public enum Message {
         // player messages
-        PLAY, PAUSE, STOP,
+        PLAY, PAUSE, STOP, FLUSH,
         // buffer messages
         OPEN, SEEK;
 

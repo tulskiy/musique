@@ -45,13 +45,12 @@ public class Player {
         Thread t1 = new Thread(playingThread, "Playing Thread");
         t1.setPriority(Thread.MAX_PRIORITY);
         t1.start();
-        bufferingThread = new BufferingThread(buffer);
+        bufferingThread = new BufferingThread(buffer, playingThread);
         new Thread(bufferingThread, "Buffer Thread").start();
     }
 
     public void open(Track track) {
         bufferingThread.send(Message.OPEN, track);
-        playingThread.send(Message.PLAY);
     }
 
     public void play() {
@@ -63,7 +62,6 @@ public class Player {
                 bufferingThread.send(Message.OPEN, track);
             }
         }
-        playingThread.send(Message.PLAY);
     }
 
     public void pause() {

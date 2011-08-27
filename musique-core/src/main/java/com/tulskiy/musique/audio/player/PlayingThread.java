@@ -64,6 +64,9 @@ public class PlayingThread extends Actor implements Runnable {
             case STOP:
                 stop();
                 break;
+            case FLUSH:
+                output.flush();
+                break;
         }
     }
 

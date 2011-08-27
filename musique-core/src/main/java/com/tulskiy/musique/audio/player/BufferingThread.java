@@ -44,10 +44,12 @@ public class BufferingThread extends Actor implements Runnable {
     private boolean active;
 
     private Buffer buffer;
+    private PlayingThread playingThread;
     private boolean stopAfterCurrent = false;
 
-    public BufferingThread(Buffer buffer) {
+    public BufferingThread(Buffer buffer, PlayingThread playingThread) {
         this.buffer = buffer;
+        this.playingThread = playingThread;
     }
 
     @Override
@@ -206,6 +208,8 @@ public class BufferingThread extends Actor implements Runnable {
 
             start();
             logger.fine("Finished opening track");
+            playingThread.send(Message.FLUSH);
+            playingThread.send(Message.PLAY);
         }
     }
 
