@@ -46,16 +46,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Author: Denis Tulskiy
  * Date: Aug 1, 2010
  */
 public class FileOperations extends JDialog {
+    private static final ArrayList<String> DEFAULT_PATTERNS = new ArrayList<String>(Arrays.asList(
+            "%fileName%", "[%artist% - ]%title%",
+            "[%trackNumber% - ]%title%",
+            "[%year% - ]%album%/%fileName%")
+    );
+
     private JComboBox namePattern;
     private PathChooser folder;
     private DefaultTableModel previewModel;
@@ -93,12 +97,8 @@ public class FileOperations extends JDialog {
         top.add(new JLabel("Destination"));
         top.add(folder);
 
-        String[] patterns = {
-                "%fileName%", "[%artist% - ]%title%",
-                "[%trackNumber% - ]%title%",
-                "[%year% - ]%album%/%fileName%"
-        };
-        namePattern = new JComboBox(patterns);
+        final ArrayList<String> patterns = config.getList("fileOperations.patterns", DEFAULT_PATTERNS);
+        namePattern = new JComboBox(patterns.toArray());
         namePattern.setEditable(true);
         top.add(new JLabel("File name pattern"));
         top.add(namePattern);
@@ -170,7 +170,7 @@ public class FileOperations extends JDialog {
             }
         });
 
-        namePattern.setSelectedItem(config.getString("fileOperations.namePattern", patterns[0]));
+        namePattern.setSelectedItem(config.getString("fileOperations.selectedPattern", patterns.get(0)));
         folder.setPath(config.getString("fileOperations.path", ""));
 
         Box buttons = Box.createHorizontalBox();
@@ -181,7 +181,11 @@ public class FileOperations extends JDialog {
             @Override
             public void actionPerformed(ActionEvent e) {
                 config.setString("fileOperations.path", folder.getPath());
-                config.setString("fileOperations.namePattern", (String) namePattern.getSelectedItem());
+                String selectedItem = (String) namePattern.getSelectedItem();
+                config.setString("fileOperations.selectedPattern", selectedItem);
+                if (!patterns.contains(selectedItem))
+                    patterns.add(selectedItem);
+                config.setList("fileOperations.patterns", patterns);
                 setVisible(false);
                 dispose();
 
@@ -339,8 +343,7 @@ public class FileOperations extends JDialog {
                         if (src.delete()) {
                             // TODO "delete yes/no" decision to be remembered
                             FileUtils.deleteEmptyParentFolders(src, true);
-                        }
-                        else {
+                        } else {
                             log.add("Failed to remove " + src);
                         }
                     }
