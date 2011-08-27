@@ -19,7 +19,7 @@ package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;

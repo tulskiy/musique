@@ -22,7 +22,8 @@ import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.gui.library.LibraryAction;
 import com.tulskiy.musique.spi.Plugin;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.AlbumArtConfiguration;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.sound.sampled.AudioSystem;
@@ -170,7 +171,7 @@ public class OptionsDialog extends JDialog {
     }
 
     private void initLibrarySettings() {
-        final ArrayList<String> musicFoldersModel = config.getList("library.folders", new ArrayList<String>());
+        final List<String> musicFoldersModel = config.getList("library.folders", new ArrayList<String>());
         musicFolders.setModel(new AbstractListModel() {
             public int getSize() {
                 return musicFoldersModel.size();
@@ -260,7 +261,7 @@ public class OptionsDialog extends JDialog {
         boolean nowPlaying = config.getBoolean("albumart.nowPlayingOnly", false);
         albumArtPlaying.setSelected(nowPlaying);
         albumArtSelected.setSelected(!nowPlaying);
-        ArrayList<String> stubList = config.getList("albumart.stubs", null);
+        List<String> stubList = AlbumArtConfiguration.getStubs();
         StringBuilder sb = new StringBuilder();
         for (String s : stubList) {
             sb.append(s).append("\n");
@@ -294,7 +295,7 @@ public class OptionsDialog extends JDialog {
                 config.setBoolean("albumart.nowPlayingOnly", albumArtPlaying.isSelected());
                 config.setString("playbackOrder.albumFormat", shuffleAlbumsPattern.getText());
                 java.util.List<String> stubList = Arrays.asList(albumArtStubs.getText().split("\n"));
-                config.setList("albumart.stubs", new ArrayList<String>(stubList));
+                AlbumArtConfiguration.setStubs(stubList);
             }
         });
     }

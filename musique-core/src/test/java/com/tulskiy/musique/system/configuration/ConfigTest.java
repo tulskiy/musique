@@ -15,18 +15,23 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.system;
+package com.tulskiy.musique.system.configuration;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * Author: Denis Tulskiy
@@ -75,7 +80,7 @@ public class ConfigTest {
         assertNotNull(string);
         assertEquals("some string", string);
 
-        ArrayList<String> list = config.getList("list", null);
+        List<String> list = config.getList("list", null);
         ArrayList<String> expected = new ArrayList<String>();
         expected.add("item 1");
         expected.add("item 2");

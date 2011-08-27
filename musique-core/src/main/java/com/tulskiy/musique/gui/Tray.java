@@ -20,7 +20,7 @@ package com.tulskiy.musique.gui;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;

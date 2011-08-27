@@ -17,20 +17,22 @@
 
 package com.tulskiy.musique.plugins.hotkeys;
 
+import java.awt.Window;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.swing.KeyStroke;
+
 import com.tulskiy.keymaster.common.HotKey;
 import com.tulskiy.keymaster.common.HotKeyListener;
 import com.tulskiy.keymaster.common.Provider;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.spi.Plugin;
 import com.tulskiy.musique.util.AudioMath;
-
-import javax.swing.*;
-import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Author: Denis Tulskiy
@@ -166,7 +168,7 @@ public class GlobalHotKeysPlugin extends Plugin {
         }
 
         private void parseConfig() {
-            ArrayList<String> hotKeys = config.getList("hotkeys.list", new ArrayList<String>());
+            List<String> hotKeys = config.getList("hotkeys.list", new ArrayList<String>());
             activeHotKeys.clear();
 
             for (String hotKey : hotKeys) {

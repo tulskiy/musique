@@ -29,7 +29,7 @@ import com.tulskiy.musique.library.Library;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;

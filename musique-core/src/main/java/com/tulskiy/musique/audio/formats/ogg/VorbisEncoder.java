@@ -18,7 +18,8 @@
 package com.tulskiy.musique.audio.formats.ogg;
 
 import com.tulskiy.musique.audio.Encoder;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
+
 import org.xiph.libogg.ogg_packet;
 import org.xiph.libogg.ogg_page;
 import org.xiph.libogg.ogg_stream_state;

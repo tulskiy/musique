@@ -18,7 +18,7 @@
 package com.tulskiy.musique.gui.dialogs;
 
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;

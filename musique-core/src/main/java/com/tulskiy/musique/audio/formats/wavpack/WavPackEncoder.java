@@ -18,7 +18,7 @@
 package com.tulskiy.musique.audio.formats.wavpack;
 
 import com.tulskiy.musique.audio.Encoder;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 import com.wavpack.encoder.Defines;
 import com.wavpack.encoder.WavPackUtils;

@@ -24,7 +24,7 @@ import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.FileUtils;
 import com.tulskiy.musique.util.Util;
 
@@ -97,7 +97,7 @@ public class FileOperations extends JDialog {
         top.add(new JLabel("Destination"));
         top.add(folder);
 
-        final ArrayList<String> patterns = config.getList("fileOperations.patterns", DEFAULT_PATTERNS);
+        final List<String> patterns = config.getList("fileOperations.patterns", DEFAULT_PATTERNS);
         namePattern = new JComboBox(patterns.toArray());
         namePattern.setEditable(true);
         top.add(new JLabel("File name pattern"));

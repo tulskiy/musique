@@ -21,6 +21,33 @@
  */
 package com.tulskiy.musique.system;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Mixer;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.plaf.metal.MetalFileChooserUI;
+import javax.swing.plaf.metal.MetalIconFactory;
+
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Scrobbler;
 import com.tulskiy.musique.audio.player.Player;
@@ -29,22 +56,8 @@ import com.tulskiy.musique.gui.MainWindow;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.spi.PluginLoader;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
-
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Mixer;
-import javax.swing.*;
-import javax.swing.plaf.metal.MetalFileChooserUI;
-import javax.swing.plaf.metal.MetalIconFactory;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.*;
-import java.net.Authenticator;
-import java.net.PasswordAuthentication;
-import java.nio.channels.FileChannel;
-import java.nio.charset.Charset;
-import java.util.logging.*;
-import java.util.logging.Formatter;
 
 public class Application {
     private static Application ourInstance = new Application();

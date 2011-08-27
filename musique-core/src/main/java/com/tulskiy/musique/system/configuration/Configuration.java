@@ -15,7 +15,7 @@
  * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.tulskiy.musique.system;
+package com.tulskiy.musique.system.configuration;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -42,6 +42,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import com.tulskiy.musique.system.Application;
 
 /**
  * Author: Denis Tulskiy
@@ -104,12 +105,10 @@ public class Configuration extends XMLConfiguration {
             String key = /*"musique." +*/ entry.getKey();
             if (entry.getValue() instanceof List) {
                 List values = (List) entry.getValue();
-/*
                 if (key.equals("albumart.stubs")) {
-                    for (Object value : values) {
-                        addProperty("albumart.stubs.stub", value);
-                    }
+                    AlbumArtConfiguration.setStubs(values);
                 }
+                /*
                 else if (key.equals("hotkeys.list")) {
                     for (Object value : values) {
                         String[] tokens = value.toString().split(": ");
@@ -123,14 +122,11 @@ public class Configuration extends XMLConfiguration {
                         addProperty("library.folders.folder", value);
                     }
                 }
+                */
                 else {
                     for (Object value : values) {
                         addProperty(key, value);
                     }
-                }
-*/
-                for (Object value : values) {
-                    addProperty(key, value);
                 }
             }
             else {
@@ -214,11 +210,26 @@ public class Configuration extends XMLConfiguration {
 
     @Deprecated
     /**
-     * use add/setProperty instead
+     * use addProperty instead
+     */
+    public void add(String key, Object value) {
+        Object old = get(key);
+        addProperty(key, value == null ? null : value.toString());
+        changeSupport.firePropertyChange(key, old, value);
+    }
+
+    @Deprecated
+    /**
+     * use setProperty instead
      */
     public void put(String key, Object value) {
         Object old = get(key);
-        setProperty(key, value);
+        if (value == null) {
+            remove(key);
+        }
+        else {
+            setProperty(key, value.toString());
+        }
         changeSupport.firePropertyChange(key, old, value);
     }
 
@@ -328,22 +339,10 @@ public class Configuration extends XMLConfiguration {
         put(key, value);
     }
 
-    @SuppressWarnings({"unchecked"})
-    public ArrayList<String> getList(String key, ArrayList<String> def) {
-        try {
-            ArrayList<String> strings = (ArrayList<String>) getList(key);
-            if (strings != null)
-                return strings;
-        } catch (Exception ignored) {
-        }
-        setList(key, def);
-        return def;
-    }
-
-    public void setList(String key, ArrayList<?> values) {
+    public void setList(String key, List<?> values) {
         remove(key);
         for (Object value : values) {
-            addProperty(key, value);
+            add(key, value);
         }
     }
 

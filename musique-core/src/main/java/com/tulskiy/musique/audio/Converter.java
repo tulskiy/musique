@@ -22,8 +22,8 @@ import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Codecs;
-import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.AudioMath;
 
 import javax.swing.*;

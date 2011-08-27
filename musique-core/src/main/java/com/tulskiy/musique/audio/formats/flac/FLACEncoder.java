@@ -18,7 +18,7 @@
 package com.tulskiy.musique.audio.formats.flac;
 
 import com.tulskiy.musique.audio.Encoder;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.AudioMath;
 import javaFlacEncoder.EncodingConfiguration;
 import javaFlacEncoder.FLACFileOutputStream;

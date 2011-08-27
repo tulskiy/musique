@@ -31,7 +31,7 @@ import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.PlaylistListener;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;

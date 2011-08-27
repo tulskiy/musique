@@ -20,7 +20,7 @@ package com.tulskiy.musique.playlist;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;

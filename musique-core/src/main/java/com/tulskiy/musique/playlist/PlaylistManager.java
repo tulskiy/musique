@@ -23,7 +23,7 @@ package com.tulskiy.musique.playlist;
 
 import com.tulskiy.musique.library.Library;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -75,7 +75,7 @@ public class PlaylistManager {
     }
 
     public void loadPlaylists() {
-        ArrayList<String> list = config.getList("playlists", new ArrayList<String>());
+        List<String> list = config.getList("playlists", new ArrayList<String>());
 
         Playlist libraryPlaylist = new Playlist();
         File file = new File(PLAYLIST_PATH, "library.mus");

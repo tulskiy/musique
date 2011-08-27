@@ -24,8 +24,8 @@ import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Codecs;
-import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.system.TrackIO;
+import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.tree.TreeNode;
@@ -52,7 +52,7 @@ public class Library {
     }
 
     public void rescan(Map<String, Object> progress) {
-        ArrayList<String> folders = config.getList("library.folders", null);
+        List<String> folders = config.getList("library.folders", null);
         if (folders == null || folders.isEmpty()) {
             return;
         }

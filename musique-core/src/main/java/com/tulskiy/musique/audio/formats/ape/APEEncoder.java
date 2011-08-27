@@ -18,7 +18,8 @@
 package com.tulskiy.musique.audio.formats.ape;
 
 import com.tulskiy.musique.audio.Encoder;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
+
 import davaguine.jmac.encoder.IAPECompress;
 import davaguine.jmac.info.CompressionLevel;
 import davaguine.jmac.info.WaveFormat;

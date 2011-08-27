@@ -22,7 +22,8 @@ import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.gui.components.ColorChooser;
 import com.tulskiy.musique.gui.components.FontChooser;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.AlbumArtConfiguration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
@@ -183,7 +184,7 @@ public class SettingsDialog extends JDialog {
         side.add(Box.createVerticalStrut(5));
 
         side.add(new JLabel("Album Art stubs: "));
-        ArrayList<String> stubList = config.getList("albumart.stubs", null);
+        List<String> stubList = AlbumArtConfiguration.getStubs();
         StringBuilder sb = new StringBuilder();
         for (String s : stubList) {
             sb.append(s).append("\n");
@@ -222,7 +223,7 @@ public class SettingsDialog extends JDialog {
                 config.setBoolean("albumart.nowPlayingOnly", plTrack.isSelected());
                 config.setString("playbackOrder.albumFormat", patternField.getText());
                 List<String> stubList = Arrays.asList(stubs.getText().split("\n"));
-                config.setList("albumart.stubs", new ArrayList<String>(stubList));
+                AlbumArtConfiguration.setStubs(stubList);
             }
         });
 

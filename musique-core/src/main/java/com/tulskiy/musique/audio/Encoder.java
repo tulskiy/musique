@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.audio;
 
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 import javax.sound.sampled.AudioFormat;
 import java.io.File;

@@ -24,7 +24,7 @@ import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 import javax.swing.*;
 import java.awt.*;

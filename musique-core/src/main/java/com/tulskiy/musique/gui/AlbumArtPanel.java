@@ -17,17 +17,11 @@
 
 package com.tulskiy.musique.gui;
 
-import com.tulskiy.musique.audio.player.Player;
-import com.tulskiy.musique.audio.player.PlayerEvent;
-import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.playlist.formatting.Parser;
-import com.tulskiy.musique.playlist.formatting.tokens.Expression;
-import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -36,8 +30,24 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.Timer;
+
+import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.audio.player.PlayerEvent;
+import com.tulskiy.musique.audio.player.PlayerListener;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.playlist.formatting.Parser;
+import com.tulskiy.musique.playlist.formatting.tokens.Expression;
+import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.configuration.AlbumArtConfiguration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 /**
  * Author: Denis Tulskiy
@@ -169,11 +179,11 @@ public class AlbumArtPanel extends JPanel {
             }
         });
 
-        config.addPropertyChangeListener("albumart.stubs", true, new PropertyChangeListener() {
+        config.addPropertyChangeListener(AlbumArtConfiguration.getStubKey(), true, new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 stubs.clear();
-                ArrayList<String> list = config.getList("albumart.stubs", stubDefaults);
+                List<String> list = AlbumArtConfiguration.getStubs(stubDefaults);
                 for (String s : list) {
                     stubs.add(Parser.parse(s));
                 }

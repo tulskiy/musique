@@ -23,7 +23,7 @@ import com.tulskiy.musique.gui.menu.Menu;
 import com.tulskiy.musique.gui.menu.TracksMenu;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
+import com.tulskiy.musique.system.configuration.Configuration;
 
 import java.awt.*;
 import java.util.logging.Logger;

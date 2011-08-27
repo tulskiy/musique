@@ -17,24 +17,9 @@
 
 package com.tulskiy.musique.gui.playlist;
 
-import com.tulskiy.musique.audio.player.Player;
-import com.tulskiy.musique.audio.player.PlayerEvent;
-import com.tulskiy.musique.audio.player.PlayerListener;
-import com.tulskiy.musique.gui.dialogs.*;
-import com.tulskiy.musique.images.Images;
-import com.tulskiy.musique.playlist.PlaybackOrder;
-import com.tulskiy.musique.playlist.Playlist;
-import com.tulskiy.musique.playlist.PlaylistManager;
-import com.tulskiy.musique.playlist.Track;
-import com.tulskiy.musique.system.Application;
-import com.tulskiy.musique.system.Configuration;
-import com.tulskiy.musique.util.Util;
-
-import javax.swing.*;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -45,6 +30,47 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.ButtonGroup;
+import javax.swing.Icon;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import javax.swing.TransferHandler;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
+import com.tulskiy.musique.audio.player.Player;
+import com.tulskiy.musique.audio.player.PlayerEvent;
+import com.tulskiy.musique.audio.player.PlayerListener;
+import com.tulskiy.musique.gui.dialogs.OptionsDialog;
+import com.tulskiy.musique.gui.dialogs.PlaybackQueueDialog;
+import com.tulskiy.musique.gui.dialogs.ProgressDialog;
+import com.tulskiy.musique.gui.dialogs.SearchDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.gui.dialogs.TreeFileChooser;
+import com.tulskiy.musique.images.Images;
+import com.tulskiy.musique.playlist.PlaybackOrder;
+import com.tulskiy.musique.playlist.Playlist;
+import com.tulskiy.musique.playlist.PlaylistManager;
+import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.configuration.Configuration;
+import com.tulskiy.musique.util.Util;
 
 /**
  * @Author: Denis Tulskiy
@@ -75,7 +101,7 @@ public class PlaylistPanel extends JPanel {
 
         PlaylistManager playlistManager = app.getPlaylistManager();
         ArrayList<Playlist> playlists = playlistManager.getPlaylists();
-        ArrayList<String> bounds = config.getList("playlist.tabs.bounds", null);
+        List<String> bounds = config.getList("playlist.tabs.bounds", null);
 
         for (int i = 0; i < playlists.size(); i++) {
             Playlist pl = playlists.get(i);
@@ -144,7 +170,7 @@ public class PlaylistPanel extends JPanel {
     }
 
     private ArrayList<PlaylistColumn> loadColumns() {
-        ArrayList<String> list = config.getList("playlist.columns", null);
+        List<String> list = config.getList("playlist.columns", null);
         ArrayList<PlaylistColumn> res = new ArrayList<PlaylistColumn>();
         if (list == null) {
             res.addAll(Arrays.asList(defaultColumns));
