@@ -216,6 +216,7 @@ public class FileOperations extends JDialog {
         previewModel.setRowCount(0);
         paths.clear();
         if (!Util.isEmpty(text)) {
+            text = text.replaceAll("%([\\w]+)%", "\\$escape($0)");
             Expression expression = Parser.parse(text);
             for (Track track : tracks) {
                 Object key;

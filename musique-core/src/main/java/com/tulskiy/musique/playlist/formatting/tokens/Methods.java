@@ -18,7 +18,6 @@
 package com.tulskiy.musique.playlist.formatting.tokens;
 
 import java.util.ArrayList;
-import java.util.Set;
 
 import javax.swing.ImageIcon;
 
@@ -29,8 +28,8 @@ import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.util.Util;
 
 /**
- * @Author: Denis Tulskiy
- * @Date: Feb 6, 2010
+ * Author: Denis Tulskiy
+ * Date: Feb 6, 2010
  */
 @SuppressWarnings({"UnusedDeclaration"})
 public class Methods {
@@ -159,5 +158,13 @@ public class Methods {
         String separator = (String) args.get(1).eval(track);
         
         return Util.formatFieldValues(tagFieldValues, separator);
+    }
+
+    public String escape(Track track, ArrayList<Expression> args) {
+        Object eval = args.get(0).eval(track);
+        if (eval != null)
+            return eval.toString().replaceAll("[\\\\/|:*?<>\"]", "_");
+        else
+            return null;
     }
 }
