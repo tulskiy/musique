@@ -59,7 +59,10 @@ public class Player {
             if (track == null) {
                 next();
             } else {
-                bufferingThread.send(Message.OPEN, track);
+                if (getPlaybackOrder().trackPlayable(track))
+                    bufferingThread.send(Message.OPEN, track);
+                else
+                    next();
             }
         }
     }

@@ -445,4 +445,8 @@ public class PlaybackOrder {
 
         return maxSmaller != null ? maxSmaller : maxRating;
     }
+
+    public boolean trackPlayable(Track track) {
+        return playlist.contains(track);
+    }
 }
