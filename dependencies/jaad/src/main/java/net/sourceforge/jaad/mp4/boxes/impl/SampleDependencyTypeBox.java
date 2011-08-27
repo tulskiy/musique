@@ -1,10 +1,27 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import java.io.IOException;
 import net.sourceforge.jaad.mp4.MP4InputStream;
-import net.sourceforge.jaad.mp4.boxes.Box;
 import net.sourceforge.jaad.mp4.boxes.BoxTypes;
-import net.sourceforge.jaad.mp4.boxes.ContainerBox;
 import net.sourceforge.jaad.mp4.boxes.FullBox;
 
 /**
@@ -45,7 +62,7 @@ public class SampleDependencyTypeBox extends FullBox {
 	private int[] sampleDependsOn, sampleIsDependedOn, sampleHasRedundancy;
 
 	public SampleDependencyTypeBox() {
-		super("Sample Dependency Type Box", "sdtp");
+		super("Sample Dependency Type Box");
 	}
 
 	@Override
@@ -53,13 +70,13 @@ public class SampleDependencyTypeBox extends FullBox {
 		super.decode(in);
 
 		//get number of samples from SampleSizeBox
-		int sampleCount = -1;
-		if(parent.containsChild(BoxTypes.SAMPLE_SIZE_BOX)) sampleCount = ((SampleSizeBox)parent.getChild(BoxTypes.SAMPLE_SIZE_BOX)).getSampleSize();
+		long sampleCount = -1;
+		if(parent.hasChild(BoxTypes.SAMPLE_SIZE_BOX)) sampleCount = ((SampleSizeBox) parent.getChild(BoxTypes.SAMPLE_SIZE_BOX)).getSampleCount();
 		//TODO: uncomment when CompactSampleSizeBox is implemented
 		//else if(parent.containsChild(BoxTypes.COMPACT_SAMPLE_SIZE_BOX)) sampleCount = ((CompactSampleSizeBox)parent.getChild(BoxTypes.SAMPLE_SIZE_BOX)).getSampleSize();
-		sampleHasRedundancy = new int[sampleCount];
-		sampleIsDependedOn = new int[sampleCount];
-		sampleDependsOn = new int[sampleCount];
+		sampleHasRedundancy = new int[(int) sampleCount];
+		sampleIsDependedOn = new int[(int) sampleCount];
+		sampleDependsOn = new int[(int) sampleCount];
 
 		byte b;
 		for(int i = 0; i<sampleCount; i++) {
@@ -73,7 +90,6 @@ public class SampleDependencyTypeBox extends FullBox {
 			sampleIsDependedOn[i] = (b>>2)&3;
 			sampleDependsOn[i] = (b>>4)&3;
 		}
-		left -= sampleCount;
 	}
 
 	/**

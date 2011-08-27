@@ -1,25 +1,27 @@
 /*
- * Copyright (C) 2010 in-somnia
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import net.sourceforge.jaad.mp4.boxes.FullBox;
 import net.sourceforge.jaad.mp4.MP4InputStream;
 import java.io.IOException;
-import java.util.Date;
 import net.sourceforge.jaad.mp4.boxes.Utils;
 
 /**
@@ -29,51 +31,38 @@ import net.sourceforge.jaad.mp4.boxes.Utils;
  */
 public class MovieHeaderBox extends FullBox {
 
-	private Date creationTime, modificationTime;
-	private long timeScale, duration;
+	private long creationTime, modificationTime, timeScale, duration;
 	private double rate, volume;
 	private double[] matrix;
 	private long nextTrackID;
 
 	public MovieHeaderBox() {
-		super("Movie Header Box", "mvhd");
+		super("Movie Header Box");
 		matrix = new double[9];
 	}
 
 	@Override
 	public void decode(MP4InputStream in) throws IOException {
 		super.decode(in);
-		if(version==1) {
-			creationTime = Utils.getDate(in.readBytes(8));
-			modificationTime = Utils.getDate(in.readBytes(8));
-			timeScale = in.readBytes(4);
-			duration = in.readBytes(8);
-		}
-		else {
-			creationTime = Utils.getDate(in.readBytes(4));
-			modificationTime = Utils.getDate(in.readBytes(4));
-			timeScale = in.readBytes(4);
-			duration = in.readBytes(4);
-		}
+		final int len = (version==1) ? 8 : 4;
+		creationTime = in.readBytes(len);
+		modificationTime = in.readBytes(len);
+		timeScale = in.readBytes(4);
+		duration = Utils.detectUndetermined(in.readBytes(len));
 
-		//rate: 16.16 fixed point
-		rate = in.readFixedPoint(4, MP4InputStream.MASK16);
-		//volume: 8.8 fixed point
-		volume = in.readFixedPoint(2, MP4InputStream.MASK8);
+		rate = in.readFixedPoint(16, 16);
+		volume = in.readFixedPoint(8, 8);
 
-		in.skipBytes(2); //reserved
-		in.skipBytes(4); //reserved
-		in.skipBytes(4); //reserved
+		in.skipBytes(10); //reserved
 
 		for(int i = 0; i<9; i++) {
-			matrix[i] = in.readFixedPoint(4, MP4InputStream.MASK16);
+			if(i<6) matrix[i] = in.readFixedPoint(16, 16);
+			else matrix[i] = in.readFixedPoint(2, 30);
 		}
 
 		in.skipBytes(24); //reserved
 
 		nextTrackID = in.readBytes(4);
-
-		left = 0;
 	}
 
 	/**
@@ -81,7 +70,7 @@ public class MovieHeaderBox extends FullBox {
 	 * presentation in seconds since midnight, Jan. 1, 1904, in UTC time.
 	 * @return the creation time
 	 */
-	public Date getCreationTime() {
+	public long getCreationTime() {
 		return creationTime;
 	}
 
@@ -90,7 +79,7 @@ public class MovieHeaderBox extends FullBox {
 	 * the presentation was modified in seconds since midnight, Jan. 1, 1904,
 	 * in UTC time.
 	 */
-	public Date getModificationTime() {
+	public long getModificationTime() {
 		return modificationTime;
 	}
 
@@ -109,7 +98,8 @@ public class MovieHeaderBox extends FullBox {
 	 * The duration is an integer that declares length of the presentation (in
 	 * the indicated timescale). This property is derived from the
 	 * presentation's tracks: the value of this field corresponds to the
-	 * duration of the longest track in the presentation. 
+	 * duration of the longest track in the presentation. If the duration cannot
+	 * be determined then duration is set to -1.
 	 * @return the duration of the longest track
 	 */
 	public long getDuration() {

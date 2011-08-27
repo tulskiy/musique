@@ -1,13 +1,32 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import net.sourceforge.jaad.mp4.MP4InputStream;
 import net.sourceforge.jaad.mp4.boxes.BoxFactory;
 import net.sourceforge.jaad.mp4.boxes.BoxImpl;
 import net.sourceforge.jaad.mp4.boxes.BoxTypes;
-import net.sourceforge.jaad.mp4.boxes.ContainerBox;
 import net.sourceforge.jaad.mp4.boxes.FullBox;
 import net.sourceforge.jaad.mp4.boxes.impl.samplegroupentries.*;
 import java.io.IOException;
+import net.sourceforge.jaad.mp4.boxes.Box;
 
 /**
  * This description table gives information about the characteristics of sample
@@ -35,7 +54,7 @@ public class SampleGroupDescriptionBox extends FullBox {
 	private SampleGroupDescriptionEntry[] entries;
 
 	public SampleGroupDescriptionBox() {
-		super("Sample Group Description Box", "sgpd");
+		super("Sample Group Description Box");
 	}
 
 	@Override
@@ -43,42 +62,39 @@ public class SampleGroupDescriptionBox extends FullBox {
 		super.decode(in);
 
 		groupingType = in.readBytes(4);
-		if(version==1) {
-			defaultLength = in.readBytes(4);
-			left -= 4;
-		}
+		defaultLength = (version==1)?in.readBytes(4):0;
+
 		final int entryCount = (int) in.readBytes(4);
-		left -= 8;
 
-		final ContainerBox minf = (ContainerBox) parent.getParent().getParent();
-		final HandlerBox hdlr = (HandlerBox) minf.getChild(BoxTypes.HANDLER_BOX);
+		//TODO!
+		/*final HandlerBox hdlr = (HandlerBox) parent.getParent().getParent().getChild(BoxTypes.HANDLER_BOX);
 		final int handlerType = (int) hdlr.getHandlerType();
-
+		
 		final Class<? extends BoxImpl> boxClass;
 		switch(handlerType) {
-			case HandlerBox.TYPE_VIDEO:
-				boxClass = VisualSampleGroupEntry.class;
-				break;
-			case HandlerBox.TYPE_SOUND:
-				boxClass = AudioSampleGroupEntry.class;
-				break;
-			case HandlerBox.TYPE_HINT:
-				boxClass = HintSampleGroupEntry.class;
-				break;
-			default:
-				boxClass = null;
+		case HandlerBox.TYPE_VIDEO:
+		boxClass = VisualSampleGroupEntry.class;
+		break;
+		case HandlerBox.TYPE_SOUND:
+		boxClass = AudioSampleGroupEntry.class;
+		break;
+		case HandlerBox.TYPE_HINT:
+		boxClass = HintSampleGroupEntry.class;
+		break;
+		default:
+		boxClass = null;
 		}
-
+		
 		for(int i = 1; i<entryCount; i++) {
-			if(version==1&&defaultLength==0) {
-				descriptionLength = in.readBytes(4);
-				left -= 4;
-			}
-			if(boxClass!=null) {
-				entries[i] = (SampleGroupDescriptionEntry) BoxFactory.parseBox(in, boxClass);
-				if(entries[i]!=null) left -= entries[i].getSize();
-			}
+		if(version==1&&defaultLength==0) {
+		descriptionLength = in.readBytes(4);
+		left -= 4;
 		}
+		if(boxClass!=null) {
+		entries[i] = (SampleGroupDescriptionEntry) BoxFactory.parseBox(in, boxClass);
+		if(entries[i]!=null) left -= entries[i].getSize();
+		}
+		}*/
 	}
 
 	/**

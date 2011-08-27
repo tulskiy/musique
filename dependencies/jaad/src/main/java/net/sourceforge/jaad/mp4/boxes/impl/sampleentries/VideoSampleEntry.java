@@ -1,18 +1,21 @@
 /*
- * Copyright (C) 2010 in-somnia
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sourceforge.jaad.mp4.boxes.impl.sampleentries;
 
@@ -21,14 +24,13 @@ import java.io.IOException;
 
 public class VideoSampleEntry extends SampleEntry {
 
-	public static final int DEFAULT_DEPTH = 0x18;
 	private int width, height;
 	private double horizontalResolution, verticalResolution;
 	private int frameCount, depth;
 	private String compressorName;
 
-	public VideoSampleEntry() {
-		super("Video Sample Entry", "mp4v");
+	public VideoSampleEntry(String name) {
+		super(name);
 	}
 
 	@Override
@@ -44,8 +46,8 @@ public class VideoSampleEntry extends SampleEntry {
 
 		width = (int) in.readBytes(2);
 		height = (int) in.readBytes(2);
-		horizontalResolution = in.readFixedPoint(4, MP4InputStream.MASK16);
-		verticalResolution = in.readFixedPoint(4, MP4InputStream.MASK16);
+		horizontalResolution = in.readFixedPoint(16, 16);
+		verticalResolution = in.readFixedPoint(16, 16);
 		in.skipBytes(4); //reserved
 		frameCount = (int) in.readBytes(2);
 
@@ -55,8 +57,6 @@ public class VideoSampleEntry extends SampleEntry {
 
 		depth = (int) in.readBytes(2);
 		in.skipBytes(2); //pre-defined: -1
-
-		left -= 70;
 
 		readChildren(in);
 	}

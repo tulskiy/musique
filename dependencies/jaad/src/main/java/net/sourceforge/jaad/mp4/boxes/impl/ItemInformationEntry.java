@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import java.io.IOException;
@@ -12,7 +31,7 @@ public class ItemInformationEntry extends FullBox {
 	private Extension extension;
 
 	public ItemInformationEntry() {
-		super("Item Information Entry", "infe");
+		super("Item Information Entry");
 	}
 
 	@Override
@@ -22,23 +41,16 @@ public class ItemInformationEntry extends FullBox {
 		if((version==0)||(version==1)) {
 			itemID = (int) in.readBytes(2);
 			itemProtectionIndex = (int) in.readBytes(2);
-			left -= 4;
-			itemName = in.readUTFString((int) left, MP4InputStream.UTF8);
-			left -= itemName.length()+1;
-			contentType = in.readUTFString((int) left, MP4InputStream.UTF8);
-			left -= contentType.length()+1;
-			contentEncoding = in.readUTFString((int) left, MP4InputStream.UTF8); //optional
-			left -= contentEncoding.length()+1;
+			itemName = in.readUTFString((int) getLeft(in), MP4InputStream.UTF8);
+			contentType = in.readUTFString((int) getLeft(in), MP4InputStream.UTF8);
+			contentEncoding = in.readUTFString((int) getLeft(in), MP4InputStream.UTF8); //optional
 		}
-		if(version==1) {
-			if(left>0) {
-				//optional
-				extensionType = in.readBytes(4);
-				left -= 4;
-				if(left>0) {
-					extension = Extension.forType((int) extensionType);
-					if(extension!=null) left -= extension.decode(in);
-				}
+		if(version==1&&getLeft(in)>0) {
+			//optional
+			extensionType = in.readBytes(4);
+			if(getLeft(in)>0) {
+				extension = Extension.forType((int) extensionType);
+				if(extension!=null) extension.decode(in);
 			}
 		}
 	}
@@ -135,8 +147,7 @@ public class ItemInformationEntry extends FullBox {
 			return ext;
 		}
 
-		//returns the number of bytes read
-		abstract int decode(MP4InputStream in) throws IOException;
+		abstract void decode(MP4InputStream in) throws IOException;
 	}
 
 	public static class FDExtension extends Extension {
@@ -146,7 +157,7 @@ public class ItemInformationEntry extends FullBox {
 		private long[] groupID;
 
 		@Override
-		int decode(MP4InputStream in) throws IOException {
+		void decode(MP4InputStream in) throws IOException {
 			contentLocation = in.readUTFString(100, MP4InputStream.UTF8);
 			contentMD5 = in.readUTFString(100, MP4InputStream.UTF8);
 
@@ -158,8 +169,6 @@ public class ItemInformationEntry extends FullBox {
 			for(int i = 0; i<entryCount; i++) {
 				groupID[i] = in.readBytes(4);
 			}
-
-			return contentLocation.length()+contentMD5.length()+19+(entryCount*4);
 		}
 
 		/**

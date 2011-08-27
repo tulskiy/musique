@@ -1,24 +1,28 @@
 /*
- * Copyright (C) 2010 in-somnia
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import net.sourceforge.jaad.mp4.MP4InputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.sourceforge.jaad.mp4.boxes.BoxImpl;
 
@@ -41,7 +45,7 @@ public class TrackReferenceBox extends BoxImpl {
 	private List<Long> trackIDs;
 
 	public TrackReferenceBox() {
-		super("Track Reference Box", "tref");
+		super("Track Reference Box");
 		trackIDs = new ArrayList<Long>();
 	}
 
@@ -49,9 +53,8 @@ public class TrackReferenceBox extends BoxImpl {
 	public void decode(MP4InputStream in) throws IOException {
 		referenceType = in.readString(4);
 
-		while(left>3) {
+		while(getLeft(in)>3) {
 			trackIDs.add(in.readBytes(4));
-			left -= 4;
 		}
 	}
 
@@ -76,6 +79,6 @@ public class TrackReferenceBox extends BoxImpl {
 	 * @return the track IDs this box refers to
 	 */
 	public List<Long> getTrackIDs() {
-		return trackIDs;
+		return Collections.unmodifiableList(trackIDs);
 	}
 }

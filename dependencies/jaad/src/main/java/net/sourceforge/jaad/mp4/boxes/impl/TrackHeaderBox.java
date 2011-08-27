@@ -1,24 +1,28 @@
 /*
- * Copyright (C) 2010 in-somnia
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import net.sourceforge.jaad.mp4.MP4InputStream;
 import java.io.IOException;
 import net.sourceforge.jaad.mp4.boxes.FullBox;
+import net.sourceforge.jaad.mp4.boxes.Utils;
 
 /**
  * This box specifies the characteristics of a single track. Exactly one Track
@@ -38,53 +42,47 @@ import net.sourceforge.jaad.mp4.boxes.FullBox;
  */
 public class TrackHeaderBox extends FullBox {
 
+	private boolean enabled, inMovie, inPreview;
 	private long creationTime, modificationTime, duration;
 	private int trackID, layer, alternateGroup;
 	private double volume, width, height;
 	private double[] matrix;
 
 	public TrackHeaderBox() {
-		super("Track Header Box", "tkhd");
+		super("Track Header Box");
 		matrix = new double[9];
 	}
 
 	@Override
 	public void decode(MP4InputStream in) throws IOException {
 		super.decode(in);
-		if(version==1) {
-			creationTime = in.readBytes(8);
-			modificationTime = in.readBytes(8);
-			trackID = (int) in.readBytes(4);
-			in.skipBytes(4); //reserved
-			duration = in.readBytes(8);
-			left -= 32;
-		}
-		else {
-			creationTime = in.readBytes(4);
-			modificationTime = in.readBytes(4);
-			trackID = (int) in.readBytes(4);
-			in.skipBytes(4); //reserved
-			duration = in.readBytes(4);
-			left -= 20;
-		}
 
+		enabled = (flags&1)==1;
+		inMovie = (flags&2)==2;
+		inPreview = (flags&4)==4;
+
+		final int len = (version==1) ? 8 : 4;
+		creationTime = in.readBytes(len);
+		modificationTime = in.readBytes(len);
+		trackID = (int) in.readBytes(4);
 		in.skipBytes(4); //reserved
-		in.skipBytes(4); //reserved
+		duration = Utils.detectUndetermined(in.readBytes(len));
+
+		in.skipBytes(8); //reserved
 
 		layer = (int) in.readBytes(2);
 		alternateGroup = (int) in.readBytes(2);
-		volume = in.readFixedPoint(2, MP4InputStream.MASK8);
+		volume = in.readFixedPoint(8, 8);
 
-		in.skipBytes(2);
+		in.skipBytes(2); //reserved
 
 		for(int i = 0; i<9; i++) {
-			matrix[i] = in.readFixedPoint(4, MP4InputStream.MASK16);
+			if(i<6) matrix[i] = in.readFixedPoint(16, 16);
+			else matrix[i] = in.readFixedPoint(2, 30);
 		}
 
-		width = in.readFixedPoint(4, MP4InputStream.MASK16);
-		height = in.readFixedPoint(4, MP4InputStream.MASK16);
-
-		left = 0;
+		width = in.readFixedPoint(16, 16);
+		height = in.readFixedPoint(16, 16);
 	}
 
 	/**
@@ -93,7 +91,7 @@ public class TrackHeaderBox extends FullBox {
 	 * @return true if the track is enabled
 	 */
 	public boolean isTrackEnabled() {
-		return (flags&1)==1;
+		return enabled;
 	}
 
 	/**
@@ -101,7 +99,7 @@ public class TrackHeaderBox extends FullBox {
 	 * @return true if the track is used
 	 */
 	public boolean isTrackInMovie() {
-		return (flags&2)==2;
+		return inMovie;
 	}
 
 	/**
@@ -110,7 +108,7 @@ public class TrackHeaderBox extends FullBox {
 	 * @return true if the track is used in previews
 	 */
 	public boolean isTrackInPreview() {
-		return (flags&4)==4;
+		return inPreview;
 	}
 
 	/**
@@ -142,11 +140,13 @@ public class TrackHeaderBox extends FullBox {
 	}
 
 	/**
-	 * The duration is an integer that declares length of the presentation (in
-	 * the indicated timescale). This property is derived from the
-	 * presentation's tracks: the value of this field corresponds to the
-	 * duration of the longest track in the presentation.
-	 * @return the duration of the longest track
+	 * The duration is an integer that indicates the duration of this track (in 
+	 * the timescale indicated in the Movie Header Box). The value of this field
+	 * is equal to the sum of the durations of all of the track's edits. If 
+	 * there is no edit list, then the duration is the sum of the sample 
+	 * durations, converted into the timescale in the Movie Header Box. If the 
+	 * duration of this track cannot be determined then this value is -1.
+	 * @return the duration this track
 	 */
 	public long getDuration() {
 		return duration;
@@ -211,5 +211,9 @@ public class TrackHeaderBox extends FullBox {
 	 */
 	public double getHeight() {
 		return height;
+	}
+
+	public double[] getMatrix() {
+		return matrix;
 	}
 }

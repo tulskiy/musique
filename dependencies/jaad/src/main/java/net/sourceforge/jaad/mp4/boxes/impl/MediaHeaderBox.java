@@ -1,25 +1,27 @@
 /*
- * Copyright (C) 2010 in-somnia
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import net.sourceforge.jaad.mp4.boxes.FullBox;
 import net.sourceforge.jaad.mp4.MP4InputStream;
 import java.io.IOException;
-import java.util.Date;
 import net.sourceforge.jaad.mp4.boxes.Utils;
 
 /**
@@ -28,41 +30,26 @@ import net.sourceforge.jaad.mp4.boxes.Utils;
  */
 public class MediaHeaderBox extends FullBox {
 
-	private Date creationTime, modificationTime;
-	private long timeScale, duration;
+	private long creationTime, modificationTime, timeScale, duration;
 	private String language;
 
 	public MediaHeaderBox() {
-		super("Media Header Box", "mdhd");
+		super("Media Header Box");
 	}
 
 	@Override
 	public void decode(MP4InputStream in) throws IOException {
 		super.decode(in);
-		if(version==1) {
-			creationTime = Utils.getDate(in.readBytes(8));
-			modificationTime = Utils.getDate(in.readBytes(8));
-			timeScale = in.readBytes(4);
-			duration = in.readBytes(8);
-		}
-		else {
-			creationTime = Utils.getDate(in.readBytes(4));
-			modificationTime = Utils.getDate(in.readBytes(4));
-			timeScale = in.readBytes(4);
-			duration = in.readBytes(4);
-		}
+		
+		final int len = (version==1) ? 8 : 4;
+		creationTime = in.readBytes(len);
+		modificationTime = in.readBytes(len);
+		timeScale = in.readBytes(4);
+		duration = Utils.detectUndetermined(in.readBytes(len));
 
-		//1 bit padding, 5*3 bits language code (ISO-639-2/T)
-		final long l = in.readBytes(2);
-		char[] c = new char[3];
-		c[0] = (char) (((l>>10)&31)+0x60);
-		c[1] = (char) (((l>>5)&31)+0x60);
-		c[2] = (char) ((l&31)+0x60);
-		language = new String(c);
+		language = Utils.getLanguageCode(in.readBytes(2));
 
 		in.skipBytes(2); //pre-defined: 0
-
-		left = 0;
 	}
 
 	/**
@@ -70,7 +57,7 @@ public class MediaHeaderBox extends FullBox {
 	 * presentation in seconds since midnight, Jan. 1, 1904, in UTC time.
 	 * @return the creation time
 	 */
-	public Date getCreationTime() {
+	public long getCreationTime() {
 		return creationTime;
 	}
 
@@ -79,7 +66,7 @@ public class MediaHeaderBox extends FullBox {
 	 * the presentation was modified in seconds since midnight, Jan. 1, 1904,
 	 * in UTC time.
 	 */
-	public Date getModificationTime() {
+	public long getModificationTime() {
 		return modificationTime;
 	}
 
@@ -95,11 +82,10 @@ public class MediaHeaderBox extends FullBox {
 	}
 
 	/**
-	 * The duration is an integer that declares length of the presentation (in
-	 * the indicated timescale). This property is derived from the
-	 * presentation's tracks: the value of this field corresponds to the
-	 * duration of the longest track in the presentation.
-	 * @return the duration of the longest track
+	 * The duration is an integer that declares the duration of this media (in 
+	 * the scale of the timescale). If the duration cannot be determined then 
+	 * duration is set to -1.
+	 * @return the duration of this media
 	 */
 	public long getDuration() {
 		return duration;

@@ -17,26 +17,26 @@
 
 package com.tulskiy.musique.audio.formats.mp4;
 
-import com.tulskiy.musique.audio.Decoder;
 import com.tulskiy.musique.playlist.Track;
-import net.sourceforge.jaad.DecoderConfig;
-import net.sourceforge.jaad.SampleBuffer;
-import net.sourceforge.jaad.mp4.AudioFrame;
-import net.sourceforge.jaad.mp4.MP4Reader;
+import net.sourceforge.jaad.aac.Decoder;
+import net.sourceforge.jaad.aac.SampleBuffer;
+import net.sourceforge.jaad.mp4.MP4Container;
+import net.sourceforge.jaad.mp4.api.AudioTrack;
+import net.sourceforge.jaad.mp4.api.Frame;
+import net.sourceforge.jaad.mp4.api.Movie;
 
 import javax.sound.sampled.AudioFormat;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.List;
 import java.util.logging.Level;
 
 /**
  * Author: Denis Tulskiy
  * Date: 4/5/11
  */
-public class MP4AACDecoder implements Decoder {
-    private FileInputStream is;
-    private net.sourceforge.jaad.Decoder decoder;
-    private MP4Reader mp4;
+public class MP4AACDecoder implements com.tulskiy.musique.audio.Decoder {
+    private Decoder decoder;
     private SampleBuffer sampleBuffer;
     private AudioFormat audioFormat;
     private int currentSample;
@@ -44,12 +44,15 @@ public class MP4AACDecoder implements Decoder {
     private int gaplessPadding;
     private int offset;
     private int bps = 2;
-    private AudioFrame frame;
+    private Frame frame;
+    private RandomAccessFile in;
+    private AudioTrack track;
 
     @Override
     public boolean open(Track track) {
         try {
-            is = new FileInputStream(track.getTrackData().getFile());
+            in = new RandomAccessFile(track.getTrackData().getFile(), "r");
+
             sampleBuffer = new SampleBuffer();
             initDecoder(0);
             return true;
@@ -60,12 +63,19 @@ public class MP4AACDecoder implements Decoder {
     }
 
     private void initDecoder(long sample) throws IOException {
-        is.getChannel().position(0);
-        mp4 = new MP4Reader(is);
-        final DecoderConfig conf = DecoderConfig.parseMP4DecoderSpecificInfo(mp4.getDecoderSpecificInfo());
-        decoder = new net.sourceforge.jaad.Decoder(conf);
+        in.seek(0);
+        MP4Container cont = new MP4Container(in);
+        Movie movie = cont.getMovie();
+        List<net.sourceforge.jaad.mp4.api.Track> tracks = movie.getTracks(AudioTrack.AudioCodec.AAC);
 
-        sample += mp4.getGaplessDelay();
+        if (tracks == null || tracks.isEmpty()) {
+            throw new IOException("Could not find AAC track");
+        }
+
+        track = (AudioTrack) tracks.get(0);
+        decoder = new Decoder(track.getDecoderSpecificInfo());
+
+        /*sample += mp4.getGaplessDelay();
         gaplessPadding = mp4.getGaplessPadding();
         totalSamples = (int) mp4.getNumSamples();
         bps = mp4.getBitsPerSample() / 8;
@@ -90,9 +100,9 @@ public class MP4AACDecoder implements Decoder {
             decoder.decodeFrame(frame.getData(), sampleBuffer);
         }
 
-        offset = (int) (sample - (target - mp4.getSampleDuration(currentSample)));
+        offset = (int) (sample - (target - mp4.getSampleDuration(currentSample)));*/
         if (audioFormat == null)
-            audioFormat = new AudioFormat((float) mp4.getSampleRate(), bps * 8, (int) mp4.getChannelCount(), true, false);
+            audioFormat = new AudioFormat((float) track.getSampleRate(), bps * 8, track.getChannelCount(), true, true);
     }
 
     @Override
@@ -112,7 +122,7 @@ public class MP4AACDecoder implements Decoder {
     @Override
     public int decode(byte[] buf) {
         try {
-            frame = mp4.readSample(currentSample++);
+            frame = track.readNextFrame();
             if (frame == null) {
                 return -1;
             }
@@ -122,7 +132,7 @@ public class MP4AACDecoder implements Decoder {
             if (currentSample == totalSamples && gaplessPadding != 0) {
                 len = gaplessPadding * sampleBuffer.getChannels();
             } else {
-                len = sampleBuffer.getSamples();
+                len = (int) (sampleBuffer.getLength() * sampleBuffer.getSampleRate()) * sampleBuffer.getBitsPerSample() / 8;
             }
             len *= bps;
             int off = offset * bps * sampleBuffer.getChannels();
@@ -138,8 +148,8 @@ public class MP4AACDecoder implements Decoder {
     @Override
     public void close() {
         try {
-            mp4.close();
-            mp4 = null;
+            in.close();
+            in = null;
             decoder = null;
         } catch (IOException e) {
             logger.log(Level.WARNING, "Error closing file input stream", e);

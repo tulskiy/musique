@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import java.io.IOException;
@@ -49,7 +68,7 @@ public class ItemLocationBox extends FullBox {
 	private long[][] extentOffset, extentLength;
 
 	public ItemLocationBox() {
-		super("Item Location Box", "iloc");
+		super("Item Location Box");
 	}
 
 	@Override
@@ -67,7 +86,6 @@ public class ItemLocationBox extends FullBox {
 		final int baseOffsetSize = (int) (l>>4)&0xF;
 
 		final int itemCount = (int) in.readBytes(2);
-		left -= 4;
 		dataReferenceIndex = new int[itemCount];
 		baseOffset = new long[itemCount];
 		extentOffset = new long[itemCount][];
@@ -80,14 +98,12 @@ public class ItemLocationBox extends FullBox {
 			baseOffset[i] = in.readBytes(baseOffsetSize);
 
 			extentCount = (int) in.readBytes(2);
-			left -= 6+baseOffsetSize;
 			extentOffset[i] = new long[extentCount];
 			extentLength[i] = new long[extentCount];
 
 			for(j = 0; j<extentCount; j++) {
 				extentOffset[i][j] = in.readBytes(offsetSize);
 				extentLength[i][j] = in.readBytes(lengthSize);
-				left -= offsetSize+lengthSize;
 			}
 		}
 	}

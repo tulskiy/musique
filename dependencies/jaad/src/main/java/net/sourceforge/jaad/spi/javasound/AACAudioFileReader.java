@@ -1,24 +1,26 @@
 /*
- * Copyright (C) 2010 in-somnia
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sourceforge.jaad.spi.javasound;
 
-import net.sourceforge.jaad.impl.BitStream;
-import net.sourceforge.jaad.impl.transport.ADIFHeader;
-import net.sourceforge.jaad.impl.transport.ADTSFrame;
+import net.sourceforge.jaad.adts.ADTSDemultiplexer;
+import net.sourceforge.jaad.aac.syntax.BitStream;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -83,7 +85,13 @@ public class AACAudioFileReader extends AudioFileReader {
 		if(new String(b, 4, 4).equals("ftyp")) canHandle = true;
 		else {
 			final BitStream bit = new BitStream(b);
-			if(ADIFHeader.isPresent(bit)||ADTSFrame.isPresent(bit)) canHandle = true;
+			try {
+				ADTSDemultiplexer adts = new ADTSDemultiplexer(in);
+				canHandle = true;
+			}
+			catch(Exception e) {
+				canHandle = false;
+			}
 		}
 		if(canHandle) {
 			final AudioFormat format = new AudioFormat(AAC_ENCODING, AudioSystem.NOT_SPECIFIED, AudioSystem.NOT_SPECIFIED, mediaLength, AudioSystem.NOT_SPECIFIED, AudioSystem.NOT_SPECIFIED, true);

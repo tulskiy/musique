@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import java.awt.Color;
@@ -16,7 +35,7 @@ public class VideoMediaHeaderBox extends FullBox {
 	private Color color;
 
 	public VideoMediaHeaderBox() {
-		super("Video Media Header Box", "vmhd");
+		super("Video Media Header Box");
 	}
 
 	@Override
@@ -24,9 +43,12 @@ public class VideoMediaHeaderBox extends FullBox {
 		super.decode(in);
 
 		graphicsMode = in.readBytes(2);
-
 		//6 byte RGB color
-		color = new Color(in.readBytes(2), in.readBytes(2), in.readBytes(2));
+		final int[] c = new int[3];
+		for(int i = 0; i<3; i++) {
+			c[i] = (in.read()&0xFF)|((in.read()<<8)&0xFF);
+		}
+		color = new Color(c[0], c[1], c[2]);
 	}
 
 	/**

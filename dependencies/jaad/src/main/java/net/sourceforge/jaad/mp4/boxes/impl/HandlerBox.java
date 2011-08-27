@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import java.io.IOException;
@@ -21,16 +40,25 @@ import net.sourceforge.jaad.mp4.boxes.FullBox;
  */
 public class HandlerBox extends FullBox {
 
+	//ISO BMFF types
 	public static final int TYPE_VIDEO = 1986618469; //vide
 	public static final int TYPE_SOUND = 1936684398; //soun
 	public static final int TYPE_HINT = 1751740020; //hint
 	public static final int TYPE_META = 1835365473; //meta
 	public static final int TYPE_NULL = 1853189228; //null
+	//MP4 types
+	public static final int TYPE_ODSM = 1868854125; //odsm
+	public static final int TYPE_CRSM = 1668445037; //crsm
+	public static final int TYPE_SDSM = 1935962989; //sdsm
+	public static final int TYPE_M7SM = 1832350573; //m7sm
+	public static final int TYPE_OCSM = 1868788589; //ocsm
+	public static final int TYPE_IPSM = 1768977261; //ipsm
+	public static final int TYPE_MJSM = 1835692909; //mjsm
 	private long handlerType;
 	private String handlerName;
 
 	public HandlerBox() {
-		super("Handler Box", "hdlr");
+		super("Handler Box");
 	}
 
 	@Override
@@ -44,10 +72,8 @@ public class HandlerBox extends FullBox {
 		in.readBytes(4); //reserved
 		in.readBytes(4); //reserved
 		in.readBytes(4); //reserved
-		left -= 20;
 
-		handlerName = in.readUTFString((int) left, MP4InputStream.UTF8);
-		left -= handlerName.length()+1;
+		handlerName = in.readUTFString((int) getLeft(in), MP4InputStream.UTF8);
 	}
 
 	/**

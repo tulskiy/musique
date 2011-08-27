@@ -1,18 +1,21 @@
 /*
- * Copyright (C) 2010 in-somnia
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
@@ -20,6 +23,7 @@ import net.sourceforge.jaad.mp4.boxes.BoxImpl;
 import net.sourceforge.jaad.mp4.MP4InputStream;
 import java.io.IOException;
 
+//TODO: 3gpp brands
 public class FileTypeBox extends BoxImpl {
 
 	public static final String BRAND_ISO_BASE_MEDIA = "isom";
@@ -38,18 +42,16 @@ public class FileTypeBox extends BoxImpl {
 	protected String[] compatibleBrands;
 
 	public FileTypeBox() {
-		super("File Type Box", "ftyp");
+		super("File Type Box");
 	}
 
 	@Override
 	public void decode(MP4InputStream in) throws IOException {
 		majorBrand = in.readString(4);
 		minorVersion = in.readString(4);
-		left -= 8;
-		compatibleBrands = new String[(int) left/4];
+		compatibleBrands = new String[(int) getLeft(in)/4];
 		for(int i = 0; i<compatibleBrands.length; i++) {
 			compatibleBrands[i] = in.readString(4);
-			left -= 4;
 		}
 	}
 

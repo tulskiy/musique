@@ -1,7 +1,27 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import net.sourceforge.jaad.mp4.MP4InputStream;
 import net.sourceforge.jaad.mp4.boxes.FullBox;
@@ -46,7 +66,7 @@ public class TrackSelectionBox extends FullBox {
 	private final List<Long> attributes;
 
 	public TrackSelectionBox() {
-		super("Track Selection Box", "tsel");
+		super("Track Selection Box");
 		attributes = new ArrayList<Long>();
 	}
 
@@ -55,11 +75,9 @@ public class TrackSelectionBox extends FullBox {
 		super.decode(in);
 
 		switchGroup = in.readBytes(4);
-		left -= 4;
 
-		while(left>3) {
+		while(getLeft(in)>3) {
 			attributes.add(in.readBytes(4));
-			left -= 4;
 		}
 	}
 
@@ -122,6 +140,6 @@ public class TrackSelectionBox extends FullBox {
 	 * the track from other tracks with the same attribute.</p>
 	 */
 	public List<Long> getAttributes() {
-		return attributes;
+		return Collections.unmodifiableList(attributes);
 	}
 }

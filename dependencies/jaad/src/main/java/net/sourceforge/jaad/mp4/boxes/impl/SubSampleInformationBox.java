@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import java.io.IOException;
@@ -26,7 +45,7 @@ public class SubSampleInformationBox extends FullBox {
 	private boolean[][] discardable;
 
 	public SubSampleInformationBox() {
-		super("Sub Sample Information Box", "subs");
+		super("Sub Sample Information Box");
 	}
 
 	@Override
@@ -35,7 +54,6 @@ public class SubSampleInformationBox extends FullBox {
 
 		final int len = (version==1) ? 4 : 2;
 		final int entryCount = (int) in.readBytes(4);
-		left -= 4;
 		sampleDelta = new long[entryCount];
 		subsampleSize = new long[entryCount][];
 		subsamplePriority = new int[entryCount][];
@@ -45,7 +63,6 @@ public class SubSampleInformationBox extends FullBox {
 		for(int i = 0; i<entryCount; i++) {
 			sampleDelta[i] = in.readBytes(4);
 			subsampleCount = (int) in.readBytes(2);
-			left -= 6;
 			subsampleSize[i] = new long[subsampleCount];
 			subsamplePriority[i] = new int[subsampleCount];
 			discardable[i] = new boolean[subsampleCount];
@@ -55,7 +72,6 @@ public class SubSampleInformationBox extends FullBox {
 				subsamplePriority[i][j] = in.read();
 				discardable[i][j] = (in.read()&1)==1;
 				in.skipBytes(4); //reserved
-				left -= len+6;
 			}
 		}
 	}

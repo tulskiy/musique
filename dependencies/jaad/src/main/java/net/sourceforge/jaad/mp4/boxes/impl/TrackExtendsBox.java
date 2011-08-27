@@ -1,3 +1,22 @@
+/*
+ *  Copyright (C) 2011 in-somnia
+ * 
+ *  This file is part of JAAD.
+ * 
+ *  JAAD is free software; you can redistribute it and/or modify it 
+ *  under the terms of the GNU Lesser General Public License as 
+ *  published by the Free Software Foundation; either version 3 of the 
+ *  License, or (at your option) any later version.
+ *
+ *  JAAD is distributed in the hope that it will be useful, but WITHOUT 
+ *  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY 
+ *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General 
+ *  Public License for more details.
+ *
+ *  You should have received a copy of the GNU Lesser General Public
+ *  License along with this library.
+ *  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.sourceforge.jaad.mp4.boxes.impl;
 
 import java.io.IOException;
@@ -13,13 +32,12 @@ import net.sourceforge.jaad.mp4.boxes.FullBox;
  */
 public class TrackExtendsBox extends FullBox {
 
-	private long trackID, defaultSampleDescriptionIndex, defaultSampleDuration, defaultSampleSize;
-	private int sampleDegradationPriority, samplePaddingValue;
-	private int sampleDependsOn, sampleIsDependedOn, sampleHasRedundancy;
-	private boolean differenceSample;
+	private long trackID;
+	private long defaultSampleDescriptionIndex, defaultSampleDuration, defaultSampleSize;
+	private long defaultSampleFlags;
 
 	public TrackExtendsBox() {
-		super("Track Extends Box", "trex");
+		super("Track Extends Box");
 	}
 
 	@Override
@@ -30,7 +48,6 @@ public class TrackExtendsBox extends FullBox {
 		defaultSampleDescriptionIndex = in.readBytes(4);
 		defaultSampleDuration = in.readBytes(4);
 		defaultSampleSize = in.readBytes(4);
-		long l = in.readBytes(4);
 		/* 6 bits reserved
 		 * 2 bits sampleDependsOn
 		 * 2 bits sampleIsDependedOn
@@ -39,19 +56,7 @@ public class TrackExtendsBox extends FullBox {
 		 * 1 bit sampleIsDifferenceSample
 		 * 16 bits sampleDegradationPriority
 		 */
-		sampleDegradationPriority = (int) (l&0xFFFF);
-		l >>= 16;
-		differenceSample = (l&1)==1;
-		l >>= 1;
-		samplePaddingValue = (int) (l&7);
-		l >>= 3;
-		sampleHasRedundancy = (int) (l&3);
-		l >>= 2;
-		sampleIsDependedOn = (int) (l&3);
-		l >>= 2;
-		sampleDependsOn = (int) (l&3);
-
-		left -= 20;
+		defaultSampleFlags = in.readBytes(4);
 	}
 
 	/**
@@ -99,7 +104,7 @@ public class TrackExtendsBox extends FullBox {
 	 * @return the default 'sample depends on' value
 	 */
 	public int getSampleDependsOn() {
-		return sampleDependsOn;
+		return (int) ((defaultSampleFlags>>24)&3);
 	}
 
 	/**
@@ -110,7 +115,7 @@ public class TrackExtendsBox extends FullBox {
 	 * @return the default 'sample is depended on' value
 	 */
 	public int getSampleIsDependedOn() {
-		return sampleIsDependedOn;
+		return (int) ((defaultSampleFlags>>22)&3);
 	}
 
 	/**
@@ -121,7 +126,7 @@ public class TrackExtendsBox extends FullBox {
 	 * @return the default 'sample has redundancy' value
 	 */
 	public int getSampleHasRedundancy() {
-		return sampleHasRedundancy;
+		return (int) ((defaultSampleFlags>>20)&3);
 	}
 
 	/**
@@ -131,18 +136,18 @@ public class TrackExtendsBox extends FullBox {
 	 * @return the default padding value
 	 */
 	public int getSamplePaddingValue() {
-		return samplePaddingValue;
+		return (int) ((defaultSampleFlags>>17)&7);
 	}
 
 	public boolean isSampleDifferenceSample() {
-		return differenceSample;
+		return ((defaultSampleFlags>>16)&1)==1;
 	}
 
 	/**
 	 * The default degradation priority for the samples.
-	 * @return
+	 * @return the default degradation priority
 	 */
 	public int getSampleDegradationPriority() {
-		return sampleDegradationPriority;
+		return (int) (defaultSampleFlags&0xFFFF);
 	}
 }
