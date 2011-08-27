@@ -151,8 +151,8 @@ public class DecoderSeekTester {
                     byte bb = refB.get();
                     if (bb != b[i]) {
                         try {
-                            FileOutputStream f1 = new FileOutputStream("testfiles/frame1.dmp");
-                            FileOutputStream f2 = new FileOutputStream("testfiles/frame2.dmp");
+                            FileOutputStream f1 = new FileOutputStream("tmp/frame1.dmp");
+                            FileOutputStream f2 = new FileOutputStream("tmp/frame2.dmp");
                             refB.reset();
                             byte[] frame = new byte[len];
                             refB.get(frame);
