@@ -27,7 +27,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -70,6 +69,7 @@ import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.playlist.Track;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.configuration.Configuration;
+import com.tulskiy.musique.system.configuration.PlaylistConfiguration;
 import com.tulskiy.musique.util.Util;
 
 /**
@@ -87,7 +87,7 @@ public class PlaylistPanel extends JPanel {
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
-    private ArrayList<PlaylistColumn> columns;
+    private List<PlaylistColumn> columns;
     private PlaylistTabs tabs;
     private TableColumnModel columnModel;
 
@@ -101,7 +101,7 @@ public class PlaylistPanel extends JPanel {
 
         PlaylistManager playlistManager = app.getPlaylistManager();
         ArrayList<Playlist> playlists = playlistManager.getPlaylists();
-        List<String> bounds = config.getList("playlist.tabs.bounds", null);
+        List<String> bounds = PlaylistConfiguration.getTabBounds();
 
         for (int i = 0; i < playlists.size(); i++) {
             Playlist pl = playlists.get(i);
@@ -169,17 +169,8 @@ public class PlaylistPanel extends JPanel {
         });
     }
 
-    private ArrayList<PlaylistColumn> loadColumns() {
-        List<String> list = config.getList("playlist.columns", null);
-        ArrayList<PlaylistColumn> res = new ArrayList<PlaylistColumn>();
-        if (list == null) {
-            res.addAll(Arrays.asList(defaultColumns));
-        } else {
-            for (String s : list) {
-                res.add(new PlaylistColumn(s));
-            }
-        }
-        return res;
+    private List<PlaylistColumn> loadColumns() {
+        return PlaylistConfiguration.getColumns(defaultColumns);
     }
 
     public void saveSettings() {
@@ -192,14 +183,14 @@ public class PlaylistPanel extends JPanel {
 
         Collections.sort(columns);
         config.put("playlist.selectedTrack", null);
-        config.setList("playlist.columns", columns);
+        PlaylistConfiguration.setColumns(columns);
 
         ArrayList<Integer> list = new ArrayList<Integer>();
         for (int i = 0; i < tabs.getTabCount(); i++) {
             PlaylistTable t = tabs.getTableAt(i);
             list.add(t.getVisibleRect().y);
         }
-        config.setList("playlist.tabs.bounds", list);
+        PlaylistConfiguration.setTabBounds(list);
     }
 
     private JMenuItem newItem(String name, String hotkey, ActionListener al) {

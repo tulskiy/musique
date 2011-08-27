@@ -37,11 +37,13 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
 import com.sun.org.apache.xml.internal.serialize.OutputFormat;
 import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+import com.tulskiy.musique.plugins.hotkeys.HotkeyConfiguration;
 import com.tulskiy.musique.system.Application;
 
 /**
@@ -108,21 +110,24 @@ public class Configuration extends XMLConfiguration {
                 if (key.equals("albumart.stubs")) {
                     AlbumArtConfiguration.setStubs(values);
                 }
-                /*
+                else if (key.equals("fileOperations.patterns")) {
+                    FileOperationsConfiguration.setPatterns(values);
+                }
                 else if (key.equals("hotkeys.list")) {
-                    for (Object value : values) {
-                        String[] tokens = value.toString().split(": ");
-
-                        addProperty("hotkeys.hotkey(-1).event", tokens[0]);
-                        addProperty("hotkeys.hotkey.shortcut", tokens[1]);
-                    }
+                    HotkeyConfiguration.setHotkeysRaw(values);
                 }
                 else if (key.equals("library.folders")) {
-                    for (Object value : values) {
-                        addProperty("library.folders.folder", value);
-                    }
+                    LibraryConfiguration.setFolders(values);
                 }
-                */
+                else if (key.equals("playlist.columns")) {
+                    PlaylistConfiguration.setColumnsRaw(values);
+                }
+                else if (key.equals("playlist.tabs.bounds")) {
+                    PlaylistConfiguration.setTabBoundsRaw(values);
+                }
+                else if (key.equals("playlists")) {
+                    PlaylistConfiguration.setPlaylistsRaw(values);
+                }
                 else {
                     for (Object value : values) {
                         addProperty(key, value);
@@ -130,7 +135,12 @@ public class Configuration extends XMLConfiguration {
                 }
             }
             else {
-                addProperty(key, entry.getValue());
+                if (key.equals("wavpack.encoder.hybrid.wvc")) {
+                    addProperty("wavpack.encoder.hybrid.wvc.enabled", entry.getValue());
+                }
+                else {
+                    addProperty(key, entry.getValue());
+                }
             }
         }
         
@@ -341,6 +351,10 @@ public class Configuration extends XMLConfiguration {
 
     public void setList(String key, List<?> values) {
         remove(key);
+        if (values == null) {
+            // TODO refactor when dev cycle finished (right now check implemented for debug in emergency case)
+            logger.severe("Illegal argument (empty list). Please check calling code.");
+        }
         for (Object value : values) {
             add(key, value);
         }

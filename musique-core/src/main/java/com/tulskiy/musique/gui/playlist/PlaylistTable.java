@@ -17,12 +17,58 @@
 
 package com.tulskiy.musique.gui.playlist;
 
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.DropMode;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.KeyStroke;
+import javax.swing.RepaintManager;
+import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.PlayerEvent;
 import com.tulskiy.musique.audio.player.PlayerListener;
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.gui.components.Separator;
-import com.tulskiy.musique.gui.dialogs.*;
+import com.tulskiy.musique.gui.dialogs.ColumnDialog;
+import com.tulskiy.musique.gui.dialogs.ProgressDialog;
+import com.tulskiy.musique.gui.dialogs.Task;
+import com.tulskiy.musique.gui.dialogs.TracksInfoDialog;
+import com.tulskiy.musique.gui.dialogs.TreeFileChooser;
 import com.tulskiy.musique.gui.dnd.PlaylistTransferHandler;
 import com.tulskiy.musique.gui.dnd.SongsSelection;
 import com.tulskiy.musique.gui.menu.TracksMenu;
@@ -34,27 +80,6 @@ import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-
 /**
  * Author: Denis Tulskiy
  * Date: May 13, 2010
@@ -65,7 +90,7 @@ public class PlaylistTable extends GroupTable {
     private static Configuration config = app.getConfiguration();
 
     private Playlist playlist;
-    private ArrayList<PlaylistColumn> columns;
+    private List<PlaylistColumn> columns;
     private PlaylistModel model;
 
     private JScrollPane scrollPane;
@@ -74,7 +99,7 @@ public class PlaylistTable extends GroupTable {
     private PropertyChangeListener autoResizeChangeListener;
     private PlaylistListener playlistListener;
 
-    public PlaylistTable(Playlist playlist, ArrayList<PlaylistColumn> columns) {
+    public PlaylistTable(Playlist playlist, List<PlaylistColumn> columns) {
         this.playlist = playlist;
         this.columns = columns;
 

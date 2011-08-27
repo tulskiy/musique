@@ -115,13 +115,7 @@ public class GlobalHotKeysSettings extends javax.swing.JDialog {
 
     @SuppressWarnings({"unchecked"})
     private void updateConfig() {
-        Vector<Vector> dataVector = tableModel.getDataVector();
-        ArrayList<String> list = new ArrayList<String>();
-        for (Vector o : dataVector) {
-            list.add(o.get(0) + ": " + o.get(1));
-        }
-
-        config.setList("hotkeys.list", list);
+        HotkeyConfiguration.setHotkeys(tableModel.getDataVector());
     }
 
     private static class HotKeyTableModel extends DefaultTableModel {

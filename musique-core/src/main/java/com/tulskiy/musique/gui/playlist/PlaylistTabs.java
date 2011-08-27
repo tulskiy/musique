@@ -17,6 +17,38 @@
 
 package com.tulskiy.musique.gui.playlist;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.TableColumnModel;
+
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
 import com.tulskiy.musique.playlist.Playlist;
@@ -26,27 +58,13 @@ import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.configuration.Configuration;
 import com.tulskiy.musique.util.Util;
 
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.TableColumnModel;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.util.ArrayList;
-
 /**
  * Author: Denis Tulskiy
  * Date: Jun 21, 2010
  */
 public class PlaylistTabs extends JPanel {
     private TableColumnModel columnModel;
-    private ArrayList<PlaylistColumn> columns;
+    private List<PlaylistColumn> columns;
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
@@ -61,7 +79,7 @@ public class PlaylistTabs extends JPanel {
     private int dragFrom;
     private String singleTitle;
 
-    public PlaylistTabs(ArrayList<PlaylistColumn> columns) {
+    public PlaylistTabs(List<PlaylistColumn> columns) {
         this.columns = columns;
         setLayout(new BorderLayout());
         tabbedPane = new JTabbedPane();

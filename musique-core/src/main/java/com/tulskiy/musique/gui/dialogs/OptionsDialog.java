@@ -24,6 +24,7 @@ import com.tulskiy.musique.spi.Plugin;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.configuration.AlbumArtConfiguration;
 import com.tulskiy.musique.system.configuration.Configuration;
+import com.tulskiy.musique.system.configuration.LibraryConfiguration;
 import com.tulskiy.musique.util.Util;
 
 import javax.sound.sampled.AudioSystem;
@@ -171,7 +172,7 @@ public class OptionsDialog extends JDialog {
     }
 
     private void initLibrarySettings() {
-        final List<String> musicFoldersModel = config.getList("library.folders", new ArrayList<String>());
+        final List<String> musicFoldersModel = LibraryConfiguration.getFolders(new ArrayList<String>());
         musicFolders.setModel(new AbstractListModel() {
             public int getSize() {
                 return musicFoldersModel.size();
@@ -231,7 +232,7 @@ public class OptionsDialog extends JDialog {
         applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                config.setList("library.folders", musicFoldersModel);
+                LibraryConfiguration.setFolders(musicFoldersModel);
                 config.setBoolean("library.libraryView", enableLibraryView.isSelected());
                 config.setEnum("library.doubleClickAction", (Enum) libraryDoubleClickAction.getSelectedItem());
                 config.setEnum("library.middleClickAction", (Enum) libraryMiddleClickAction.getSelectedItem());

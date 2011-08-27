@@ -25,29 +25,29 @@ import com.tulskiy.musique.system.Application;
  * Author: Maksim Liauchuk
  * Date: Aug 27, 2011
  */
-public class AlbumArtConfiguration {
+public class FileOperationsConfiguration {
     
-    private AlbumArtConfiguration() {
+    private FileOperationsConfiguration() {
         // prevent instantiation
     }
     
-    public static String getStubKey() {
-        return "albumart.stubs.stub";
+    public static String getPatternKey() {
+        return "fileOperations.patterns.pattern";
     }
     
-    public static List<String> getStubs() {
+    public static List<String> getPatterns() {
         Configuration config = Application.getInstance().getConfiguration();
-        return (List<String>) config.getList(getStubKey());
+        return (List<String>) config.getList(getPatternKey());
     }
     
-    public static List<String> getStubs(List<String> def) {
+    public static List<String> getPatterns(List<String> def) {
         Configuration config = Application.getInstance().getConfiguration();
-        return (List<String>) config.getList(getStubKey(), def);
+        return (List<String>) config.getList(getPatternKey(), def);
     }
     
-    public static void setStubs(List<String> values) {
+    public static void setPatterns(List<String> values) {
         Configuration config = Application.getInstance().getConfiguration();
-        config.setList(getStubKey(), values);
+        config.setList(getPatternKey(), values);
     }
 }
 

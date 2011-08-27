@@ -24,6 +24,7 @@ import com.tulskiy.musique.gui.components.FontChooser;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.configuration.AlbumArtConfiguration;
 import com.tulskiy.musique.system.configuration.Configuration;
+import com.tulskiy.musique.system.configuration.LibraryConfiguration;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Mixer;
@@ -448,7 +449,7 @@ public class SettingsDialog extends JDialog {
         JPanel foldersPanel = new JPanel(new BorderLayout());
         foldersPanel.setBorder(BorderFactory.createTitledBorder("Music folders"));
         final ArrayList<String> model = new ArrayList<String>();
-        model.addAll(config.getList("library.folders", new ArrayList<String>()));
+        model.addAll(LibraryConfiguration.getFolders(new ArrayList<String>()));
         final JList list = new JList(model.toArray());
         foldersPanel.add(new JScrollPane(list), BorderLayout.CENTER);
         Container buttons = new JPanel(new GridLayout(0, 1));
@@ -494,7 +495,7 @@ public class SettingsDialog extends JDialog {
         applyButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                config.setList("library.folders", model);
+                LibraryConfiguration.setFolders(model);
                 config.setBoolean("library.libraryView", libraryView.isSelected());
             }
         });

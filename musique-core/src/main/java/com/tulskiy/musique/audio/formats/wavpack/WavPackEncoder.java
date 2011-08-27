@@ -54,7 +54,7 @@ public class WavPackEncoder implements Encoder {
                     config.flags |= Defines.CONFIG_HYBRID_FLAG;
                     config.bitrate = (int) (bitrate * 256);
 
-                    if (options.getBoolean("wavpack.encoder.hybrid.wvc", true)) {
+                    if (options.getBoolean("wavpack.encoder.hybrid.wvc.enabled", true)) {
                         config.flags |= Defines.CONFIG_CREATE_WVC;
 
                         File wvc = new File(Util.removeExt(

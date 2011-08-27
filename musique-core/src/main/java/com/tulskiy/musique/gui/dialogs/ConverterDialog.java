@@ -221,7 +221,7 @@ public class ConverterDialog extends JDialog {
         misc.add(maxHybrid);
         maxHybrid.setSelected(config.getBoolean("wavpack.encoder.hybrid.wvc.optimize", false));
         final JCheckBox wvc = new JCheckBox("Create correction file");
-        wvc.setSelected(config.getBoolean("wavpack.encoder.hybrid.wvc", false));
+        wvc.setSelected(config.getBoolean("wavpack.encoder.hybrid.wvc.enabled", false));
         misc.add(wvc);
         misc.add(new JLabel());
         misc.add(new JLabel("Bitrate, bits/sample"));
@@ -254,7 +254,7 @@ public class ConverterDialog extends JDialog {
                 config.setBoolean("wavpack.encoder.hybrid.enable", hybrid.isSelected());
                 if (hybrid.isSelected()) {
                     config.setFloat("wavpack.encoder.hybrid.bitrate", ((Number) bitrate.getValue()).floatValue());
-                    config.setBoolean("wavpack.encoder.hybrid.wvc", wvc.isSelected());
+                    config.setBoolean("wavpack.encoder.hybrid.wvc.enabled", wvc.isSelected());
                     config.setBoolean("wavpack.encoder.hybrid.wvc.optimize", maxHybrid.isSelected());
                     config.setFloat("wavpack.encoder.hybrid.noiseShape", ((Number) noise.getValue()).floatValue());
                 }

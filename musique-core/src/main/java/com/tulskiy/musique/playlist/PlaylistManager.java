@@ -24,6 +24,7 @@ package com.tulskiy.musique.playlist;
 import com.tulskiy.musique.library.Library;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.configuration.Configuration;
+import com.tulskiy.musique.system.configuration.PlaylistConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ public class PlaylistManager {
     }
 
     public void loadPlaylists() {
-        List<String> list = config.getList("playlists", new ArrayList<String>());
+        List<Playlist> list = PlaylistConfiguration.getPlaylists(new ArrayList<Playlist>());
 
         Playlist libraryPlaylist = new Playlist();
         File file = new File(PLAYLIST_PATH, "library.mus");
@@ -84,8 +85,7 @@ public class PlaylistManager {
         library = new Library(libraryPlaylist);
 
         for (int i = 0; i < list.size(); i++) {
-            String fmt = list.get(i);
-            Playlist playlist = new Playlist(fmt);
+            Playlist playlist = list.get(i);
             playlist.load(new File(PLAYLIST_PATH, i + ".mus"));
             playlists.add(playlist);
         }
@@ -130,7 +130,7 @@ public class PlaylistManager {
         }
         library.getData().save(new File(PLAYLIST_PATH, "library.mus"));
 
-        config.setList("playlists", playlists);
+        PlaylistConfiguration.setPlaylists(playlists);
         if (activePlaylist != null && playlists.contains(activePlaylist)) {
             config.setInt("playlist.activePlaylist", playlists.indexOf(activePlaylist));
 

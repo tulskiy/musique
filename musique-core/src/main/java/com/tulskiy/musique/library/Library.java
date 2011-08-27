@@ -26,9 +26,13 @@ import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Codecs;
 import com.tulskiy.musique.system.TrackIO;
 import com.tulskiy.musique.system.configuration.Configuration;
+import com.tulskiy.musique.system.configuration.LibraryConfiguration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.tree.TreeNode;
+
+import org.apache.commons.collections.CollectionUtils;
+
 import java.io.File;
 import java.io.FileFilter;
 import java.util.*;
@@ -52,8 +56,8 @@ public class Library {
     }
 
     public void rescan(Map<String, Object> progress) {
-        List<String> folders = config.getList("library.folders", null);
-        if (folders == null || folders.isEmpty()) {
+        List<String> folders = LibraryConfiguration.getFolders();
+        if (CollectionUtils.isEmpty(folders)) {
             return;
         }
         progress.put("processing.file", "");

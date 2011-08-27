@@ -168,21 +168,8 @@ public class GlobalHotKeysPlugin extends Plugin {
         }
 
         private void parseConfig() {
-            List<String> hotKeys = config.getList("hotkeys.list", new ArrayList<String>());
             activeHotKeys.clear();
-
-            for (String hotKey : hotKeys) {
-                try {
-                    String[] tokens = hotKey.split(": ");
-
-                    HotKeyEvent event = HotKeyEvent.valueOf(tokens[0]);
-                    KeyStroke keyStroke = KeyStroke.getKeyStroke(tokens[1]);
-
-                    activeHotKeys.put(keyStroke, event);
-                } catch (IllegalArgumentException e) {
-                    logger.warning("Could not parse hotkey for string: " + hotKey);
-                }
-            }
+            activeHotKeys.putAll(HotkeyConfiguration.getHotkeys(logger));
         }
     }
 }
