@@ -17,28 +17,147 @@
 
 package com.tulskiy.musique.system;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Rectangle;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Formatter;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.Map.Entry;
 import java.util.logging.Logger;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
 
 /**
  * Author: Denis Tulskiy
  * Date: Jun 15, 2010
  */
-public class Configuration {
+public class Configuration extends XMLConfiguration {
+    
+    public static final int VERSION = 1;
+    
+    public static final String PROPERTY_INFO_VERSION = "info.version";
+
     private Logger logger = Logger.getLogger(getClass().getName());
+    // TODO move to ConfigurationListener given by Configuration Commons
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
+    @Deprecated
     private Map<String, Object> map = new TreeMap<String, Object>();
+    
+    {
+        setDelimiterParsingDisabled(true);
+    }
 
+    @Override
     public void load(Reader reader) {
+        logger.fine("Loading configuration");
+        
         try {
-            logger.fine("Loading configuration");
+            super.load(reader);
+        } catch (ConfigurationException e) {
+            // error log disabled as we're gonna try to load deprecated configuration file of v0.2
+//            logger.severe("Failed to load configuration: " + e.getMessage());
+            convertOldConfiguration(reader);
+        }
+
+        int version = getInt(PROPERTY_INFO_VERSION, -1);
+        if (version > VERSION) {
+            logger.warning(String.format("Configuration of newer v%d found, but v%d is latest supported." +
+                    " Backward compatibility is not guaranteed.", version, VERSION));
+        }
+        else if (version == -1) {
+            logger.warning("Configuration of unknown version is loaded." +
+                    " Backward compatibility is not guaranteed.");
+        }
+        else {
+            logger.config(String.format("Configuration of v%d is loaded.", version));
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Deprecated
+    private void convertOldConfiguration(Reader reader) {
+        loadFromCustomFormat(reader);
+
+        setFile(new File(Application.getInstance().CONFIG_HOME, "config"));
+        addProperty(PROPERTY_INFO_VERSION, VERSION);
+
+        Iterator<Entry<String, Object>> entries = map.entrySet().iterator();
+        while (entries.hasNext()) {
+            Entry<String, Object> entry = entries.next();
+            String key = /*"musique." +*/ entry.getKey();
+            if (entry.getValue() instanceof List) {
+                List values = (List) entry.getValue();
+/*
+                if (key.equals("albumart.stubs")) {
+                    for (Object value : values) {
+                        addProperty("albumart.stubs.stub", value);
+                    }
+                }
+                else if (key.equals("hotkeys.list")) {
+                    for (Object value : values) {
+                        String[] tokens = value.toString().split(": ");
+
+                        addProperty("hotkeys.hotkey(-1).event", tokens[0]);
+                        addProperty("hotkeys.hotkey.shortcut", tokens[1]);
+                    }
+                }
+                else if (key.equals("library.folders")) {
+                    for (Object value : values) {
+                        addProperty("library.folders.folder", value);
+                    }
+                }
+                else {
+                    for (Object value : values) {
+                        addProperty(key, value);
+                    }
+                }
+*/
+                for (Object value : values) {
+                    addProperty(key, value);
+                }
+            }
+            else {
+                addProperty(key, entry.getValue());
+            }
+        }
+        
+        map.clear();
+
+        try {
+            save();
+        } catch (ConfigurationException e1) {
+            logger.severe("Failed to save converted configuration: " + e1.getMessage());
+        }
+    }
+
+    public void save(Writer writer) {
+        logger.fine("Saving configuration");
+        
+        try {
+            super.save(writer);
+        } catch (ConfigurationException e) {
+            logger.severe("Failed to save configuration: " + e.getMessage());
+        }
+    }
+
+    // TODO remove when 0.3 released
+    @Deprecated
+    public void loadFromCustomFormat(Reader reader) {
+        try {
             BufferedReader r = new BufferedReader(reader);
 
             ArrayList<String> array = null;
@@ -79,80 +198,34 @@ public class Configuration {
         }
     }
 
-    @SuppressWarnings({"unchecked"})
-    public void save(Writer writer) {
-        logger.fine("Saving configuration");
-        PrintWriter w = new PrintWriter(writer);
-
-        for (String key : map.keySet()) {
-            Object value = get(key);
-            if (value == null) {
-                continue;
-            }
-            w.printf("%s: ", key);
-
-            if (value instanceof List) {
-                w.println();
-
-                List<Object> list = (List<Object>) value;
-                for (Object o : list) {
-                    w.println("  " + o);
-                }
-            } else {
-                w.println(value);
-            }
-        }
-
-        w.close();
-    }
-
+    @Deprecated
+    /**
+     * use add/setProperty instead
+     */
     public void put(String key, Object value) {
         Object old = get(key);
-        map.put(key, value);
+        setProperty(key, value);
         changeSupport.firePropertyChange(key, old, value);
     }
 
     public void remove(String key) {
-        map.remove(key);
+        clearTree(key);
     }
 
+    @Deprecated
+    /**
+     * use getProperty instead
+     */
     public Object get(String key) {
-        return map.get(key);
-    }
-
-    public int getInt(String key, int def) {
-        try {
-            return Integer.valueOf(get(key).toString());
-        } catch (Exception e) {
-            setInt(key, def);
-            return def;
-        }
+        return getProperty(key);
     }
 
     public void setInt(String key, int value) {
         put(key, value);
     }
 
-    public float getFloat(String key, float def) {
-        try {
-            return Float.valueOf(get(key).toString());
-        } catch (Exception e) {
-            setFloat(key, def);
-            return def;
-        }
-    }
-
     public void setFloat(String key, float value) {
         put(key, value);
-    }
-
-    public String getString(String key, String def) {
-        try {
-            return get(key).toString();
-        } catch (Exception e) {
-            setString(key, def);
-            return def;
-        }
     }
 
     public void setString(String key, String value) {
@@ -161,7 +234,7 @@ public class Configuration {
 
     public Color getColor(String key, Color def) {
         try {
-            String s = get(key).toString().substring(1);
+            String s = getString(key).substring(1);
             return new Color(Integer.parseInt(s, 16));
         } catch (Exception e) {
             setColor(key, def);
@@ -181,7 +254,7 @@ public class Configuration {
 
     public Rectangle getRectangle(String key, Rectangle def) {
         try {
-            String value = get(key).toString();
+            String value = getString(key);
             String[] tokens = value.split(" ");
             if (tokens.length != 4)
                 throw new NumberFormatException();
@@ -213,7 +286,7 @@ public class Configuration {
 
     public Font getFont(String key, Font def) {
         try {
-            String value = get(key).toString();
+            String value = getString(key);
             String[] tokens = value.split(", ");
 
             return new Font(tokens[0],
@@ -237,16 +310,6 @@ public class Configuration {
         }
     }
 
-    public boolean getBoolean(String key, boolean def) {
-        try {
-            String value = get(key).toString();
-            return Boolean.parseBoolean(value);
-        } catch (Exception e) {
-            setBoolean(key, def);
-            return def;
-        }
-    }
-
     public void setBoolean(String key, boolean value) {
         put(key, value);
     }
@@ -254,7 +317,7 @@ public class Configuration {
     @SuppressWarnings({"unchecked"})
     public ArrayList<String> getList(String key, ArrayList<String> def) {
         try {
-            ArrayList<String> strings = (ArrayList<String>) get(key);
+            ArrayList<String> strings = (ArrayList<String>) getList(key);
             if (strings != null)
                 return strings;
         } catch (Exception ignored) {
@@ -263,15 +326,10 @@ public class Configuration {
         return def;
     }
 
-    public void setList(String key, ArrayList<?> value) {
-        if (value == null)
-            remove(key);
-        else {
-            ArrayList<String> s = new ArrayList<String>(value.size());
-            for (Object o : value) {
-                s.add(o.toString());
-            }
-            put(key, s);
+    public void setList(String key, ArrayList<?> values) {
+        remove(key);
+        for (Object value : values) {
+            addProperty(key, value);
         }
     }
 
