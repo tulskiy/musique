@@ -18,11 +18,13 @@
 package com.tulskiy.musique.audio.formats.mp4;
 
 import com.tulskiy.musique.playlist.Track;
+import com.tulskiy.musique.util.AudioMath;
 import net.sourceforge.jaad.aac.Decoder;
 import net.sourceforge.jaad.aac.SampleBuffer;
 import net.sourceforge.jaad.mp4.MP4Container;
 import net.sourceforge.jaad.mp4.api.AudioTrack;
 import net.sourceforge.jaad.mp4.api.Frame;
+import net.sourceforge.jaad.mp4.api.MetaData;
 import net.sourceforge.jaad.mp4.api.Movie;
 
 import javax.sound.sampled.AudioFormat;
@@ -73,7 +75,12 @@ public class MP4AACDecoder implements com.tulskiy.musique.audio.Decoder {
         }
 
         track = (AudioTrack) tracks.get(0);
+        movie.getMetaData().get(MetaData.Field.GAPLESS_PLAYBACK);
         decoder = new Decoder(track.getDecoderSpecificInfo());
+
+        double time = AudioMath.samplesToMillis(sample, track.getSampleRate()) / 1000d;
+        double newTime = track.seek(time);
+        offset = (int) ((time - newTime) * track.getSampleRate());
 
         /*sample += mp4.getGaplessDelay();
         gaplessPadding = mp4.getGaplessPadding();

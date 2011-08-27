@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import net.sourceforge.jaad.mp4.boxes.Box;
 import net.sourceforge.jaad.mp4.boxes.BoxTypes;
 import net.sourceforge.jaad.mp4.boxes.impl.CopyrightBox;
+import net.sourceforge.jaad.mp4.boxes.impl.drm.FairPlayDataBox;
 import net.sourceforge.jaad.mp4.boxes.impl.meta.ID3TagBox;
 import net.sourceforge.jaad.mp4.boxes.impl.meta.ITunesMetadataBox;
 import net.sourceforge.jaad.mp4.boxes.impl.meta.NeroMetadataTagsBox;
@@ -368,6 +369,14 @@ public class MetaData {
 			else if(l==BoxTypes.ARTIST_SORT_BOX) put(Field.ARTIST_SORT_TEXT, data.getText());
 			else if(l==BoxTypes.TRACK_SORT_BOX) put(Field.TITLE_SORT_TEXT, data.getText());
 			else if(l==BoxTypes.ALBUM_SORT_BOX) put(Field.ALBUM_SORT_TEXT, data.getText());
+            else if(l==BoxTypes.CUSTOM_ITUNES_METADATA_BOX) {
+                // this is special iTunes tag that stores gapless info
+                FairPlayDataBox nameBox = (FairPlayDataBox) box.getChild(BoxTypes.ITUNES_METADATA_NAME_BOX);
+                String name = new String(nameBox.getData()).trim();
+                if (name.equals("iTunSMPB")) {
+                    put(Field.GAPLESS_PLAYBACK, data.getText());
+                }
+            }
 		}
 	}
 

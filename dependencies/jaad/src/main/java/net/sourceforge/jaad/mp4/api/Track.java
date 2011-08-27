@@ -176,12 +176,18 @@ public abstract class Track {
 			}
 		}
 
+        parseGaplessInfo();
+
 		//frames need not to be time-ordered: sort by timestamp
 		//TODO: is it possible to add them to the specific position?
 		Collections.sort(frames);
 	}
 
-	//TODO: implement other entry descriptors
+    private void parseGaplessInfo() {
+
+    }
+
+    //TODO: implement other entry descriptors
 	protected void findDecoderSpecificInfo(ESDBox esds) {
 		final Descriptor ed = esds.getEntryDescriptor();
 		final List<Descriptor> children = ed.getChildren();
@@ -385,13 +391,13 @@ public abstract class Track {
 		//find first frame > timestamp
 		Frame frame = null;
 		for(int i = 0; i<frames.size(); i++) {
-			frame = frames.get(i++);
+			frame = frames.get(i);
 			if(frame.getTime()>timestamp) {
-				currentFrame = i;
+				currentFrame = i - 1;
 				break;
 			}
 		}
-		return (frame==null) ? -1 : frame.getTime();
+		return (frame==null) ? -1 : frames.get(currentFrame).getTime();
 	}
 
 	/**

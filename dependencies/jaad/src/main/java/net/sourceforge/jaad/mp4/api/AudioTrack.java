@@ -88,15 +88,9 @@ public class AudioTrack extends Track {
 			sampleEntry = null;
 			codec = AudioCodec.UNKNOWN_AUDIO_CODEC;
 		}
-
-        analyzeGaplessInfo();
 	}
 
-    private void analyzeGaplessInfo() {
-
-    }
-
-    @Override
+	@Override
 	public Type getType() {
 		return Type.AUDIO;
 	}
