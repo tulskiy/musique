@@ -40,6 +40,9 @@ import java.util.logging.Logger;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
+
 /**
  * Author: Denis Tulskiy
  * Date: Jun 15, 2010
@@ -139,18 +142,29 @@ public class Configuration extends XMLConfiguration {
 
         try {
             save();
-        } catch (ConfigurationException e1) {
-            logger.severe("Failed to save converted configuration: " + e1.getMessage());
+        } catch (ConfigurationException e) {
+            logger.severe("Failed to save converted configuration: " + e.getMessage());
         }
     }
 
+    @Override
     public void save(Writer writer) {
         logger.fine("Saving configuration");
         
         try {
-            super.save(writer);
-        } catch (ConfigurationException e) {
-            logger.severe("Failed to save configuration: " + e.getMessage());
+            OutputFormat format = new OutputFormat(createDocument());
+            format.setLineWidth(65);
+            format.setIndenting(true);
+            format.setIndent(2);
+            XMLSerializer serializer = new XMLSerializer(writer, format);
+            serializer.serialize(getDocument());
+            writer.close();
+        }
+        catch (ConfigurationException ce) {
+            logger.severe("Failed to save configuration: " + ce.getMessage());
+        }
+        catch (IOException ioe) {
+            logger.severe("Failed to save configuration: " + ioe.getMessage());
         }
     }
 
