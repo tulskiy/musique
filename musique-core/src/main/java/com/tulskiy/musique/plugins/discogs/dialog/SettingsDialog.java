@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Window;
+import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -52,8 +54,10 @@ public class SettingsDialog extends JDialog {
 	/**
 	 * Create the dialog.
 	 */
-	public SettingsDialog() {
-		setMinimumSize(new Dimension(500, 300));
+	public SettingsDialog(Window owner) {
+        super(owner, ModalityType.APPLICATION_MODAL);
+
+        setMinimumSize(new Dimension(500, 300));
 		final FilenameFilter filter = new FilenameFilter() {
 			@Override
 			public boolean accept(File dir, String name) {

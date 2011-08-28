@@ -70,7 +70,7 @@ public class DiscogsPlugin extends Plugin {
 
     @Override
     public Description getDescription() {
-        return new Description("Discogs", "Maksim Liauchuk", null);
+        return new Description("Discogs", "Maksim Liauchuk", "Tag files via Discogs service (API v1.0)");
     }
 
     @Override
@@ -80,7 +80,7 @@ public class DiscogsPlugin extends Plugin {
 
     @Override
     public void configure(Window parent) {
-        SettingsDialog settingsDialog = new SettingsDialog();
+        SettingsDialog settingsDialog = new SettingsDialog(parent);
         settingsDialog.setLocationRelativeTo(null);
         settingsDialog.setVisible(true);
     }
@@ -98,15 +98,6 @@ public class DiscogsPlugin extends Plugin {
             });
             menu.add(retrieve);
         }
-        
-        JMenuItem settings = new JMenuItem("Settings");
-        settings.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				new SettingsDialog().setVisible(true);
-			}
-        });
-        menu.add(settings);
 
         return menu;
     }
