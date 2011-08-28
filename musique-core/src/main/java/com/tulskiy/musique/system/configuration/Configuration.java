@@ -136,7 +136,16 @@ public class Configuration extends XMLConfiguration {
             }
             else {
                 if (key.equals("wavpack.encoder.hybrid.wvc")) {
-                    addProperty("wavpack.encoder.hybrid.wvc.enabled", entry.getValue());
+                    addProperty("encoder.wavpack.hybrid.wvc.enabled", entry.getValue());
+                }
+                else if (key.startsWith("ape.encoder")) {
+                    addProperty(key.replace("ape.encoder", "encoder.ape"), entry.getValue());
+                }
+                else if (key.startsWith("vorbis.encoder")) {
+                    addProperty(key.replace("vorbis.encoder", "encoder.vorbis"), entry.getValue());
+                }
+                else if (key.startsWith("wavpack.encoder")) {
+                    addProperty(key.replace("wavpack.encoder", "encoder.wavpack"), entry.getValue());
                 }
                 else {
                     addProperty(key, entry.getValue());

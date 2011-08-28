@@ -55,7 +55,7 @@ public class VorbisEncoder implements Encoder {
 
         float quality = DEFAULT_BITRATE;
         if (options != null) {
-            quality = options.getFloat("vorbis.encoder.quality", DEFAULT_BITRATE);
+            quality = options.getFloat("encoder.vorbis.quality", DEFAULT_BITRATE);
         }
         logger.log(Level.INFO, "Starting encoding with {0} channels, {1} Hz, quality: {2}",
                 new Object[]{fmt.getChannels(), fmt.getSampleRate(), quality});

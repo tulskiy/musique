@@ -212,26 +212,26 @@ public class ConverterDialog extends JDialog {
         final JComboBox quality = new JComboBox(new String[]{
                 "fast", "normal", "high", "very high"
         });
-        quality.setSelectedItem(config.getString("wavpack.encoder.mode", "normal"));
+        quality.setSelectedItem(config.getString("encoder.wavpack.mode", "normal"));
         misc.add(quality);
         final JCheckBox hybrid = new JCheckBox("Enable hybrid mode");
         misc.add(hybrid);
-        hybrid.setSelected(config.getBoolean("wavpack.encoder.hybrid.enable", false));
+        hybrid.setSelected(config.getBoolean("encoder.wavpack.hybrid.enable", false));
         final JCheckBox maxHybrid = new JCheckBox("Maximum hybrid compression");
         misc.add(maxHybrid);
-        maxHybrid.setSelected(config.getBoolean("wavpack.encoder.hybrid.wvc.optimize", false));
+        maxHybrid.setSelected(config.getBoolean("encoder.wavpack.hybrid.wvc.optimize", false));
         final JCheckBox wvc = new JCheckBox("Create correction file");
-        wvc.setSelected(config.getBoolean("wavpack.encoder.hybrid.wvc.enabled", false));
+        wvc.setSelected(config.getBoolean("encoder.wavpack.hybrid.wvc.enabled", false));
         misc.add(wvc);
         misc.add(new JLabel());
         misc.add(new JLabel("Bitrate, bits/sample"));
         final JSpinner bitrate = new JSpinner(
                 new SpinnerNumberModel(4.0, 2.0, 16.0, 0.1));
-        bitrate.setValue((double) config.getFloat("wavpack.encoder.hybrid.bitrate", 4f));
+        bitrate.setValue((double) config.getFloat("encoder.wavpack.hybrid.bitrate", 4f));
         misc.add(bitrate);
         misc.add(new JLabel("Noize shape override"));
         final JSpinner noise = new JSpinner(new SpinnerNumberModel(0, -1.0, 1.0, 0.1));
-        noise.setValue((double) config.getFloat("wavpack.encoder.hybrid.noiseShape", 0));
+        noise.setValue((double) config.getFloat("encoder.wavpack.hybrid.noiseShape", 0));
         misc.add(noise);
 
         ItemListener hybridListener = new ItemListener() {
@@ -250,13 +250,13 @@ public class ConverterDialog extends JDialog {
         panel.addPropertyChangeListener("accept", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                config.setString("wavpack.encoder.mode", (String) quality.getSelectedItem());
-                config.setBoolean("wavpack.encoder.hybrid.enable", hybrid.isSelected());
+                config.setString("encoder.wavpack.mode", (String) quality.getSelectedItem());
+                config.setBoolean("encoder.wavpack.hybrid.enable", hybrid.isSelected());
                 if (hybrid.isSelected()) {
-                    config.setFloat("wavpack.encoder.hybrid.bitrate", ((Number) bitrate.getValue()).floatValue());
-                    config.setBoolean("wavpack.encoder.hybrid.wvc.enabled", wvc.isSelected());
-                    config.setBoolean("wavpack.encoder.hybrid.wvc.optimize", maxHybrid.isSelected());
-                    config.setFloat("wavpack.encoder.hybrid.noiseShape", ((Number) noise.getValue()).floatValue());
+                    config.setFloat("encoder.wavpack.hybrid.bitrate", ((Number) bitrate.getValue()).floatValue());
+                    config.setBoolean("encoder.wavpack.hybrid.wvc.enabled", wvc.isSelected());
+                    config.setBoolean("encoder.wavpack.hybrid.wvc.optimize", maxHybrid.isSelected());
+                    config.setFloat("encoder.wavpack.hybrid.noiseShape", ((Number) noise.getValue()).floatValue());
                 }
             }
         });
@@ -273,7 +273,7 @@ public class ConverterDialog extends JDialog {
         slider.setPaintLabels(true);
         slider.setPaintTicks(true);
         slider.setSnapToTicks(true);
-        slider.setValue((int) (config.getFloat("vorbis.encoder.quality", .3f) * 10));
+        slider.setValue((int) (config.getFloat("encoder.vorbis.quality", .3f) * 10));
         Box box = Box.createVerticalBox();
         box.add(slider);
         box.add(Box.createVerticalGlue());
@@ -282,7 +282,7 @@ public class ConverterDialog extends JDialog {
         panel.addPropertyChangeListener("accept", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                config.setFloat("vorbis.encoder.quality", slider.getValue() / 10f);
+                config.setFloat("encoder.vorbis.quality", slider.getValue() / 10f);
             }
         });
         return panel;
@@ -304,7 +304,7 @@ public class ConverterDialog extends JDialog {
         labels.put(4, new JLabel("Extra High"));
         labels.put(5, new JLabel("Insane"));
         slider.setLabelTable(labels);
-        slider.setValue(config.getInt("ape.encoder.level", 2000) / 1000);
+        slider.setValue(config.getInt("encoder.ape.level", 2000) / 1000);
         Box box = Box.createVerticalBox();
         box.add(slider);
         box.add(Box.createVerticalGlue());
@@ -313,7 +313,7 @@ public class ConverterDialog extends JDialog {
         panel.addPropertyChangeListener("accept", new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                config.setInt("ape.encoder.level", slider.getValue() * 1000);
+                config.setInt("encoder.ape.level", slider.getValue() * 1000);
             }
         });
         return panel;

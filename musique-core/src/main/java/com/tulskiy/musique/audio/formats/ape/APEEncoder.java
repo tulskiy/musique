@@ -51,7 +51,7 @@ public class APEEncoder implements Encoder {
             fillWaveFormat(format, fmt);
             int level = CompressionLevel.COMPRESSION_LEVEL_NORMAL;
             if (options != null) {
-                level = options.getInt("ape.encoder.level", level);
+                level = options.getInt("encoder.ape.level", level);
             }
             encoder.StartEx(new RandomAccessFile(outputFile, "rw"),
                     format, IAPECompress.MAX_AUDIO_BYTES_UNKNOWN,

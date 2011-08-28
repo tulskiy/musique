@@ -49,12 +49,12 @@ public class WavPackEncoder implements Encoder {
             wpc.outfile = new RandomAccessFile(outputFile, "rw");
             wpc.outfile.setLength(0);
             if (options != null) {
-                if (options.getBoolean("wavpack.encoder.hybrid.enable", false)) {
-                    float bitrate = options.getFloat("wavpack.encoder.hybrid.bitrate", -1);
+                if (options.getBoolean("encoder.wavpack.hybrid.enable", false)) {
+                    float bitrate = options.getFloat("encoder.wavpack.hybrid.bitrate", -1);
                     config.flags |= Defines.CONFIG_HYBRID_FLAG;
                     config.bitrate = (int) (bitrate * 256);
 
-                    if (options.getBoolean("wavpack.encoder.hybrid.wvc.enabled", true)) {
+                    if (options.getBoolean("encoder.wavpack.hybrid.wvc.enabled", true)) {
                         config.flags |= Defines.CONFIG_CREATE_WVC;
 
                         File wvc = new File(Util.removeExt(
@@ -62,12 +62,12 @@ public class WavPackEncoder implements Encoder {
                         wpc.correction_outfile = new RandomAccessFile(wvc, "rw");
                         wpc.correction_outfile.setLength(0);
 
-                        if (options.getBoolean("wavpack.encoder.hybrid.wvc.optimize", false)) {
+                        if (options.getBoolean("encoder.wavpack.hybrid.wvc.optimize", false)) {
                             config.flags |= Defines.CONFIG_OPTIMIZE_WVC;
                         }
                     }
 
-                    float noiseShape = options.getFloat("wavpack.encoder.hybrid.noiseShape", 0);
+                    float noiseShape = options.getFloat("encoder.wavpack.hybrid.noiseShape", 0);
                     config.shaping_weight = (int) (noiseShape * 1024.0);
 
                     if (config.shaping_weight == 0) {
@@ -79,7 +79,7 @@ public class WavPackEncoder implements Encoder {
                     }
                 }
 
-                String mode = options.getString("wavpack.encoder.mode", null);
+                String mode = options.getString("encoder.wavpack.mode", null);
                 if ("fast".equals(mode)) {
                     config.flags |= Defines.CONFIG_FAST_FLAG;
                 } else if ("high".equals(mode)) {
