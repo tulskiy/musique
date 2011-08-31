@@ -87,7 +87,7 @@ public class DecoderTest {
         test(new PCMFileReader(), "testfiles/uncompressed/sample.wav");
     }
 
-    @Test
+//    @Test
     public void testAAC() {
         test(new MP4FileReader(), "testfiles/aac/sample_faac.mp4");
         test(new MP4FileReader(), "testfiles/aac/sample_ffmpeg.mp4");
