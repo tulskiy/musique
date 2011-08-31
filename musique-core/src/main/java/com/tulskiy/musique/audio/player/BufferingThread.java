@@ -208,7 +208,8 @@ public class BufferingThread extends Actor implements Runnable {
 
             start();
             logger.fine("Finished opening track");
-            playingThread.send(Message.FLUSH);
+            if (forced)
+                playingThread.send(Message.FLUSH);
             playingThread.send(Message.PLAY);
         }
     }
