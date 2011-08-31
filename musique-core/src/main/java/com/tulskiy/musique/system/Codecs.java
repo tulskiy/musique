@@ -25,6 +25,7 @@ import com.tulskiy.musique.audio.formats.ape.APEEncoder;
 import com.tulskiy.musique.audio.formats.flac.FLACDecoder;
 import com.tulskiy.musique.audio.formats.flac.FLACEncoder;
 import com.tulskiy.musique.audio.formats.mp3.MP3Decoder;
+import com.tulskiy.musique.audio.formats.mp4.AACDecoder;
 import com.tulskiy.musique.audio.formats.mp4.MP4Demuxer;
 import com.tulskiy.musique.audio.formats.ogg.VorbisDecoder;
 import com.tulskiy.musique.audio.formats.ogg.VorbisEncoder;
@@ -65,6 +66,7 @@ public class Codecs {
         decoders.put("mp4", mp4Demuxer);
         decoders.put("m4a", mp4Demuxer);
         decoders.put("tta", new TTADecoder());
+        decoders.put("aac", new AACDecoder());
 
         encoders.put("wav", new PCMEncoder());
         encoders.put("ape", new APEEncoder());
@@ -93,6 +95,10 @@ public class Codecs {
 
             if ("application/ogg".equals(contentType)) {
                 return decoders.get("ogg");
+            }
+
+            if ("audio/aac".equals(contentType)) {
+                return decoders.get("aac");
             }
             logger.warning("Unsupported ContentType: " + contentType);
             return null;

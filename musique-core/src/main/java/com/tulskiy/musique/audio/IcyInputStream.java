@@ -147,7 +147,7 @@ public class IcyInputStream extends FilterInputStream {
                 readMeta();
             }
 
-            if (bytesToMeta >= 0 && bytesToMeta < len) {
+            if (bytesToMeta > 0 && bytesToMeta < len) {
                 len = bytesToMeta;
             }
         }

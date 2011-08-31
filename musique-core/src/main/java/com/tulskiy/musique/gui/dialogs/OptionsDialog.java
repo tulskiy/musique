@@ -59,6 +59,7 @@ public class OptionsDialog extends JDialog {
     }
 
     public OptionsDialog(JComponent owner, String selectedTab) {
+        super(SwingUtilities.windowForComponent(owner), ModalityType.MODELESS);
         this.owner = owner;
         initComponents();
         initDynamicComponents();
@@ -355,7 +356,7 @@ public class OptionsDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 Plugin plugin = (Plugin) pluginsList.getSelectedValue();
                 if (plugin != null)
-                    plugin.configure(SwingUtilities.getWindowAncestor(OptionsDialog.this));
+                    plugin.configure(OptionsDialog.this);
             }
         });
 

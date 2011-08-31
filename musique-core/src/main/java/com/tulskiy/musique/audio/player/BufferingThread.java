@@ -100,6 +100,7 @@ public class BufferingThread extends Actor implements Runnable {
                             }
                             open(nextTrack, false);
                             nextTrack = null;
+                            continue;
                         }
 
                         len = decoder.decode(buf);
@@ -182,7 +183,7 @@ public class BufferingThread extends Actor implements Runnable {
                 track = order.next(track);
                 if (track == null || (
                 		trackData.isFile() && !trackData.getFile().exists())) {
-                    decoder = null;
+                    stop(false);
                     return;
                 }
             }
@@ -208,7 +209,8 @@ public class BufferingThread extends Actor implements Runnable {
 
             start();
             logger.fine("Finished opening track");
-            playingThread.send(Message.FLUSH);
+            if (forced)
+                playingThread.send(Message.FLUSH);
             playingThread.send(Message.PLAY);
         }
     }
