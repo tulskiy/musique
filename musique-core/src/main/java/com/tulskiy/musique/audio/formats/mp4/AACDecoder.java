@@ -37,7 +37,7 @@ import java.util.logging.Level;
  * Date: 8/31/11
  */
 public class AACDecoder implements com.tulskiy.musique.audio.Decoder {
-    private static final int BUFFER_SIZE = 30000;
+    private static final int BUFFER_SIZE = 3000;
 
     private AudioFormat audioFormat;
     private Decoder decoder;
@@ -97,7 +97,7 @@ public class AACDecoder implements com.tulskiy.musique.audio.Decoder {
                 close();
                 //save it here because we set errorCount to 0 in open
                 int oldErr = errorCount++;
-                if (!open(track) || errorCount > 5) {
+                if (!open(track) || oldErr > 5) {
                     return -1;
                 }
                 errorCount = oldErr;
@@ -123,6 +123,5 @@ public class AACDecoder implements com.tulskiy.musique.audio.Decoder {
         decoder = null;
         adts = null;
         buffer = null;
-        track = null;
     }
 }
