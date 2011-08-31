@@ -37,7 +37,7 @@ import java.util.logging.Level;
  * Author: Denis Tulskiy
  * Date: 4/5/11
  */
-public class MP4AACDecoder implements com.tulskiy.musique.audio.Decoder {
+public class MP4Decoder implements com.tulskiy.musique.audio.Decoder {
     private Decoder decoder;
     private SampleBuffer sampleBuffer;
     private AudioFormat audioFormat;

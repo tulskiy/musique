@@ -28,7 +28,7 @@ import javax.sound.sampled.AudioFormat;
  */
 public class MP4Demuxer implements Decoder {
     private final Decoder alacDecoder = new ALACDecoder();
-    private final Decoder aacDecoder = new MP4AACDecoder();
+    private final Decoder aacDecoder = new MP4Decoder();
 
     private Decoder decoder;
 
