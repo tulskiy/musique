@@ -87,12 +87,12 @@ public class DecoderTest {
         test(new PCMFileReader(), "testfiles/uncompressed/sample.wav");
     }
 
-//    @Test
+    @Test
     public void testAAC() {
         test(new MP4FileReader(), "testfiles/aac/sample_faac.mp4");
         test(new MP4FileReader(), "testfiles/aac/sample_ffmpeg.mp4");
-//        test(new MP4FileReader(), "testfiles/aac/sample.mp4");
-//        test(new MP4FileReader(), "testfiles/aac/sample_nero.mp4");
+        test(new MP4FileReader(), "testfiles/aac/sample.mp4");
+        test(new MP4FileReader(), "testfiles/aac/sample_nero.mp4");
         test(new MP4FileReader(), "testfiles/aac/sample_itunes.m4a");
         test(new MP4FileReader(), "testfiles/aac/sample_itunes_new.m4a");
     }
