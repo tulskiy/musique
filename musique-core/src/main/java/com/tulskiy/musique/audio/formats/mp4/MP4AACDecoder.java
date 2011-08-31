@@ -57,6 +57,7 @@ public class MP4AACDecoder implements com.tulskiy.musique.audio.Decoder {
             in = new RandomAccessFile(track.getTrackData().getFile(), "r");
 
             sampleBuffer = new SampleBuffer();
+            sampleBuffer.setBigEndian(false);
             initDecoder(0);
             return true;
         } catch (IOException e) {
@@ -78,10 +79,6 @@ public class MP4AACDecoder implements com.tulskiy.musique.audio.Decoder {
         track = (AudioTrack) tracks.get(0);
         decoder = new Decoder(track.getDecoderSpecificInfo());
         parseGaplessInfo(movie);
-
-        double time = AudioMath.samplesToMillis(sample, track.getSampleRate()) / 1000d;
-        double newTime = track.seek(time);
-        offset = (int) ((time - newTime) * track.getSampleRate());
 
         sample += gaplessDelay;
         totalSamples = track.getFrameCount();
@@ -110,7 +107,7 @@ public class MP4AACDecoder implements com.tulskiy.musique.audio.Decoder {
 
         offset = (int) (sample - (target - track.getSampleDuration(currentSample)));
         if (audioFormat == null)
-            audioFormat = new AudioFormat((float) track.getSampleRate(), bps * 8, track.getChannelCount(), true, true);
+            audioFormat = new AudioFormat((float) track.getSampleRate(), bps * 8, track.getChannelCount(), true, false);
     }
 
     private void parseGaplessInfo(Movie movie) {
@@ -162,7 +159,7 @@ public class MP4AACDecoder implements com.tulskiy.musique.audio.Decoder {
             if (currentSample == totalSamples && gaplessPadding != 0) {
                 len = gaplessPadding * sampleBuffer.getChannels();
             } else {
-                len = (int) (sampleBuffer.getLength() * sampleBuffer.getSampleRate()) * sampleBuffer.getBitsPerSample() / 8;
+                len = (int) (sampleBuffer.getLength() * sampleBuffer.getSampleRate()) * bps;
             }
             len *= bps;
             int off = offset * bps * sampleBuffer.getChannels();
