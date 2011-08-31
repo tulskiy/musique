@@ -64,7 +64,7 @@ public class FileOperations extends JDialog {
     private JComboBox namePattern;
     private PathChooser folder;
     private DefaultTableModel previewModel;
-    private HashMap<Track, File> paths = new HashMap<Track, File>();
+    private HashMap<Track, File> paths = new LinkedHashMap<Track, File>();
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
 
