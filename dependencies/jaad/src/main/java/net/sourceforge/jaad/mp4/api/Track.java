@@ -43,7 +43,6 @@ import net.sourceforge.jaad.mp4.boxes.impl.DecodingTimeToSampleBox;
 import net.sourceforge.jaad.mp4.boxes.impl.TrackHeaderBox;
 import net.sourceforge.jaad.mp4.od.DecoderSpecificInfo;
 import net.sourceforge.jaad.mp4.boxes.impl.ESDBox;
-import net.sourceforge.jaad.mp4.boxes.impl.sampleentries.SampleEntry;
 import net.sourceforge.jaad.mp4.od.Descriptor;
 
 /**
@@ -72,6 +71,8 @@ public abstract class Track {
 	protected DecoderSpecificInfo decoderSpecificInfo;
 	protected DecoderInfo decoderInfo;
 	protected Protection protection;
+    private int lastFramePadding;
+    private DecodingTimeToSampleBox stts;
 
 	Track(Box trak, MP4InputStream in) {
 		this.in = in;
@@ -115,6 +116,8 @@ public abstract class Track {
 			parseSampleTable(stbl);
 		}
 		else frames = Collections.emptyList();
+
+        parseGaplessInfo();
 		currentFrame = 0;
 	}
 
@@ -137,7 +140,7 @@ public abstract class Track {
 		final long[] samplesPerChunk = stsc.getSamplesPerChunk();
 
 		//sample durations/timestamps
-		final DecodingTimeToSampleBox stts = (DecodingTimeToSampleBox) stbl.getChild(BoxTypes.DECODING_TIME_TO_SAMPLE_BOX);
+        stts = (DecodingTimeToSampleBox) stbl.getChild(BoxTypes.DECODING_TIME_TO_SAMPLE_BOX);
 		final long[] sampleCounts = stts.getSampleCounts();
 		final long[] sampleDeltas = stts.getSampleDeltas();
 		final long[] timeOffsets = new long[sampleSizes.length];
@@ -176,15 +179,16 @@ public abstract class Track {
 			}
 		}
 
-        parseGaplessInfo();
-
 		//frames need not to be time-ordered: sort by timestamp
 		//TODO: is it possible to add them to the specific position?
 		Collections.sort(frames);
 	}
 
     private void parseGaplessInfo() {
-
+        // if stts has two entries, last one is usually padding
+        if (stts != null && stts.getSampleDeltas().length == 2) {
+            lastFramePadding = (int) stts.getSampleDeltas()[1];
+        }
     }
 
     //TODO: implement other entry descriptors
@@ -409,4 +413,34 @@ public abstract class Track {
 	double getNextTimeStamp() {
 		return frames.get(currentFrame).getTime();
 	}
+
+    /**
+     * Returns duration of sample, based on stts data
+     * @param sample sample number
+     * @return duration in pcm samples
+     */
+    public long getSampleDuration(int sample) {
+        int co = 0;
+
+        for (int i = 0; i < stts.getSampleCounts().length; i++) {
+            long delta = stts.getSampleCounts()[i];
+            if (sample < co + delta)
+                return stts.getSampleDeltas()[i];
+            co += delta;
+        }
+
+        return 0;
+    }
+
+    public int getLastFramePadding() {
+        return lastFramePadding;
+    }
+
+    public void setCurrentFrame(int frame) {
+        currentFrame = frame;
+    }
+
+    public int getFrameCount() {
+        return frames.size();
+    }
 }
