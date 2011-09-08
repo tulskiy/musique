@@ -133,6 +133,7 @@ public class PlaylistManager {
         library.getData().save(new File(PLAYLIST_PATH, "library.mus"));
 
         PlaylistConfiguration.setPlaylists(playlists);
+        activePlaylist = visiblePlaylist; // workaround since activePlaylist variable isn't updated when tab clicked
         if (activePlaylist != null && playlists.contains(activePlaylist)) {
             config.setInt("playlists.activePlaylist", playlists.indexOf(activePlaylist));
 
