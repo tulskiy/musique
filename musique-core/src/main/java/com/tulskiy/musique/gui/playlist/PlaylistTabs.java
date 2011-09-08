@@ -29,8 +29,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -47,7 +46,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.table.TableColumnModel;
 
 import com.tulskiy.musique.gui.dialogs.ProgressDialog;
 import com.tulskiy.musique.gui.dialogs.Task;
@@ -63,8 +61,6 @@ import com.tulskiy.musique.util.Util;
  * Date: Jun 21, 2010
  */
 public class PlaylistTabs extends JPanel {
-    private TableColumnModel columnModel;
-    private List<PlaylistColumn> columns;
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
@@ -79,8 +75,7 @@ public class PlaylistTabs extends JPanel {
     private int dragFrom;
     private String singleTitle;
 
-    public PlaylistTabs(List<PlaylistColumn> columns) {
-        this.columns = columns;
+    public PlaylistTabs() {
         setLayout(new BorderLayout());
         tabbedPane = new JTabbedPane();
         add(tabbedPane);
@@ -98,7 +93,7 @@ public class PlaylistTabs extends JPanel {
     }
 
     private void checkTabCount() {
-        if (!config.getBoolean("playlist.tabs.hideSingle", true)) {
+        if (!config.getBoolean("playlists.tabs.hideSingle", true)) {
             return;
         }
         SwingUtilities.invokeLater(new Runnable() {
@@ -292,7 +287,7 @@ public class PlaylistTabs extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = new JFileChooser();
-                String path = config.getString("playlist.lastDir", "");
+                String path = config.getString("playlists.lastDir", "");
                 if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
                 fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fc.setAcceptAllFileFilterUsed(false);
@@ -322,7 +317,7 @@ public class PlaylistTabs extends JPanel {
                     } else if (filter == plsFiler) {
                         playlist.savePLS(file);
                     }
-                    config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
+                    config.setString("playlists.lastDir", fc.getCurrentDirectory().getAbsolutePath());
                 }
             }
         });
@@ -330,7 +325,7 @@ public class PlaylistTabs extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fc = new JFileChooser();
-                String path = config.getString("playlist.lastDir", "");
+                String path = config.getString("playlists.lastDir", "");
                 if (!path.isEmpty()) fc.setCurrentDirectory(new File(path));
                 fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 fc.setMultiSelectionEnabled(false);
@@ -346,7 +341,7 @@ public class PlaylistTabs extends JPanel {
                     Playlist playlist = addPlaylist(Util.capitalize(Util.removeExt(file.getName()), " "));
                     ProgressDialog dialog = new ProgressDialog(tabbedPane, "Adding Files");
                     dialog.show(new Task.FileAddingTask(playlist, new File[]{fc.getSelectedFile()}, -1));
-                    config.setString("playlist.lastDir", fc.getCurrentDirectory().getAbsolutePath());
+                    config.setString("playlists.lastDir", fc.getCurrentDirectory().getAbsolutePath());
                 }
             }
         });
@@ -392,13 +387,8 @@ public class PlaylistTabs extends JPanel {
     }
 
     public PlaylistTable addPlaylist(Playlist playlist) {
-        PlaylistTable newTable = new PlaylistTable(playlist, columns);
+        PlaylistTable newTable = new PlaylistTable(playlist, playlist.getColumns());
         newTable.setUpDndCCP();
-        if (columnModel == null) {
-            columnModel = newTable.getColumnModel();
-        } else {
-            newTable.setColumnModel(columnModel);
-        }
 
         addTab(playlist.getName(), newTable.getScrollPane());
         return newTable;

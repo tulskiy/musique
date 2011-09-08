@@ -204,7 +204,7 @@ public class TreeFileChooser extends JDialog {
 
     public File[] showOpenDialog() {
         Configuration config = app.getConfiguration();
-        String path = config.getString("playlist.lastDir", null);
+        String path = config.getString("playlists.lastDir", null);
         if (path != null) {
             File file = new File(path);
             if (file.exists())
@@ -219,7 +219,7 @@ public class TreeFileChooser extends JDialog {
                 dir = dir.getParentFile();
             }
             if (dir != null) {
-                config.setString("playlist.lastDir", dir.getAbsolutePath());
+                config.setString("playlists.lastDir", dir.getAbsolutePath());
             }
         }
         return selectedFiles;

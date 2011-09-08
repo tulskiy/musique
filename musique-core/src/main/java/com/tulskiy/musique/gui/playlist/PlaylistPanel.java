@@ -29,6 +29,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -77,41 +78,28 @@ import com.tulskiy.musique.util.Util;
  * @Date: Feb 6, 2010
  */
 public class PlaylistPanel extends JPanel {
-    private PlaylistColumn[] defaultColumns = {
-            new PlaylistColumn("Playing", 55, "$isPlaying()"),
-            new PlaylistColumn("Name", 325, "[%artist% - ]%title%"),
-            new PlaylistColumn("Length", 70, "%length%"),
-            new PlaylistColumn("Album", 225, "%album%"),
-            new PlaylistColumn("Date", 55, "%year%")
-    };
 
     private Application app = Application.getInstance();
     private Configuration config = app.getConfiguration();
-    private List<PlaylistColumn> columns;
     private PlaylistTabs tabs;
-    private TableColumnModel columnModel;
+    private List<TableColumnModel> columnModels = new LinkedList<TableColumnModel>();
 
     public PlaylistPanel() {
-        columns = loadColumns();
+        PlaylistManager playlistManager = app.getPlaylistManager();
+        ArrayList<Playlist> playlists = playlistManager.getPlaylists();
 
         setLayout(new BorderLayout());
 
-        tabs = new PlaylistTabs(columns);
+        tabs = new PlaylistTabs();
         add(tabs, BorderLayout.CENTER);
 
-        PlaylistManager playlistManager = app.getPlaylistManager();
-        ArrayList<Playlist> playlists = playlistManager.getPlaylists();
         List<String> bounds = PlaylistConfiguration.getTabBounds();
 
         for (int i = 0; i < playlists.size(); i++) {
             Playlist pl = playlists.get(i);
-            PlaylistTable newTable = new PlaylistTable(pl, columns);
+            PlaylistTable newTable = new PlaylistTable(pl, pl.getColumns());
             newTable.setUpDndCCP();
-            if (columnModel == null) {
-                columnModel = newTable.getColumnModel();
-            } else {
-                newTable.setColumnModel(columnModel);
-            }
+            columnModels.add(newTable.getColumnModel());
 
             //try to set last position
             try {
@@ -169,28 +157,31 @@ public class PlaylistPanel extends JPanel {
         });
     }
 
-    private List<PlaylistColumn> loadColumns() {
-        return PlaylistConfiguration.getColumns(defaultColumns);
-    }
-
     public void saveSettings() {
-        for (int i = 0; i < columnModel.getColumnCount(); i++) {
-            TableColumn tc = columnModel.getColumn(i);
-            PlaylistColumn pc = columns.get(tc.getModelIndex());
-            pc.setPosition(i);
-            pc.setSize(tc.getWidth());
-        }
+        PlaylistManager playlistManager = app.getPlaylistManager();
+        ArrayList<Playlist> playlists = playlistManager.getPlaylists();
 
-        Collections.sort(columns);
-        config.put("playlist.selectedTrack", null);
-        PlaylistConfiguration.setColumns(columns);
-
-        ArrayList<Integer> list = new ArrayList<Integer>();
-        for (int i = 0; i < tabs.getTabCount(); i++) {
-            PlaylistTable t = tabs.getTableAt(i);
-            list.add(t.getVisibleRect().y);
+        for (int n = 0; n < columnModels.size(); n++) {
+            List<PlaylistColumn> columns = playlists.get(n).getColumns();
+            TableColumnModel columnModel = columnModels.get(n);
+            for (int i = 0; i < columnModel.getColumnCount(); i++) {
+                TableColumn tc = columnModel.getColumn(i);
+                PlaylistColumn pc = columns.get(tc.getModelIndex());
+                pc.setPosition(i);
+                pc.setSize(tc.getWidth());
+            }
+    
+            Collections.sort(columns);
+            config.put("playlist.selectedTrack", null);
+    
+            ArrayList<Integer> list = new ArrayList<Integer>();
+            for (int i = 0; i < tabs.getTabCount(); i++) {
+                PlaylistTable t = tabs.getTableAt(i);
+                list.add(t.getVisibleRect().y);
+            }
+            // TODO check that bounds stuff works as expected
+            PlaylistConfiguration.setTabBounds(list);
         }
-        PlaylistConfiguration.setTabBounds(list);
     }
 
     private JMenuItem newItem(String name, String hotkey, ActionListener al) {
@@ -310,7 +301,7 @@ public class PlaylistPanel extends JPanel {
         editMenu.add(tableAction("removeSelected", "Remove Tracks"));
         final String[] groupItems = {"None", "Artist", "Album Artist", "Artist/Album",
                 "Artist/Album/Date", null, "Custom"};
-        final String[] groupValues = {null, "%artist%", "%albumArtist%", "%albumArtist%[ - %album%",
+        final String[] groupValues = {null, "%artist%", "%albumArtist%", "%albumArtist%[ - %album%]",
                 "%albumArtist%[ - %album%][ '['%year%']']"
         };
         JMenu groups = new JMenu("Group playlist");
@@ -335,10 +326,10 @@ public class PlaylistPanel extends JPanel {
                 } else {
                     Object ret = JOptionPane.showInputDialog(comp,
                             "Select formatting",
-                            config.getString("playlist.groupBy", playlist.getGroupBy()));
+                            config.getString("playlists.groupBy", playlist.getGroupBy()));
                     if (ret != null) {
                         playlist.setGroupBy(ret.toString());
-                        config.setString("playlist.groupBy", ret.toString());
+                        config.setString("playlists.groupBy", ret.toString());
                     }
                 }
 
@@ -515,21 +506,21 @@ public class PlaylistPanel extends JPanel {
         playbackMenu.addSeparator();
 
         playbackMenu.add(tableAction("showNowPlaying", "Scroll to Now Playing"));
-        boolean selected = config.getBoolean("playlist.cursorFollowsPlayback", true);
+        boolean selected = config.getBoolean("playlists.cursorFollowsPlayback", true);
         playbackMenu.add(new JCheckBoxMenuItem("Cursor Follows Playback", selected)).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
-                config.setBoolean("playlist.cursorFollowsPlayback", item.isSelected());
+                config.setBoolean("playlists.cursorFollowsPlayback", item.isSelected());
             }
         });
 
-        selected = config.getBoolean("playlist.playbackFollowsCursor", false);
+        selected = config.getBoolean("playlists.playbackFollowsCursor", false);
         playbackMenu.add(new JCheckBoxMenuItem("Playback Follows Cursor", selected)).addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JCheckBoxMenuItem item = (JCheckBoxMenuItem) e.getSource();
-                config.setBoolean("playlist.playbackFollowsCursor", item.isSelected());
+                config.setBoolean("playlists.playbackFollowsCursor", item.isSelected());
             }
         });
 

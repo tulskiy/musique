@@ -47,6 +47,7 @@ import org.jaudiotagger.tag.datatype.Pair;
 
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.gui.model.FieldValues;
+import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 import com.tulskiy.musique.gui.playlist.SeparatorTrack;
 import com.tulskiy.musique.playlist.formatting.Parser;
 import com.tulskiy.musique.playlist.formatting.tokens.Expression;
@@ -88,6 +89,9 @@ public class Playlist extends ArrayList<Track> {
     private Expression groupExpression;
     private boolean libraryView;
 
+    private List<PlaylistColumn> columns;
+
+    @Deprecated
     public Playlist(String fmt) {
         try {
             Object[] objects = format.parse(fmt);
@@ -654,6 +658,14 @@ public class Playlist extends ArrayList<Track> {
 
     public void removeChangeListener(PlaylistListener listener) {
         listeners.remove(listener);
+    }
+
+    public void setColumns(List<PlaylistColumn> columns) {
+        this.columns = columns;
+    }
+
+    public List<PlaylistColumn> getColumns() {
+        return columns;
     }
 
 }

@@ -21,6 +21,7 @@
  */
 package com.tulskiy.musique.playlist;
 
+import com.tulskiy.musique.gui.playlist.PlaylistColumn;
 import com.tulskiy.musique.library.Library;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.configuration.Configuration;
@@ -28,6 +29,7 @@ import com.tulskiy.musique.system.configuration.PlaylistConfiguration;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -94,7 +96,7 @@ public class PlaylistManager {
             setActivePlaylist(addPlaylist("Default"));
         }
 
-        int index = config.getInt("playlist.activePlaylist", -1);
+        int index = config.getInt("playlists.activePlaylist", -1);
         if (index < 0 || index >= playlists.size())
             index = 0;
         setActivePlaylist(playlists.get(index));
@@ -132,7 +134,7 @@ public class PlaylistManager {
 
         PlaylistConfiguration.setPlaylists(playlists);
         if (activePlaylist != null && playlists.contains(activePlaylist)) {
-            config.setInt("playlist.activePlaylist", playlists.indexOf(activePlaylist));
+            config.setInt("playlists.activePlaylist", playlists.indexOf(activePlaylist));
 
             Track lastPlayed = app.getPlayer().getTrack();
             if (lastPlayed != null) {
@@ -150,6 +152,13 @@ public class PlaylistManager {
     public Playlist addPlaylist(String name) {
         Playlist playlist = new Playlist();
         playlist.setName(name);
+        // default columns
+        playlist.setColumns(Arrays.asList(
+                new PlaylistColumn("Playing", 55, "$isPlaying()"),
+                new PlaylistColumn("Name", 325, "[%artist% - ]%title%"),
+                new PlaylistColumn("Length", 70, "%length%"),
+                new PlaylistColumn("Album", 225, "%album%"),
+                new PlaylistColumn("Date", 55, "%year%")));
         playlists.add(playlist);
         notifyListeners(playlist, Event.ADDED);
         return playlist;

@@ -230,7 +230,7 @@ public class PlaylistTable extends GroupTable {
                 update();
                 switch (e.getEventCode()) {
                     case FILE_OPENED:
-                        if (config.getBoolean("playlist.cursorFollowsPlayback", true)) {
+                        if (config.getBoolean("playlists.cursorFollowsPlayback", true)) {
                             SwingUtilities.invokeLater(new Runnable() {
                                 @Override
                                 public void run() {
@@ -239,7 +239,7 @@ public class PlaylistTable extends GroupTable {
                             });
                         }
 
-                        if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
+                        if (config.getBoolean("playlists.playbackFollowsCursor", false)) {
                             PlaybackOrder order = player.getPlaybackOrder();
                             order.setLastPlayed(null);
                         }
@@ -278,7 +278,7 @@ public class PlaylistTable extends GroupTable {
                     return;
                 Track track = tracks.get(0);
                 config.put("playlist.selectedTrack", track);
-                if (config.getBoolean("playlist.playbackFollowsCursor", false)) {
+                if (config.getBoolean("playlists.playbackFollowsCursor", false)) {
                     PlaybackOrder order = player.getPlaybackOrder();
                     order.setLastPlayed(track);
                 }

@@ -138,6 +138,24 @@ public class Configuration extends XMLConfiguration {
                 if (key.equals("wavpack.encoder.hybrid.wvc")) {
                     addProperty("encoder.wavpack.hybrid.wvc.enabled", entry.getValue());
                 }
+                else if (key.equals("playlist.activePlaylist")) {
+                    addProperty("playlists.activePlaylist", entry.getValue());
+                }
+                else if (key.equals("playlist.cursorFollowsPlayback")) {
+                    addProperty("playlists.cursorFollowsPlayback", entry.getValue());
+                }
+                else if (key.equals("playlist.groupBy")) {
+                    addProperty("playlists.groupBy", entry.getValue());
+                }
+                else if (key.equals("playlist.lastDir")) {
+                    addProperty("playlists.lastDir", entry.getValue());
+                }
+                else if (key.equals("playlist.playbackFollowsCursor")) {
+                    addProperty("playlists.playbackFollowsCursor", entry.getValue());
+                }
+                else if (key.equals("playlist.tabs.hideSingle")) {
+                    addProperty("playlists.tabs.hideSingle", entry.getValue());
+                }
                 else if (key.startsWith("ape.encoder")) {
                     addProperty(key.replace("ape.encoder", "encoder.ape"), entry.getValue());
                 }
