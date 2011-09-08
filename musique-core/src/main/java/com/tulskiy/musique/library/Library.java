@@ -40,7 +40,7 @@ import java.util.logging.Logger;
  */
 public class Library {
     private final Logger logger = Logger.getLogger(getClass().getName());
-    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'?')|$if1(%album%,[[%year% - ]%album%],'?')$if1($greater(%totalDiscs%,1),[|Disc %discNumber%],'')|[%trackNumber%. ]%title%";
+    private static final String DEFAULT_VIEW = "$if3(%albumArtist%,'?')|$if1(%album%,[[%year% - ]%album%],'?')$if1($greater(%discTotal%,1),[|Disc %disc%],'')|[%trackNumber%. ]%title%";
     private Configuration config = Application.getInstance().getConfiguration();
     private Playlist data;
     private String view;
