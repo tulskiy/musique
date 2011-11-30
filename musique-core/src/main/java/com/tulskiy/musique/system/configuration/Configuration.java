@@ -204,6 +204,8 @@ public class Configuration extends XMLConfiguration {
     @Deprecated
     public void loadFromCustomFormat(Reader reader) {
         try {
+            // reader has been used, so repositioning read point to start
+            reader.reset();
             BufferedReader r = new BufferedReader(reader);
 
             ArrayList<String> array = null;
