@@ -95,6 +95,13 @@ public class Configuration extends XMLConfiguration {
     @SuppressWarnings("unchecked")
     @Deprecated
     private void convertOldConfiguration(Reader reader) {
+        // reader has been used, so try to reposition read point to start
+        try {
+			reader.reset();
+		} catch (IOException e) {
+			// just ignore, will try to read from where it is
+		}
+
         loadFromCustomFormat(reader);
 
         setFile(new File(Application.getInstance().CONFIG_HOME, "config"));
@@ -204,8 +211,6 @@ public class Configuration extends XMLConfiguration {
     @Deprecated
     public void loadFromCustomFormat(Reader reader) {
         try {
-            // reader has been used, so repositioning read point to start
-            reader.reset();
             BufferedReader r = new BufferedReader(reader);
 
             ArrayList<String> array = null;
