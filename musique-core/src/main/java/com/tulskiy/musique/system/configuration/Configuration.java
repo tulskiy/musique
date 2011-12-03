@@ -63,8 +63,19 @@ public class Configuration extends XMLConfiguration {
     private Map<String, Object> map = new TreeMap<String, Object>();
     
     {
-        setDelimiterParsingDisabled(true);
-    }
+    	// Disable delimiter mechanism completely for this instance
+    	//
+    	// https://issues.apache.org/jira/browse/CONFIGURATION-268
+    	// We might add a note in the javadoc suggesting that setDelimiterParsingDisabled(true)
+    	// is not recommended if list properties are used in attributes,
+    	// and that changing the list delimiter to an untypical character is preferred.
+    	//
+    	// http://commons.apache.org/configuration/userguide/howto_xml.html
+    	// Using the static setDefaultDelimiter() method of AbstractConfiguration
+    	// you can globally define a different delimiter character
+    	// or - by setting the delimiter to 0 - disabling this mechanism completely.
+		setListDelimiter((char) 0);
+	}
 
     @Override
     public void load(Reader reader) {
