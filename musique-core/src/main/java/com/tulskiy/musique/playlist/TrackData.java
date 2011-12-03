@@ -278,8 +278,8 @@ public class TrackData implements Cloneable {
 
     public String getAlbumArtist() {
         return firstNotEmpty(FieldKey.ALBUM_ARTIST,
+                FieldKey.BAND, // foobar2000 uses BAND field as album artist in id3v2
                 FieldKey.ARTIST,
-                FieldKey.BAND,
                 FieldKey.COMPOSER
         );
     }
