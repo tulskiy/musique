@@ -116,8 +116,12 @@ public class MP4Decoder implements com.tulskiy.musique.audio.Decoder {
         String iTunSMPB = metaData.get(MetaData.Field.GAPLESS_PLAYBACK);
         if (iTunSMPB != null && iTunSMPB.length() > 0) {
             String[] data = iTunSMPB.trim().split(" ");
-            gaplessDelay = Integer.parseInt(data[1], 16);
-            gaplessPadding = (int) (track.getSampleDuration(0) - Integer.parseInt(data[2], 16));
+            try {
+                gaplessDelay = Integer.parseInt(data[1], 16);
+                gaplessPadding = (int) (track.getSampleDuration(0) - Integer.parseInt(data[2], 16));
+            } catch (Exception e) {
+                logger.log(Level.WARNING, "could not parse iTunSMPB gappless info", e);
+            }
         } else {
             //now estimate gapless delay based on the tool
             String tool = metaData.get(MetaData.Field.ENCODER_TOOL);
