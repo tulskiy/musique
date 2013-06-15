@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
+ * Copyright (c) 2008-2013 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -200,13 +200,13 @@ public class Converter {
             logger.warning("Cannot write to folder: " + parent);
             return false;
         }
-        //noinspection ResultOfMethodCallIgnored
-        parent.mkdirs();
 
         String format = config.getString("converter.encoder", "wav");
         String fileName = String.valueOf(fileNameFormat.eval(track)) +
                 "." + format;
         output = new File(parent, fileName);
+
+        output.getParentFile().mkdirs();
 
         if (output.exists()) {
             String action = config.getString("converter.actionWhenExists", "Ask");

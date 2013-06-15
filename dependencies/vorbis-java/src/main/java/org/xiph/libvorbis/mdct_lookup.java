@@ -524,7 +524,7 @@ class mdct_lookup {
         float[] T = trig;
 
         // float *w=alloca(n*sizeof(*w)); // forward needs working space
-        float[] w = new float[n];
+        float[] w = vorbis_float_cache.get(n);
         // float *w2=w+n2;
         int w2 = n2;
 
@@ -603,6 +603,8 @@ class mdct_lookup {
             w1 += 2;
             t += 2;
         }
+
+        vorbis_float_cache.ret(w);
     }
 
     public void mdct_forward_offset(float[] in, int offset, float[] out, int out_offset) {

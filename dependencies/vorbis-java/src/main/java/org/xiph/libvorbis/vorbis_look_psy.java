@@ -811,7 +811,7 @@ class vorbis_look_psy {
     }
 
     private float toBARK(double z) {
-        return new Double(13.1f * Math.atan(.00074f * (z)) + 2.24f * Math.atan((z) * (z) * 1.85e-8f) + 1e-4f * (z)).floatValue();
+        return (float) (13.1f * Math.atan(.00074f * (z)) + 2.24f * Math.atan((z) * (z) * 1.85e-8f) + 1e-4f * (z));
     }
 
 //	private float fromBARK( double z ) {
@@ -1084,10 +1084,10 @@ class vorbis_look_psy {
             m_val = 1.275f;    // 48kHz
 
         eighth_octave_lines = gi.eighth_octave_lines;
-        shiftoc = new Double(Math.rint(Math.log(gi.eighth_octave_lines * 8.0f) / Math.log(2.0f)) - 1).intValue();
+        shiftoc = (int) (Math.rint(Math.log(gi.eighth_octave_lines * 8.0f) / Math.log(2.0f)) - 1);
 
-        firstoc = new Float(toOC(0.25f * rate * 0.5 / n) * (1 << (shiftoc + 1)) - gi.eighth_octave_lines).intValue();
-        maxoc = new Float(toOC((n + .25f) * rate * 0.5 / n) * (1 << (shiftoc + 1)) + 0.5f).intValue();
+        firstoc = (int) (toOC(0.25f * rate * 0.5 / n) * (1 << (shiftoc + 1)) - gi.eighth_octave_lines);
+        maxoc = (int) (toOC((n + .25f) * rate * 0.5 / n) * (1 << (shiftoc + 1)) + 0.5f);
         total_octave_lines = maxoc - firstoc + 1;
 
         // ath=_ogg_malloc(n*sizeof(*ath));
@@ -1101,7 +1101,7 @@ class vorbis_look_psy {
         // set up the lookups for a given blocksize and sample rate
 
         for (i = 0, j = 0; i < MAX_ATH - 1; i++) {
-            int endpos = new Double(Math.rint(fromOC((i + 1) * 0.125f - 2.0f) * 2 * n / rate)).intValue();
+            int endpos = (int) Math.rint(fromOC((i + 1) * 0.125f - 2.0f) * 2 * n / rate);
             float base = ATH[i];
             if (j < endpos) {
                 float delta = (ATH[i + 1] - base) / (endpos - j);
@@ -1124,7 +1124,7 @@ class vorbis_look_psy {
         }
 
         for (i = 0; i < n; i++)
-            octave[i] = new Float(toOC((i + 0.25f) * 0.5f * rate / n) * (1 << (shiftoc + 1)) + 0.5f).intValue();
+            octave[i] = (int) (toOC((i + 0.25f) * 0.5f * rate / n) * (1 << (shiftoc + 1)) + 0.5f);
 
         setup_tone_curves(vi.toneatt, rate * 0.5f / n, n, vi.tone_centerboost, vi.tone_decay);
 
@@ -1204,7 +1204,7 @@ class vorbis_look_psy {
         curve = 2;
         post1 = (int) posts[1];
 
-        seedptr = new Float(oc + (posts[0] - EHMER_OFFSET) * linesper - (linesper >>> 1)).intValue();
+        seedptr = (int) (oc + (posts[0] - EHMER_OFFSET) * linesper - (linesper >>> 1));
 
         for (i = (int) posts[0]; i < post1; i++) {
 
@@ -1254,7 +1254,7 @@ class vorbis_look_psy {
         // long  *posstack=alloca(n*sizeof(*posstack));
         // float *ampstack=alloca(n*sizeof(*ampstack));
         int[] posstack = new int[n];
-        float[] ampstack = new float[n];
+        float[] ampstack = vorbis_float_cache.get(n);
 
         int stack = 0;
         int pos = 0;
@@ -1303,6 +1303,8 @@ class vorbis_look_psy {
             for (; pos < endpos; pos++)
                 seeds[pos] = ampstack[i];
         }
+
+        vorbis_float_cache.ret(ampstack);
     }
 
     // bleaugh, this is more complicated than it needs to be
@@ -1349,11 +1351,11 @@ class vorbis_look_psy {
         // float *XX=alloca(n*sizeof(*N));
         // float *Y=alloca(n*sizeof(*N));
         // float *XY=alloca(n*sizeof(*N));
-        float[] N = new float[n];
-        float[] X = new float[n];
-        float[] XX = new float[n];
-        float[] Y = new float[n];
-        float[] XY = new float[n];
+        float[] N = vorbis_float_cache.get(n);
+        float[] X = vorbis_float_cache.get(n);
+        float[] XX = vorbis_float_cache.get(n);
+        float[] Y = vorbis_float_cache.get(n);
+        float[] XY = vorbis_float_cache.get(n);
 
         float tN, tX, tXX, tY, tXY;
         int i;
@@ -1459,8 +1461,10 @@ class vorbis_look_psy {
             noise[i] = R - offset;
         }
 
-        if (fixed <= 0)
+        if (fixed <= 0) {
+            vorbis_float_cache.ret(N, X, XX, Y, XY);
             return;
+        }
 
         for (i = 0, x = 0.f; ; i++, x += 1.f) {
 
@@ -1511,6 +1515,8 @@ class vorbis_look_psy {
             if (R - offset < noise[i])
                 noise[i] = R - offset;
         }
+
+        vorbis_float_cache.ret(N, X, XX, Y, XY);
     }
 
     public void _vp_noisemask(float[] logmdct, int offset, float[] logmask) {
@@ -1518,7 +1524,7 @@ class vorbis_look_psy {
         int i;
 
         // float *work=alloca(n*sizeof(*work));
-        float[] work = new float[n];
+        float[] work = vorbis_float_cache.get(n);
 
         bark_noise_hybridmp(n, bark, logmdct, offset, logmask, 140.f, -1);
 
@@ -1531,13 +1537,15 @@ class vorbis_look_psy {
             work[i] = logmdct[offset + i] - work[i];
 
         for (i = 0; i < n; i++) {
-            int dB = new Float(logmask[i] + .5f).intValue();
+            int dB = (int) (logmask[i] + .5f);
             if (dB >= NOISE_COMPAND_LEVELS)
                 dB = NOISE_COMPAND_LEVELS - 1;
             if (dB < 0)
                 dB = 0;
             logmask[i] = work[i] + vi.noisecompand[dB];
         }
+
+        vorbis_float_cache.ret(work);
     }
 
     public void _vp_tonemask(float[] logfft, float[] logmask, float global_specmax, float local_specmax) {
@@ -1545,7 +1553,7 @@ class vorbis_look_psy {
         int i;
 
         // float *seed=alloca(sizeof(*seed)*p->total_octave_lines);
-        float[] seed = new float[total_octave_lines];
+        float[] seed = vorbis_float_cache.get(total_octave_lines);
 
         float att = local_specmax + vi.ath_adjatt;
         for (i = 0; i < total_octave_lines; i++)
@@ -1562,6 +1570,7 @@ class vorbis_look_psy {
 
         seed_loop(tonecurves, logfft, logmask, seed, global_specmax);
         max_seeds(seed, logmask);
+        vorbis_float_cache.ret(seed);
     }
 
     public void _vp_offset_and_mix(float[] noise, float[] tone, int offset_select, float[] logmask, float[] mdct, int logmdct) {

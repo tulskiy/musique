@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010 Denis Tulskiy
+ * Copyright (c) 2008-2013 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -25,10 +25,9 @@ import org.xiph.libogg.ogg_stream_state;
 import org.xiph.libvorbis.*;
 
 import javax.sound.sampled.AudioFormat;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Based on sample VorbisEncoder from vorbis-java
@@ -37,6 +36,8 @@ import java.util.logging.Level;
  * Date: Jul 26, 2010
  */
 public class VorbisEncoder implements Encoder {
+    private Logger logger = Logger.getLogger(getClass().getName());
+
     private ogg_stream_state os;    // take physical pages, weld into a logical stream of packets
 
     private ogg_page og;    // one Ogg bitstream page.  Vorbis packets are inside
@@ -44,7 +45,7 @@ public class VorbisEncoder implements Encoder {
 
     private vorbis_dsp_state vd;    // central working state for the packet->PCM decoder
     private vorbis_block vb;    // local working space for packet->PCM decode
-    private FileOutputStream output;
+    private OutputStream output;
     private static final float DEFAULT_BITRATE = 0.3f;
 
     @Override
@@ -91,7 +92,7 @@ public class VorbisEncoder implements Encoder {
         op = new ogg_packet();
 
         try {
-            output = new FileOutputStream(outputFile);
+            output = new BufferedOutputStream(new FileOutputStream(outputFile), (int) Math.pow(2, 16));
 
             if (!os.ogg_stream_flush(og))
                 return false;
@@ -99,7 +100,8 @@ public class VorbisEncoder implements Encoder {
             output.write(og.header, 0, og.header_len);
             output.write(og.body, 0, og.body_len);
             return true;
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Could not write initial header data", e);
         }
 
         return false;
@@ -168,8 +170,10 @@ public class VorbisEncoder implements Encoder {
                 vd.vorbis_analysis_wrote(0);
                 analyze();
             }
-            if (output != null)
+            if (output != null) {
+                output.flush();
                 output.close();
+            }
         } catch (Exception ignored) {
         }
     }

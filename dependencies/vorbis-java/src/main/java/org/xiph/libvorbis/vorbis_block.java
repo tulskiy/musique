@@ -10,7 +10,7 @@
 
 package org.xiph.libvorbis;
 
-import org.xiph.libogg.*;
+import org.xiph.libogg.ogg_packet;
 
 import static org.xiph.libvorbis.vorbis_constants.integer_constants.*;
 
@@ -386,7 +386,7 @@ public class vorbis_block {
 
         // weight toward the actually used frequencies if we meet the threshhold
 
-        int weight = new Float(nb * info.twofitweight / (na + 1)).intValue();
+        int weight = (int) (nb * info.twofitweight / (na + 1));
 
         a.xa = xa * weight + xb;
         a.ya = ya * weight + yb;
@@ -727,33 +727,33 @@ public class vorbis_block {
         return (output);
     }
 
-    static float dipole_hypot(float a, float b) {
+    static double dipole_hypot(float a, float b) {
 
         if (a > 0.) {
-            if (b > 0.) return new Double(Math.sqrt(a * a + b * b)).floatValue();
-            if (a > -b) return new Double(Math.sqrt(a * a - b * b)).floatValue();
-            return new Double(-Math.sqrt(b * b - a * a)).floatValue();
+            if (b > 0.) return Math.sqrt(a * a + b * b);
+            if (a > -b) return Math.sqrt(a * a - b * b);
+            return -Math.sqrt(b * b - a * a);
         }
 
-        if (b < 0.) return new Double(-Math.sqrt(a * a + b * b)).floatValue();
-        if (-a > b) return new Double(-Math.sqrt(a * a - b * b)).floatValue();
+        if (b < 0.) return -Math.sqrt(a * a + b * b);
+        if (-a > b) return -Math.sqrt(a * a - b * b);
 
-        return new Double(Math.sqrt(b * b - a * a)).floatValue();
+        return Math.sqrt(b * b - a * a);
     }
 
-    static float round_hypot(float a, float b) {
+    static double round_hypot(float a, float b) {
 
         if (a > 0.) {
-            if (b > 0.) return new Double(Math.sqrt(a * a + b * b)).floatValue();
-            if (a > -b) return new Double(Math.sqrt(a * a + b * b)).floatValue();
-            return new Double(-Math.sqrt(b * b + a * a)).floatValue();
+            if (b > 0.) return  Math.sqrt(a * a + b * b);
+            if (a > -b) return  Math.sqrt(a * a + b * b);
+            return  -Math.sqrt(b * b + a * a);
         }
 
-        if (b < 0.) return new Double(-Math.sqrt(a * a + b * b)).floatValue();
+        if (b < 0.) return -Math.sqrt(a * a + b * b);
 
-        if (-a > b) return new Double(-Math.sqrt(a * a + b * b)).floatValue();
+        if (-a > b) return -Math.sqrt(a * a + b * b);
 
-        return new Double(Math.sqrt(b * b + a * a)).floatValue();
+        return Math.sqrt(b * b + a * a);
     }
 
     private float[][] _vp_quantize_couple_memo(vorbis_info_psy_global g, vorbis_look_psy p, vorbis_info_mapping0 vi, float[][] mdct) {
@@ -771,9 +771,9 @@ public class vorbis_block {
             float[] mdctA = mdct[vi.coupling_ang[i]];
             // ret[i] = _vorbis_block_alloc(vb,n*sizeof(**ret));
             for (j = 0; j < limit; j++)
-                ret[i][j] = dipole_hypot(mdctM[j], mdctA[j]);
+                ret[i][j] = (float) dipole_hypot(mdctM[j], mdctA[j]);
             for (; j < n; j++)
-                ret[i][j] = round_hypot(mdctM[j], mdctA[j]);
+                ret[i][j] = (float) round_hypot(mdctM[j], mdctA[j]);
         }
 
         return ret;
@@ -1159,7 +1159,11 @@ public class vorbis_block {
             in[out + j] = (float) Math.rint(in[j]);
     }
 
-    static float[] couple_lossless(float A, float B, float qA, float qB) {
+    static void couple_lossless(float[] rM, float[] rA, int l, int qM) {
+        float A = rM[l];
+        float B = rA[l];
+        float qA = rM[qM + l];
+        float qB = rA[qM + l];
 
         int test1 = ((Math.abs(qA) > Math.abs(qB)) ? 1 : 0);
         test1 -= ((Math.abs(qA) < Math.abs(qB)) ? 1 : 0);
@@ -1168,20 +1172,17 @@ public class vorbis_block {
             test1 = ((((Math.abs(A) > Math.abs(B))) ? 1 : 0) << 1) - 1;
 
         if (test1 == 1) {
-            qB = (qA > 0.f ? qA - qB : qB - qA);
+            qB = rA[qM + l] = (qA > 0.f ? qA - qB : qB - qA);
         } else {
             float temp = qB;
-            qB = (qB > 0.f ? qA - qB : qB - qA);
-            qA = temp;
+            qB = rA[qM + l] = (qB > 0.f ? qA - qB : qB - qA);
+            qA = rM[qM + l] = temp;
         }
 
         if (qB > Math.abs(qA) * 1.9999f) {
-            qB = -Math.abs(qA) * 2.f;
-            qA = -qA;
+            rA[qM + l] = -Math.abs(qA) * 2.f;
+            rM[qM + l] = -qA;
         }
-
-        float[] ret = {qA, qB};
-        return ret;
     }
 
     static float[] hypot_lookup = { // [32]
@@ -1272,9 +1273,7 @@ public class vorbis_block {
                                     acc += rM[qM + l] * rM[qM + l];
 
                             } else {
-                                float[] return_buffer = couple_lossless(rM[l], rA[l], rM[qM + l], rA[qA + l]);
-                                rM[qM + l] = return_buffer[0];
-                                rA[qA + l] = return_buffer[1];
+                                couple_lossless(rM, rA, l, qM);
                             }
                         } else {
                             rM[qM + l] = 0.f;

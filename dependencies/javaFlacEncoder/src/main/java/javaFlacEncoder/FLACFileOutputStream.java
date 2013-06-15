@@ -18,8 +18,9 @@
  */
 
 package javaFlacEncoder;
-import java.io.FileOutputStream;
+
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 /**
@@ -49,9 +50,7 @@ public class FLACFileOutputStream implements FLACOutputStream{
         }
         catch(FileNotFoundException e) {
             System.err.println("Error creating file");
-            valid = false;
-        }catch(IOException e) {
-            System.err.println("Error handling file");
+            e.printStackTrace();
             valid = false;
         }
     }

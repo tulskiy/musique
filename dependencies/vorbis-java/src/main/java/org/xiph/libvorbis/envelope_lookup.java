@@ -146,7 +146,7 @@ class envelope_lookup {
 
         float minV = minenergy;
         // float *vec=alloca(n*sizeof(*vec));
-        float[] vec = new float[n];
+        float[] vec = vorbis_float_cache.get(n);
 
         /* stretch is used to gradually lengthen the number of windows
            * considered prevoius-to-potential-trigger */
@@ -259,7 +259,7 @@ class envelope_lookup {
             if (valmin < gi.postecho_thresh[j] - penalty)
                 ret |= 2;
         }
-
+        vorbis_float_cache.ret(vec);
         return ret;
     }
 
