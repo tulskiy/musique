@@ -35,8 +35,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -68,6 +68,22 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>ideauidesigner-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>javac2</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <fork>true</fork>
+                    <debug>true</debug>
+                    <failOnError>true</failOnError>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -156,16 +172,14 @@
             <version>0.1</version>
         </dependency>
         <dependency>
-            <groupId>com.tulskiy</groupId>
+            <groupId>com.github.tulskiy</groupId>
             <artifactId>jkeymaster</artifactId>
-            <version>1.0</version>
+            <version>1.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.intellij</groupId>
+            <artifactId>forms_rt</artifactId>
+            <version>7.0.3</version>
         </dependency>
     </dependencies>
-
-    <repositories>
-        <repository>
-            <id>tulskiy/jkeymaster</id>
-            <url>http://tulskiy.github.com/jkeymaster/maven/</url>
-        </repository>
-    </repositories>
 </project>
