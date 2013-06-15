@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
+ * Copyright (c) 2008-2013 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -105,6 +105,7 @@ public class PlayingThread extends Actor implements Runnable {
                     output.start();
                     player.fireEvent(PlayerEventCode.PLAYING_STARTED);
                     out : while (active) {
+                        long time = System.currentTimeMillis();
                         int len = buffer.read(buf, 0, BUFFER_SIZE);
                         while (len == -1) {
                             if (!openNext()) {
@@ -116,6 +117,11 @@ public class PlayingThread extends Actor implements Runnable {
                         currentByte += len;
                         playbackBytes += len;
                         output.write(buf, 0, len);
+                        long timeToWrite = System.currentTimeMillis() - time;
+                        double timeToPlay = AudioMath.bytesToMillis(len, format);
+                        if (timeToWrite / timeToPlay > 1.3) {
+                            logger.warning("time to play " + timeToPlay + " vs. time to write " + timeToWrite);
+                        }
                     }
                 } catch (Exception e) {
                     logger.log(Level.WARNING, "Exception while playing. Stopping now", e);

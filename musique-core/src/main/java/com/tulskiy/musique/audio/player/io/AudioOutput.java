@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
+ * Copyright (c) 2008-2013 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * Date: Jul 25, 2010
  */
 public class AudioOutput {
-    public static final int BUFFER_SIZE = (int) (Math.pow(2, 15) / 24) * 24;
+    public static final int BUFFER_SIZE = (int) (Math.pow(2, 17) / 24) * 24;
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     private SourceDataLine line;
