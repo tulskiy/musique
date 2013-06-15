@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
+ * Copyright (c) 2008-2013 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -56,11 +56,9 @@ public class MainWindow extends JFrame {
         ControlPanel controlPanel = new ControlPanel();
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
-        LyricsPanel lyricsPanel = new LyricsPanel();
         LibraryView libraryView = new LibraryView();
-        JTabbedPane topLeftSide = new JTabbedPane();
-        topLeftSide.add("Library", libraryView);
-        topLeftSide.add("Lyrics", lyricsPanel);
+        JPanel topLeftSide = new JPanel(new BorderLayout());
+        topLeftSide.add(libraryView);
         topLeftSide.setFocusable(false);
         side = new JSplitPane(JSplitPane.VERTICAL_SPLIT, topLeftSide, new AlbumArtPanel());
         side.setDividerSize(6);

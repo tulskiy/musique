@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
+ * Copyright (c) 2008-2013 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -44,7 +44,6 @@ import java.net.PasswordAuthentication;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.util.logging.*;
-import java.util.logging.Formatter;
 
 public class Application {
     private static Application ourInstance = new Application();
@@ -191,13 +190,7 @@ public class Application {
         UIManager.put("Slider.paintValue", Boolean.FALSE);
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
         UIManager.put("swing.boldMetal", Boolean.FALSE);
-        Object thumbWidth = configuration.get("gui.thumbWidth");
-        if (thumbWidth != null) {
-            try {
-                UIManager.put("Slider.thumbWidth", Integer.valueOf(thumbWidth.toString()));
-            } catch (NumberFormatException ignored) {
-            }
-        }
+        UIManager.put("Slider.thumbWidth", 17);
 
         Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
         AudioFileReader.setDefaultCharset(charset);
