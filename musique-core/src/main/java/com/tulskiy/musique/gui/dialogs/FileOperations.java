@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import com.tulskiy.musique.gui.components.GroupTable;
 import com.tulskiy.musique.playlist.Playlist;
 import com.tulskiy.musique.playlist.Track;

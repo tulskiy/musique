@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui.dialogs;
 
-import com.sun.java.swing.Painter;
+import javax.swing.Painter;
 import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.util.Util;
 

@@ -17,7 +17,7 @@
 
 package com.tulskiy.musique.gui.library;
 
-import com.sun.java.swing.Painter;
+import javax.swing.Painter;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.library.MappedTreeNode;
 import com.tulskiy.musique.library.TrackNode;
