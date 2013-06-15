@@ -11,5 +11,5 @@ cd "$MUSIQUE_HOME"
 if [ -z "$JAVA_PATH" ]; then
     JAVA_PATH="java"
 fi
-JVM_ARGS=$(tr '\n' ' ' < musique.vmoptions)
+JVM_ARGS=$(tr '[:space:]' ' ' < musique.vmoptions)
 exec $DSP $JAVA_PATH $JVM_ARGS -jar ../${project.build.finalName}.jar
