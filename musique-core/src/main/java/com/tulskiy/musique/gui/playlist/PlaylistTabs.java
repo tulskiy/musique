@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008, 2009, 2010, 2011 Denis Tulskiy
+ * Copyright (c) 2008-2013 Denis Tulskiy
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -8,11 +8,11 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public License
- * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>.
+ * version 3 along with this work.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package com.tulskiy.musique.gui.playlist;
@@ -25,6 +25,7 @@ import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.system.Application;
 import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
+import org.apache.commons.lang.StringUtils;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -424,7 +425,7 @@ public class PlaylistTabs extends JPanel {
     }
 
     private String center(String name) {
-        return Util.center(name, 7, 10);
+        return StringUtils.center(name, 10);
     }
 
     public ActionMap getActions() {
