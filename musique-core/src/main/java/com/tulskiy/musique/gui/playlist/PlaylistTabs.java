@@ -65,16 +65,12 @@ public class PlaylistTabs extends JPanel {
     public PlaylistTabs(ArrayList<PlaylistColumn> columns) {
         this.columns = columns;
         setLayout(new BorderLayout());
-        tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane(SwingConstants.TOP, JTabbedPane.SCROLL_TAB_LAYOUT);
         add(tabbedPane);
         tabsVisible = true;
 
         tabbedPane.setFocusable(false);
-        if (Util.isGTKLaF()) {
-            tabbedPane.setPreferredSize(new Dimension(10000, 30));
-        } else {
-            tabbedPane.setPreferredSize(new Dimension(10000, 25));
-        }
+        tabbedPane.setPreferredSize(new Dimension(10000, 25));
 
         buildListeners();
         createActions();
