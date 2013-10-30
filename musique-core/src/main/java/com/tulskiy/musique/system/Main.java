@@ -17,12 +17,9 @@
 
 package com.tulskiy.musique.system;
 
-import java.io.IOException;
-import java.util.logging.LogManager;
-
 /**
- * @Author: Denis Tulskiy
- * @Date: Jan 10, 2010
+ * Author: Denis Tulskiy
+ * Date: Jan 10, 2010
  */
 public class Main {
     public static void main(String[] args) {

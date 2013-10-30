@@ -33,7 +33,7 @@ import static com.tulskiy.musique.audio.player.Actor.Message;
  */
 public class Player {
     public final Logger logger = Logger.getLogger(getClass().getName());
-    private static final int BUFFER_SIZE = (int) Math.pow(2, 18);
+    private static final int BUFFER_SIZE = (int) Math.pow(2, 19);
 
     private PlayingThread playingThread;
     private BufferingThread bufferingThread;
