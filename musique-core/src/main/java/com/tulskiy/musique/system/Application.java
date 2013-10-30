@@ -36,9 +36,11 @@ import javax.sound.sampled.Mixer;
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalFileChooserUI;
 import javax.swing.plaf.metal.MetalIconFactory;
+import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.*;
+import java.lang.reflect.Field;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.nio.channels.FileChannel;
@@ -100,6 +102,13 @@ public class Application {
     }
 
     public void load() {
+        try {
+            Toolkit xToolkit = Toolkit.getDefaultToolkit();
+            Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
+            awtAppClassNameField.setAccessible(true);
+            awtAppClassNameField.set(xToolkit, "Musique");
+        } catch (Exception ignored) {}
+
         configuration = new Configuration();
         try {
             configuration.load(new FileReader(configFile));
