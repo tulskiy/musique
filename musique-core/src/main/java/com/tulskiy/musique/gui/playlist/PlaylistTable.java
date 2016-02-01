@@ -360,22 +360,22 @@ public class PlaylistTable extends GroupTable {
     public void updateUI() {
         super.updateUI();
 
-        Color text = config.getColor("gui.color.text", null);
+        Color text = config.getColor("gui.color.text", new Color(231, 231, 231));
         if (text != null) {
             setForeground(text);
         }
 
-        Color background = config.getColor("gui.color.background", null);
+        Color background = config.getColor("gui.color.background", new Color(51, 51, 51));
         if (background != null) {
             setBackground(background);
         }
 
-        Color selection = config.getColor("gui.color.selection", null);
+        Color selection = config.getColor("gui.color.selection", new Color(138, 51, 51));
         if (selection != null) {
             setSelectionBackground(selection);
         }
 
-        Color highlight = config.getColor("gui.color.highlight", null);
+        Color highlight = config.getColor("gui.color.highlight", new Color(138, 138, 138));
         if (highlight != null) {
             setSeparatorColor(highlight);
         }
