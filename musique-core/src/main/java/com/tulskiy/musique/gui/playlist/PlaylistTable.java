@@ -375,7 +375,7 @@ public class PlaylistTable extends GroupTable {
             setSelectionBackground(selection);
         }
 
-        Color highlight = config.getColor("gui.color.highlight", new Color(138, 138, 138));
+        Color highlight = config.getColor("gui.color.highlight", new Color(173, 173, 173));
         if (highlight != null) {
             setSeparatorColor(highlight);
         }
