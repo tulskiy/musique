@@ -21,11 +21,13 @@
  */
 package com.tulskiy.musique.system;
 
+import com.bulenkov.darcula.DarculaLaf;
 import com.tulskiy.musique.audio.AudioFileReader;
 import com.tulskiy.musique.audio.Scrobbler;
 import com.tulskiy.musique.audio.player.Player;
 import com.tulskiy.musique.audio.player.io.AudioOutput;
 import com.tulskiy.musique.gui.MainWindow;
+import com.tulskiy.musique.images.Images;
 import com.tulskiy.musique.playlist.PlaybackOrder;
 import com.tulskiy.musique.playlist.PlaylistManager;
 import com.tulskiy.musique.spi.PluginLoader;
@@ -36,6 +38,8 @@ import javax.sound.sampled.Mixer;
 import javax.swing.*;
 import javax.swing.plaf.metal.MetalFileChooserUI;
 import javax.swing.plaf.metal.MetalIconFactory;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import javax.swing.plaf.metal.OceanTheme;
 import java.awt.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -102,6 +106,8 @@ public class Application {
     }
 
     public void load() {
+        UIManager.installLookAndFeel("Darcula", DarculaLaf.class.getName());
+
         try {
             Toolkit xToolkit = Toolkit.getDefaultToolkit();
             Field awtAppClassNameField = xToolkit.getClass().getDeclaredField("awtAppClassName");
@@ -197,16 +203,16 @@ public class Application {
             }
         });
         UIManager.put("Slider.paintValue", Boolean.FALSE);
+        UIManager.put("Slider.thumbWidth", 17);
         UIManager.put("FileChooser.readOnly", Boolean.TRUE);
         UIManager.put("swing.boldMetal", Boolean.FALSE);
-        UIManager.put("Slider.thumbWidth", 17);
 
         Charset charset = Charset.forName(configuration.getString("tag.defaultEncoding", "windows-1251"));
         AudioFileReader.setDefaultCharset(charset);
         try {
-            String laf = configuration.getString("gui.LAF", "");
+            String laf = configuration.getString("gui.LAF", "com.bulenkov.darcula.DarculaLaf");
             if (laf.isEmpty()) {
-                laf = "com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel";
+                laf = UIManager.getSystemLookAndFeelClassName();
             }
             UIManager.setLookAndFeel(laf);
         } catch (Exception e) {
@@ -226,6 +232,12 @@ public class Application {
                     UIManager.put("FileChooser.listViewIcon", MetalIconFactory.getFileChooserListViewIcon());
                 } else {
                     UIManager.put("FileChooserUI", null);
+                }
+                if (laf.contains("Metal")) {
+                    MetalLookAndFeel.setCurrentTheme(new OceanTheme());
+                    UIManager.put("Slider.horizontalThumbIcon", Images.loadIcon("scale-slider-horizontal.png"));
+                } else if (laf.contains("Darcula")) {
+                    UIManager.put("Slider.horizontalThumbIcon", Images.loadIcon("scale-slider-horizontal-dark.png"));
                 }
 //                Font defaultFont = new Font("Sans Serif", 0, 11);
 //                UIManager.put("defaultFont", defaultFont);

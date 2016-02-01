@@ -277,10 +277,10 @@ public class OptionsDialog extends JDialog {
                 if (index != -1) {
                     try {
                         String laf = lafs[index].getClassName();
+                        config.setString("gui.LAF", laf);
                         UIManager.setLookAndFeel(laf);
                         SwingUtilities.updateComponentTreeUI(SwingUtilities.getRoot(owner));
                         SwingUtilities.updateComponentTreeUI(comp);
-                        config.setString("gui.LAF", laf);
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }

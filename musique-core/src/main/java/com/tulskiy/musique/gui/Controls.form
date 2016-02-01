@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.tulskiy.musique.gui.Controls">
+  <grid id="27dc6" binding="panel" custom-create="true" layout-manager="GridLayoutManager" row-count="1" column-count="7" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="719" height="46"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="7fb25" class="javax.swing.JSlider" binding="volume">
+        <constraints>
+          <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="120" height="-1"/>
+          </grid>
+        </constraints>
+        <properties>
+          <enabled value="true"/>
+          <focusable value="false"/>
+          <value value="100"/>
+          <valueIsAdjusting value="true"/>
+        </properties>
+      </component>
+      <component id="1173" class="javax.swing.JSlider" binding="progress">
+        <constraints>
+          <grid row="0" column="3" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="70a91" class="javax.swing.JComboBox" binding="mode">
+        <constraints>
+          <grid row="0" column="5" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+      </component>
+      <component id="67165" class="javax.swing.JLabel" binding="time">
+        <constraints>
+          <grid row="0" column="4" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <text value=""/>
+        </properties>
+      </component>
+      <hspacer id="afa7b">
+        <constraints>
+          <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="1" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="5" height="-1"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <hspacer id="63bc3">
+        <constraints>
+          <grid row="0" column="6" row-span="1" col-span="1" vsize-policy="1" hsize-policy="0" anchor="0" fill="1" indent="0" use-parent-layout="false">
+            <preferred-size width="10" height="-1"/>
+          </grid>
+        </constraints>
+      </hspacer>
+      <grid id="32d19" binding="buttons" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="7fe4d" class="javax.swing.JButton" binding="prev">
+            <constraints/>
+            <properties>
+              <borderPainted value="true"/>
+              <contentAreaFilled value="true"/>
+              <focusPainted value="true"/>
+              <focusable value="false"/>
+              <icon value="com/tulskiy/musique/images/prev.png"/>
+              <iconTextGap value="0"/>
+              <margin top="2" left="3" bottom="2" right="3"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <rolloverEnabled value="true"/>
+              <selected value="false"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="22c7" class="javax.swing.JButton" binding="playPause">
+            <constraints/>
+            <properties>
+              <borderPainted value="true"/>
+              <contentAreaFilled value="true"/>
+              <focusPainted value="true"/>
+              <focusable value="false"/>
+              <icon value="com/tulskiy/musique/images/play.png"/>
+              <iconTextGap value="0"/>
+              <margin top="2" left="3" bottom="2" right="3"/>
+              <maximumSize width="20" height="32"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <rolloverEnabled value="true"/>
+              <selected value="false"/>
+              <text value=""/>
+            </properties>
+          </component>
+          <component id="64f8" class="javax.swing.JButton" binding="next">
+            <constraints/>
+            <properties>
+              <borderPainted value="true"/>
+              <contentAreaFilled value="true"/>
+              <focusPainted value="true"/>
+              <focusable value="false"/>
+              <icon value="com/tulskiy/musique/images/next.png"/>
+              <margin top="2" left="3" bottom="2" right="3"/>
+              <opaque value="false"/>
+              <requestFocusEnabled value="false"/>
+              <rolloverEnabled value="true"/>
+              <selected value="false"/>
+              <text value=""/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+    </children>
+  </grid>
+</form>

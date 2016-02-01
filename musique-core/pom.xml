@@ -41,20 +41,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <jarPath>${project.parent.relativePath}</jarPath>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.tulskiy.musique.system.Main</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
@@ -174,12 +160,19 @@
         <dependency>
             <groupId>com.github.tulskiy</groupId>
             <artifactId>jkeymaster</artifactId>
-            <version>1.1</version>
+            <version>1.2</version>
         </dependency>
         <dependency>
             <groupId>com.intellij</groupId>
             <artifactId>forms_rt</artifactId>
             <version>7.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>darcula</groupId>
+            <artifactId>darcula</artifactId>
+            <version>0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/darcula.jar</systemPath>
         </dependency>
     </dependencies>
 </project>

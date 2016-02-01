@@ -53,7 +53,7 @@ public class MainWindow extends JFrame {
 
     public MainWindow() {
         setIconImage(Images.loadImage("icon.png"));
-        ControlPanel controlPanel = new ControlPanel();
+        Controls controls = new Controls();
         StatusBar statusBar = new StatusBar();
         playlistPanel = new PlaylistPanel();
         LibraryView libraryView = new LibraryView();
@@ -70,7 +70,7 @@ public class MainWindow extends JFrame {
         side.setDividerLocation(sideBarSeparator);
         JMenuBar menuBar = new JMenuBar();
         setJMenuBar(menuBar);
-        add(controlPanel, BorderLayout.NORTH);
+        add(controls.getPanel(), BorderLayout.NORTH);
         add(statusBar, BorderLayout.SOUTH);
         add(center, BorderLayout.CENTER);
         playlistPanel.addMenu(menuBar);

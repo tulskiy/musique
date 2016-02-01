@@ -44,9 +44,6 @@ public class Images {
     }
 
     public static Icon getEmptyIcon() {
-        if (System.getProperty("java.runtime.name").contains("OpenJDK")) {
-            return new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
-        }
-        return null;
+        return new ImageIcon(new BufferedImage(10, 10, BufferedImage.TYPE_INT_ARGB));
     }
 }

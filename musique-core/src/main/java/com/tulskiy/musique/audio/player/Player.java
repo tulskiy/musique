@@ -54,16 +54,14 @@ public class Player {
     }
 
     public void play() {
-        if (!isPaused()) {
-            Track track = getTrack();
-            if (track == null) {
+        Track track = getTrack();
+        if (track == null) {
+            next();
+        } else {
+            if (getPlaybackOrder().trackPlayable(track))
+                bufferingThread.send(Message.OPEN, track);
+            else
                 next();
-            } else {
-                if (getPlaybackOrder().trackPlayable(track))
-                    bufferingThread.send(Message.OPEN, track);
-                else
-                    next();
-            }
         }
     }
 

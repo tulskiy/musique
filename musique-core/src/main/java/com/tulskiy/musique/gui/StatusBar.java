@@ -53,8 +53,8 @@ public class StatusBar extends JPanel {
 
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(10, 23));
-        setBackground(new Color(238, 238, 238));
-        setBorder(BorderFactory.createMatteBorder(2, 0, 0, 0, Color.lightGray));
+//        setBackground(new Color(238, 238, 238));
+        setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, Color.gray));
 
         Box box = new Box(BoxLayout.X_AXIS);
         box.add(info);
