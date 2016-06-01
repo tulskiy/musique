@@ -17,6 +17,8 @@
 
 package com.tulskiy.musique.gui.components;
 
+import com.tulskiy.musique.system.Application;
+import com.tulskiy.musique.system.Configuration;
 import com.tulskiy.musique.util.Util;
 
 import javax.swing.*;
@@ -47,6 +49,10 @@ public class GroupTable extends JTable {
     private final Font defaultFont = getFont();
 
     private boolean trackSelection = true;
+
+    private static Application app = Application.getInstance();
+    private static Configuration config = app.getConfiguration();
+
 
     public GroupTable() {
         setDefaultRenderer(Object.class, new DefaultCellRenderer());
@@ -129,7 +135,6 @@ public class GroupTable extends JTable {
     private void initUI() {
         setUI(new GroupTableUI());
 
-        setBackground(Color.white);
         setIntercellSpacing(new Dimension(0, 0));
         setFocusable(true);
         setDragEnabled(true);
@@ -138,10 +143,31 @@ public class GroupTable extends JTable {
         setRowSelectionAllowed(true);
         setShowGrid(false);
         setOpaque(true);
-        setFont(getFont());
-        setForeground(getForeground());
-        setSelectionBackground(getSelectionBackground());
-        setSeparatorColor(getForeground());
+
+        Color text = config.getColor("gui.color.text", new Color(231, 231, 231));
+        if (text != null) {
+            setForeground(text);
+        }
+
+        Color background = config.getColor("gui.color.background", new Color(51, 51, 51));
+        if (background != null) {
+            setBackground(background);
+        }
+
+        Color selection = config.getColor("gui.color.selection", new Color(138, 51, 51));
+        if (selection != null) {
+            setSelectionBackground(selection);
+        }
+
+        Color highlight = config.getColor("gui.color.highlight", new Color(173, 173, 173));
+        if (highlight != null) {
+            setSeparatorColor(highlight);
+        }
+
+        Font defaultFont = config.getFont("gui.font.default", null);
+        if (defaultFont != null) {
+            setFont(defaultFont);
+        }
 
         //fix dropLine colors, I hate Nimbus
         Color droplineColor = UIManager.getColor("Table.dropLineShortColor");

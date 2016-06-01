@@ -112,7 +112,7 @@ public class AlbumArtPanel extends JPanel {
                                 continue;
                             image = cache.get(file);
                             if (image == null) {
-                                if (file.length() > 102400) //100 Kb
+                                if (file.length() / 1024 / 1024 > 1) //1Mb
                                     continue;
                                 logger.fine("Loading Album Art from file: " + file);
                                 final ImageIcon newImage = new ImageIcon(file.getAbsolutePath());
