@@ -103,7 +103,7 @@ public class TrackData implements Cloneable {
     public TrackData copy() {
         try {
         	TrackData copy = (TrackData) this.clone();
-        	copy.tagFields = new EnumMap<FieldKey, FieldValues>(copy.tagFields);
+        	copy.tagFields = new HashMap<FieldKey, FieldValues>(copy.tagFields);
             return copy;
         } catch (CloneNotSupportedException ignored) {
             return null;
