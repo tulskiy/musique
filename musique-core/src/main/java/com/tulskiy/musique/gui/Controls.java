@@ -239,10 +239,10 @@ public class Controls {
         });
         playPause.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                if (player.isPlaying())
-                    player.pause();
-                else
+                if (player.getTrack() == null)
                     player.play();
+                else
+                    player.pause();
             }
         });
         next.addActionListener(new ActionListener() {

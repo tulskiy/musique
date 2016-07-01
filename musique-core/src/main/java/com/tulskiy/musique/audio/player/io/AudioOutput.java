@@ -25,7 +25,7 @@ import java.util.logging.Logger;
  * Date: Jul 25, 2010
  */
 public class AudioOutput {
-    public static final int BUFFER_SIZE = (int) (Math.pow(2, 17) / 24) * 24;
+    public static final int BUFFER_SIZE = (int) (Math.pow(2, 16) / 24) * 24;
     private final Logger logger = Logger.getLogger(getClass().getName());
 
     private SourceDataLine line;
